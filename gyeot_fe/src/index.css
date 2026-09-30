@@ -1,0 +1,17 @@
+/* 전역 스타일 관리 (기본 폰트, 컬러 등) */
+:root {
+}
+
+body {
+  margin: 0;
+}
+
+/* 다크모드 스타일 */
+@media (prefers-color-scheme: dark) {
+  :root {
+  }
+
+  #social .button-icon {
+    filter: invert(1) brightness(2);
+  }
+}
