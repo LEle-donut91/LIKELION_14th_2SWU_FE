@@ -38,33 +38,6 @@
   --font-gothic: "KimjungchulGothic";
   --font-myungjo: "KimjungchulMyungjo";
 
-  /* =======================================================
-   * [Typography System 변수] - 폰트 굵기, 크기, 줄간격, 자간
-   * ======================================================= */
-
-  /* 1) Display (Kim jung chul Myungjo) */
-  --typo-display-medium: 700 24px/34px var(--font-myungjo);
-  --typo-display-medium-ls: -0.2px;
-
-  --typo-display-small: 400 17px/26px var(--font-myungjo);
-  --typo-display-small-ls: -0.4px;
-
-  /* 2) Title / Body / Caption (Kim jung chul Gothic) */
-  --typo-title-medium: 700 22px/32px var(--font-gothic);
-  --typo-title-medium-ls: -0.2px;
-
-  --typo-body-strong: 700 17px/26px var(--font-gothic);
-  --typo-body-strong-ls: -0.2px;
-
-  --typo-body-medium: 400 17px/26px var(--font-gothic);
-  --typo-body-medium-ls: -0.4px;
-
-  --typo-body-small: 400 15px/22px var(--font-gothic);
-  --typo-body-small-ls: -0.5px;
-
-  --typo-caption-medium: 300 12px/16px var(--font-gothic);
-  --typo-caption-medium-ls: -0.5px;
-
   /* =========================================
    * [Color System 변수] - 색상만 설정
    * ========================================= */
@@ -112,6 +85,68 @@
   --color-opacity-100: #2424221a;
   --color-opacity-200: #24242233;
   --color-opacity-400: #24242266;
+}
+
+/* =======================================================
+ * [Typography System Classes] - 폰트 굵기, 크기, 줄간격, 자간
+ * ======================================================= */
+
+/* 1) Display (Kim jung chul Myungjo) */
+.typoDisplayMedium {
+  font-family: var(--font-myungjo);
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 34px;
+  letter-spacing: -0.2px;
+}
+
+.typoDisplaySmall {
+  font-family: var(--font-myungjo);
+  font-weight: 400;
+  font-size: 17px;
+  line-height: 26px;
+  letter-spacing: -0.4px;
+}
+
+/* 2) Title / Body / Caption (Kim jung chul Gothic) */
+.typoTitleMedium {
+  font-family: var(--font-gothic);
+  font-weight: 700;
+  font-size: 22px;
+  line-height: 32px;
+  letter-spacing: -0.2px;
+}
+
+.typoBodyStrong {
+  font-family: var(--font-gothic);
+  font-weight: 700;
+  font-size: 17px;
+  line-height: 26px;
+  letter-spacing: -0.2px;
+}
+
+.typoBodyMedium {
+  font-family: var(--font-gothic);
+  font-weight: 400;
+  font-size: 17px;
+  line-height: 26px;
+  letter-spacing: -0.4px;
+}
+
+.typoBodySmall {
+  font-family: var(--font-gothic);
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 22px;
+  letter-spacing: -0.5px;
+}
+
+.typoCaptionMedium {
+  font-family: var(--font-gothic);
+  font-weight: 300;
+  font-size: 12px;
+  line-height: 16px;
+  letter-spacing: -0.5px;
 }
 
 /* 전체 화면 (모바일 프레임의 바깥쪽 영역 포함) 스타일 설정 */

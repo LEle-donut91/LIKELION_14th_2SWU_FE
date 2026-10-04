@@ -10,25 +10,25 @@ function Test() {
       <hr />
 
       {/* 2. Typography System */}
-      <p className={styles.typoDisplayMedium}>
+      <p className="typoDisplayMedium">
         함께, 곁에. / Be:side / 0123 / ~@!?-#&’” (Display / medium)
       </p>
-      <p className={styles.typoDisplaySmall}>
+      <p className="typoDisplaySmall">
         함께, 곁에. / Be:side / 0123 / ~@!?-#&’” (Display / small)
       </p>
-      <p className={styles.typoTitleMedium}>
+      <p className="typoTitleMedium">
         함께, 곁에. / Be:side / 0123 / ~@!?-#&’” (Title / medium)
       </p>
-      <p className={styles.typoBodyStrong}>
+      <p className="typoBodyStrong">
         함께, 곁에. / Be:side / 0123 / ~@!?-#&’” (Body / strong)
       </p>
-      <p className={styles.typoBodyMedium}>
+      <p className="typoBodyMedium">
         함께, 곁에. / Be:side / 0123 / ~@!?-#&’” (Body / medium)
       </p>
-      <p className={styles.typoBodySmall}>
+      <p className="typoBodySmall">
         함께, 곁에. / Be:side / 0123 / ~@!?-#&’” (Body / small)
       </p>
-      <p className={styles.typoCaptionMedium}>
+      <p className="typoCaptionMedium">
         함께, 곁에. / Be:side / 0123 / ~@!?-#&’” (Caption / medium)
       </p>
 

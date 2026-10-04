@@ -7,43 +7,7 @@
   font-family: var(--font-myungjo);
 }
 
-/* 2. Typography System */
-.typoDisplayMedium {
-  font: var(--typo-display-medium);
-  letter-spacing: var(--typo-display-medium-ls);
-}
-
-.typoDisplaySmall {
-  font: var(--typo-display-small);
-  letter-spacing: var(--typo-display-small-ls);
-}
-
-.typoTitleMedium {
-  font: var(--typo-title-medium);
-  letter-spacing: var(--typo-title-medium-ls);
-}
-
-.typoBodyStrong {
-  font: var(--typo-body-strong);
-  letter-spacing: var(--typo-body-strong-ls);
-}
-
-.typoBodyMedium {
-  font: var(--typo-body-medium);
-  letter-spacing: var(--typo-body-medium-ls);
-}
-
-.typoBodySmall {
-  font: var(--typo-body-small);
-  letter-spacing: var(--typo-body-small-ls);
-}
-
-.typoCaptionMedium {
-  font: var(--typo-caption-medium);
-  letter-spacing: var(--typo-caption-medium-ls);
-}
-
-/* 3. Color System Boxes (32개 개별 정의) */
+/* 2. Color System Boxes */
 .colorBase000Box {
   width: 60px;
   height: 60px;
