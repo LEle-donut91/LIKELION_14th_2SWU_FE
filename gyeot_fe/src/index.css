@@ -114,16 +114,18 @@
   --color-opacity-400: #24242266;
 }
 
+/* 전체 화면 (모바일 프레임의 바깥쪽 영역 포함) 스타일 설정 */
 body {
   margin: 0;
+  background-color: var(--color-olive-100); /* 모바일 프레임 바깥쪽 배경색*/
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* 다크모드 스타일 */
-@media (prefers-color-scheme: dark) {
+/* @media (prefers-color-scheme: dark) {
   :root {
   }
-
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
-}
+} */

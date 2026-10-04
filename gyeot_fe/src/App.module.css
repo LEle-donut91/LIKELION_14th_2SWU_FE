@@ -1,1 +1,33 @@
-/* 최상위 레이아웃 스타일 관리 */
+/* 모바일 프레임 */
+.frame {
+  /* 너비는 기본적으로 402px로 지정 */
+  width: 402px;
+
+  /* 높이는 현재 스크린 높이를 꽉 채우도록 지정*/
+  height: 100vh;
+
+  box-sizing: border-box; /* 테두리 영역 포함 설정 */
+  overflow: hidden; /* 영역을 벗어나는 자식 요소 숨김 */
+
+  border-radius: 16px;
+  background-color: var(--color-base-000); /* 기본 배경색 설정 */
+  overflow-y: auto;
+}
+
+/* 스크롤바 전체 스타일 */
+.frame::-webkit-scrollbar {
+  width: 10px; /* 스크롤바 전체 너비 */
+}
+
+/* 스크롤바 막대 스타일 */
+.frame::-webkit-scrollbar-thumb {
+  background: var(--color-gray-300); /* 스크롤바 막대 색상 */
+  border-radius: 10px; /* 스크롤바 막대 둥근 테두리 */
+}
+
+/* 모바일 프레임 내부 app (실제 content) */
+.app {
+  /* 아이폰 17의 화면 비율 (402*874 px) 기준 */
+  width: 402px;
+  height: 874px;
+}
