@@ -1,0 +1,211 @@
+/* 1. Font Family */
+.fontGothic {
+  font-family: var(--font-gothic);
+}
+
+.fontMyungjo {
+  font-family: var(--font-myungjo);
+}
+
+/* 2. Typography System */
+.typoDisplayMedium {
+  font: var(--typo-display-medium);
+  letter-spacing: var(--typo-display-medium-ls);
+}
+
+.typoDisplaySmall {
+  font: var(--typo-display-small);
+  letter-spacing: var(--typo-display-small-ls);
+}
+
+.typoTitleMedium {
+  font: var(--typo-title-medium);
+  letter-spacing: var(--typo-title-medium-ls);
+}
+
+.typoBodyStrong {
+  font: var(--typo-body-strong);
+  letter-spacing: var(--typo-body-strong-ls);
+}
+
+.typoBodyMedium {
+  font: var(--typo-body-medium);
+  letter-spacing: var(--typo-body-medium-ls);
+}
+
+.typoBodySmall {
+  font: var(--typo-body-small);
+  letter-spacing: var(--typo-body-small-ls);
+}
+
+.typoCaptionMedium {
+  font: var(--typo-caption-medium);
+  letter-spacing: var(--typo-caption-medium-ls);
+}
+
+/* 3. Color System Boxes (32개 개별 정의) */
+.colorBase000Box {
+  width: 60px;
+  height: 60px;
+  background-color: var(--color-base-000);
+}
+.colorBase999Box {
+  width: 60px;
+  height: 60px;
+  background-color: var(--color-base-999);
+}
+
+.colorGray100Box {
+  width: 60px;
+  height: 60px;
+  background-color: var(--color-gray-100);
+}
+.colorGray200Box {
+  width: 60px;
+  height: 60px;
+  background-color: var(--color-gray-200);
+}
+.colorGray300Box {
+  width: 60px;
+  height: 60px;
+  background-color: var(--color-gray-300);
+}
+.colorGray400Box {
+  width: 60px;
+  height: 60px;
+  background-color: var(--color-gray-400);
+}
+.colorGray500Box {
+  width: 60px;
+  height: 60px;
+  background-color: var(--color-gray-500);
+}
+.colorGray600Box {
+  width: 60px;
+  height: 60px;
+  background-color: var(--color-gray-600);
+}
+.colorGray700Box {
+  width: 60px;
+  height: 60px;
+  background-color: var(--color-gray-700);
+}
+.colorGray800Box {
+  width: 60px;
+  height: 60px;
+  background-color: var(--color-gray-800);
+}
+.colorGray900Box {
+  width: 60px;
+  height: 60px;
+  background-color: var(--color-gray-900);
+}
+
+.colorOlive100Box {
+  width: 60px;
+  height: 60px;
+  background-color: var(--color-olive-100);
+}
+.colorOlive200Box {
+  width: 60px;
+  height: 60px;
+  background-color: var(--color-olive-200);
+}
+.colorOlive300Box {
+  width: 60px;
+  height: 60px;
+  background-color: var(--color-olive-300);
+}
+.colorOlive400Box {
+  width: 60px;
+  height: 60px;
+  background-color: var(--color-olive-400);
+}
+.colorOlive500Box {
+  width: 60px;
+  height: 60px;
+  background-color: var(--color-olive-500);
+}
+.colorOlive600Box {
+  width: 60px;
+  height: 60px;
+  background-color: var(--color-olive-600);
+}
+.colorOlive700Box {
+  width: 60px;
+  height: 60px;
+  background-color: var(--color-olive-700);
+}
+.colorOlive800Box {
+  width: 60px;
+  height: 60px;
+  background-color: var(--color-olive-800);
+}
+.colorOlive900Box {
+  width: 60px;
+  height: 60px;
+  background-color: var(--color-olive-900);
+}
+
+.colorBeige100Box {
+  width: 60px;
+  height: 60px;
+  background-color: var(--color-beige-100);
+}
+.colorBeige200Box {
+  width: 60px;
+  height: 60px;
+  background-color: var(--color-beige-200);
+}
+.colorBeige300Box {
+  width: 60px;
+  height: 60px;
+  background-color: var(--color-beige-300);
+}
+.colorBeige500Box {
+  width: 60px;
+  height: 60px;
+  background-color: var(--color-beige-500);
+}
+.colorBeige600Box {
+  width: 60px;
+  height: 60px;
+  background-color: var(--color-beige-600);
+}
+.colorBeige800Box {
+  width: 60px;
+  height: 60px;
+  background-color: var(--color-beige-800);
+}
+
+.colorRed500Box {
+  width: 60px;
+  height: 60px;
+  background-color: var(--color-red-500);
+}
+.colorRed700Box {
+  width: 60px;
+  height: 60px;
+  background-color: var(--color-red-700);
+}
+.colorRed900Box {
+  width: 60px;
+  height: 60px;
+  background-color: var(--color-red-900);
+}
+
+.colorOpacity100Box {
+  width: 60px;
+  height: 60px;
+  background-color: var(--color-opacity-100);
+}
+.colorOpacity200Box {
+  width: 60px;
+  height: 60px;
+  background-color: var(--color-opacity-200);
+}
+.colorOpacity400Box {
+  width: 60px;
+  height: 60px;
+  background-color: var(--color-opacity-400);
+}
