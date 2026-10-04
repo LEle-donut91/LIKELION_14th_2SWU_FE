@@ -1,5 +1,117 @@
-/* 전역 스타일 관리 (기본 폰트, 컬러 등) */
+/* 폰트 정의 */
+@font-face {
+  font-family: KimjungchulMyungjo;
+  src: url("./shared/assets/fonts/KimjungchulMyungjo-Bold.ttf");
+  font-weight: 700;
+  font-style: normal;
+}
+@font-face {
+  font-family: KimjungchulMyungjo;
+  src: url("./shared/assets/fonts/KimjungchulMyungjo-Regular.ttf");
+  font-weight: 400;
+  font-style: normal;
+}
+@font-face {
+  font-family: KimjungchulGothic;
+  src: url("./shared/assets/fonts/KimjungchulGothic-Bold.ttf");
+  font-weight: 700;
+  font-style: normal;
+}
+@font-face {
+  font-family: KimjungchulGothic;
+  src: url("./shared/assets/fonts/KimjungchulGothic-Regular.ttf");
+  font-weight: 400;
+  font-style: normal;
+}
+@font-face {
+  font-family: KimjungchulGothic;
+  src: url("./shared/assets/fonts/KimjungchulGothic-Light.ttf");
+  font-weight: 300;
+  font-style: normal;
+}
+
+/* 전역 변수 정의 */
 :root {
+  /* =========================================
+   * [Font Family 변수] - 기본 폰트
+   * ========================================= */
+  --font-gothic: "KimjungchulGothic";
+  --font-myungjo: "KimjungchulMyungjo";
+
+  /* =======================================================
+   * [Typography System 변수] - 폰트 굵기, 크기, 줄간격, 자간
+   * ======================================================= */
+
+  /* 1) Display (Kim jung chul Myungjo) */
+  --typo-display-medium: 700 24px/34px var(--font-myungjo);
+  --typo-display-medium-ls: -0.2px;
+
+  --typo-display-small: 400 17px/26px var(--font-myungjo);
+  --typo-display-small-ls: -0.4px;
+
+  /* 2) Title / Body / Caption (Kim jung chul Gothic) */
+  --typo-title-medium: 700 22px/32px var(--font-gothic);
+  --typo-title-medium-ls: -0.2px;
+
+  --typo-body-strong: 700 17px/32px var(--font-gothic);
+  --typo-body-strong-ls: -0.2px;
+
+  --typo-body-medium: 400 17px/32px var(--font-gothic);
+  --typo-body-medium-ls: -0.4px;
+
+  --typo-body-small: 400 15px/22px var(--font-gothic);
+  --typo-body-small-ls: -0.5px;
+
+  --typo-caption-medium: 400 12px/16px var(--font-gothic);
+  --typo-caption-medium-ls: -0.5px;
+
+  /* =========================================
+   * [Color System 변수] - 색상만 설정
+   * ========================================= */
+
+  /* 1) Base */
+  --color-base-000: #ffffff;
+  --color-base-999: #000000;
+
+  /* 2) Gray */
+  --color-gray-100: #e8e7e5;
+  --color-gray-200: #d3d2d0;
+  --color-gray-300: #b4b2ad;
+  --color-gray-400: #989792;
+  --color-gray-500: #868580;
+  --color-gray-600: #63625f;
+  --color-gray-700: #4b4b49;
+  --color-gray-800: #383836;
+  --color-gray-900: #242422;
+
+  /* 3) Olive */
+  --color-olive-100: #eef2e9;
+  --color-olive-200: #cddcb8;
+  --color-olive-300: #abc288;
+  --color-olive-400: #95ac63;
+  --color-olive-500: #7e9a46;
+  --color-olive-600: #5a782a;
+  --color-olive-700: #405a25;
+  --color-olive-800: #2f4218;
+  --color-olive-900: #202d0d;
+
+  /* 4) Beige */
+  --color-beige-100: #efe6db;
+  --color-beige-200: #d2bea2;
+  --color-beige-300: #b49770;
+  --color-beige-500: #95754e;
+  --color-beige-600: #795c36;
+  --color-beige-800: #4f3d27;
+
+  /* 5) Red */
+  --color-red-500: #d2665b;
+  --color-red-700: #b3372c;
+  --color-red-900: #6b0f06;
+
+  /* 6) Opacity (#242422 기반 투명도) */
+  --color-opacity-100: #2424221a;
+  --color-opacity-200: #24242233;
+  --color-opacity-400: #24242266;
 }
 
 body {
