@@ -1,0 +1,38 @@
+.bottomNav {
+  position: fixed;                 /* 화면 맨 아래 고정 */
+  bottom: 0;                       /* 바닥에 붙이기 */
+  left: 50%;                       /* 가운데 정렬 1 */
+  transform: translateX(-50%);     /* 가운데 정렬 2 */
+  width: 402px;                    /* 피그마 너비 */
+  box-sizing: border-box;          /* 패딩 포함해서 402px 유지 */
+  padding: 12px 24px 40px;         /* 위 12 / 양옆 24 / 아래 40 */
+  display: flex;                   /* 탭 가로 나열 */
+  justify-content: space-between;  /* 피그마 space-between */
+  background: #FFFFFF;             /* 피그마 base-000 */
+}
+
+.navItem {
+  display: flex;                   /* 아이콘+글씨 묶기 */
+  flex-direction: column;          /* 세로로 쌓기 */
+  align-items: center;             /* 가운데 정렬 */
+  gap: 4px;                        /* 아이콘-글씨 간격 */
+  font-size: 10px;                 /* 작은 글씨 */
+  color: #888888;                  /* 안 선택 탭 회색 (피그마 색 확인 후 수정) */
+  text-decoration: none;           /* 밑줄 없애기 */
+}
+
+.active {
+  color: #6B8E3D;                  /* 선택 탭 초록 (피그마 색 확인 후 수정) */
+}
+
+.navIcon {
+  width: 24px;                     /* 아이콘 크기 (피그마 보고 수정) */
+  height: 24px;
+  background-color: currentColor;  /* 글씨랑 같은 색으로 칠하기 */
+  mask-size: contain;              /* 아이콘 크기에 맞추기 */
+  mask-repeat: no-repeat;          /* 반복 안 함 */
+  mask-position: center;           /* 가운데 */
+  -webkit-mask-size: contain;      /* 크롬·사파리용 */
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+}
