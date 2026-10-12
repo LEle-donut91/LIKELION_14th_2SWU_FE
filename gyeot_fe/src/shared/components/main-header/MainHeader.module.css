@@ -1,0 +1,52 @@
+/* 메인 헤더 전체 영역 */
+.header {
+  /* 좌측 타이틀 / 우측 버튼 2분할 */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+
+  height: 56px;
+  padding: 0 16px;
+  box-sizing: border-box;
+}
+
+/* 왼쪽 타이틀 (시안: Gothic Bold 18 / 22.5) */
+.title {
+  margin: 0;
+
+  font-family: var(--font-gothic);
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 22.5px;
+  letter-spacing: -0.16px;
+  color: var(--color-gray-900);
+}
+
+/* 오른쪽 버튼 영역 */
+.rightArea {
+  display: flex;
+  flex-shrink: 0; /* 영역이 좁아져도 버튼 크기 유지 */
+  gap: 6px;
+}
+
+/* 헤더 버튼 공통 */
+.headerBtn {
+  width: 44px;
+  height: 36px;
+  padding: 0;
+  border: none;
+  border-radius: 2px;
+
+  background-color: var(--color-gray-100);
+  color: var(--color-gray-600);
+
+  font-family: var(--font-gothic);
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 12px;
+  letter-spacing: -0.16px;
+  white-space: nowrap;
+
+  cursor: pointer;
+}
