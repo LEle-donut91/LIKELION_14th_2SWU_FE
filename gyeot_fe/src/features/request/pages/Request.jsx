@@ -6,8 +6,14 @@ import LargeFooter from "@/features/request/components/Footer/LargeFooter";
 import RadioSection from "@/features/request/components/Section/RadioSection";
 import SelectSection from "@/features/request/components/Section/SelectSection";
 import InputSection from "@/features/request/components/Section/InputSection";
+import situationData from "@/features/request/request.json";
+import SituationSheet from "@/features/request/components/Sheet/SituationSheet";
+import { useState } from "react";
 
 function Request() {
+  const [situationId, setSituationId] = useState(null);
+  const [isSituationSheetOpen, setSituationSheetOpen] = useState(false);
+
   return (
     <div className="page">
       {/* 헤더 */}
@@ -21,6 +27,15 @@ function Request() {
           text="무릎 수술 회복"
           border="borderActive"
           width="large"
+          onClick={() => setSituationSheetOpen(true)}
+        />
+
+        <SituationSheet
+          isOpen={isSituationSheetOpen}
+          onClose={() => setSituationSheetOpen(false)}
+          data={ situationData }
+          selectedId={situationId}
+          onSelect={setSituationId}
         />
 
         {/* 도움 종류 */}

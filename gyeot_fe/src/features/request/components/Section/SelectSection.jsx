@@ -1,14 +1,15 @@
 import styles from "@/features/request/components/Section/SelectSection.module.css";
 import modalBtn from "@/features/request/assets/modalBtn.svg";
 
-function SelectSection({ title, text, border, width }) {
+function SelectSection({ title, text, border, width, onClick }) {
   return (
     <section>
       {/* section 타이틀 */}
       <span className={`${styles.sectionTitle} typoBodyStrong`}>{title}</span>
       
       {/* 버튼 (선택 시트 표시) */}
-      <button 
+      <button
+        onClick={onClick}
         className={`${styles.sectionBtn} ${styles[border]} ${styles[width]}`}
       >
         <span className="typoBodyMedium">{text}</span>
