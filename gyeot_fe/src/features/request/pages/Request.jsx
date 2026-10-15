@@ -10,6 +10,8 @@ import situationData from "@/features/request/api/situationData.json";
 import userData from "@/features/request/api/userData.json";
 import SituationSheet from "@/features/request/components/Sheet/SituationSheet";
 import UserSheet from "@/features/request/components/Sheet/UserSheet";
+import DateTimeSheet from "@/features/request/components/Sheet/DateTimeSheet";
+import DueDateSheet from "@/features/request/components/Sheet/DueDateSheet";
 import { useState } from "react";
 
 function Request() {
@@ -19,6 +21,8 @@ function Request() {
 
   const [isSituationSheetOpen, setSituationSheetOpen] = useState(false);
   const [isUserSheetOpen, setUserSheetOpen] = useState(false);
+  const [isDateTimeSheetOpen, setDateTimeSheetOpen] = useState(false);
+  const [isDuedateSheetOpen, setDuedateSheetOpen] = useState(false);
 
   return (
     <div className="page">
@@ -54,14 +58,21 @@ function Request() {
             text="선택"
             border="borderDefault"
             width="small"
+            onClick={() => setDateTimeSheetOpen(true)}
           />
           <SelectSection
             title="종료 *"
             text="선택"
             border="borderDefault"
             width="small"
+            onClick={() => setDateTimeSheetOpen(true)}
           />
         </div>
+
+        <DateTimeSheet
+          isOpen={isDateTimeSheetOpen}
+          onClose={() => setDateTimeSheetOpen(false)}
+        />
 
         {/* 장소 */}
         <InputSection title="장소 *" size="small" />
@@ -92,6 +103,12 @@ function Request() {
           text="24시간 (기본)"
           border="borderActive"
           width="large"
+          onClick={() => setDuedateSheetOpen(true)}
+        />
+
+        <DueDateSheet
+          isOpen={isDuedateSheetOpen}
+          onClose={() => setDuedateSheetOpen(false)}
         />
       </main>
 
