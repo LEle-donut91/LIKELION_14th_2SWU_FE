@@ -3,7 +3,7 @@ import styles from "@/features/request/pages/Request.module.css";
 
 import SelectSection from "@/features/request/components/SelectSection";
 import InputSection from "@/features/request/components/InputSection";
-import HeaderStep from "@/features/request/components/HeaderStep";
+import StepHeader from "@/features/request/components/Header/StepHeader";
 import LargeFooter from "@/features/request/components/Footer/LargeFooter";
 import RadioSection from "@/features/request/components/RadioSection";
 
@@ -11,7 +11,7 @@ function Request() {
   return (
     <div className="page">
       {/* 헤더 */}
-      <HeaderStep title="요청 작성" step="1" />
+      <StepHeader title="요청 작성" step="1" />
 
       {/* 메인 컨텐츠 */}
       <main>

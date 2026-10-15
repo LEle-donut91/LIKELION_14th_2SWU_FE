@@ -1,7 +1,7 @@
-import styles from "@/features/request/components/HeaderStep.module.css";
+import styles from "@/features/request/components/Header/StepHeader.module.css";
 import backBtn from "@/features/request/assets/backBtn.svg";
 
-function HeaderStep({title, step}) {
+function StepHeader({title, step}) {
   return (
     <header>
       <button>
@@ -13,4 +13,4 @@ function HeaderStep({title, step}) {
   );
 }
 
-export default HeaderStep;
+export default StepHeader;
