@@ -1,0 +1,32 @@
+section {
+  display: flex;
+  flex-direction: column;
+}
+
+.sectionTitle {
+  padding: 0px 0px 8px;
+}
+
+.sectionInput {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background-color: var(--color-base-000);
+  padding: 16px;
+  border: 1px solid var(--color-opacity-200); 
+  outline: none;
+}
+
+.sectionTextarea {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 136px;
+  border-radius: 12px;
+  background-color: var(--color-base-000);
+  padding: 16px;
+  border: 1px solid var(--color-opacity-200); 
+  outline: none;
+}
+
