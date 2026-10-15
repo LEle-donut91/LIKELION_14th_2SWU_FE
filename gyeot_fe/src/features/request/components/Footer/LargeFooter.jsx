@@ -1,6 +1,6 @@
-import styles from "@/features/request/components/FooterLarge.module.css";
+import styles from "@/features/request/components/Footer/LargeFooter.module.css";
 
-function FooterLarge({title, type}) {
+function LargeFooter({title, type}) {
   return (
       <footer>
         <button className={`${styles.footerBtn} ${styles[type]}`}>
@@ -10,4 +10,4 @@ function FooterLarge({title, type}) {
   );
 }
 
-export default FooterLarge;
+export default LargeFooter;

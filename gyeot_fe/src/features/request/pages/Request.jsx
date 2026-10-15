@@ -4,7 +4,7 @@ import styles from "@/features/request/pages/Request.module.css";
 import SelectSection from "@/features/request/components/SelectSection";
 import InputSection from "@/features/request/components/InputSection";
 import HeaderStep from "@/features/request/components/HeaderStep";
-import FooterLarge from "@/features/request/components/FooterLarge";
+import LargeFooter from "@/features/request/components/Footer/LargeFooter";
 import RadioSection from "@/features/request/components/RadioSection";
 
 function Request() {
@@ -66,7 +66,7 @@ function Request() {
       </main>
 
       {/* 하단 Footer(버튼) */}
-      <FooterLarge title="다음" type="primary" />
+      <LargeFooter title="다음" type="primary" />
     </div>
   );
 }
