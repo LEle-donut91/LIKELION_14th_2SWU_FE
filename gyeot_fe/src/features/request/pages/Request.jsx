@@ -1,11 +1,11 @@
 // H-03-02
 import styles from "@/features/request/pages/Request.module.css";
 
-import SelectSection from "@/features/request/components/SelectSection";
-import InputSection from "@/features/request/components/InputSection";
 import StepHeader from "@/features/request/components/Header/StepHeader";
 import LargeFooter from "@/features/request/components/Footer/LargeFooter";
-import RadioSection from "@/features/request/components/RadioSection";
+import RadioSection from "@/features/request/components/Section/RadioSection";
+import SelectSection from "@/features/request/components/Section/SelectSection";
+import InputSection from "@/features/request/components/Section/InputSection";
 
 function Request() {
   return (

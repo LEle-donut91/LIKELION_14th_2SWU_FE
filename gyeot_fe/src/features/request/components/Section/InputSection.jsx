@@ -1,4 +1,4 @@
-import styles from "@/features/request/components/InputSection.module.css";
+import styles from "@/features/request/components/Section/InputSection.module.css";
 
 function InputSection({ title, size }) {
   return (

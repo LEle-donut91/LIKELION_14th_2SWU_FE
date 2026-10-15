@@ -1,4 +1,4 @@
-import styles from "@/features/request/components/SelectSection.module.css";
+import styles from "@/features/request/components/Section/SelectSection.module.css";
 import modalBtn from "@/features/request/assets/modalBtn.svg";
 
 function SelectSection({ title, text, border, width }) {
