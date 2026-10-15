@@ -5,6 +5,7 @@ footer {
   bottom: 0px;
   padding: 16px 16px 40px 16px;
   box-sizing: border-box;
+  background-color: var(--color-base-000);
 }
 
 .footerBtn {
