@@ -6,13 +6,19 @@ import LargeFooter from "@/features/request/components/Footer/LargeFooter";
 import RadioSection from "@/features/request/components/Section/RadioSection";
 import SelectSection from "@/features/request/components/Section/SelectSection";
 import InputSection from "@/features/request/components/Section/InputSection";
-import situationData from "@/features/request/request.json";
+import situationData from "@/features/request/api/situationData.json";
+import userData from "@/features/request/api/userData.json";
 import SituationSheet from "@/features/request/components/Sheet/SituationSheet";
+import UserSheet from "@/features/request/components/Sheet/UserSheet";
 import { useState } from "react";
 
 function Request() {
   const [situationId, setSituationId] = useState(null);
+  const [userId, setUserId] = useState(null);
+
+
   const [isSituationSheetOpen, setSituationSheetOpen] = useState(false);
+  const [isUserSheetOpen, setUserSheetOpen] = useState(false);
 
   return (
     <div className="page">
@@ -69,6 +75,15 @@ function Request() {
           text="한 명 선택"
           border="borderDefault"
           width="large"
+          onClick={() => setUserSheetOpen(true)}
+        />
+
+        <UserSheet
+          isOpen={isUserSheetOpen}
+          onClose={() => setUserSheetOpen(false)}
+          data={ userData }
+          selectedId={userId}
+          onSelect={setUserId}
         />
 
         {/* 응답 기한 */}
