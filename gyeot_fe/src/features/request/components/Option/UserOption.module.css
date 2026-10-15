@@ -1,0 +1,44 @@
+label {
+  display: flex;
+  cursor: pointer;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--color-base-100);
+  border: 1px solid var(--color-gray-100);
+  border-radius: 16px;
+  padding: 12px 16px;
+}
+
+.userImg {
+  width: 40px;
+  height: 40px;
+}
+
+.txtContainer {
+  display: flex;
+  flex: 1;
+  gap: 8px;
+}
+
+.userNameTxt {
+  margin-left: 8px;
+  color: var(--color-gray-900);
+}
+
+.selected {
+  background-color: var(--color-olive-100);
+  border: 1px solid var(--color-olive-300);
+}
+
+.guardianTag {
+  border-radius: 999px;
+  background-color: var(--color-beige-500);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 8px;
+}
+
+.guardianTxt {
+  color: var(--color-base-000);
+}
