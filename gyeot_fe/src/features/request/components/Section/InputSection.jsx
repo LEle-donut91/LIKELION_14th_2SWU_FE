@@ -9,13 +9,13 @@ function InputSection({ title, size }) {
       {/* 내용 입력 칸 (size 값에 따라 input 또는 textarea 렌더링) */}
       {size === "large" ? (
         <textarea 
-          className={styles.sectionTextarea}
+          className={`${styles.sectionTextarea} typoBodyMedium`}
           placeholder="입력"
         />
       ) : (
         <input 
           type="text"
-          className={styles.sectionInput}
+          className={`${styles.sectionInput} typoBodyMedium`}
           placeholder="입력"
         />
       )}

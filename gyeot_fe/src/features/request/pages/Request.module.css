@@ -17,29 +17,6 @@ button {
   -moz-appearance: none;
 }
 
-/* input, textarea 기본 설정 */
-input, textarea {
-  background: none;
-  border: none;
-  outline: none;
-  padding: 0;
-  margin: 0;
-  
-  /* 폰트 및 색상 명시적 상속 */
-  font-family: inherit;
-  font-size: inherit;
-  color: inherit;
-  
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  border-radius: 0;
-}
-
-textarea {
-  resize: none; 
-}
-
 /* 전체 페이지 */
 .page {
   width: 100%;
