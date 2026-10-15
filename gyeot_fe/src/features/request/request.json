@@ -1,0 +1,16 @@
+[
+  {
+    "id": "1",
+    "title": "출장 부재",
+    "startDate": "9/28(월)",
+    "endDate": "10/10(토)",
+    "joinCount": "2"
+  },
+  {
+    "id": "2",
+    "title": "수술 회복",
+    "startDate": "9/1(화)",
+    "endDate": "10/2(금)",
+    "joinCount": "4"
+  }
+]
