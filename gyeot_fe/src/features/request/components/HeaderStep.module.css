@@ -1,0 +1,23 @@
+/* 헤더 */
+header {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  gap: 16px;
+}
+
+.backBtn {
+  width: 28px;
+  height: 28px;
+  padding: 2.3px;
+  box-sizing: border-box;
+}
+
+.title {
+  flex: 1;
+  text-align: center;
+}
+
+.step {
+  color: var(--color-gray-600);
+}
