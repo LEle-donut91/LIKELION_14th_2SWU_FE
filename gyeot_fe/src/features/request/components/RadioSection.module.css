@@ -1,0 +1,30 @@
+.sectionTitle {
+  padding: 0px 0px 8px;
+}
+
+.radioContainer {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* 라디오 버튼 Default 스타일 (선택 안 되었을 때) */
+.radioBtn {
+  border-radius: 12px;
+  background-color: var(--color-base-000);
+  border: 1px solid var(--color-opacity-100);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+}
+
+/* 선택된 라디오 버튼 스타일 */
+.radioSelected {
+  background-color: var(--color-olive-300);
+}
+
+.radioTxt {
+  color: var(--color-olive-900);
+}
