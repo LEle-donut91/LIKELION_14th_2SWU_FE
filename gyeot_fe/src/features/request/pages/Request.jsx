@@ -8,11 +8,19 @@ import SelectSection from "@/features/request/components/Section/SelectSection";
 import InputSection from "@/features/request/components/Section/InputSection";
 import situationData from "@/features/request/api/situationData.json";
 import userData from "@/features/request/api/userData.json";
-import SituationSheet from "@/features/request/components/Sheet/SituationSheet";
-import UserSheet from "@/features/request/components/Sheet/UserSheet";
-import DateTimeSheet from "@/features/request/components/Sheet/DateTimeSheet";
-import DueDateSheet from "@/features/request/components/Sheet/DueDateSheet";
+import DefaultSheet from "@/features/request/components/Sheet/DefaultSheet";
+import TimeSheet from "@/features/request/components/Sheet/TimeSheet";
+import SituationOption from "@/features/request/components/Option/SituationOption";
+import UserOption from "@/features/request/components/Option/UserOption";
+import DateTimeOption from "@/features/request/components/Option/DateTimeOption";
 import { useState } from "react";
+
+// 시트에 주입할 DateTimeOption 입력 그룹 설정
+const DATE_TIME_SECTIONS = [
+  { type: "date", title: "날짜" },
+  { type: "time", title: "시간" },
+];
+const DUE_DATE_SECTIONS = [{ type: "dueDate", title: "응답기한" }];
 
 function Request() {
   // 각 선택 항목에 대한 상태(State) 정의
@@ -88,13 +96,22 @@ function Request() {
           onClick={() => setSituationSheetOpen(true)}
         />
 
-        <SituationSheet
+        <DefaultSheet
           isOpen={isSituationSheetOpen}
           onClose={() => setSituationSheetOpen(false)}
-          data={situationData}
-          selectedId={situationId}
-          onSelect={setSituationId}
-        />
+          title="상황"
+          description="상황에 참여한 사람들에게만 요청을 보낼 수 있어요."
+          value={situationId}
+          onConfirm={setSituationId}
+        >
+          {(temp, setTemp) => (
+            <SituationOption
+              data={situationData}
+              selectedValue={temp}
+              onSelect={setTemp}
+            />
+          )}
+        </DefaultSheet>
 
         {/* 도움 종류 */}
         <RadioSection />
@@ -123,12 +140,20 @@ function Request() {
           />
         </div>
 
-        <DateTimeSheet
+        <TimeSheet
           isOpen={isDateTimeSheetOpen}
           onClose={() => setDateTimeSheetOpen(false)}
-          initialValue={dateTarget === "start" ? startDateTime : endDateTime}
+          value={dateTarget === "start" ? startDateTime : endDateTime}
           onConfirm={handleDateTimeConfirm}
-        />
+        >
+          {(temp, setTemp) => (
+            <DateTimeOption
+              sections={DATE_TIME_SECTIONS}
+              value={temp}
+              onChange={setTemp}
+            />
+          )}
+        </TimeSheet>
 
         {/* 장소 */}
         <InputSection
@@ -155,13 +180,22 @@ function Request() {
           onClick={() => setUserSheetOpen(true)}
         />
 
-        <UserSheet
+        <DefaultSheet
           isOpen={isUserSheetOpen}
           onClose={() => setUserSheetOpen(false)}
-          data={userData}
-          selectedId={userId}
-          onSelect={setUserId}
-        />
+          title="요청 대상"
+          description="상황에 참여한 사람들에게만 요청을 보낼 수 있어요."
+          value={userId}
+          onConfirm={setUserId}
+        >
+          {(temp, setTemp) => (
+            <UserOption
+              data={userData}
+              selectedValue={temp}
+              onSelect={setTemp}
+            />
+          )}
+        </DefaultSheet>
 
         {/* 응답 기한 */}
         <SelectSection
@@ -172,11 +206,20 @@ function Request() {
           onClick={() => setDuedateSheetOpen(true)}
         />
 
-        <DueDateSheet
+        <TimeSheet
           isOpen={isDuedateSheetOpen}
           onClose={() => setDuedateSheetOpen(false)}
-          onConfirm={(value) => setDueDate(value)}
-        />
+          value={dueDate}
+          onConfirm={setDueDate}
+        >
+          {(temp, setTemp) => (
+            <DateTimeOption
+              sections={DUE_DATE_SECTIONS}
+              value={temp}
+              onChange={setTemp}
+            />
+          )}
+        </TimeSheet>
       </main>
 
       {/* 하단 Footer(버튼) */}
