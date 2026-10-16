@@ -180,7 +180,7 @@ function Request() {
       </main>
 
       {/* 하단 Footer(버튼) */}
-      <LargeFooter title="다음" type="primary" />
+      <LargeFooter navUrl="/request/info-preview" title="다음" type="primary" />
     </div>
   );
 }
