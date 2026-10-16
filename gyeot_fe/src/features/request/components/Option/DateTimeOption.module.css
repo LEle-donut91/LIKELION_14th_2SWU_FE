@@ -1,3 +1,10 @@
+.optionList {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin-bottom: 48px;
+}
+
 .dateTimeOption {
   display: flex;
   flex-direction: column;
