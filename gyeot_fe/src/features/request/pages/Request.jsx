@@ -31,19 +31,45 @@ function Request() {
   const [isDuedateSheetOpen, setDuedateSheetOpen] = useState(false);
   
   // 어떤 시트(시작 또는 종료)에서 DateTimeSheet를 열었는지 구분하기 위한 상태
-  const [dateTarget, setDateTarget] = useState(null); 
+  const [dateTarget, setDateTarget] = useState(null);
 
   // 선택된 ID를 통해 화면에 보여줄 텍스트(title) 찾기
-  const selectedSituation = situationData.find((item) => item.id === situationId);
+  const selectedSituation = situationData.find(
+    (item) => item.id === situationId,
+  );
   const selectedUser = userData?.find((item) => item.id === userId);
 
-// 화면에 보여줄 응답 기한 텍스트 가공
+  // 날짜/시간 객체를 화면에 보여줄 문자열로 가공하는 함수
+  const getDateTimeText = (dateTimeObj) => {
+    if (!dateTimeObj) return "선택";
+    const { year, month, day, hour, minute } = dateTimeObj;
+    if (!year && !month && !day && !hour && !minute) return "선택";
+
+    const datePart =
+      year || month || day
+        ? `${year || "0000"}.${month || "00"}.${day || "00"}`
+        : "";
+    const timePart = hour || minute ? `${hour || "00"}:${minute || "00"}` : "";
+
+    return `${datePart} ${timePart}`.trim();
+  };
+
+  // 화면에 보여줄 응답 기한 텍스트 가공
   const getDueDateText = () => {
     if (!dueDate) return "선택";
     const { days, hours, minutes } = dueDate;
     if (!days && !hours && !minutes) return "선택";
     
     return `${days ? `${days}일 ` : ""}${hours ? `${hours}시간 ` : ""}${minutes ? `${minutes}분` : ""}`.trim();
+  };
+
+  // DateTimeSheet에서 확인을 눌렀을 때 실행될 핸들러
+  const handleDateTimeConfirm = (value) => {
+    if (dateTarget === "start") {
+      setStartDateTime(value);
+    } else if (dateTarget === "end") {
+      setEndDateTime(value);
+    }
   };
 
   return (
@@ -77,7 +103,7 @@ function Request() {
         <div className={styles.timeSectionContainer}>
           <SelectSection
             title="시작 *"
-            text={startDateTime}
+            text={getDateTimeText(startDateTime)}
             border={startDateTime ? "borderActive" : "borderDefault"}
             width="small"
             onClick={() => {
@@ -87,7 +113,7 @@ function Request() {
           />
           <SelectSection
             title="종료 *"
-            text={endDateTime}
+            text={getDateTimeText(endDateTime)}
             border={endDateTime ? "borderActive" : "borderDefault"}
             width="small"
             onClick={() => {
@@ -100,7 +126,8 @@ function Request() {
         <DateTimeSheet
           isOpen={isDateTimeSheetOpen}
           onClose={() => setDateTimeSheetOpen(false)}
-          // DateTimeSheet 내부에서 선택 완료 시 상태를 업데이트하는 함수를 전달
+          initialValue={dateTarget === "start" ? startDateTime : endDateTime}
+          onConfirm={handleDateTimeConfirm}
         />
 
         {/* 장소 */}
