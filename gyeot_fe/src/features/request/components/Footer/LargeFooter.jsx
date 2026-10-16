@@ -5,7 +5,7 @@ function LargeFooter({title, type, navUrl}) {
   const navigate = useNavigate();
 
   return (
-      <footer>
+      <footer className={styles.largeFooter}>
         <button 
         onClick={() => {navigate(navUrl)}}
         className={`${styles.footerBtn} ${styles[type]}`}>

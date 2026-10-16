@@ -2,7 +2,7 @@ import styles from "@/features/request/components/Section/InputSection.module.cs
 
 function InputSection({ title, size, value, onChange }) {
   return (
-    <section>
+    <section className={styles.inputSection}>
       {/* section 타이틀 */}
       <span className={`${styles.sectionTitle} typoBodyStrong`}>{title}</span>
 

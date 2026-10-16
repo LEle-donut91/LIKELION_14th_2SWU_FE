@@ -5,7 +5,7 @@
   margin-bottom: 48px;
 }
 
-label {
+.optionItem {
   display: flex;
   cursor: pointer;
   background-color: var(--color-base-100);
@@ -19,7 +19,7 @@ label {
   border: 1px solid var(--color-olive-300);
 }
 
-input {
+.optionInput {
   display: none;
 }
 

@@ -3,7 +3,7 @@ import modalBtn from "@/features/request/assets/modalBtn.svg";
 
 function SelectSection({ title, text, border, width, onClick }) {
   return (
-    <section>
+    <section className={styles.selectSection}>
       {/* section 타이틀 */}
       <span className={`${styles.sectionTitle} typoBodyStrong`}>{title}</span>
       

@@ -15,10 +15,11 @@ function UserOption({
         const isSelected = selectedValue === id;
 
         return (
-          <label key={id} className={isSelected ? styles.selected : ""}>
+          <label key={id} className={`${styles.optionItem} ${isSelected ? styles.selected : ""}`}>
             <input
               type="radio"
               id={id}
+              className={styles.optionInput}
               name="userOptionGroup" // 동일한 name으로 하나의 그룹으로 묶음 (중복 선택 방지)
               checked={isSelected}
               onChange={() => onSelect(id)}
