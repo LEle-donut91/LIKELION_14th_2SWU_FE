@@ -37,6 +37,15 @@ function Request() {
   const selectedSituation = situationData.find((item) => item.id === situationId);
   const selectedUser = userData?.find((item) => item.id === userId);
 
+// 화면에 보여줄 응답 기한 텍스트 가공
+  const getDueDateText = () => {
+    if (!dueDate) return "선택";
+    const { days, hours, minutes } = dueDate;
+    if (!days && !hours && !minutes) return "선택";
+    
+    return `${days ? `${days}일 ` : ""}${hours ? `${hours}시간 ` : ""}${minutes ? `${minutes}분` : ""}`.trim();
+  };
+
   return (
     <div className="page">
       {/* 헤더 */}
@@ -130,7 +139,7 @@ function Request() {
         {/* 응답 기한 */}
         <SelectSection
           title="응답 기한 *"
-          text={dueDate}
+          text={getDueDateText()}
           border={dueDate ? "borderActive" : "borderDefault"}
           width="large"
           onClick={() => setDuedateSheetOpen(true)}
@@ -139,6 +148,7 @@ function Request() {
         <DueDateSheet
           isOpen={isDuedateSheetOpen}
           onClose={() => setDuedateSheetOpen(false)}
+          onConfirm={(value) => setDueDate(value)}
         />
       </main>
 
