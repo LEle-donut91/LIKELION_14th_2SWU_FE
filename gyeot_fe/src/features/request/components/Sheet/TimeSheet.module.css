@@ -13,13 +13,6 @@
   pointer-events: auto !important;
 }
 
-.optionList {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  margin-bottom: 48px;
-}
-
 /* 하단 버튼 */
 .footerBtn {
   width: 100%;
@@ -28,3 +21,4 @@
   color: var(--color-olive-900);
   padding: 16px;
 }
+
