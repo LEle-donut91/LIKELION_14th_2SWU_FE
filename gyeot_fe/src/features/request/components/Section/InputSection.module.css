@@ -33,3 +33,7 @@ section {
   color: var(--color-gray-500); 
 }
 
+.hasValue {
+  border: 1px solid var(--color-olive-300); 
+}
+
