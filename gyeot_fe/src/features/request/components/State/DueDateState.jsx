@@ -1,6 +1,5 @@
-import styles from "@/features/request/components/Request/RequestDueDate.module.css";
 
-function RequestDueDate({ isResponse, title, dueDate }) {
+function DueDateState({ isResponse, title, dueDate }) {
   return (
     <div
       className={`${styles.component} ${isResponse ? styles.responseComponent : ""}`}
@@ -15,4 +14,4 @@ function RequestDueDate({ isResponse, title, dueDate }) {
   );
 }
 
-export default RequestDueDate;
+export default DueDateState;

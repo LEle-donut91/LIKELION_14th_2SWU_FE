@@ -7,7 +7,7 @@ import CheckOption from "@/features/request/components/Option/CheckOption";
 import { useState } from "react";
 import requestSafetyCardData from "@/features/request/api/requestSafetyCardData.json";
 import UserInfo from "@/features/request/components/User/UserInfo";
-import RequestDueDate from "../components/Request/RequestDueDate";
+import DueDateState from "../components/State/DueDateState";
 import LargeFooter from "@/features/request/components/Footer/LargeFooter";
 import DefaultModal from "@/features/request/components/Modal/DefaultModal";
 import { useNavigate } from "react-router-dom";
@@ -190,7 +190,7 @@ function InfoPreview() {
           part="나의 사람"
         />
 
-        <RequestDueDate
+        <DueDateState
           isResponse={false}
           title="접근 기한"
           dueDate="~10/2 18:00"
