@@ -10,6 +10,7 @@ import UserInfo from "@/features/request/components/User/UserInfo";
 import RequestDueDate from "../components/Request/RequestDueDate";
 import LargeFooter from "@/features/request/components/Footer/LargeFooter";
 import DefaultModal from "@/features/request/components/Modal/DefaultModal";
+import { useNavigate } from "react-router-dom";
 
 function InfoPreview() {
 // 1. [기본정보] JSON에서 데이터 꺼내서 CheckOption용 배열로 만들기
@@ -157,6 +158,12 @@ function InfoPreview() {
   const handleModalOpen = () => {
     setModalOpen(!isModalOpen);
   };
+
+  // 전송 완료 화면으로 이동
+  const navigate = useNavigate();
+  const handleToRequestSend = () => {
+    navigate('/request/send');
+  }
 
   // 선택된 ID 목록(checkedList)과 원본 데이터 목록(dataList)을 받아서,
   // 선택된 항목들의 title을 쉼표(,)로 연결하여 반환
@@ -308,6 +315,7 @@ function InfoPreview() {
         }
         cancelTxt="취소"
         confirmTxt="공유"
+        onConfirmClick={handleToRequestSend}
       />
     </div>
   );
