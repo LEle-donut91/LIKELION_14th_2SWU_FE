@@ -1,0 +1,44 @@
+/* 헤더 */
+.stepHeader {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  gap: 16px;
+}
+
+.backBtn {
+  /* 1. 버튼 기본 설정 */
+  /* 배경, 테두리 제거 */
+  background: none;
+  border: none;
+
+  /* 여백 및 패딩 제거 */
+  padding: 0;
+  margin: 0;
+
+  /* 커서 설정 */
+  cursor: pointer;
+
+  /* 기타 브라우저 기본 스타일 제거 */
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  /* 추가 설정 */
+}
+
+.backBtnImg {
+  width: 28px;
+  height: 28px;
+  padding: 2.3px;
+  box-sizing: border-box;
+}
+
+.title {
+  flex: 1;
+  text-align: center;
+}
+
+.step {
+  color: var(--color-gray-600);
+}

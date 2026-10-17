@@ -1,0 +1,64 @@
+.selectSection {
+  display: flex;
+  flex-direction: column;
+}
+
+.sectionTitle {
+  padding: 0px 0px 8px;
+}
+
+.sectionBtn {
+  /* 1. 버튼 기본 설정 */
+  /* 배경, 테두리 제거 */
+  background: none;
+  border: none;
+
+  /* 여백 및 패딩 제거 */
+  padding: 0;
+  margin: 0;
+
+  /* 커서 설정 */
+  cursor: pointer;
+
+  /* 기타 브라우저 기본 스타일 제거 */
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  /* 추가 설정 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background-color: var(--color-base-000);
+  padding: 16px;
+}
+
+.sectionBtn.borderDefault {
+  border: 1px solid var(--color-opacity-200);
+}
+
+.sectionBtn.borderActive {
+  border: 1px solid var(--color-olive-300);
+}
+
+.sectionBtn.large {
+  width: 100%;
+}
+
+.sectionBtn.small {
+  width: 181px;
+}
+
+.sectionBtn > span {
+  flex: 1;
+  text-align: left;
+  color: var(--color-gray-900);
+}
+
+.sectionBtn > img {
+  height: 20px;
+  width: 20px;
+  padding: 1.7px;
+  box-sizing: border-box;
+}
