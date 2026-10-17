@@ -135,7 +135,16 @@ function InfoPreview() {
   const [isLifeSheetOpen, setLifeSheetOpen] = useState(false);
   const [isMessageSheetOpen, setMessageSheetOpen] = useState(false);
 
-  // 선택된 ID를 통해 화면에 보여줄 텍스트(title) 찾기 (로직 추가 필요)
+  // 선택된 ID 목록(checkedList)과 원본 데이터 목록(dataList)을 받아서,
+  // 선택된 항목들의 title을 쉼표(,)로 연결하여 반환
+  const getSelectedTitles = (checkedList, dataList) => {
+    if (!checkedList || checkedList.length === 0) return "해당 없음";
+
+    return dataList
+      .filter((item) => checkedList.includes(item.id))
+      .map((item) => item.title)
+      .join(", ");
+  };
 
   return (
     <div className={styles.page}>
@@ -148,7 +157,7 @@ function InfoPreview() {
         {/* 기본 정보 */}
         <SafetyCardGroup
           title="기본 정보"
-          information="생년월일"
+          information={getSelectedTitles(checkedBasicLst, basicInfoData)}
           onClick={() => setBasicSheetOpen(true)}
         />
 
@@ -172,7 +181,7 @@ function InfoPreview() {
         {/* 건강 정보 */}
         <SafetyCardGroup
           title="건강 정보"
-          information="질환, 복용약, 알러지"
+          information={getSelectedTitles(checkedHealthLst, healthInfoData)}
           onClick={() => setHealthSheetOpen(true)}
         />
 
@@ -196,7 +205,7 @@ function InfoPreview() {
         {/* 생활 정보 */}
         <SafetyCardGroup
           title="생활 정보"
-          information="주소, 출입 방법"
+          information={getSelectedTitles(checkedLifeLst, lifeInfoData)}
           onClick={() => setLifeSheetOpen(true)}
         />
 
@@ -220,7 +229,7 @@ function InfoPreview() {
         {/* 미리 남기는 말 */}
         <SafetyCardGroup
           title="미리 남기는 말"
-          information="해당 없음"
+          information={getSelectedTitles(checkedMessageLst, messageInfoData)}
           onClick={() => setMessageSheetOpen(true)}
         />
 
