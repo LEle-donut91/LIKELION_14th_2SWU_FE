@@ -6,6 +6,7 @@ import DefaultSheet from "@/features/request/components/Sheet/DefaultSheet";
 import CheckOption from "@/features/request/components/Option/CheckOption";
 import { useState } from "react";
 import requestSafetyCardData from "@/features/request/api/requestSafetyCardData.json";
+import UserInfo from "@/features/request/components/User/UserInfo";
 
 function InfoPreview() {
 // 1. [기본정보] JSON에서 데이터 꺼내서 CheckOption용 배열로 만들기
@@ -164,6 +165,12 @@ function InfoPreview() {
 
       {/* 메인 컨텐츠 */}
       <main>
+        <UserInfo
+          isAgain={false}
+          state="받는 사람"
+          userName="서연"
+          part="나의 사람"
+        />
 
         {/* 기본 정보 */}
         <SafetyCardGroup

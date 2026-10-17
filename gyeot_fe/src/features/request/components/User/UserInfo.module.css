@@ -1,0 +1,47 @@
+.userInfo {
+    display: flex;
+    padding: 16px;
+    gap: 16px;
+    border-radius: 16px;
+    border: 1px solid var(--color-opacity-100);
+    background-color: var(--color-base-000);
+    
+    /* 그림자 컬러도 CSS 변수로 등록 필요 */
+    box-shadow: 0px 0px 4px rgba(192, 192, 192, 0.16);
+}
+
+.userImg {
+  width: 40px;
+  height: 40px;
+}
+
+.txtContainer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.stateTxt {
+  color: var(--color-gray-900);
+}
+
+.subTxtContainer {
+  display: flex;
+  align-items: center;
+}
+
+.userNameTxt {
+  color: var(--color-olive-600);
+}
+
+.circleContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0px 6.67px;
+}
+
+.partTxt {
+  color: var(--color-gray-900);
+}
