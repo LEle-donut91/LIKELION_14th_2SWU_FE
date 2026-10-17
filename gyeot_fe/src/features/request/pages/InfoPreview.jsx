@@ -182,7 +182,7 @@ function InfoPreview() {
       <StepHeader title="요청 작성" step="2" />
 
       {/* 메인 컨텐츠 */}
-      <main>
+      <main className={styles.content}>
         <UserInfo
           isAgain={false}
           state="받는 사람"
