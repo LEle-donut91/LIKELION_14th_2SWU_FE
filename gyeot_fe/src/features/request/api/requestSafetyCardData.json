@@ -1,0 +1,47 @@
+{
+  "basicInfo": {
+    "birthDate": "2000년 00월 00일",
+    "bloodType": "AB형"
+  },
+  "healthInfo": {
+    "hypertension": {
+      "diagnosedYear": "2024년",
+      "updatedAt": "9/20"
+    },
+    "bloodPressureMedication": {
+      "dosage": "매일 1정",
+      "updatedAt": "9/20"
+    },
+    "penicillinAllergy": {
+      "reaction": "두드러기 반응"
+    },
+    "dizzinessPrecautions": {
+      "instruction": "앉아서 휴식 필요"
+    }
+  },
+  "lifeInfo": {
+    "address": {
+      "value": "서울특별시 화랑로 621 서울여자대학교 조형예술관 000호",
+      "updatedAt": "9/20"
+    },
+    "entranceMethod": {
+      "value": "공동현관문 비밀번호 0000*",
+      "updatedAt": "9/20"
+    },
+    "pet": {
+      "name": "나롱이",
+      "care": "하루에 3번 끼니 제공",
+      "updatedAt": "9/20"
+    }
+  },
+  "messageInfo": {
+    "preference": {
+      "value": "내용 값",
+      "updatedAt": "9/20"
+    },
+    "document": {
+      "value": "내용 값",
+      "updatedAt": "9/20"
+    }
+  }
+}
