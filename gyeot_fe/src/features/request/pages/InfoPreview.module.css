@@ -17,3 +17,8 @@ main {
   padding: 16px 16px 240px;
   gap: 16px;
 }
+
+.defaultTxt {
+  margin-top: 32px;
+  text-align: center;
+}

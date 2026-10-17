@@ -8,6 +8,7 @@ import { useState } from "react";
 import requestSafetyCardData from "@/features/request/api/requestSafetyCardData.json";
 import UserInfo from "@/features/request/components/User/UserInfo";
 import RequestDueDate from "../components/Request/RequestDueDate";
+import LargeFooter from "@/features/request/components/Footer/LargeFooter";
 
 function InfoPreview() {
 // 1. [기본정보] JSON에서 데이터 꺼내서 CheckOption용 배열로 만들기
@@ -274,7 +275,14 @@ function InfoPreview() {
             />
           )}
         </DefaultSheet>
+
+        <span className={`${styles.defaultTxt} typoBodySmall`}>
+          기본값이 선택되어 있어요.
+          <br />
+          공유한 정보는 요청이 끝나면 자동 회수돼요.
+        </span>
       </main>
+      <LargeFooter title="요청 보내기" type="primary" />
     </div>
   );
 }
