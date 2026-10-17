@@ -10,19 +10,23 @@
     }
   },
   "healthInfo": {
-    "hypertension": {
+    "disease": {
+      "name": "고혈압",
       "diagnosedYear": "2024년",
       "updatedAt": "9/20"
     },
-    "bloodPressureMedication": {
+    "medicine": {
+      "name": "혈압약",
       "dosage": "매일 1정",
       "updatedAt": "9/20"
     },
-    "penicillinAllergy": {
+    "allergy": {
+      "name": "페니실린",
       "reaction": "두드러기 반응",
       "updatedAt": null
     },
-    "dizzinessPrecautions": {
+    "caution": {
+      "name": "어지러움",
       "instruction": "앉아서 휴식 필요",
       "updatedAt": null
     }

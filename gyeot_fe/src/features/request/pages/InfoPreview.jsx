@@ -12,6 +12,7 @@ function InfoPreview() {
   const basicInfoData = [
     {
       id: "birthDate",
+      label: "생년월일",
       title: "생년월일",
       description: `${requestSafetyCardData.basicInfo.birthDate.value} 출생${
         requestSafetyCardData.basicInfo.birthDate.updatedAt
@@ -21,6 +22,7 @@ function InfoPreview() {
     },
     {
       id: "bloodType",
+      label: "혈액형",
       title: "혈액형",
       description: `${requestSafetyCardData.basicInfo.bloodType.value}${
         requestSafetyCardData.basicInfo.bloodType.updatedAt
@@ -33,38 +35,42 @@ function InfoPreview() {
   // 2. [건강정보] JSON에서 데이터 꺼내서 CheckOption용 배열로 만들기
   const healthInfoData = [
     {
-      id: "hypertension",
-      title: "고혈압",
-      description: `${requestSafetyCardData.healthInfo.hypertension.diagnosedYear} 진단${
-        requestSafetyCardData.healthInfo.hypertension.updatedAt
-          ? `, 갱신 ${requestSafetyCardData.healthInfo.hypertension.updatedAt}`
+      id: "disease",
+      label: "질환",
+      title: requestSafetyCardData.healthInfo.disease.name,
+      description: `${requestSafetyCardData.healthInfo.disease.diagnosedYear} 진단${
+        requestSafetyCardData.healthInfo.disease.updatedAt
+          ? `, 갱신 ${requestSafetyCardData.healthInfo.disease.updatedAt}`
           : ""
       }`,
     },
     {
-      id: "bloodPressureMedication",
-      title: "혈압약",
-      description: `${requestSafetyCardData.healthInfo.bloodPressureMedication.dosage}${
-        requestSafetyCardData.healthInfo.bloodPressureMedication.updatedAt
-          ? `, 갱신 ${requestSafetyCardData.healthInfo.bloodPressureMedication.updatedAt}`
+      id: "medicine",
+      label: "복용약",
+      title: requestSafetyCardData.healthInfo.medicine.name,
+      description: `${requestSafetyCardData.healthInfo.medicine.dosage}${
+        requestSafetyCardData.healthInfo.medicine.updatedAt
+          ? `, 갱신 ${requestSafetyCardData.healthInfo.medicine.updatedAt}`
           : ""
       }`,
     },
     {
-      id: "penicillinAllergy",
-      title: "페니실린 알러지",
-      description: `${requestSafetyCardData.healthInfo.penicillinAllergy.reaction}${
-        requestSafetyCardData.healthInfo.penicillinAllergy.updatedAt
-          ? `, 갱신 ${requestSafetyCardData.healthInfo.penicillinAllergy.updatedAt}`
+      id: "allergy",
+      label: "알러지",
+      title: `${requestSafetyCardData.healthInfo.allergy.name} 알러지`,
+      description: `${requestSafetyCardData.healthInfo.allergy.reaction}${
+        requestSafetyCardData.healthInfo.allergy.updatedAt
+          ? `, 갱신 ${requestSafetyCardData.healthInfo.allergy.updatedAt}`
           : ""
       }`,
     },
     {
-      id: "dizzinessPrecautions",
-      title: "어지러움 주의사항",
-      description: `${requestSafetyCardData.healthInfo.dizzinessPrecautions.instruction}${
-        requestSafetyCardData.healthInfo.dizzinessPrecautions.updatedAt
-          ? `, 갱신 ${requestSafetyCardData.healthInfo.dizzinessPrecautions.updatedAt}`
+      id: "caution",
+      label: "주의사항",
+      title: `${requestSafetyCardData.healthInfo.caution.name} 주의사항`,
+      description: `${requestSafetyCardData.healthInfo.caution.instruction}${
+        requestSafetyCardData.healthInfo.caution.updatedAt
+          ? `, 갱신 ${requestSafetyCardData.healthInfo.caution.updatedAt}`
           : ""
       }`,
     },
@@ -74,6 +80,7 @@ function InfoPreview() {
   const lifeInfoData = [
     {
       id: "address",
+      label: "주소",
       title: "주소",
       description: `${requestSafetyCardData.lifeInfo.address.value}${
         requestSafetyCardData.lifeInfo.address.updatedAt
@@ -83,7 +90,8 @@ function InfoPreview() {
     },
     {
       id: "entranceMethod",
-      title: "출입 방법",
+      label: "출입 방법",
+      title:  "출입 방법",
       description: `${requestSafetyCardData.lifeInfo.entranceMethod.value}${
         requestSafetyCardData.lifeInfo.entranceMethod.updatedAt
           ? `, 갱신 ${requestSafetyCardData.lifeInfo.entranceMethod.updatedAt}`
@@ -92,6 +100,7 @@ function InfoPreview() {
     },
     {
       id: "pet",
+      label: "반려동물 정보",
       title: `반려동물 (${requestSafetyCardData.lifeInfo.pet.name})`,
       description: `${requestSafetyCardData.lifeInfo.pet.care}${
         requestSafetyCardData.lifeInfo.pet.updatedAt
@@ -105,6 +114,7 @@ function InfoPreview() {
   const messageInfoData = [
     {
       id: "preference",
+      label: "선호",
       title: "선호",
       description: `${requestSafetyCardData.messageInfo.preference.value}${
         requestSafetyCardData.messageInfo.preference.updatedAt
@@ -114,6 +124,7 @@ function InfoPreview() {
     },
     {
       id: "document",
+      label: "문서",
       title: "문서",
       description: `${requestSafetyCardData.messageInfo.document.value}${
         requestSafetyCardData.messageInfo.document.updatedAt
@@ -142,7 +153,7 @@ function InfoPreview() {
 
     return dataList
       .filter((item) => checkedList.includes(item.id))
-      .map((item) => item.title)
+      .map((item) => item.label)
       .join(", ");
   };
 
