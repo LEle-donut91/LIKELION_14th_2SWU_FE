@@ -9,6 +9,7 @@ import requestSafetyCardData from "@/features/request/api/requestSafetyCardData.
 import UserInfo from "@/features/request/components/User/UserInfo";
 import RequestDueDate from "../components/Request/RequestDueDate";
 import LargeFooter from "@/features/request/components/Footer/LargeFooter";
+import DefaultModal from "@/features/request/components/Modal/DefaultModal";
 
 function InfoPreview() {
 // 1. [기본정보] JSON에서 데이터 꺼내서 CheckOption용 배열로 만들기
@@ -149,6 +150,14 @@ function InfoPreview() {
   const [isLifeSheetOpen, setLifeSheetOpen] = useState(false);
   const [isMessageSheetOpen, setMessageSheetOpen] = useState(false);
 
+  // 모달의 열림/닫힘 상태(State) 정의
+  const [isModalOpen, setModalOpen] = useState(false);
+
+  // 모달 여는 함수 정의
+  const handleModalOpen = () => {
+    setModalOpen(!isModalOpen);
+  };
+
   // 선택된 ID 목록(checkedList)과 원본 데이터 목록(dataList)을 받아서,
   // 선택된 항목들의 title을 쉼표(,)로 연결하여 반환
   const getSelectedTitles = (checkedList, dataList) => {
@@ -282,7 +291,24 @@ function InfoPreview() {
           공유한 정보는 요청이 끝나면 자동 회수돼요.
         </span>
       </main>
-      <LargeFooter title="요청 보내기" type="primary" />
+      <LargeFooter
+        title="요청 보내기"
+        type="primary"
+        onClick={handleModalOpen}
+      />
+      <DefaultModal
+        modalOpen={isModalOpen}
+        setModalOpen={setModalOpen}
+        title="민감 정보 확인"
+        description={
+          <>
+            민감 정보가 포함되어 있어요.<br />
+            서연님에게 10/2 18:00까지 정보를 공유할까요?
+          </>
+        }
+        cancelTxt="취소"
+        confirmTxt="공유"
+      />
     </div>
   );
 }
