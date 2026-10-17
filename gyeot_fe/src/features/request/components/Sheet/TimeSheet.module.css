@@ -32,11 +32,10 @@
   -webkit-appearance: none;
   -moz-appearance: none;
 
-  /* 추가 설정 */ 
+  /* 추가 설정 */
   width: 100%;
   border-radius: 16px;
   background-color: var(--color-olive-200);
   color: var(--color-olive-900);
   padding: 16px;
 }
-

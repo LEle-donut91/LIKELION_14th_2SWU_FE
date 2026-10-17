@@ -15,7 +15,10 @@ function UserOption({
         const isSelected = selectedValue === id;
 
         return (
-          <label key={id} className={`${styles.optionItem} ${isSelected ? styles.selected : ""}`}>
+          <label
+            key={id}
+            className={`${styles.optionItem} ${isSelected ? styles.selected : ""}`}
+          >
             <input
               type="radio"
               id={id}

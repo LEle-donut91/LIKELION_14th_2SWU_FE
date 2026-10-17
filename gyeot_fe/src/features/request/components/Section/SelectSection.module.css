@@ -35,11 +35,11 @@
 }
 
 .sectionBtn.borderDefault {
-  border: 1px solid var(--color-opacity-200); 
+  border: 1px solid var(--color-opacity-200);
 }
 
 .sectionBtn.borderActive {
-  border: 1px solid var(--color-olive-300); 
+  border: 1px solid var(--color-olive-300);
 }
 
 .sectionBtn.large {
@@ -47,7 +47,7 @@
 }
 
 .sectionBtn.small {
-  width: 181px; 
+  width: 181px;
 }
 
 .sectionBtn > span {

@@ -37,7 +37,7 @@ function Request() {
   const [isUserSheetOpen, setUserSheetOpen] = useState(false);
   const [isDateTimeSheetOpen, setDateTimeSheetOpen] = useState(false);
   const [isDuedateSheetOpen, setDuedateSheetOpen] = useState(false);
-  
+
   // 어떤 시트(시작 또는 종료)에서 DateTimeSheet를 열었는지 구분하기 위한 상태
   const [dateTarget, setDateTarget] = useState(null);
 
@@ -67,7 +67,7 @@ function Request() {
     if (!dueDate) return "선택";
     const { days, hours, minutes } = dueDate;
     if (!days && !hours && !minutes) return "선택";
-    
+
     return `${days ? `${days}일 ` : ""}${hours ? `${hours}시간 ` : ""}${minutes ? `${minutes}분` : ""}`.trim();
   };
 

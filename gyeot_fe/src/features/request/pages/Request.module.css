@@ -17,6 +17,6 @@ main {
 
 /* 시작-종료 섹션 container */
 .timeSectionContainer {
-    display: flex;
-    gap: 8px;
+  display: flex;
+  gap: 8px;
 }

@@ -3,18 +3,66 @@ import styles from "@/features/request/components/Option/DateTimeOption.module.c
 // type별 입력 필드 설정 데이터
 const OPTION_CONFIGS = {
   date: [
-    { placeholder: "0000", maxLength: 4, label: "년", className: styles.yearInput, key: "year" },
-    { placeholder: "00", maxLength: 2, label: "월", className: styles.dateTimeInput, key: "month" },
-    { placeholder: "00", maxLength: 2, label: "일", className: styles.dateTimeInput, key: "day" },
+    {
+      placeholder: "0000",
+      maxLength: 4,
+      label: "년",
+      className: styles.yearInput,
+      key: "year",
+    },
+    {
+      placeholder: "00",
+      maxLength: 2,
+      label: "월",
+      className: styles.dateTimeInput,
+      key: "month",
+    },
+    {
+      placeholder: "00",
+      maxLength: 2,
+      label: "일",
+      className: styles.dateTimeInput,
+      key: "day",
+    },
   ],
   time: [
-    { placeholder: "00", maxLength: 2, label: "시", className: styles.dateTimeInput, key: "hour" },
-    { placeholder: "00", maxLength: 2, label: "분", className: styles.dateTimeInput, key: "minute" },
+    {
+      placeholder: "00",
+      maxLength: 2,
+      label: "시",
+      className: styles.dateTimeInput,
+      key: "hour",
+    },
+    {
+      placeholder: "00",
+      maxLength: 2,
+      label: "분",
+      className: styles.dateTimeInput,
+      key: "minute",
+    },
   ],
   dueDate: [
-    { placeholder: "00", maxLength: 2, label: "일", className: styles.dateTimeInput, key: "days" },
-    { placeholder: "00", maxLength: 2, label: "시간", className: styles.dateTimeInput, key: "hours" },
-    { placeholder: "00", maxLength: 2, label: "분", className: styles.dateTimeInput, key: "minutes" },
+    {
+      placeholder: "00",
+      maxLength: 2,
+      label: "일",
+      className: styles.dateTimeInput,
+      key: "days",
+    },
+    {
+      placeholder: "00",
+      maxLength: 2,
+      label: "시간",
+      className: styles.dateTimeInput,
+      key: "hours",
+    },
+    {
+      placeholder: "00",
+      maxLength: 2,
+      label: "분",
+      className: styles.dateTimeInput,
+      key: "minutes",
+    },
   ],
 };
 
@@ -35,7 +83,9 @@ function DateTimeOption({ sections = [], value, onChange }) {
       {sections.map(({ type, title }) => (
         <div key={type} className={styles.dateTimeOption}>
           {title && (
-            <span className={`${styles.dateTimeTitle} typoBodyStrong`}>{title}</span>
+            <span className={`${styles.dateTimeTitle} typoBodyStrong`}>
+              {title}
+            </span>
           )}
 
           <div className={styles.dateTimeGroup}>
