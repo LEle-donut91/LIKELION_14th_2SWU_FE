@@ -1,7 +1,13 @@
 {
   "basicInfo": {
-    "birthDate": "2000년 00월 00일",
-    "bloodType": "AB형"
+    "birthDate": {
+      "value": "2000년 00월 00일",
+      "updatedAt": null
+    },
+    "bloodType": {
+      "value": "AB형",
+      "updatedAt": null
+    }
   },
   "healthInfo": {
     "hypertension": {
@@ -13,10 +19,12 @@
       "updatedAt": "9/20"
     },
     "penicillinAllergy": {
-      "reaction": "두드러기 반응"
+      "reaction": "두드러기 반응",
+      "updatedAt": null
     },
     "dizzinessPrecautions": {
-      "instruction": "앉아서 휴식 필요"
+      "instruction": "앉아서 휴식 필요",
+      "updatedAt": null
     }
   },
   "lifeInfo": {
