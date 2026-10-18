@@ -3,14 +3,15 @@ import DefaultHeader from "@/features/request/components/Header/DefaultHeader";
 import requestSend from "@/features/request/assets/requestSend.svg";
 import styles from "@/features/request/pages/RequestSend.module.css";
 import LargeFooter from "@/features/request/components/Footer/LargeFooter";
-import { useNavigate } from "react-router-dom";
+import { useRequestNav } from "@/features/request//hooks/useRequestNav";
 
 function RequestSend() {
-  // 페이지 이동을 위해 navigate 선언
-  const navigate = useNavigate();
+  // navigation 커스텀 훅 불러오기
+  const { handleGoBackToTarget } = useRequestNav();
+
   return (
     <div className={styles.page}>
-      <DefaultHeader title="요청 작성" onClick={() => navigate(-1)} />
+      <DefaultHeader title="요청 작성" onClick={() => handleGoBackToTarget(true)} />
       <main className={styles.content}>
         <img className={styles.requestSendImg} src={requestSend} />
         <span className={`${styles.requetSendTxt} typoDisplaySmall`}>
@@ -20,9 +21,7 @@ function RequestSend() {
       <LargeFooter
         title="닫기"
         type="primary"
-        onClick={() => {
-          navigate(-1);
-        }}
+        onClick={() => handleGoBackToTarget(true)}
       />
     </div>
   );

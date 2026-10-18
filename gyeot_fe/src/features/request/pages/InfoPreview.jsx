@@ -10,7 +10,7 @@ import UserInfo from "@/features/request/components/User/UserInfo";
 import DueDateState from "../components/State/DueDateState";
 import LargeFooter from "@/features/request/components/Footer/LargeFooter";
 import DefaultModal from "@/features/request/components/Modal/DefaultModal";
-import { useNavigate } from "react-router-dom";
+import { useRequestNav } from "@/features/request//hooks/useRequestNav";
 
 function InfoPreview() {
 // 1. [기본정보] JSON에서 데이터 꺼내서 CheckOption용 배열로 만들기
@@ -196,13 +196,8 @@ function InfoPreview() {
     return isHealthSensitiveSelected || isLifeSensitiveSelected;
   };
 
-  // 전송 완료 화면으로 이동
-  const navigate = useNavigate();
-  const handleSendMove = () => {
-    // replace: true
-    // -> 스택에서 현재 경로(/request/info-preview)를 삭제하고 다음 경로(/request/send)로 덮어쓰기(replace)
-    navigate('/request/send', { replace: true });
-  }
+  // navigation 커스텀 훅 불러오기
+  const { handleGoNextWithTarget, handleGoBack } = useRequestNav();
 
   // 요청 보내기 버튼 클릭 핸들러
   const handleSendBtnClick = () => {
@@ -212,13 +207,13 @@ function InfoPreview() {
       return;
     }
     console.log("민감정보 미포함");
-    handleSendMove();
+    handleGoNextWithTarget('/request/send');
   };
 
   return (
     <div className={styles.page}>
       {/* 헤더 */}
-      <StepHeader title="요청 작성" step="2" onClick={() => {navigate(-1)}} />
+      <StepHeader title="요청 작성" step="2" onClick={handleGoBack} />
 
       {/* 메인 컨텐츠 */}
       <main className={styles.content}>
@@ -354,7 +349,7 @@ function InfoPreview() {
         }
         cancelTxt="취소"
         confirmTxt="공유"
-        onConfirmClick={handleSendMove}
+        onConfirmClick={() => handleGoNextWithTarget('/request/send')}
       />
     </div>
   );
