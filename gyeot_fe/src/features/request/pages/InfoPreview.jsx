@@ -186,14 +186,14 @@ function InfoPreview() {
         <UserInfo
           isAgain={false}
           state="받는 사람"
-          userName="서연"
-          part="나의 사람"
+          userName={requestSafetyCardData.userName}
+          part={requestSafetyCardData.userPart}
         />
 
         <DueDateState
           isResponse={false}
           title="접근 기한"
-          dueDate="~10/2 18:00"
+          dueDate={`~ ${requestSafetyCardData.dueDate}`}
         />
 
         {/* 기본 정보 */}
@@ -310,7 +310,7 @@ function InfoPreview() {
         description={
           <>
             민감 정보가 포함되어 있어요.<br />
-            서연님에게 10/2 18:00까지 정보를 공유할까요?
+            {requestSafetyCardData.userName}님에게 {requestSafetyCardData.dueDate}까지 정보를 공유할까요?
           </>
         }
         cancelTxt="취소"
