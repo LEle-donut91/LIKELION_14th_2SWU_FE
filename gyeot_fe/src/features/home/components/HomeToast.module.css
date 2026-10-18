@@ -1,0 +1,14 @@
+.homeToast {
+  position: fixed;
+  left: 50%;
+  /* 하단 네비 높이(추정 96px) + 16px */
+  bottom: 112px;
+  z-index: 50;
+  transform: translateX(-50%);
+
+  padding: 12px 32px;
+  border-radius: 999px;
+  background-color: var(--color-beige-600);
+  color: var(--color-base-000);
+  white-space: nowrap;
+}

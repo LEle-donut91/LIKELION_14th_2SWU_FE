@@ -1,0 +1,23 @@
+.actionBtn {
+  width: 100%;
+  padding: 16px;
+  border-radius: 16px;
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+
+.actionBtn:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
+.primary {
+  background-color: var(--color-olive-500);
+  color: var(--color-base-000);
+}
+
+.secondary {
+  background-color: var(--color-olive-200);
+  border-color: var(--color-opacity-100);
+  color: var(--color-gray-900);
+}
