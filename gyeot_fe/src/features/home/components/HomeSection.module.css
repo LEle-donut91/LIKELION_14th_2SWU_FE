@@ -1,0 +1,33 @@
+.homeSection {
+  display: flex;
+  flex-direction: column;
+}
+
+/* 타이틀: 패딩 하단 20, 간격 8, Title/medium */
+.title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding-bottom: 20px;
+  color: var(--color-gray-900);
+}
+
+/* 리스트 컨테이너 간격 12 */
+.listContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.emptyBox {
+  margin: 0;
+  padding: 24px 16px;
+  border-radius: 16px;
+  background-color: var(--color-gray-100);
+  color: var(--color-gray-800);
+  text-align: center;
+}

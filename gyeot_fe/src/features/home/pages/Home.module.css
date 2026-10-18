@@ -1,0 +1,36 @@
+/* 배경: beige-100 → base-000 선형 그라데이션 (위 → 아래) */
+.home {
+  position: relative;
+  min-height: 100%;
+  background: linear-gradient(
+    180deg,
+    var(--color-base-000) 0%,
+    var(--color-beige-100) 240%
+  );
+}
+
+/* 메인 콘텐츠: 상단 + 좌우 16px, 마지막 요소 ~ 하단 네비 240px */
+.mainContent {
+  padding: 16px 16px 240px;
+}
+
+/* 메인 div 간격 48 */
+.mainContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+}
+
+/* 섹션탭 div 간격 16 */
+.sectionTabContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.message {
+  margin: 0;
+  padding: 16px;
+  color: var(--color-gray-700);
+  text-align: center;
+}

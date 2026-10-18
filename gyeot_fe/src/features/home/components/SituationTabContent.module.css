@@ -1,0 +1,13 @@
+/* 상황 목록 · 각 섹션 사이 간격 48 */
+.situationTabContent {
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+}
+
+/* 상황 카드 목록 간격 20 */
+.situationList {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}

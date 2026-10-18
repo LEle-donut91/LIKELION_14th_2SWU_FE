@@ -1,0 +1,19 @@
+/* 스케줄 리스트: 라디우스 16, 패딩 16, space-between, cardeffect */
+.scheduleItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 16px;
+  border-radius: 16px;
+  background-color: var(--color-base-000);
+  box-shadow: 0 0 4px rgba(192, 192, 192, 0.16);
+}
+
+.title {
+  color: var(--color-gray-900);
+}
+
+.data {
+  color: var(--color-gray-700);
+}
