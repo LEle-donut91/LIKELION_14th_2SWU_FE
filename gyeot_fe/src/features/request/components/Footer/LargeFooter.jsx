@@ -1,8 +1,6 @@
 import styles from "@/features/request/components/Footer/LargeFooter.module.css";
-import { useNavigate } from "react-router-dom";
 
 function LargeFooter({ title, type, onClick }) {
-  const navigate = useNavigate();
 
   return (
     <footer className={styles.largeFooter}>

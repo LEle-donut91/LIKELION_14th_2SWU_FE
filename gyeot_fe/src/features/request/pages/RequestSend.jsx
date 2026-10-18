@@ -10,7 +10,7 @@ function RequestSend() {
   const navigate = useNavigate();
   return (
     <div className={styles.page}>
-      <DefaultHeader title="요청 작성" />
+      <DefaultHeader title="요청 작성" onClick={() => navigate(-1)} />
       <main className={styles.content}>
         <img className={styles.requestSendImg} src={requestSend} />
         <span className={`${styles.requetSendTxt} typoDisplaySmall`}>
@@ -21,8 +21,7 @@ function RequestSend() {
         title="닫기"
         type="primary"
         onClick={() => {
-          // 요청 작성 이전 페이지로 이동
-          navigate(-3);
+          navigate(-1);
         }}
       />
     </div>

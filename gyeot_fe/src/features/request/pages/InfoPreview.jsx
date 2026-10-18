@@ -173,12 +173,6 @@ function InfoPreview() {
   // 모달의 열림/닫힘 상태(State) 정의
   const [isModalOpen, setModalOpen] = useState(false);
 
-  // 전송 완료 화면으로 이동
-  const navigate = useNavigate();
-  const handleToRequestSend = () => {
-    navigate('/request/send');
-  }
-
   // 선택된 ID 목록(checkedList)과 원본 데이터 목록(dataList)을 받아서,
   // 선택된 항목들의 title을 쉼표(,)로 연결하여 반환
   const getSelectedTitles = (checkedList, dataList) => {
@@ -202,21 +196,29 @@ function InfoPreview() {
     return isHealthSensitiveSelected || isLifeSensitiveSelected;
   };
 
+  // 전송 완료 화면으로 이동
+  const navigate = useNavigate();
+  const handleSendMove = () => {
+    // replace: true
+    // -> 스택에서 현재 경로(/request/info-preview)를 삭제하고 다음 경로(/request/send)로 덮어쓰기(replace)
+    navigate('/request/send', { replace: true });
+  }
+
   // 요청 보내기 버튼 클릭 핸들러
-  const handleRequestSend = () => {
+  const handleSendBtnClick = () => {
     if (isSensitiveIncluded()) {
       console.log("민감정보 포함");
       setModalOpen(!isModalOpen);
       return;
     }
     console.log("민감정보 미포함");
-    handleToRequestSend();
+    handleSendMove();
   };
 
   return (
     <div className={styles.page}>
       {/* 헤더 */}
-      <StepHeader title="요청 작성" step="2" />
+      <StepHeader title="요청 작성" step="2" onClick={() => {navigate(-1)}} />
 
       {/* 메인 컨텐츠 */}
       <main className={styles.content}>
@@ -338,7 +340,7 @@ function InfoPreview() {
       <LargeFooter
         title="요청 보내기"
         type="primary"
-        onClick={handleRequestSend}
+        onClick={handleSendBtnClick}
       />
       <DefaultModal
         modalOpen={isModalOpen}
@@ -352,7 +354,7 @@ function InfoPreview() {
         }
         cancelTxt="취소"
         confirmTxt="공유"
-        onConfirmClick={handleToRequestSend}
+        onConfirmClick={handleSendMove}
       />
     </div>
   );
