@@ -1,13 +1,13 @@
 .userInfo {
-    display: flex;
-    padding: 16px;
-    gap: 16px;
-    border-radius: 16px;
-    border: 1px solid var(--color-opacity-100);
-    background-color: var(--color-base-000);
-    
-    /* 그림자 컬러도 CSS 변수로 등록 필요 */
-    box-shadow: 0px 0px 4px rgba(192, 192, 192, 0.16);
+  display: flex;
+  padding: 16px;
+  gap: 16px;
+  border-radius: 16px;
+  border: 1px solid var(--color-opacity-100);
+  background-color: var(--color-base-000);
+
+  /* 그림자 컬러도 CSS 변수로 등록 필요 */
+  box-shadow: 0px 0px 4px rgba(192, 192, 192, 0.16);
 }
 
 .userImg {

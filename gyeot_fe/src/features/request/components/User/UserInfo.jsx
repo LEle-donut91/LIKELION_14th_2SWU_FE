@@ -16,7 +16,9 @@ function UserInfo({ isAgain, state, userName, part }) {
               <div className={styles.circleContainer}>
                 <img src={circle} alt="" />
               </div>
-              <span className={`${styles.partTxt} typoCaptionMedium`}>{part}</span>
+              <span className={`${styles.partTxt} typoCaptionMedium`}>
+                {part}
+              </span>
             </div>
             <span className={`${styles.stateTxt} typoBodySmall`}>{state}</span>
           </>
@@ -30,7 +32,9 @@ function UserInfo({ isAgain, state, userName, part }) {
               <div className={styles.circleContainer}>
                 <img src={circle} alt="" />
               </div>
-              <span className={`${styles.partTxt} typoCaptionMedium`}>{part}</span>
+              <span className={`${styles.partTxt} typoCaptionMedium`}>
+                {part}
+              </span>
             </div>
           </>
         )}

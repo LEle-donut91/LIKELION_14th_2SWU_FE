@@ -1,7 +1,6 @@
 import styles from "@/features/request/components/Footer/LargeFooter.module.css";
 
 function LargeFooter({ title, type, onClick }) {
-
   return (
     <footer className={styles.largeFooter}>
       <button

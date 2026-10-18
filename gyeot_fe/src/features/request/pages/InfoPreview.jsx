@@ -13,7 +13,7 @@ import DefaultModal from "@/features/request/components/Modal/DefaultModal";
 import { useRequestNav } from "@/features/request//hooks/useRequestNav";
 
 function InfoPreview() {
-// 1. [기본정보] JSON에서 데이터 꺼내서 CheckOption용 배열로 만들기
+  // 1. [기본정보] JSON에서 데이터 꺼내서 CheckOption용 배열로 만들기
   const basicInfoData = [
     {
       id: "birthDate",
@@ -103,7 +103,7 @@ function InfoPreview() {
     {
       id: "entranceMethod",
       label: "출입 방법",
-      title:  "출입 방법",
+      title: "출입 방법",
       isDefault: requestSafetyCardData.lifeInfo.entranceMethod.isDefault,
       description: `${requestSafetyCardData.lifeInfo.entranceMethod.value}${
         requestSafetyCardData.lifeInfo.entranceMethod.updatedAt
@@ -152,16 +152,16 @@ function InfoPreview() {
 
   // 각 선택 항목에 대한 상태(State) 정의 (isDefault가 true인 항목들의 id를 초기값으로 설정)
   const [checkedBasicLst, setCheckedBasicLst] = useState(
-    basicInfoData.filter((item) => item.isDefault).map((item) => item.id)
+    basicInfoData.filter((item) => item.isDefault).map((item) => item.id),
   );
   const [checkedHealthLst, setCheckedHealthLst] = useState(
-    healthInfoData.filter((item) => item.isDefault).map((item) => item.id)
+    healthInfoData.filter((item) => item.isDefault).map((item) => item.id),
   );
   const [checkedLifeLst, setCheckedLifeLst] = useState(
-    lifeInfoData.filter((item) => item.isDefault).map((item) => item.id)
+    lifeInfoData.filter((item) => item.isDefault).map((item) => item.id),
   );
   const [checkedMessageLst, setCheckedMessageLst] = useState(
-    messageInfoData.filter((item) => item.isDefault).map((item) => item.id)
+    messageInfoData.filter((item) => item.isDefault).map((item) => item.id),
   );
 
   // 각 Sheet의 열림/닫힘 상태(State) 정의
@@ -185,13 +185,23 @@ function InfoPreview() {
   };
 
   // 민감정보 항목의 ID 목록 정의
-  const SENSITIVE_KEYS = ["disease", "medicine", "allergy", "address", "entranceMethod"];
+  const SENSITIVE_KEYS = [
+    "disease",
+    "medicine",
+    "allergy",
+    "address",
+    "entranceMethod",
+  ];
 
   // 사용자가 체크한 항목 중 민감정보가 포함되어 있으면 true 반환 (아니라면 false)
   const isSensitiveIncluded = () => {
     // 건강 정보 및 생활 정보 선택 목록 중 민감정보 ID가 포함되어 있는지 검사
-    const isHealthSensitiveSelected = checkedHealthLst.some((id) => SENSITIVE_KEYS.includes(id));
-    const isLifeSensitiveSelected = checkedLifeLst.some((id) => SENSITIVE_KEYS.includes(id));
+    const isHealthSensitiveSelected = checkedHealthLst.some((id) =>
+      SENSITIVE_KEYS.includes(id),
+    );
+    const isLifeSensitiveSelected = checkedLifeLst.some((id) =>
+      SENSITIVE_KEYS.includes(id),
+    );
 
     return isHealthSensitiveSelected || isLifeSensitiveSelected;
   };
@@ -207,7 +217,7 @@ function InfoPreview() {
       return;
     }
     console.log("민감정보 미포함");
-    handleGoNextWithTarget('/request/send');
+    handleGoNextWithTarget("/request/send");
   };
 
   return (
@@ -343,13 +353,15 @@ function InfoPreview() {
         title="민감 정보 확인"
         description={
           <>
-            민감 정보가 포함되어 있어요.<br />
-            {requestSafetyCardData.userName}님에게 {requestSafetyCardData.dueDate}까지 정보를 공유할까요?
+            민감 정보가 포함되어 있어요.
+            <br />
+            {requestSafetyCardData.userName}님에게{" "}
+            {requestSafetyCardData.dueDate}까지 정보를 공유할까요?
           </>
         }
         cancelTxt="취소"
         confirmTxt="공유"
-        onConfirmClick={() => handleGoNextWithTarget('/request/send')}
+        onConfirmClick={() => handleGoNextWithTarget("/request/send")}
       />
     </div>
   );

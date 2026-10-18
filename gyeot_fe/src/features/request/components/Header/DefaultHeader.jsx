@@ -8,7 +8,9 @@ function DefaultHeader({ title, subBtnTitle, onClick }) {
         <img className={styles.backBtnImg} src={backBtn} />
       </button>
       <div className={`${styles.title} typoDisplaySmall`}>{title}</div>
-      <button className={`${styles.subBtn} typoBodyMedium`}>{subBtnTitle ? subBtnTitle : ""}</button>
+      <button className={`${styles.subBtn} typoBodyMedium`}>
+        {subBtnTitle ? subBtnTitle : ""}
+      </button>
     </header>
   );
 }

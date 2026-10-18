@@ -11,7 +11,10 @@ function RequestSend() {
 
   return (
     <div className={styles.page}>
-      <DefaultHeader title="요청 작성" onClick={() => handleGoBackToTarget(true)} />
+      <DefaultHeader
+        title="요청 작성"
+        onClick={() => handleGoBackToTarget(true)}
+      />
       <main className={styles.content}>
         <img className={styles.requestSendImg} src={requestSend} />
         <span className={`${styles.requetSendTxt} typoDisplaySmall`}>
