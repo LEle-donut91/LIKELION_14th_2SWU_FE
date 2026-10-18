@@ -1,0 +1,96 @@
+/* 모바일 프레임(402px) 영역을 덮는 딤 */
+.overlay {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  z-index: 100;
+  width: 402px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: flex-end;
+  background-color: var(--color-opacity-400);
+}
+
+.sheet {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 16px 16px 48px;
+  border-radius: 24px 24px 0 0;
+  background-color: var(--color-base-000);
+}
+
+.handle {
+  align-self: center;
+  width: 120px;
+  height: 4px;
+  border-radius: 999px;
+  background-color: var(--color-gray-200);
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.title {
+  margin: 0;
+  color: var(--color-gray-900);
+}
+
+.description {
+  margin: 0;
+  color: var(--color-gray-700);
+}
+
+.optionList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0 0 24px;
+  padding: 0;
+  list-style: none;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 20px 24px;
+  border: 1px solid var(--color-opacity-100);
+  border-radius: 16px;
+  background-color: var(--color-base-000);
+  color: var(--color-gray-900);
+  text-align: left;
+  cursor: pointer;
+}
+
+.selected {
+  border: 2px solid var(--color-olive-300);
+  padding: 19px 23px; /* 두꺼워진 테두리만큼 보정 */
+  background-color: var(--color-olive-100);
+}
+
+.optionText {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.optionMeta {
+  color: var(--color-gray-700);
+}
+
+.radioOn {
+  color: var(--color-olive-600);
+}
+
+.radioOff {
+  color: var(--color-gray-500);
+}
