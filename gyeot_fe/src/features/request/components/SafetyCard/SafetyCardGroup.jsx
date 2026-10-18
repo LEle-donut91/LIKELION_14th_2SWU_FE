@@ -1,5 +1,5 @@
 import styles from "@/features/request/components/SafetyCard/SafetyCardGroup.module.css";
-import backBtn from "@/features/request/assets/backBtn.svg";
+import iconRight from "@/shared/assets/icons/iconRight.svg";
 
 function SafyCardGroup({ title, information, onClick }) {
   return (
@@ -11,7 +11,7 @@ function SafyCardGroup({ title, information, onClick }) {
         </span>
       </div>
       <div className={styles.imgContainer}>
-        <img className={styles.arrowImg} src={backBtn} />
+        <img className={styles.arrowImg} src={iconRight} />
       </div>
     </button>
   );

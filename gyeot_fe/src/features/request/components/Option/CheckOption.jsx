@@ -1,5 +1,5 @@
-import unchecked from "@/features/request/assets/unchecked.svg";
-import checked from "@/features/request/assets/checked.svg";
+import iconCheckOff from "@/shared/assets/icons/iconCheckOff.svg";
+import iconCheckOn from "@/shared/assets/icons/iconCheckOn.svg";
 import styles from "@/features/request/components/Option/CheckOption.module.css";
 
 function CheckOption({
@@ -46,7 +46,7 @@ function CheckOption({
             </div>
 
             <div className={styles.imgContainer}>
-              <img src={isChecked ? checked : unchecked} />
+              <img className={isChecked ? styles.checkOnImg : styles.checkOffImg} src={isChecked ? iconCheckOn : iconCheckOff} />
             </div>
           </label>
         );

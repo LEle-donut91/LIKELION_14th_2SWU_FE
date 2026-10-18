@@ -52,6 +52,5 @@
 }
 
 .arrowImg {
-  width: 14.3px;
-  transform: scaleX(-1);
+  filter: brightness(0) saturate(100%) invert(35%) sepia(0%) saturate(1181%) hue-rotate(218deg) brightness(100%) contrast(77%);
 }

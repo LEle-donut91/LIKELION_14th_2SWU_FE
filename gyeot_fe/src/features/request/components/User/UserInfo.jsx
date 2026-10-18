@@ -1,11 +1,10 @@
 import styles from "@/features/request/components/User/UserInfo.module.css";
-import userImg from "@/features/request/assets/userImg.svg";
-import circle from "@/features/request/assets/circle.svg";
+import iconPoint from "@/shared/assets/icons/iconPoint.svg";
 
 function UserInfo({ isAgain, state, userName, part }) {
   return (
     <div className={styles.userInfo}>
-      <img className={styles.userImg} src={userImg} />
+      <div className={styles.userImg} />
       <div className={styles.txtContainer}>
         {isAgain ? (
           <>
@@ -14,7 +13,7 @@ function UserInfo({ isAgain, state, userName, part }) {
                 {userName}
               </span>
               <div className={styles.circleContainer}>
-                <img src={circle} alt="" />
+                <img className={styles.pointImg} src={iconPoint} alt="" />
               </div>
               <span className={`${styles.partTxt} typoCaptionMedium`}>
                 {part}
@@ -30,7 +29,7 @@ function UserInfo({ isAgain, state, userName, part }) {
                 {userName}
               </span>
               <div className={styles.circleContainer}>
-                <img src={circle} alt="" />
+                <img src={iconPoint} alt="" />
               </div>
               <span className={`${styles.partTxt} typoCaptionMedium`}>
                 {part}

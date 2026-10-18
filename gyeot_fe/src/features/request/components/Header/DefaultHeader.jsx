@@ -1,11 +1,11 @@
 import styles from "@/features/request/components/Header/DefaultHeader.module.css";
-import backBtn from "@/features/request/assets/backBtn.svg";
+import iconLeft from "@/shared/assets/icons/iconLeft.svg";
 
 function DefaultHeader({ title, subBtnTitle, onClick }) {
   return (
     <header className={styles.defaultHeader}>
       <button className={styles.backBtn} onClick={onClick}>
-        <img className={styles.backBtnImg} src={backBtn} />
+        <img className={styles.backBtnImg} src={iconLeft} />
       </button>
       <div className={`${styles.title} typoDisplaySmall`}>{title}</div>
       <button className={`${styles.subBtn} typoBodyMedium`}>
