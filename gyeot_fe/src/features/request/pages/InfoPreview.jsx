@@ -173,11 +173,6 @@ function InfoPreview() {
   // 모달의 열림/닫힘 상태(State) 정의
   const [isModalOpen, setModalOpen] = useState(false);
 
-  // 모달 여는 함수 정의
-  const handleModalOpen = () => {
-    setModalOpen(!isModalOpen);
-  };
-
   // 전송 완료 화면으로 이동
   const navigate = useNavigate();
   const handleToRequestSend = () => {
@@ -193,6 +188,29 @@ function InfoPreview() {
       .filter((item) => checkedList.includes(item.id))
       .map((item) => item.label)
       .join(", ");
+  };
+
+  // 민감정보 항목의 ID 목록 정의
+  const SENSITIVE_KEYS = ["disease", "medicine", "allergy", "address", "entranceMethod"];
+
+  // 사용자가 체크한 항목 중 민감정보가 포함되어 있으면 true 반환 (아니라면 false)
+  const isSensitiveIncluded = () => {
+    // 건강 정보 및 생활 정보 선택 목록 중 민감정보 ID가 포함되어 있는지 검사
+    const isHealthSensitiveSelected = checkedHealthLst.some((id) => SENSITIVE_KEYS.includes(id));
+    const isLifeSensitiveSelected = checkedLifeLst.some((id) => SENSITIVE_KEYS.includes(id));
+
+    return isHealthSensitiveSelected || isLifeSensitiveSelected;
+  };
+
+  // 요청 보내기 버튼 클릭 핸들러
+  const handleRequestSend = () => {
+    if (isSensitiveIncluded()) {
+      console.log("민감정보 포함");
+      setModalOpen(!isModalOpen);
+      return;
+    }
+    console.log("민감정보 미포함");
+    handleToRequestSend();
   };
 
   return (
@@ -320,7 +338,7 @@ function InfoPreview() {
       <LargeFooter
         title="요청 보내기"
         type="primary"
-        onClick={handleModalOpen}
+        onClick={handleRequestSend}
       />
       <DefaultModal
         modalOpen={isModalOpen}
