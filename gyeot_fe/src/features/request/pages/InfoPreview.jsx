@@ -19,6 +19,7 @@ function InfoPreview() {
       id: "birthDate",
       label: "생년월일",
       title: "생년월일",
+      isDefault: requestSafetyCardData.basicInfo.birthDate.isDefault,
       description: `${requestSafetyCardData.basicInfo.birthDate.value} 출생${
         requestSafetyCardData.basicInfo.birthDate.updatedAt
           ? `, 갱신 ${requestSafetyCardData.basicInfo.birthDate.updatedAt}`
@@ -29,6 +30,7 @@ function InfoPreview() {
       id: "bloodType",
       label: "혈액형",
       title: "혈액형",
+      isDefault: requestSafetyCardData.basicInfo.bloodType.isDefault,
       description: `${requestSafetyCardData.basicInfo.bloodType.value}${
         requestSafetyCardData.basicInfo.bloodType.updatedAt
           ? `, 갱신 ${requestSafetyCardData.basicInfo.bloodType.updatedAt}`
@@ -43,6 +45,7 @@ function InfoPreview() {
       id: "disease",
       label: "질환",
       title: requestSafetyCardData.healthInfo.disease.name,
+      isDefault: requestSafetyCardData.healthInfo.disease.isDefault,
       description: `${requestSafetyCardData.healthInfo.disease.diagnosedYear} 진단${
         requestSafetyCardData.healthInfo.disease.updatedAt
           ? `, 갱신 ${requestSafetyCardData.healthInfo.disease.updatedAt}`
@@ -53,6 +56,7 @@ function InfoPreview() {
       id: "medicine",
       label: "복용약",
       title: requestSafetyCardData.healthInfo.medicine.name,
+      isDefault: requestSafetyCardData.healthInfo.medicine.isDefault,
       description: `${requestSafetyCardData.healthInfo.medicine.dosage}${
         requestSafetyCardData.healthInfo.medicine.updatedAt
           ? `, 갱신 ${requestSafetyCardData.healthInfo.medicine.updatedAt}`
@@ -63,6 +67,7 @@ function InfoPreview() {
       id: "allergy",
       label: "알러지",
       title: `${requestSafetyCardData.healthInfo.allergy.name} 알러지`,
+      isDefault: requestSafetyCardData.healthInfo.allergy.isDefault,
       description: `${requestSafetyCardData.healthInfo.allergy.reaction}${
         requestSafetyCardData.healthInfo.allergy.updatedAt
           ? `, 갱신 ${requestSafetyCardData.healthInfo.allergy.updatedAt}`
@@ -73,6 +78,7 @@ function InfoPreview() {
       id: "caution",
       label: "주의사항",
       title: `${requestSafetyCardData.healthInfo.caution.name} 주의사항`,
+      isDefault: requestSafetyCardData.healthInfo.caution.isDefault,
       description: `${requestSafetyCardData.healthInfo.caution.instruction}${
         requestSafetyCardData.healthInfo.caution.updatedAt
           ? `, 갱신 ${requestSafetyCardData.healthInfo.caution.updatedAt}`
@@ -87,6 +93,7 @@ function InfoPreview() {
       id: "address",
       label: "주소",
       title: "주소",
+      isDefault: requestSafetyCardData.lifeInfo.address.isDefault,
       description: `${requestSafetyCardData.lifeInfo.address.value}${
         requestSafetyCardData.lifeInfo.address.updatedAt
           ? `, 갱신 ${requestSafetyCardData.lifeInfo.address.updatedAt}`
@@ -97,6 +104,7 @@ function InfoPreview() {
       id: "entranceMethod",
       label: "출입 방법",
       title:  "출입 방법",
+      isDefault: requestSafetyCardData.lifeInfo.entranceMethod.isDefault,
       description: `${requestSafetyCardData.lifeInfo.entranceMethod.value}${
         requestSafetyCardData.lifeInfo.entranceMethod.updatedAt
           ? `, 갱신 ${requestSafetyCardData.lifeInfo.entranceMethod.updatedAt}`
@@ -107,6 +115,7 @@ function InfoPreview() {
       id: "pet",
       label: "반려동물 정보",
       title: `반려동물 (${requestSafetyCardData.lifeInfo.pet.name})`,
+      isDefault: requestSafetyCardData.lifeInfo.pet.isDefault,
       description: `${requestSafetyCardData.lifeInfo.pet.care}${
         requestSafetyCardData.lifeInfo.pet.updatedAt
           ? `, 갱신 ${requestSafetyCardData.lifeInfo.pet.updatedAt}`
@@ -121,6 +130,7 @@ function InfoPreview() {
       id: "preference",
       label: "선호",
       title: "선호",
+      isDefault: requestSafetyCardData.messageInfo.preference.isDefault,
       description: `${requestSafetyCardData.messageInfo.preference.value}${
         requestSafetyCardData.messageInfo.preference.updatedAt
           ? `, 갱신 ${requestSafetyCardData.messageInfo.preference.updatedAt}`
@@ -131,6 +141,7 @@ function InfoPreview() {
       id: "document",
       label: "문서",
       title: "문서",
+      isDefault: requestSafetyCardData.messageInfo.document.isDefault,
       description: `${requestSafetyCardData.messageInfo.document.value}${
         requestSafetyCardData.messageInfo.document.updatedAt
           ? `, 갱신 ${requestSafetyCardData.messageInfo.document.updatedAt}`
@@ -139,11 +150,19 @@ function InfoPreview() {
     },
   ];
 
-  // 각 선택 항목에 대한 상태(State) 정의
-  const [checkedBasicLst, setCheckedBasicLst] = useState([]);
-  const [checkedHealthLst, setCheckedHealthLst] = useState([]);
-  const [checkedLifeLst, setCheckedLifeLst] = useState([]);
-  const [checkedMessageLst, setCheckedMessageLst] = useState([]);
+  // 각 선택 항목에 대한 상태(State) 정의 (isDefault가 true인 항목들의 id를 초기값으로 설정)
+  const [checkedBasicLst, setCheckedBasicLst] = useState(
+    basicInfoData.filter((item) => item.isDefault).map((item) => item.id)
+  );
+  const [checkedHealthLst, setCheckedHealthLst] = useState(
+    healthInfoData.filter((item) => item.isDefault).map((item) => item.id)
+  );
+  const [checkedLifeLst, setCheckedLifeLst] = useState(
+    lifeInfoData.filter((item) => item.isDefault).map((item) => item.id)
+  );
+  const [checkedMessageLst, setCheckedMessageLst] = useState(
+    messageInfoData.filter((item) => item.isDefault).map((item) => item.id)
+  );
 
   // 각 Sheet의 열림/닫힘 상태(State) 정의
   const [isBasicSheetOpen, setBasicSheetOpen] = useState(false);
