@@ -16,6 +16,7 @@ function DefaultModal({
       onRequestClose={() => setModalOpen(false)}
       overlayClassName={styles.overlayContent}
       className={styles.modalContent}
+      ariaHideApp={false}
     >
       <div className={styles.txtContainer}>
         <span className={`${styles.title} typoBodyStrong`}>{title}</span>
