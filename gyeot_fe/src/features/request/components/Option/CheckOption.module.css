@@ -1,0 +1,47 @@
+.optionList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 48px;
+}
+
+.optionItem {
+  display: flex;
+  cursor: pointer;
+}
+
+.optionInput {
+  display: none;
+}
+
+.txtContainer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.checkedTitle {
+  color: var(--color-olive-600);
+}
+
+.uncheckedTitle {
+  color: var(--color-gray-900);
+}
+
+.description {
+  color: var(--color-gray-700);
+}
+
+.imgContainer {
+  padding: 3.5px;
+  margin-left: auto;
+}
+
+.checkOnImg {
+  filter: brightness(0) saturate(100%) invert(39%) sepia(82%) saturate(361%) hue-rotate(41deg) brightness(89%) contrast(85%);
+}
+
+.checkOffImg {
+filter: brightness(0) saturate(100%) invert(57%) sepia(5%) saturate(284%) hue-rotate(13deg) brightness(91%) contrast(90%);
+}
