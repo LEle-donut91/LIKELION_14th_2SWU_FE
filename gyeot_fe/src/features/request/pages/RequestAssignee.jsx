@@ -1,5 +1,5 @@
 // H-03-01
-import styles from "@/features/request/pages/RequestAssignee.module.css"
+import styles from "@/features/request/pages/RequestAssignee.module.css";
 import RequestStep from "@/features/request/components/Request/RequestStep";
 import RequestState from "@/features/request/components/State/RequestState";
 import RequestSummary from "@/features/request/components/Request/RequestSummary";
@@ -8,20 +8,52 @@ import iconDate from "@/shared/assets/icons/iconDate.svg";
 import DefaultHeader from "@/features/request/components/Header/DefaultHeader";
 import SafetyCardGroup from "@/features/request/components/SafetyCard/SafetyCardGroup";
 import LargeFooter from "@/features/request/components/Footer/LargeFooter";
+import requestAssigneeData from "@/features/request/api/requestAssigneeData.json";
 
 function RequestAssignee() {
+  const requestState = requestAssigneeData.requestState; // 요청 상태 ("accept", "progress", "done" 중 하나)
+  const isChanged = requestAssigneeData.isChanged; // 요청이 수정되었는지 (true / false)
+
+  // SafetyCardGroup의 information props 결정
+  const getSafetyInformation = () => {
+    if (requestState === "accept") {
+      return "수락한 이후 확인할 수 있어요.";
+    } else if (requestState === "done") {
+      return "접근이 종료되었어요.";
+    } else {
+      return "";
+    }
+  };
+
+  // LargeFooter의 title props 결정
+  const getFooterTitle = () => {
+    if (isChanged) {
+      return "변경 내용 확인";
+    }
+    if (!isChanged && requestState === "accept") {
+      return "시작";
+    }
+    if (!isChanged && requestState === "progress") {
+      return "완료";
+    }
+    if (!isChanged && requestState === "done") {
+      return "지난 상황에서 보기";
+    }
+    return "";
+  };
+
   // RequestSummary에 넘겨줄 infoList 배열 구성
   // 부모 컴포넌트에서 동적으로 아이콘, 라벨, 값을 묶어서 전달
   const infoList = [
     {
       icon: iconDate,
       label: "시간",
-      value: "10/2(목) 14:00 - 15:00",
+      value: requestAssigneeData.time,
     },
     {
       icon: iconLocation,
       label: "장소",
-      value: "슈슈병원",
+      value: requestAssigneeData.location,
     },
   ];
 
@@ -34,28 +66,41 @@ function RequestAssignee() {
       />
       <div className={styles.content}>
         <div className={styles.stepContainer}>
-      <RequestStep isRequester={false} state="done" />
-      </div>
-      <RequestState
-        isRequester={false}
-        title="요청 수정"
-        information="수정된 정보를 확인해주세요."
-      />
-      <RequestSummary
-        isChanged={false}
-        title="지우님의 요청"
-        isRequester={false}
-        infoList={infoList}
-        message="병원에 가야하는 일이 생겼는데, 혼자 가기에 부담스러워요. 같이 가면 큰 도움이 될 것 같아요!"
-      />
-      <SafetyCardGroup
-        title="전달받은 정보"
-        information="수락한 이후 확인할 수 있어요."
-        // onClick={}
-      />
+          <RequestStep isRequester={false} state={requestState} />
+        </div>
+
+        {/* 요청이 수정되었을 때만 표시 */}
+        {isChanged && (
+          <RequestState
+            isRequester={false}
+            title="요청 수정"
+            information="수정된 정보를 확인해주세요."
+          />
+        )}
+
+        <RequestSummary
+          isChanged={isChanged}
+          title={`${requestAssigneeData.userName}님의 요청`}
+          isRequester={false}
+          infoList={infoList}
+          message={requestAssigneeData.message}
+        />
+
+        <SafetyCardGroup
+          title="전달받은 정보"
+          information={getSafetyInformation()}
+          // onClick={}
+        />
+
+        {/* 요청이 완료된 경우에만 span 태그 추가 */}
+        {requestState === "done" && (
+          <span className={`${styles.doneNotice} typoBodySmall`}>
+            완료된 요청은 다시 열 수 없어요
+          </span>
+        )}
       </div>
       <LargeFooter
-        title="시작"
+        title={getFooterTitle()}
         type="primary"
         // onClick={}
       />

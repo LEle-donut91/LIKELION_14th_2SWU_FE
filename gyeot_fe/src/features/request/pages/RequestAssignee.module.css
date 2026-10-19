@@ -20,5 +20,11 @@
 }
 
 .stepContainer {
-    margin-bottom: 32px;
+  margin-bottom: 32px;
+}
+
+.doneNotice {
+  margin-top: 48px;
+  text-align: center;
+  color: var(--color-gray-700);
 }
