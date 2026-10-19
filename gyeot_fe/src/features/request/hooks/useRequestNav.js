@@ -43,6 +43,20 @@ export function useRequestNav() {
     });
   };
 
+  // 다음 화면으로 이동 (key-value 쌍으로 여러 state를 함께 전달)
+  const handleGoNextWithState = (
+    nextPath,
+    stateObject = {},
+    replace = false,
+  ) => {
+    navigate(nextPath, {
+      replace,
+      state: {
+        ...stateObject,
+      },
+    });
+  };
+
   return {
     targetPath,
     handleGoStart,
@@ -50,5 +64,6 @@ export function useRequestNav() {
     handleGoNextWithTarget,
     handleGoBack,
     handleGoNext,
+    handleGoNextWithState,
   };
 }
