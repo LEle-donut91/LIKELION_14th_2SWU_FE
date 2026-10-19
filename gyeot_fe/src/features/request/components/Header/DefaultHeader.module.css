@@ -26,7 +26,8 @@
   -moz-appearance: none;
 
   /* 추가 설정 */
-  filter: brightness(0) saturate(100%) invert(35%) sepia(0%) saturate(1181%) hue-rotate(218deg) brightness(100%) contrast(77%);
+  filter: brightness(0) saturate(100%) invert(35%) sepia(0%) saturate(1181%)
+    hue-rotate(218deg) brightness(100%) contrast(77%);
 }
 
 .backBtnImg {

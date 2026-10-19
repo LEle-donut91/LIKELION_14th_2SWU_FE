@@ -8,7 +8,9 @@ function RequestSummary({
   message,
 }) {
   return (
-    <div className={`${styles.component} ${isAfterInfo ? styles.isChanged : ""}`}>
+    <div
+      className={`${styles.component} ${isAfterInfo ? styles.isChanged : ""}`}
+    >
       <div className={styles.header}>
         <span className={`${styles.title} typoTitleMedium`}>{title}</span>
         {!isRequester && (

@@ -27,7 +27,7 @@
 
 .tag {
   border-radius: 999px;
-  background-color:  var(--color-beige-500);
+  background-color: var(--color-beige-500);
   padding: 4px 8px;
   text-align: center;
   color: var(--color-base-000);

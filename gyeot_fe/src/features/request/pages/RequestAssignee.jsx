@@ -10,7 +10,7 @@ import SafetyCardGroup from "@/features/request/components/SafetyCard/SafetyCard
 import LargeFooter from "@/features/request/components/Footer/LargeFooter";
 import requestAssigneeData from "@/features/request/api/requestAssigneeData.json";
 import { useRequestNav } from "@/features/request//hooks/useRequestNav";
-import DefaultModal from '@/features/request/components/Modal/DefaultModal';
+import DefaultModal from "@/features/request/components/Modal/DefaultModal";
 import { useState } from "react";
 
 function RequestAssignee() {
@@ -59,7 +59,7 @@ function RequestAssignee() {
       value: requestAssigneeData.location,
     },
   ];
-  
+
   // 모달의 열림/닫힘 상태(State) 정의
   const [isModalOpen, setModalOpen] = useState(false);
 
@@ -87,8 +87,8 @@ function RequestAssignee() {
     if (!isChanged && requestState === "done") {
       return handlePastBtnClick;
     }
-    
-    return () => {}; 
+
+    return () => {};
   };
 
   const handleStartBtnClick = () => {
