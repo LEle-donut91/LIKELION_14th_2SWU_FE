@@ -1,14 +1,14 @@
 import styles from "@/features/request/components/Request/RequestSummary.module.css";
 
 function RequestSummary({
-  isChanged,
+  isAfterInfo,
   title,
   isRequester,
   infoList = [], // 부모로부터 infoList 배열을 props로 전달받음
   message,
 }) {
   return (
-    <div className={`${styles.component} ${isChanged ? styles.isChanged : ""}`}>
+    <div className={`${styles.component} ${isAfterInfo ? styles.isChanged : ""}`}>
       <div className={styles.header}>
         <span className={`${styles.title} typoTitleMedium`}>{title}</span>
         {!isRequester && (

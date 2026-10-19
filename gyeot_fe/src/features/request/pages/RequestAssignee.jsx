@@ -75,7 +75,6 @@ function RequestAssignee() {
 
   /* Footer 버튼 클릭 이벤트 결정  */
   const getFooterOnClick = () => {
-    console.log("현재 상태:", { isChanged, requestState });
     if (isChanged) {
       return handleChangedBtnClick;
     }
@@ -116,7 +115,7 @@ function RequestAssignee() {
     <div className={styles.page}>
       <DefaultHeader
         title="요청 상세"
-        subBtnTitle="철회"
+        {...(requestState === "accept" && { subBtnTitle: "철회" })}
         onClick={handleGoBack}
         onSubBtnClick={() => setModalOpen(!isModalOpen)}
       />
@@ -130,12 +129,12 @@ function RequestAssignee() {
           <RequestState
             isRequester={false}
             title="요청 수정"
-            information="수정된 정보를 확인해주세요."
+            information="수정된 정보를 확인해 주세요."
           />
         )}
 
         <RequestSummary
-          isChanged={isChanged}
+          isAfterInfo={false}
           title={`${requestAssigneeData.userName}님의 요청`}
           isRequester={false}
           infoList={infoList}
