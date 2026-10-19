@@ -1,0 +1,64 @@
+.component {
+  /* 그림자 컬러 css 변수 추가 필요 */
+  box-shadow: 0px 0px 4px rgba(192, 192, 192, 0.16);
+  border-radius: 16px;
+  background-color: var(--color-base-000);
+  border: 1px solid var(--color-beige-100);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 16px;
+  gap: 20px;
+}
+
+.isChanged {
+  background-color: var(--color-olive-100);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+}
+
+.title {
+  flex: 1;
+  color: var(--color-gray-900);
+}
+
+.tag {
+  border-radius: 999px;
+  background-color:  var(--color-beige-500);
+  padding: 4px 8px;
+  text-align: center;
+  color: var(--color-base-000);
+}
+
+.infoGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: var(--color-gray-900);
+}
+
+.infoRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.infoTitleGroup {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--color-olive-600);
+}
+
+.infoImg {
+  height: 16px;
+  filter: brightness(0) saturate(100%) invert(31%) sepia(7%) saturate(3898%)
+    hue-rotate(47deg) brightness(89%) contrast(84%);
+}
+
+.message {
+  color: var(--color-gray-700);
+}
