@@ -17,6 +17,7 @@
   -moz-appearance: none;
 
   /* 추가 설정 */
+  width: 100%;
   border-radius: 16px;
   background-color: var(--color-base-000);
   border: 1px solid var(--color-opacity-100);
@@ -52,5 +53,6 @@
 }
 
 .arrowImg {
-  filter: brightness(0) saturate(100%) invert(35%) sepia(0%) saturate(1181%) hue-rotate(218deg) brightness(100%) contrast(77%);
+  filter: brightness(0) saturate(100%) invert(35%) sepia(0%) saturate(1181%)
+    hue-rotate(218deg) brightness(100%) contrast(77%);
 }
