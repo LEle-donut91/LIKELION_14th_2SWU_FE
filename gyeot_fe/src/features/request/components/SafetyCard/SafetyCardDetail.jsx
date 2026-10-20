@@ -4,7 +4,7 @@ function SafetyCardDetail({ title, cardList }) {
   return (
     <div className={styles.component}>
       <span className={`${styles.title} typoBodyStrong`}>{title}</span>
-      
+
       {/* 배열을 받아 map 메서드로 card div를 동적 렌더링 */}
       {cardList.map((card, index) => (
         <div className={styles.card} key={index}>
