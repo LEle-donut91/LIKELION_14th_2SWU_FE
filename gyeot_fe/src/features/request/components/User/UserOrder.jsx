@@ -8,25 +8,30 @@ const STATE_TEXT_MAP = {
   CANCEL: "취소",
 };
 
-function UserOrder({ order, userName, state }) {
-  // state에 대응하는 한글 텍스트를 가져오고, 없으면 state 그대로 출력
-  const stateText = STATE_TEXT_MAP[state] || state;
-
-  // EXPIRED("기한 경과")일 때만 expiredTag, 나머지는 모두 defaultTag 적용
-  const tagStyle = state === "EXPIRED" ? styles.expiredTag : styles.defaultTag;
-
+function UserOrder({ orderList }) {
   return (
     <div className={styles.component}>
-      <div className={styles.card}>
-        <div className={styles.titleGroup}>
-          <div className={`${styles.order} typoCaptionMedium`}>{order}</div>
-          <span className={`${styles.userName} typoBodyStrong`}>
-            {userName}
-          </span>
-        </div>
+      {/* 배열을 받아 map 메서드로 card div들을 동적 렌더링 */}
+      {orderList.map((item, index) => {
+        // state에 대응하는 한글 텍스트를 가져오고, 없으면 state 그대로 출력
+        const stateText = STATE_TEXT_MAP[item.state] || item.state;
 
-        <div className={`${tagStyle} typoCaptionMedium`}>{stateText}</div>
-      </div>
+        // EXPIRED("기한 경과")일 때만 expiredTag, 나머지는 모두 defaultTag 적용
+        const tagStyle = item.state === "EXPIRED" ? styles.expiredTag : styles.defaultTag;
+
+        return (
+          <div className={styles.card} key={index}>
+            <div className={styles.titleGroup}>
+              <div className={`${styles.order} typoCaptionMedium`}>{item.order}</div>
+              <span className={`${styles.userName} typoBodyStrong`}>
+                {item.userName}
+              </span>
+            </div>
+
+            <div className={`${tagStyle} typoCaptionMedium`}>{stateText}</div>
+          </div>
+        );
+      })}
     </div>
   );
 }
