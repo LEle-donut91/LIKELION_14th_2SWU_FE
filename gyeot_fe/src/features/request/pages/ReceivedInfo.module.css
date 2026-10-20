@@ -17,3 +17,16 @@
   padding: 16px 16px 240px;
   gap: 24px;
 }
+
+.imgContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 112px;
+  gap: 24px;
+  color: var(--color-olive-900);
+}
+
+.lockImg {
+  width: 240px;
+}

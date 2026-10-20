@@ -4,9 +4,12 @@ import ExitHeader from "@/features/request/components/Header/ExitHeader";
 import { useRequestNav } from "@/features/request//hooks/useRequestNav";
 import SafetyCardDetail from "@/features/request/components/SafetyCard/SafetyCardDetail";
 import DueDateState from "@/features/request/components/State/DueDateState";
+import receivedInfoData from "@/features/request/api/receivedInfoData.json";
+import resImgLock from "@/shared/assets/images/resImgLock.png";
 
 function ReceivedInfo() {
   const { handleGoBack } = useRequestNav();
+  const { dueDate, isAccessible, safetyCardDetails } = receivedInfoData;
 
   return (
     <div className={styles.page}>
@@ -16,63 +19,28 @@ function ReceivedInfo() {
         <DueDateState
           isResponse={false}
           title="접근 기한"
-          dueDate={`~ 00/00 00:00 (종료 시점)`}
+          dueDate={`~ ${dueDate} (종료 시점)`}
         />
-        <SafetyCardDetail
-          title="기본 정보"
-          cardList={[
-            {
-              cardTitle: "생년월일",
-              isSensitive: false,
-              firstInfo: "2000년 00월 00일",
-            },
-          ]}
-        />
-        <SafetyCardDetail
-          title="건강 정보"
-          cardList={[
-            {
-              cardTitle: "페니실린 알러지",
-              isSensitive: true,
-              firstInfo: "2000년 00월 00일",
-              secondInfo: "9/20 갱신",
-            },
-            {
-              cardTitle: "어지러움 주의사항",
-              isSensitive: false,
-              firstInfo: "앉아서 휴식 필요",
-              secondInfo: "추가됨",
-            },
-          ]}
-        />
-        <SafetyCardDetail
-          title="생활 정보"
-          cardList={[
-            {
-              cardTitle: "반려동물 나롱이",
-              isSensitive: false,
-              firstInfo: "하루에 3번 끼니 제공",
-              secondInfo: "9/20 갱신",
-            },
-          ]}
-        />
-        <SafetyCardDetail
-          title="미리 남기는 말"
-          cardList={[
-            {
-              cardTitle: "선호",
-              isSensitive: false,
-              firstInfo: "내용 값",
-              secondInfo: "9/20 갱신",
-            },
-            {
-              cardTitle: "문서",
-              isSensitive: false,
-              firstInfo: "내용 값",
-              secondInfo: "9/20 갱신",
-            },
-          ]}
-        />
+
+        {/* SafetyCardDetail 리스트를 map 함수로 동적 렌더링 */}
+        {isAccessible ? (
+          // 전달 정보 - 비활성화
+          safetyCardDetails.map((section, index) => (
+            <SafetyCardDetail
+              key={index}
+              title={section.title}
+              cardList={section.cardList}
+            />
+          ))
+        ) : (
+          // 전달 정보 - 비활성화
+          <div className={styles.imgContainer}>
+            <img className={styles.lockImg} src={resImgLock} />
+            <span className="typoDisplaySmall">
+              요청을 완료하여 접근이 종료됐어요.
+            </span>
+          </div>
+        )}
       </main>
     </div>
   );
