@@ -1,0 +1,61 @@
+{
+  "dueDate": "00/00 00:00",
+  "isAccessible": true,
+  "safetyCardDetails": [
+    {
+      "title": "기본 정보",
+      "cardList": [
+        {
+          "cardTitle": "생년월일",
+          "isSensitive": false,
+          "firstInfo": "2000년 00월 00일"
+        }
+      ]
+    },
+    {
+      "title": "건강 정보",
+      "cardList": [
+        {
+          "cardTitle": "페니실린 알러지",
+          "isSensitive": true,
+          "firstInfo": "2000년 00월 00일",
+          "secondInfo": "9/20 갱신"
+        },
+        {
+          "cardTitle": "어지러움 주의사항",
+          "isSensitive": false,
+          "firstInfo": "앉아서 휴식 필요",
+          "secondInfo": "추가됨"
+        }
+      ]
+    },
+    {
+      "title": "생활 정보",
+      "cardList": [
+        {
+          "cardTitle": "반려동물 나롱이",
+          "isSensitive": false,
+          "firstInfo": "하루에 3번 끼니 제공",
+          "secondInfo": "9/20 갱신"
+        }
+      ]
+    },
+    {
+      "title": "미리 남기는 말",
+      "cardList": [
+        {
+          "cardTitle": "선호",
+          "isSensitive": false,
+          "firstInfo": "내용 값",
+          "secondInfo": "9/20 갱신"
+        },
+        {
+          "cardTitle": "문서",
+          "isSensitive": false,
+          "firstInfo": "내용 값",
+          "secondInfo": "9/20 갱신"
+        }
+      ]
+    }
+  ]
+}
