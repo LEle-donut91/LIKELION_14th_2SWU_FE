@@ -41,6 +41,7 @@
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
+  color: var(--color-gray-900);
 }
 
 .step {
