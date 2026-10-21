@@ -10,6 +10,7 @@ import UserState from "@/features/request/components/User/UserState";
 import DefaultHeader from "@/features/request/components/Header/DefaultHeader";
 import iconLocation from "@/shared/assets/icons/iconLocation.svg";
 import iconDate from "@/shared/assets/icons/iconDate.svg";
+import iconResGradientRadial from "@/shared/assets/icons/iconResGradientRadial.svg";
 import resImgWith from "@/shared/assets/images/resImgWith.png";
 import requesterData from "@/features/request/api/requesterData.json";
 import LargeFooter from "@/features/request/components/Footer/LargeFooter";
@@ -167,8 +168,11 @@ function RequestRequester() {
         )}
 
         {requesterData.requestState === "progress" && (
-          <div className={styles.imgContainer}>
-            <img className={styles.withImg} src={resImgWith} />
+          <div className={styles.progressContainer}>
+            <div className={styles.imgContainer}>
+              <img className={styles.imgBg} src={iconResGradientRadial}/>
+              <img className={styles.withImg} src={resImgWith} />
+            </div>
             <span className="typoDisplaySmall">
               {requesterData.userName}님과 요청사항을 진행 중이에요.
               <br />
