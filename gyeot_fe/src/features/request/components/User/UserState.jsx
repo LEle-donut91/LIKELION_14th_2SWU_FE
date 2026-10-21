@@ -1,6 +1,6 @@
 import styles from "@/features/request/components/User/UserState.module.css";
 
-function UserState({ userName, isDone }) {
+function UserState({ userName, userState }) {
   return (
     <div className={styles.component}>
       <div className={styles.userImg} />
@@ -9,7 +9,7 @@ function UserState({ userName, isDone }) {
           {userName}
         </span>
         <span className={`${styles.stateTxt} typoBodySmall`}>
-          {isDone ? "*요청사항을 완료했어요!" : "*수정사항을 확인 중이에요."}
+          {userState}
         </span>
       </div>
     </div>

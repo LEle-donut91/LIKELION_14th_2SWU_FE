@@ -3,7 +3,8 @@ import styles from "@/features/request/components/Request/RequestSummary.module.
 function RequestSummary({
   isAfterInfo,
   title,
-  isRequester,
+  hasTag,
+  type,
   infoList = [], // 부모로부터 infoList 배열을 props로 전달받음
   message,
 }) {
@@ -13,8 +14,8 @@ function RequestSummary({
     >
       <div className={styles.header}>
         <span className={`${styles.title} typoTitleMedium`}>{title}</span>
-        {!isRequester && (
-          <div className={`${styles.tag} typoCaptionMedium`}>병원 동행</div>
+        {hasTag && (
+          <div className={`${styles.tag} typoCaptionMedium`}>{type}</div>
         )}
       </div>
 
@@ -29,8 +30,9 @@ function RequestSummary({
           </div>
         ))}
       </div>
-
-      <span className={`${styles.message} typoBodyMedium`}>{message}</span>
+      {message && (
+        <span className={`${styles.message} typoBodyMedium`}>{message}</span>
+      )}
     </div>
   );
 }
