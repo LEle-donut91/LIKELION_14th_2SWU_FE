@@ -61,4 +61,6 @@
   width: 20px;
   padding: 1.7px;
   box-sizing: border-box;
+  filter: brightness(0) saturate(100%) invert(37%) sepia(7%) saturate(175%)
+    hue-rotate(7deg) brightness(100%) contrast(89%);
 }
