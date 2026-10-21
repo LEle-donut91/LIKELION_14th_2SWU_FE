@@ -8,9 +8,7 @@ function UserState({ userName, userState }) {
         <span className={`${styles.userNameTxt} typoBodyStrong`}>
           {userName}
         </span>
-        <span className={`${styles.stateTxt} typoBodySmall`}>
-          {userState}
-        </span>
+        <span className={`${styles.stateTxt} typoBodySmall`}>{userState}</span>
       </div>
     </div>
   );

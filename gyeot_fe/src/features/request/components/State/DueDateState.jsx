@@ -26,7 +26,7 @@ function DueDateState({ isResponse, title, dueDate }) {
 
   useEffect(() => {
     interval.current = setInterval(() => {
-      // 0초보다 큰 경우에만, 1초씩 줄어드는 타이머 실행 
+      // 0초보다 큰 경우에만, 1초씩 줄어드는 타이머 실행
       if (count.current > 0) {
         count.current -= 1;
         setHour(intToString(parseInt(count.current / 3600)));
