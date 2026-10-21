@@ -1,5 +1,5 @@
 import styles from "@/features/request/components/Section/SelectSection.module.css";
-import modalBtn from "@/features/request/assets/modalBtn.svg";
+import iconDown from "@/shared/assets/icons/iconDown.svg";
 
 function SelectSection({ title, text, border, width, onClick }) {
   return (
@@ -13,7 +13,7 @@ function SelectSection({ title, text, border, width, onClick }) {
         className={`${styles.sectionBtn} ${styles[border]} ${styles[width]}`}
       >
         <span className="typoBodyMedium">{text}</span>
-        <img src={modalBtn} />
+        <img src={iconDown} />
       </button>
     </section>
   );
