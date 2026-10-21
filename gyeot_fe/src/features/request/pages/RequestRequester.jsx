@@ -14,6 +14,8 @@ import resImgWith from "@/shared/assets/images/resImgWith.png";
 import requesterData from "@/features/request/api/requesterData.json";
 import LargeFooter from "@/features/request/components/Footer/LargeFooter";
 import { useRequestNav } from "@/features/request/hooks/useRequestNav";
+import DefaultModal from "@/features/request/components/Modal/DefaultModal";
+import { useState } from "react";
 
 function RequestRequester() {
   // 담당자 없음의 사유(reason)를 한글 텍스트로 변환해 주는 매핑 객체
@@ -37,7 +39,10 @@ function RequestRequester() {
     },
   ];
 
-  const { handleGoNext } = useRequestNav();
+  // 모달의 열림/닫힘 상태(State) 정의
+  const [isModalOpen, setModalOpen] = useState(false);
+
+  const { handleGoBack, handleGoNext } = useRequestNav();
 
   // 푸터 클릭 이벤트 핸들러
   const handleEditBtnClick = () => {
@@ -51,6 +56,15 @@ function RequestRequester() {
     handleGoNext("/request/ask-again");
   };
 
+  // 모달의 confirm 버튼 (요청 취소) 클릭 이벤트 핸들러
+  const handleModalConfirmClick = () => {
+    console.log("모달의 confirm 버튼(요청 취소) 클릭");
+    // API 호출 로직 추가 필요
+
+    // 모달 닫기
+    setModalOpen(false);
+  };
+
   return (
     <div className={styles.page}>
       <DefaultHeader
@@ -61,8 +75,8 @@ function RequestRequester() {
             ? "취소"
             : undefined
         }
-        // onClick={}
-        // onSubBtnClick={}
+        onClick={handleGoBack}
+        onSubBtnClick={() => setModalOpen(!isModalOpen)}
       />
       <div className={styles.content}>
         <div className={styles.stepContainer}>
@@ -206,6 +220,24 @@ function RequestRequester() {
           onClick={handleAskAgainBtnClick}
         />
       )}
+
+      <DefaultModal
+        modalOpen={isModalOpen}
+        setModalOpen={setModalOpen}
+        title="요청 취소"
+        description={
+          <>
+            담당자에게 취소가 전달되고,
+            <br />
+            정보 접근 권한이 바로 회수돼요.
+            <br />
+            취소하는 경우, 이전 상태로 돌아올 수 없어요.
+          </>
+        }
+        cancelTxt="돌아가기"
+        confirmTxt="요청 취소"
+        onConfirmClick={handleModalConfirmClick}
+      />
     </div>
   );
 }
