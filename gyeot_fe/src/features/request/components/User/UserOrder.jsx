@@ -8,9 +8,11 @@ const STATE_TEXT_MAP = {
   CANCEL: "취소",
 };
 
-function UserOrder({ orderList }) {
+function UserOrder({ title, orderList }) {
   return (
     <div className={styles.component}>
+    <span className={`${styles.title} typoTitleMedium`}>{title}</span>
+    <div className={styles.cardList}>
       {/* 배열을 받아 map 메서드로 card div들을 동적 렌더링 */}
       {orderList.map((item, index) => {
         // state에 대응하는 한글 텍스트를 가져오고, 없으면 state 그대로 출력
@@ -32,6 +34,7 @@ function UserOrder({ orderList }) {
           </div>
         );
       })}
+    </div>
     </div>
   );
 }
