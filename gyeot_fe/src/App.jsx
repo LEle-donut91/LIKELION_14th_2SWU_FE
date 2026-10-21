@@ -45,7 +45,8 @@ import RequestAssignee from "@/features/request/pages/RequestAssignee";
 import RequestRequester from "@/features/request/pages/RequestRequester";
 import RequestTarget from "@/features/request/pages/RequestTarget";
 import ReceivedInfo from "@/features/request/pages/ReceivedInfo";
-import RequestEditCancel from "@/features/request/pages/RequestEditCancel";
+import RequestEditForm from "@/features/request/pages/RequestEditForm";
+import RequestEditCheck from "@/features/request/pages/RequestEditCheck";
 import RequestModal from "@/features/request/pages/RequestModal";
 import AssigneeReconfirm from "@/features/request/pages/AssigneeReconfirm";
 import AskAgain from "@/features/request/pages/AskAgain";
@@ -108,7 +109,8 @@ function App() {
               <Route path="/request/requester" element={<RequestRequester />} />  {/* H-03-01-A */}
               <Route path="/request/target" element={<RequestTarget />} />  {/* H-03-01-B */}
               <Route path="/request/received-info" element={<ReceivedInfo />} />  {/* H-03-01-01 */}
-              <Route path="/request/edit" element={<RequestEditCancel />} />  {/* H-03-01-02 */}
+              <Route path="/request/edit-form" element={<RequestEditForm />} />  {/* H-03-01-02 */}
+              <Route path="/request/edit-check" element={<RequestEditCheck />} />  {/* H-03-01-02 */}
               <Route path="/request/modal" element={<RequestModal />} />  {/* M-01 */}
               <Route path="/request/assignee-reconfirm" element={<AssigneeReconfirm />} />  {/* N-05 */}
               <Route path="/request/ask-again" element={<AskAgain />} />  {/* N-06 */}
