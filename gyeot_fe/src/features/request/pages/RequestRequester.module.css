@@ -1,0 +1,72 @@
+/* 전체 페이지 */
+.page {
+  width: 100%;
+  min-height: 100vh;
+
+  /* index.css의 CSS 변수 형태로 수정 필요 */
+  background-color: #f8f8f8;
+
+  display: flex;
+  flex-direction: column;
+}
+
+/* 메인 컨텐츠 */
+.content {
+  display: flex;
+  flex-direction: column;
+  padding: 16px 16px 240px;
+}
+
+.stepContainer {
+  margin-bottom: 48px;
+}
+
+.requestStateContainer {
+  margin-bottom: 16px;
+}
+
+.dueDateContainer {
+  margin-top: 16px;
+}
+
+.orderContainer {
+  margin-top: 48px;
+}
+
+.useStateContainer {
+  margin-top: 16px;
+}
+
+.progressContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-top: 32px;
+  gap: 24px;
+  color: var(--color-olive-900);
+}
+
+.imgContainer {
+  width: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.imgBg {
+  position: absolute;
+  top: 0;
+  left: 53px;
+  width: 264px;
+  height: 204px;
+  filter: brightness(0) saturate(100%) invert(94%) sepia(12%) saturate(494%)
+    hue-rotate(33deg) brightness(92%) contrast(90%);
+}
+
+.withImg {
+  position: relative;
+  width: 240px;
+  height: 192px;
+}

@@ -108,7 +108,7 @@ function App() {
               <Route path="/request/requester" element={<RequestRequester />} />  {/* H-03-01-A */}
               <Route path="/request/target" element={<RequestTarget />} />  {/* H-03-01-B */}
               <Route path="/request/received-info" element={<ReceivedInfo />} />  {/* H-03-01-01 */}
-              <Route path="/request/edit-cancel" element={<RequestEditCancel />} />  {/* H-03-01-02 */}
+              <Route path="/request/edit" element={<RequestEditCancel />} />  {/* H-03-01-02 */}
               <Route path="/request/modal" element={<RequestModal />} />  {/* M-01 */}
               <Route path="/request/assignee-reconfirm" element={<AssigneeReconfirm />} />  {/* N-05 */}
               <Route path="/request/ask-again" element={<AskAgain />} />  {/* N-06 */}

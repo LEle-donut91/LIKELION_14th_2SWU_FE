@@ -1,0 +1,40 @@
+{
+  "requestId": "req_01",
+  "requestState": "cancel",
+  "userName": "예진",
+  "requestType": "병원 동행",
+  "time": "10/2(목) 14:00 - 15:00",
+  "location": "슈슈병원",
+  "message": "병원에 가야하는 일이 생겼는데, 혼자 가기에 부담스러워요. 같이 가면 큰 도움이 될 것 같아요!",
+  "dueDate": "12:00:00",
+  "assignStatus": {
+    "isAssignedNoti": true,
+    "reason": "DIFFICULTY"
+  },
+  "changeStatus": {
+    "isChanged": true,
+    "isChangedConfirm": false
+  },
+  "userList": [
+    {
+      "order": "1",
+      "userName": "민재",
+      "state": "EXPIRED"
+    },
+    {
+      "order": "2",
+      "userName": "예진",
+      "state": "WAITING"
+    },
+    {
+      "order": "3",
+      "userName": "철수",
+      "state": "DIFFICULTY"
+    },
+    {
+      "order": "4",
+      "userName": "영희",
+      "state": "CANCEL"
+    }
+  ]
+}
