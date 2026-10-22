@@ -19,25 +19,27 @@ import { getSelectedTitles, checkSensitiveIncluded, getDateTimeText } from "@/fe
 import { DATE_TIME_SECTIONS } from "@/features/request/constants/requestConstants.js";;
 
 function RequestEditForm() {
-  // JSON 데이터 꺼내서 변수에 각각 저장
-  const { basicInfo, healthInfo, lifeInfo, messageInfo } =
-    requestSafetyCardData;
-  const { birthDate, bloodType } = [basicInfo.birthDate, basicInfo.bloodType];
-  const { disease, medicine, allergy, caution } = [
-    healthInfo.disease,
-    healthInfo.medicine,
-    healthInfo.allergy,
-    healthInfo.caution,
-  ];
-  const { address, entranceMethod, pet } = [
-    lifeInfo.address,
-    lifeInfo.entranceMethod,
-    lifeInfo.pet,
-  ];
-  const { preference, document } = [
-    messageInfo.preference,
-    messageInfo.document,
-  ];
+  /* JSON 데이터 꺼내서 변수에 각각 저장 */
+const { basicInfo, healthInfo, lifeInfo, messageInfo } = requestSafetyCardData;
+
+  // 기본 정보
+  const { value: birthDateValue, isDefault: isBirthDateDefault, updatedAt: birthDateUpdatedAt } = basicInfo.birthDate;
+  const { value: bloodTypeValue, isDefault: isBloodTypeDefault, updatedAt: bloodTypeUpdatedAt } = basicInfo.bloodType;
+
+  // 건강 정보
+  const { name: diseaseName, diagnosedYear: diseaseDiagnosedYear, isDefault: isDiseaseDefault, updatedAt: diseaseUpdatedAt } = healthInfo.disease;
+  const { name: medicineName, dosage: medicineDosage, isDefault: isMedicineDefault, updatedAt: medicineUpdatedAt } = healthInfo.medicine;
+  const { name: allergyName, reaction: allergyReaction, isDefault: isAllergyDefault, updatedAt: allergyUpdatedAt } = healthInfo.allergy;
+  const { name: cautionName, instruction: cautionInstruction, isDefault: isCautionDefault, updatedAt: cautionUpdatedAt } = healthInfo.caution;
+
+  // 생활 정보
+  const { value: addressValue, isDefault: isAddressDefault, updatedAt: addressUpdatedAt } = lifeInfo.address;
+  const { value: entranceMethodValue, isDefault: isEntranceMethodDefault, updatedAt: entranceMethodUpdatedAt } = lifeInfo.entranceMethod;
+  const { name: petName, care: petCare, isDefault: isPetDefault, updatedAt: petUpdatedAt } = lifeInfo.pet;
+
+  // 미리 남기는 말
+  const { value: preferenceValue, isDefault: isPreferenceDefault, updatedAt: preferenceUpdatedAt } = messageInfo.preference;
+  const { value: documentValue, isDefault: isDocumentDefault, updatedAt: documentUpdatedAt } = messageInfo.document;
 
   // 1. [기본정보] CheckOption용 배열
   const basicInfoData = [
@@ -45,18 +47,18 @@ function RequestEditForm() {
       id: "birthDate",
       label: "생년월일",
       title: "생년월일",
-      isDefault: birthDate.isDefault,
-      description: `${birthDate.value} 출생${
-        birthDate.updatedAt ? `, 갱신 ${birthDate.updatedAt}` : ""
+      isDefault: isBirthDateDefault,
+      description: `${birthDateValue} 출생${
+        birthDateUpdatedAt ? `, 갱신 ${birthDateUpdatedAt}` : ""
       }`,
     },
     {
       id: "bloodType",
       label: "혈액형",
       title: "혈액형",
-      isDefault: bloodType.isDefault,
-      description: `${bloodType.value}${
-        bloodType.updatedAt ? `, 갱신 ${bloodType.updatedAt}` : ""
+      isDefault: isBloodTypeDefault,
+      description: `${bloodTypeValue}${
+        bloodTypeUpdatedAt ? `, 갱신 ${bloodTypeUpdatedAt}` : ""
       }`,
     },
   ];
@@ -66,37 +68,37 @@ function RequestEditForm() {
     {
       id: "disease",
       label: "질환",
-      title: disease.name,
-      isDefault: disease.isDefault,
-      description: `${disease.diagnosedYear} 진단${
-        disease.updatedAt ? `, 갱신 ${disease.updatedAt}` : ""
+      title: diseaseName,
+      isDefault: isDiseaseDefault,
+      description: `${diseaseDiagnosedYear} 진단${
+        diseaseUpdatedAt ? `, 갱신 ${diseaseUpdatedAt}` : ""
       }`,
     },
     {
       id: "medicine",
       label: "복용약",
-      title: medicine.name,
-      isDefault: medicine.isDefault,
-      description: `${medicine.dosage}${
-        medicine.updatedAt ? `, 갱신 ${medicine.updatedAt}` : ""
+      title: medicineName,
+      isDefault: isMedicineDefault,
+      description: `${medicineDosage}${
+        medicineUpdatedAt ? `, 갱신 ${medicineUpdatedAt}` : ""
       }`,
     },
     {
       id: "allergy",
       label: "알러지",
-      title: `${allergy.name} 알러지`,
-      isDefault: allergy.isDefault,
-      description: `${allergy.reaction}${
-        allergy.updatedAt ? `, 갱신 ${allergy.updatedAt}` : ""
+      title: `${allergyName} 알러지`,
+      isDefault: isAllergyDefault,
+      description: `${allergyReaction}${
+        allergyUpdatedAt ? `, 갱신 ${allergyUpdatedAt}` : ""
       }`,
     },
     {
       id: "caution",
       label: "주의사항",
-      title: `${caution.name} 주의사항`,
-      isDefault: caution.isDefault,
-      description: `${caution.instruction}${
-        caution.updatedAt ? `, 갱신 ${caution.updatedAt}` : ""
+      title: `${cautionName} 주의사항`,
+      isDefault: isCautionDefault,
+      description: `${cautionInstruction}${
+        cautionUpdatedAt ? `, 갱신 ${cautionUpdatedAt}` : ""
       }`,
     },
   ];
@@ -107,28 +109,26 @@ function RequestEditForm() {
       id: "address",
       label: "주소",
       title: "주소",
-      isDefault: address.isDefault,
-      description: `${address.value}${
-        address.updatedAt ? `, 갱신 ${address.updatedAt}` : ""
+      isDefault: isAddressDefault,
+      description: `${addressValue}${
+        addressUpdatedAt ? `, 갱신 ${addressUpdatedAt}` : ""
       }`,
     },
     {
       id: "entranceMethod",
       label: "출입 방법",
       title: "출입 방법",
-      isDefault: entranceMethod.isDefault,
-      description: `${entranceMethod.value}${
-        entranceMethod.updatedAt ? `, 갱신 ${entranceMethod.updatedAt}` : ""
+      isDefault: isEntranceMethodDefault,
+      description: `${entranceMethodValue}${
+        entranceMethodUpdatedAt ? `, 갱신 ${entranceMethodUpdatedAt}` : ""
       }`,
     },
     {
       id: "pet",
       label: "반려동물 정보",
-      title: `반려동물 (${pet.name})`,
-      isDefault: pet.isDefault,
-      description: `${pet.care}${
-        pet.updatedAt ? `, 갱신 ${pet.updatedAt}` : ""
-      }`,
+      title: `반려동물 (${petName})`,
+      isDefault: isPetDefault,
+      description: `${petCare}${petUpdatedAt ? `, 갱신 ${petUpdatedAt}` : ""}`,
     },
   ];
 
@@ -138,18 +138,18 @@ function RequestEditForm() {
       id: "preference",
       label: "선호",
       title: "선호",
-      isDefault: preference.isDefault,
-      description: `${preference.value}${
-        preference.updatedAt ? `, 갱신 ${preference.updatedAt}` : ""
+      isDefault: isPreferenceDefault,
+      description: `${preferenceValue}${
+        preferenceUpdatedAt ? `, 갱신 ${preferenceUpdatedAt}` : ""
       }`,
     },
     {
       id: "document",
       label: "문서",
       title: "문서",
-      isDefault: document.isDefault,
-      description: `${document.value}${
-        document.updatedAt ? `, 갱신 ${document.updatedAt}` : ""
+      isDefault: isDocumentDefault,
+      description: `${documentValue}${
+        documentUpdatedAt ? `, 갱신 ${documentUpdatedAt}` : ""
       }`,
     },
   ];
