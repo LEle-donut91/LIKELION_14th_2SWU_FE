@@ -11,7 +11,7 @@ import DefaultSheet from "@/features/request/components/Sheet/DefaultSheet";
 import { useState } from "react";
 import CheckOption from "@/features/request/components/Option/CheckOption";
 import SafetyCardGroup from "@/features/request/components/SafetyCard/SafetyCardGroup";
-import { useRequestNav } from "@/features/request/hooks/useRequestNav";
+import { handleGoBack, handleGoNext } from "@/features/request/hooks/useRequestNav";
 import requestSafetyCardData from "@/features/request/api/requestSafetyCardData.json";
 import SmallFooter from "@/features/request/components/Footer/SmallFooter";
 import DefaultModal from "@/features/request/components/Modal/DefaultModal";
@@ -19,139 +19,137 @@ import { getSelectedTitles, checkSensitiveIncluded, getDateTimeText } from "@/fe
 import { DATE_TIME_SECTIONS } from "@/features/request/constants/requestConstants.js";;
 
 function RequestEditForm() {
-  // 1. [기본정보] JSON에서 데이터 꺼내서 CheckOption용 배열로 만들기
+  // JSON 데이터 꺼내서 변수에 각각 저장
+  const { basicInfo, healthInfo, lifeInfo, messageInfo } =
+    requestSafetyCardData;
+  const { birthDate, bloodType } = [basicInfo.birthDate, basicInfo.bloodType];
+  const { disease, medicine, allergy, caution } = [
+    healthInfo.disease,
+    healthInfo.medicine,
+    healthInfo.allergy,
+    healthInfo.caution,
+  ];
+  const { address, entranceMethod, pet } = [
+    lifeInfo.address,
+    lifeInfo.entranceMethod,
+    lifeInfo.pet,
+  ];
+  const { preference, document } = [
+    messageInfo.preference,
+    messageInfo.document,
+  ];
+
+  // 1. [기본정보] CheckOption용 배열
   const basicInfoData = [
     {
       id: "birthDate",
       label: "생년월일",
       title: "생년월일",
-      isDefault: requestSafetyCardData.basicInfo.birthDate.isDefault,
-      description: `${requestSafetyCardData.basicInfo.birthDate.value} 출생${
-        requestSafetyCardData.basicInfo.birthDate.updatedAt
-          ? `, 갱신 ${requestSafetyCardData.basicInfo.birthDate.updatedAt}`
-          : ""
+      isDefault: birthDate.isDefault,
+      description: `${birthDate.value} 출생${
+        birthDate.updatedAt ? `, 갱신 ${birthDate.updatedAt}` : ""
       }`,
     },
     {
       id: "bloodType",
       label: "혈액형",
       title: "혈액형",
-      isDefault: requestSafetyCardData.basicInfo.bloodType.isDefault,
-      description: `${requestSafetyCardData.basicInfo.bloodType.value}${
-        requestSafetyCardData.basicInfo.bloodType.updatedAt
-          ? `, 갱신 ${requestSafetyCardData.basicInfo.bloodType.updatedAt}`
-          : ""
+      isDefault: bloodType.isDefault,
+      description: `${bloodType.value}${
+        bloodType.updatedAt ? `, 갱신 ${bloodType.updatedAt}` : ""
       }`,
     },
   ];
 
-  // 2. [건강정보] JSON에서 데이터 꺼내서 CheckOption용 배열로 만들기
+  // 2. [건강정보] CheckOption용 배열
   const healthInfoData = [
     {
       id: "disease",
       label: "질환",
-      title: requestSafetyCardData.healthInfo.disease.name,
-      isDefault: requestSafetyCardData.healthInfo.disease.isDefault,
-      description: `${requestSafetyCardData.healthInfo.disease.diagnosedYear} 진단${
-        requestSafetyCardData.healthInfo.disease.updatedAt
-          ? `, 갱신 ${requestSafetyCardData.healthInfo.disease.updatedAt}`
-          : ""
+      title: disease.name,
+      isDefault: disease.isDefault,
+      description: `${disease.diagnosedYear} 진단${
+        disease.updatedAt ? `, 갱신 ${disease.updatedAt}` : ""
       }`,
     },
     {
       id: "medicine",
       label: "복용약",
-      title: requestSafetyCardData.healthInfo.medicine.name,
-      isDefault: requestSafetyCardData.healthInfo.medicine.isDefault,
-      description: `${requestSafetyCardData.healthInfo.medicine.dosage}${
-        requestSafetyCardData.healthInfo.medicine.updatedAt
-          ? `, 갱신 ${requestSafetyCardData.healthInfo.medicine.updatedAt}`
-          : ""
+      title: medicine.name,
+      isDefault: medicine.isDefault,
+      description: `${medicine.dosage}${
+        medicine.updatedAt ? `, 갱신 ${medicine.updatedAt}` : ""
       }`,
     },
     {
       id: "allergy",
       label: "알러지",
-      title: `${requestSafetyCardData.healthInfo.allergy.name} 알러지`,
-      isDefault: requestSafetyCardData.healthInfo.allergy.isDefault,
-      description: `${requestSafetyCardData.healthInfo.allergy.reaction}${
-        requestSafetyCardData.healthInfo.allergy.updatedAt
-          ? `, 갱신 ${requestSafetyCardData.healthInfo.allergy.updatedAt}`
-          : ""
+      title: `${allergy.name} 알러지`,
+      isDefault: allergy.isDefault,
+      description: `${allergy.reaction}${
+        allergy.updatedAt ? `, 갱신 ${allergy.updatedAt}` : ""
       }`,
     },
     {
       id: "caution",
       label: "주의사항",
-      title: `${requestSafetyCardData.healthInfo.caution.name} 주의사항`,
-      isDefault: requestSafetyCardData.healthInfo.caution.isDefault,
-      description: `${requestSafetyCardData.healthInfo.caution.instruction}${
-        requestSafetyCardData.healthInfo.caution.updatedAt
-          ? `, 갱신 ${requestSafetyCardData.healthInfo.caution.updatedAt}`
-          : ""
+      title: `${caution.name} 주의사항`,
+      isDefault: caution.isDefault,
+      description: `${caution.instruction}${
+        caution.updatedAt ? `, 갱신 ${caution.updatedAt}` : ""
       }`,
     },
   ];
 
-  // 3. [생활정보] JSON에서 데이터 꺼내서 CheckOption용 배열로 만들기
+  // 3. [생활정보] CheckOption용 배열
   const lifeInfoData = [
     {
       id: "address",
       label: "주소",
       title: "주소",
-      isDefault: requestSafetyCardData.lifeInfo.address.isDefault,
-      description: `${requestSafetyCardData.lifeInfo.address.value}${
-        requestSafetyCardData.lifeInfo.address.updatedAt
-          ? `, 갱신 ${requestSafetyCardData.lifeInfo.address.updatedAt}`
-          : ""
+      isDefault: address.isDefault,
+      description: `${address.value}${
+        address.updatedAt ? `, 갱신 ${address.updatedAt}` : ""
       }`,
     },
     {
       id: "entranceMethod",
       label: "출입 방법",
       title: "출입 방법",
-      isDefault: requestSafetyCardData.lifeInfo.entranceMethod.isDefault,
-      description: `${requestSafetyCardData.lifeInfo.entranceMethod.value}${
-        requestSafetyCardData.lifeInfo.entranceMethod.updatedAt
-          ? `, 갱신 ${requestSafetyCardData.lifeInfo.entranceMethod.updatedAt}`
-          : ""
+      isDefault: entranceMethod.isDefault,
+      description: `${entranceMethod.value}${
+        entranceMethod.updatedAt ? `, 갱신 ${entranceMethod.updatedAt}` : ""
       }`,
     },
     {
       id: "pet",
       label: "반려동물 정보",
-      title: `반려동물 (${requestSafetyCardData.lifeInfo.pet.name})`,
-      isDefault: requestSafetyCardData.lifeInfo.pet.isDefault,
-      description: `${requestSafetyCardData.lifeInfo.pet.care}${
-        requestSafetyCardData.lifeInfo.pet.updatedAt
-          ? `, 갱신 ${requestSafetyCardData.lifeInfo.pet.updatedAt}`
-          : ""
+      title: `반려동물 (${pet.name})`,
+      isDefault: pet.isDefault,
+      description: `${pet.care}${
+        pet.updatedAt ? `, 갱신 ${pet.updatedAt}` : ""
       }`,
     },
   ];
 
-  // 4. [미리 남기는 말] JSON에서 데이터 꺼내서 CheckOption용 배열로 만들기
+  // 4. [미리 남기는 말] CheckOption용 배열
   const messageInfoData = [
     {
       id: "preference",
       label: "선호",
       title: "선호",
-      isDefault: requestSafetyCardData.messageInfo.preference.isDefault,
-      description: `${requestSafetyCardData.messageInfo.preference.value}${
-        requestSafetyCardData.messageInfo.preference.updatedAt
-          ? `, 갱신 ${requestSafetyCardData.messageInfo.preference.updatedAt}`
-          : ""
+      isDefault: preference.isDefault,
+      description: `${preference.value}${
+        preference.updatedAt ? `, 갱신 ${preference.updatedAt}` : ""
       }`,
     },
     {
       id: "document",
       label: "문서",
       title: "문서",
-      isDefault: requestSafetyCardData.messageInfo.document.isDefault,
-      description: `${requestSafetyCardData.messageInfo.document.value}${
-        requestSafetyCardData.messageInfo.document.updatedAt
-          ? `, 갱신 ${requestSafetyCardData.messageInfo.document.updatedAt}`
-          : ""
+      isDefault: document.isDefault,
+      description: `${document.value}${
+        document.updatedAt ? `, 갱신 ${document.updatedAt}` : ""
       }`,
     },
   ];
@@ -188,9 +186,6 @@ function RequestEditForm() {
   // 모달의 열림/닫힘 상태(State) 정의
   const [isCancelModalOpen, setCancelModalOpen] = useState(false);
   const [isSensitiveModalOpen, setSensitiveModalOpen] = useState(false);
-
-  // navigation 커스텀 훅 불러오기
-  const { handleGoNext, handleGoBack } = useRequestNav();
 
   // DateTimeSheet에서 확인을 눌렀을 때 실행될 핸들러
   const handleDateTimeConfirm = (value) => {
