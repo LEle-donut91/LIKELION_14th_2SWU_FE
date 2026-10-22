@@ -190,7 +190,8 @@ function RequestEditForm() {
   const [dateTarget, setDateTarget] = useState(null);
 
   // 모달의 열림/닫힘 상태(State) 정의
-  const [isModalOpen, setModalOpen] = useState(false);
+  const [isCancelModalOpen, setCancelModalOpen] = useState(false);
+  const [isSensitiveModalOpen, setSensitiveModalOpen] = useState(false);
 
   // 날짜/시간 객체를 화면에 보여줄 문자열로 가공하는 함수
   const getDateTimeText = (dateTimeObj) => {
@@ -218,6 +219,28 @@ function RequestEditForm() {
       .join(", ");
   };
 
+  // 민감정보 항목의 ID 목록 정의
+  const SENSITIVE_KEYS = [
+    "disease",
+    "medicine",
+    "allergy",
+    "address",
+    "entranceMethod",
+  ];
+
+  // 사용자가 체크한 항목 중 민감정보가 포함되어 있으면 true 반환 (아니라면 false)
+  const isSensitiveIncluded = () => {
+    // 건강 정보 및 생활 정보 선택 목록 중 민감정보 ID가 포함되어 있는지 검사
+    const isHealthSensitiveSelected = checkedHealthLst.some((id) =>
+      SENSITIVE_KEYS.includes(id),
+    );
+    const isLifeSensitiveSelected = checkedLifeLst.some((id) =>
+      SENSITIVE_KEYS.includes(id),
+    );
+
+    return isHealthSensitiveSelected || isLifeSensitiveSelected;
+  };
+
   // navigation 커스텀 훅 불러오기
   const { handleGoNext, handleGoBack } = useRequestNav();
 
@@ -230,12 +253,30 @@ function RequestEditForm() {
     }
   };
 
-  const handleModalConfirmClick = () => {
-    console.log("모달의 confirm 버튼(요청 취소) 클릭");
+  // 다음 버튼 클릭 핸들러
+  const handleNextBtnClick = () => {
+    if (isSensitiveIncluded()) {
+      console.log("민감정보 포함");
+      setSensitiveModalOpen(!isSensitiveModalOpen);
+      return;
+    }
+    console.log("민감정보 미포함");
+    handleGoNext("/request/edit-check");
+  };
+
+  // 민감 정보 확인 모달의 확인 버튼
+  const handleSensitiveConfirm = () => {
+    setSensitiveModalOpen(false); // 모달 닫기
+    handleGoNext("/request/edit-check"); // 다음 페이지로 이동
+  };
+
+  // 요청 취소 모달의 확인 버튼
+  const handleCancelConfirm = () => {
+    console.log("요청 취소 모달의 confirm 버튼(요청 취소) 클릭");
     // API 호출 로직 추가 필요
 
     // 모달 닫기
-    setModalOpen(false);
+    setCancelModalOpen(false);
   };
 
   return (
@@ -396,14 +437,14 @@ function RequestEditForm() {
         leftType="tertiary"
         leftTitle="요청 취소"
         rightTitle="다음"
-        leftOnClick={() => setModalOpen(!isModalOpen)}
-        rightOnClick={() => handleGoNext("/request/edit-check")}
+        leftOnClick={() => setCancelModalOpen(!isCancelModalOpen)}
+        rightOnClick={handleNextBtnClick}
       />
 
       {/* 요청 취소 모달 */}
       <DefaultModal
-        modalOpen={isModalOpen}
-        setModalOpen={setModalOpen}
+        modalOpen={isCancelModalOpen}
+        setModalOpen={setCancelModalOpen}
         title="요청 취소"
         description={
           <>
@@ -416,7 +457,25 @@ function RequestEditForm() {
         }
         cancelTxt="돌아가기"
         confirmTxt="요청 취소"
-        onConfirmClick={handleModalConfirmClick}
+        onConfirmClick={handleCancelConfirm}
+      />
+
+      {/* 민감정보 확인 모달 */}
+      <DefaultModal
+        modalOpen={isSensitiveModalOpen}
+        setModalOpen={setSensitiveModalOpen}
+        title="민감 정보 확인"
+        description={
+          <>
+            민감 정보가 포함되어 있어요.
+            <br />
+            {requestSafetyCardData.userName}님에게{" "}
+            {requestSafetyCardData.dueDate}까지 정보를 공유할까요?
+          </>
+        }
+        cancelTxt="취소"
+        confirmTxt="공유"
+        onConfirmClick={handleSensitiveConfirm}
       />
     </div>
   );
