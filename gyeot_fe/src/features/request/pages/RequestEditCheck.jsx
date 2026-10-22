@@ -9,6 +9,7 @@ import iconDate from "@/shared/assets/icons/iconDate.svg";
 import iconLocation from "@/shared/assets/icons/iconLocation.svg";
 import iconHealthy from "@/shared/assets/icons/iconHealthy.svg";
 import iconToggle from "@/shared/assets/icons/iconToggle.svg";
+import { useRequestNav } from "@/features/request/hooks/useRequestNav";
 
 function RequestEditCheck() {
   // JSON 데이터 변수에 각각 저장
@@ -37,12 +38,20 @@ function RequestEditCheck() {
     { icon: iconHealthy, label: "정보", value: afterMessage },
   ];
 
+  const { handleGoBack, handleGoNext } = useRequestNav(); 
+  const handleReconfirmBtnClick = () => {
+    // API 호출 로직 추가 필요
+
+    // H-03-01-A (요청 상세 · 요청자 뷰)로 이동
+    handleGoNext("/request/requester")
+  }
+
   return (
     <div className={styles.page}>
       <StepHeader
         title="요청 수정"
         step="2"
-        // onClick={}
+        onClick={handleGoBack}
       />
 
       {/* 실제 컨텐츠가 들어갈 자리 */}
@@ -95,7 +104,7 @@ function RequestEditCheck() {
       <LargeFooter
         title="재확인 요청"
         type="primary"
-        // onClick={}
+        onClick={handleReconfirmBtnClick}
       />
     </div>
   );
