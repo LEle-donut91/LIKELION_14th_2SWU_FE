@@ -2,6 +2,7 @@ import styles from "@/features/request/components/Request/RequestSummary.module.
 
 function RequestSummary({
   isAfterInfo,
+  hasBeigeBorder,
   title,
   hasTag,
   type,
@@ -10,7 +11,13 @@ function RequestSummary({
 }) {
   return (
     <div
-      className={`${styles.component} ${isAfterInfo ? styles.isChanged : ""}`}
+      className={`${styles.component} ${
+        isAfterInfo
+          ? styles.isChanged
+          : hasBeigeBorder
+            ? styles.hasBeigeBorder
+            : ""
+      }`}
     >
       <div className={styles.header}>
         <span className={`${styles.title} typoTitleMedium`}>{title}</span>
