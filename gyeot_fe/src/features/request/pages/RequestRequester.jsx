@@ -20,6 +20,7 @@ import { useState } from "react";
 
 function RequestRequester() {
   const [isModalOpen, setModalOpen] = useState(false); // 모달 열기/닫기 상태
+  const [isSameModalOpen, setSameModalOpen] = useState(false); // "같은 내용 요청" 모달 열기/닫기 상태
   const { handleGoBack, handleGoNext } = useRequestNav(); // navigation 커스텀 훅의 함수 불러오기
 
   // JSON 데이터 불러오기
@@ -66,6 +67,16 @@ function RequestRequester() {
 
     // 모달 닫기
     setModalOpen(false);
+  };
+
+  // [같은 내용 요청 모달의 확인 버튼] 클릭 이벤트 핸들러
+  const handleSameConfirm = () => {
+    console.log("모달의 confirm 버튼(복제 요청) 클릭");
+    // API 호출 로직 추가 필요
+
+    // 모달 닫고, H-03-02(요청 작성)으로 이동
+    setSameModalOpen(false);
+    handleGoNext("/request");
   };
 
   // 조건부 변수 정리
@@ -118,7 +129,7 @@ function RequestRequester() {
         <LargeFooter
           title="같은 내용 요청"
           type="secondary"
-          onClick={handleAskAgainBtnClick}
+          onClick={() => setSameModalOpen(!isSameModalOpen)}
         />
       );
     }
@@ -255,6 +266,23 @@ function RequestRequester() {
         cancelTxt="돌아가기"
         confirmTxt="요청 취소"
         onConfirmClick={handleModalConfirmClick}
+      />
+
+      {/* 같은 내용 요청 모달 */}
+      <DefaultModal
+        modalOpen={isSameModalOpen}
+        setModalOpen={setSameModalOpen}
+        title="같은 내용 요청"
+        description={
+          <>
+            내용을 복제하여 같은 내용으로
+            <br />
+            새로운 요청을 만들까요?
+          </>
+        }
+        cancelTxt="취소"
+        confirmTxt="복제 요청"
+        onConfirmClick={handleSameConfirm}
       />
     </div>
   );
