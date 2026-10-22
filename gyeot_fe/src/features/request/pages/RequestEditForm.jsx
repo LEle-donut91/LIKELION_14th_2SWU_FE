@@ -11,7 +11,7 @@ import DefaultSheet from "@/features/request/components/Sheet/DefaultSheet";
 import { useState } from "react";
 import CheckOption from "@/features/request/components/Option/CheckOption";
 import SafetyCardGroup from "@/features/request/components/SafetyCard/SafetyCardGroup";
-import { handleGoBack, handleGoNext } from "@/features/request/hooks/useRequestNav";
+import { useRequestNav } from "@/features/request/hooks/useRequestNav";
 import requestSafetyCardData from "@/features/request/api/requestSafetyCardData.json";
 import SmallFooter from "@/features/request/components/Footer/SmallFooter";
 import DefaultModal from "@/features/request/components/Modal/DefaultModal";
@@ -195,6 +195,8 @@ function RequestEditForm() {
       setEndDateTime(value);
     }
   };
+
+  const { handleGoBack, handleGoNext } = useRequestNav(); 
 
   // 다음 버튼 클릭 핸들러
   const handleNextBtnClick = () => {
