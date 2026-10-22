@@ -15,31 +15,85 @@ import { useRequestNav } from "@/features/request/hooks/useRequestNav";
 import requestSafetyCardData from "@/features/request/api/requestSafetyCardData.json";
 import SmallFooter from "@/features/request/components/Footer/SmallFooter";
 import DefaultModal from "@/features/request/components/Modal/DefaultModal";
-import { getSelectedTitles, checkSensitiveIncluded, getDateTimeText } from "@/features/request/utils/requestUtils.js";
-import { DATE_TIME_SECTIONS } from "@/features/request/constants/requestConstants.js";;
+import {
+  getSelectedTitles,
+  checkSensitiveIncluded,
+  getDateTimeText,
+} from "@/features/request/utils/requestUtils.js";
+import { DATE_TIME_SECTIONS } from "@/features/request/constants/requestConstants.js";
 
 function RequestEditForm() {
   /* JSON 데이터 꺼내서 변수에 각각 저장 */
-const { basicInfo, healthInfo, lifeInfo, messageInfo } = requestSafetyCardData;
+  const { basicInfo, healthInfo, lifeInfo, messageInfo } =
+    requestSafetyCardData;
 
   // 기본 정보
-  const { value: birthDateValue, isDefault: isBirthDateDefault, updatedAt: birthDateUpdatedAt } = basicInfo.birthDate;
-  const { value: bloodTypeValue, isDefault: isBloodTypeDefault, updatedAt: bloodTypeUpdatedAt } = basicInfo.bloodType;
+  const {
+    value: birthDateValue,
+    isDefault: isBirthDateDefault,
+    updatedAt: birthDateUpdatedAt,
+  } = basicInfo.birthDate;
+  const {
+    value: bloodTypeValue,
+    isDefault: isBloodTypeDefault,
+    updatedAt: bloodTypeUpdatedAt,
+  } = basicInfo.bloodType;
 
   // 건강 정보
-  const { name: diseaseName, diagnosedYear: diseaseDiagnosedYear, isDefault: isDiseaseDefault, updatedAt: diseaseUpdatedAt } = healthInfo.disease;
-  const { name: medicineName, dosage: medicineDosage, isDefault: isMedicineDefault, updatedAt: medicineUpdatedAt } = healthInfo.medicine;
-  const { name: allergyName, reaction: allergyReaction, isDefault: isAllergyDefault, updatedAt: allergyUpdatedAt } = healthInfo.allergy;
-  const { name: cautionName, instruction: cautionInstruction, isDefault: isCautionDefault, updatedAt: cautionUpdatedAt } = healthInfo.caution;
+  const {
+    name: diseaseName,
+    diagnosedYear: diseaseDiagnosedYear,
+    isDefault: isDiseaseDefault,
+    updatedAt: diseaseUpdatedAt,
+  } = healthInfo.disease;
+  const {
+    name: medicineName,
+    dosage: medicineDosage,
+    isDefault: isMedicineDefault,
+    updatedAt: medicineUpdatedAt,
+  } = healthInfo.medicine;
+  const {
+    name: allergyName,
+    reaction: allergyReaction,
+    isDefault: isAllergyDefault,
+    updatedAt: allergyUpdatedAt,
+  } = healthInfo.allergy;
+  const {
+    name: cautionName,
+    instruction: cautionInstruction,
+    isDefault: isCautionDefault,
+    updatedAt: cautionUpdatedAt,
+  } = healthInfo.caution;
 
   // 생활 정보
-  const { value: addressValue, isDefault: isAddressDefault, updatedAt: addressUpdatedAt } = lifeInfo.address;
-  const { value: entranceMethodValue, isDefault: isEntranceMethodDefault, updatedAt: entranceMethodUpdatedAt } = lifeInfo.entranceMethod;
-  const { name: petName, care: petCare, isDefault: isPetDefault, updatedAt: petUpdatedAt } = lifeInfo.pet;
+  const {
+    value: addressValue,
+    isDefault: isAddressDefault,
+    updatedAt: addressUpdatedAt,
+  } = lifeInfo.address;
+  const {
+    value: entranceMethodValue,
+    isDefault: isEntranceMethodDefault,
+    updatedAt: entranceMethodUpdatedAt,
+  } = lifeInfo.entranceMethod;
+  const {
+    name: petName,
+    care: petCare,
+    isDefault: isPetDefault,
+    updatedAt: petUpdatedAt,
+  } = lifeInfo.pet;
 
   // 미리 남기는 말
-  const { value: preferenceValue, isDefault: isPreferenceDefault, updatedAt: preferenceUpdatedAt } = messageInfo.preference;
-  const { value: documentValue, isDefault: isDocumentDefault, updatedAt: documentUpdatedAt } = messageInfo.document;
+  const {
+    value: preferenceValue,
+    isDefault: isPreferenceDefault,
+    updatedAt: preferenceUpdatedAt,
+  } = messageInfo.preference;
+  const {
+    value: documentValue,
+    isDefault: isDocumentDefault,
+    updatedAt: documentUpdatedAt,
+  } = messageInfo.document;
 
   // 1. [기본정보] CheckOption용 배열
   const basicInfoData = [
@@ -196,7 +250,7 @@ const { basicInfo, healthInfo, lifeInfo, messageInfo } = requestSafetyCardData;
     }
   };
 
-  const { handleGoBack, handleGoNext } = useRequestNav(); 
+  const { handleGoBack, handleGoNext } = useRequestNav();
 
   // 다음 버튼 클릭 핸들러
   const handleNextBtnClick = () => {

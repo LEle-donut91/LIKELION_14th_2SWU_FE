@@ -12,7 +12,11 @@ function RequestSummary({
   return (
     <div
       className={`${styles.component} ${
-        isAfterInfo ? styles.isChanged : hasBeigeBorder ? styles.hasBeigeBorder : ""
+        isAfterInfo
+          ? styles.isChanged
+          : hasBeigeBorder
+            ? styles.hasBeigeBorder
+            : ""
       }`}
     >
       <div className={styles.header}>

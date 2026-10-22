@@ -38,28 +38,22 @@ function RequestEditCheck() {
     { icon: iconHealthy, label: "정보", value: afterMessage },
   ];
 
-  const { handleGoBack, handleGoNext } = useRequestNav(); 
+  const { handleGoBack, handleGoNext } = useRequestNav();
   const handleReconfirmBtnClick = () => {
     // API 호출 로직 추가 필요
 
     // H-03-01-A (요청 상세 · 요청자 뷰)로 이동
-    handleGoNext("/request/requester")
-  }
+    handleGoNext("/request/requester");
+  };
 
   return (
     <div className={styles.page}>
-      <StepHeader
-        title="요청 수정"
-        step="2"
-        onClick={handleGoBack}
-      />
+      <StepHeader title="요청 수정" step="2" onClick={handleGoBack} />
 
       {/* 실제 컨텐츠가 들어갈 자리 */}
       <main className={styles.content}>
-
         {/* 변경 전 - 변경 후 카드 Container */}
         <div className={styles.cardContainer}>
-
           {/* 변경 전 Card */}
           <RequestSummary
             isAfterInfo={false}
