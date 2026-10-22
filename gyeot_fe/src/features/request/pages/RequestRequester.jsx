@@ -19,7 +19,7 @@ import DefaultModal from "@/features/request/components/Modal/DefaultModal";
 import { useState } from "react";
 
 function RequestRequester() {
-  const [isModalOpen, setModalOpen] = useState(false); // 모달 열기/닫기 상태
+  const [isModalOpen, setModalOpen] = useState(false); // "요청 취소" 모달 열기/닫기 상태
   const [isSameModalOpen, setSameModalOpen] = useState(false); // "같은 내용 요청" 모달 열기/닫기 상태
   const { handleGoBack, handleGoNext } = useRequestNav(); // navigation 커스텀 훅의 함수 불러오기
 
@@ -61,6 +61,8 @@ function RequestRequester() {
     console.log("완료 버튼 클릭");
     // API 요청 로직 추가 필요
   };
+
+  // [요청 취소 모달의 확인 버튼] 클릭 이벤트 핸들러
   const handleModalConfirmClick = () => {
     console.log("모달의 confirm 버튼(요청 취소) 클릭");
     // API 호출 로직 추가 필요
