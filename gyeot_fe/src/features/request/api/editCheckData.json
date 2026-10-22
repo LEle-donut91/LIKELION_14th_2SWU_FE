@@ -1,0 +1,14 @@
+{
+  "userName": "서연",
+  "userPart": "나의 사람",
+  "beforeInfo": {
+    "time": "9/22 14:00 - 9/22 17:00",
+    "location": "슈슈병원",
+    "message": "생년월일, 출입 방법 외 3건"
+  },
+  "afterInfo": {
+    "time": "9/22 15:00 - 9/22 18:00",
+    "location": "슈슈병원",
+    "message": "생년월일, 복용약 외 1건"
+  }
+}
