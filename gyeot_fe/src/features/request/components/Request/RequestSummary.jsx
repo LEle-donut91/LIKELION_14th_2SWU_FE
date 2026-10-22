@@ -6,7 +6,7 @@ function RequestSummary({
   title,
   hasTag,
   type,
-  infoList = [], // 부모로부터 infoList 배열을 props로 전달받음
+  infoList, // 부모로부터 infoList 배열을 props로 전달받음
   message,
 }) {
   return (
@@ -26,17 +26,20 @@ function RequestSummary({
         )}
       </div>
 
-      <div className={`${styles.infoGroup} typoBodyMedium`}>
-        {infoList.map((item, index) => (
-          <div className={styles.infoRow} key={index}>
-            <div className={styles.infoTitleGroup}>
-              <img className={styles.infoImg} src={item.icon} />
-              <span>{item.label}</span>
+      {infoList && (
+        <div className={`${styles.infoGroup} typoBodyMedium`}>
+          {infoList.map((item, index) => (
+            <div className={styles.infoRow} key={index}>
+              <div className={styles.infoTitleGroup}>
+                <img className={styles.infoImg} src={item.icon} />
+                <span>{item.label}</span>
+              </div>
+              <span>{item.value}</span>
             </div>
-            <span>{item.value}</span>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
+
       {message && (
         <span className={`${styles.message} typoBodyMedium`}>{message}</span>
       )}
