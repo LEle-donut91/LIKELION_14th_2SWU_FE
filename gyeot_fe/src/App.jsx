@@ -50,7 +50,6 @@ import RequestEditCheck from "@/features/request/pages/RequestEditCheck";
 import RequestModal from "@/features/request/pages/RequestModal";
 import AssigneeReconfirm from "@/features/request/pages/AssigneeReconfirm";
 import AskAgain from "@/features/request/pages/AskAgain";
-import SameRequest from "@/features/request/pages/SameRequest";
 
 function App() {
   return (
@@ -102,6 +101,7 @@ function App() {
               <Route path="/situation/past/detail" element={<PastSituationDetail />} />  {/* N-04 */}
 
               {/* 요청 */}
+              {/* N-07은 features/request/Modal/DefaultModal.jsx로 구현 */}
               <Route path="/request" element={<Request />} />  {/* H-03-02 */}
               <Route path="/request/info-preview" element={<InfoPreview />} />  {/* H-03-02-01 */}
               <Route path="/request/send" element={<RequestSend />} />  {/* H-03-02-01 */}
@@ -114,7 +114,6 @@ function App() {
               <Route path="/request/modal" element={<RequestModal />} />  {/* M-01 */}
               <Route path="/request/assignee-reconfirm" element={<AssigneeReconfirm />} />  {/* N-05 */}
               <Route path="/request/ask-again" element={<AskAgain />} />  {/* N-06 */}
-              <Route path="/request/same" element={<SameRequest />} />  {/* N-07 */}
             </Routes>
           </BrowserRouter>
         </ErrorBoundary>
