@@ -9,8 +9,11 @@ import iconDate from "@/shared/assets/icons/iconDate.svg";
 import RequestState from "@/features/request/components/State/RequestState";
 import SmallFooter from "@/features/request/components/Footer/SmallFooter";
 import LargeFooter from "@/features/request/components/Footer/LargeFooter";
+import { useRequestNav } from "@/features/request/hooks/useRequestNav";
 
 function RequestTarget() {
+  const { handleGoBack, handleGoNext } = useRequestNav();
+
   // JSON 데이터 변수에 저장
   const {
     reqState,
@@ -37,13 +40,53 @@ function RequestTarget() {
     { icon: iconLocation, label: "장소", value: reqLocation },
   ];
 
+  /* 버튼 클릭 이벤트 핸들러 */
+  // 1) "보류" 버튼
+  const handleHoldBtnClick = () => {
+    console.log("보류 버튼 클릭");
+
+    // API 호출 로직 추가 필요
+  };
+
+  // 2) "거절" 버튼
+  const handleRefuseBtnClick = () => {
+    console.log("거절 버튼 클릭");
+
+    // API 호출 로직 추가 필요
+  };
+
+  // 3) "수락" 버튼
+  const handleAcceptBtnClick = () => {
+    console.log("수락 버튼 클릭");
+
+    // API 호출 로직 추가 필요
+
+    handleGoNext("/request/assignee");
+  };
+
+  // 4) "거절로 변경" 버튼
+  const handleToRefuseBtnClick = () => {
+    console.log("거절로 변경 버튼 클릭");
+
+    // API 호출 로직 추가 필요
+  };
+
+  // 5) "수락으로 변경" 버튼
+  const handleToAcceptBtnClick = () => {
+    console.log("수락으로 변경 버튼 클릭");
+
+    // API 호출 로직 추가 필요
+
+    handleGoNext("/request/assignee");
+  };
+
   return (
     <div className={styles.page}>
       <DefaultHeader
         title="받은 요청"
         subBtnTitle={isBeforeState ? "보류" : undefined}
-        // onClick={}
-        // onSubBtnClick={}
+        onClick={handleGoBack}
+        onSubBtnClick={handleHoldBtnClick}
       />
       <div className={styles.content}>
         {isCancelState && (
@@ -107,8 +150,8 @@ function RequestTarget() {
           leftType="secondary"
           leftTitle="거절"
           rightTitle="수락"
-          // leftOnClick={}
-          // rightOnClick={}
+          leftOnClick={handleRefuseBtnClick}
+          rightOnClick={handleAcceptBtnClick}
         />
       )}
 
@@ -117,8 +160,8 @@ function RequestTarget() {
           leftType="secondary"
           leftTitle="거절로 변경"
           rightTitle="수락으로 변경"
-          // leftOnClick={}
-          // rightOnClick={}
+          leftOnClick={handleToRefuseBtnClick}
+          rightOnClick={handleToAcceptBtnClick}
         />
       )}
 
@@ -126,7 +169,7 @@ function RequestTarget() {
         <LargeFooter
           title="수락으로 변경"
           type="primary"
-          // onClick={}
+          onClick={handleToAcceptBtnClick}
         />
       )}
     </div>
