@@ -1,7 +1,183 @@
 // H-03-01-B
+import styles from "@/features/request/pages/RequestTarget.module.css";
+import DefaultHeader from "@/features/request/components/Header/DefaultHeader";
+import RequestSummary from "@/features/request/components/Request/RequestSummary";
+import DueDateState from "@/features/request/components/State/DueDateState";
+import targetData from "@/features/request/api/targetData";
+import iconLocation from "@/shared/assets/icons/iconLocation.svg";
+import iconDate from "@/shared/assets/icons/iconDate.svg";
+import RequestState from "@/features/request/components/State/RequestState";
+import SmallFooter from "@/features/request/components/Footer/SmallFooter";
+import LargeFooter from "@/features/request/components/Footer/LargeFooter";
+import { useRequestNav } from "@/features/request/hooks/useRequestNav";
+import { REQUEST_STATE_CONFIG } from "@/features/request/constants/requestConstants";
 
 function RequestTarget() {
-  return <h1>H-03-01-B</h1>;
+  const { handleGoBack, handleGoNext } = useRequestNav();
+
+  // JSON 데이터 변수에 저장
+  const {
+    reqState,
+    reqUser,
+    reqType,
+    reqTime,
+    reqLocation,
+    reqMsg,
+    resDueDate,
+  } = targetData;
+
+  // 조건부 변수 정리
+  const isBeforeState = reqState === "before";
+  const isHoldState = reqState === "hold";
+  const isRefusedState = reqState === "refused";
+  const isCancelState = reqState === "cancel";
+  const isExpiredState = reqState === "expired";
+  const isPassState = reqState === "pass";
+
+  // RequestSummary에 넘겨줄 infoList 배열 구성
+  // 부모 컴포넌트에서 동적으로 아이콘, 라벨, 값을 묶어서 전달
+  const infoList = [
+    { icon: iconDate, label: "시간", value: reqTime },
+    { icon: iconLocation, label: "장소", value: reqLocation },
+  ];
+
+  /* 버튼 클릭 이벤트 핸들러 */
+  // 1) "보류" 버튼
+  const handleHoldBtnClick = () => {
+    console.log("보류 버튼 클릭");
+
+    // API 호출 로직 추가 필요
+  };
+
+  // 2) "거절" 버튼
+  const handleRefuseBtnClick = () => {
+    console.log("거절 버튼 클릭");
+
+    // API 호출 로직 추가 필요
+  };
+
+  // 3) "수락" 버튼
+  const handleAcceptBtnClick = () => {
+    console.log("수락 버튼 클릭");
+
+    // API 호출 로직 추가 필요
+
+    handleGoNext("/request/assignee");
+  };
+
+  // 4) "거절로 변경" 버튼
+  const handleToRefuseBtnClick = () => {
+    console.log("거절로 변경 버튼 클릭");
+
+    // API 호출 로직 추가 필요
+  };
+
+  // 5) "수락으로 변경" 버튼
+  const handleToAcceptBtnClick = () => {
+    console.log("수락으로 변경 버튼 클릭");
+
+    // API 호출 로직 추가 필요
+
+    handleGoNext("/request/assignee");
+  };
+
+  // 하단 푸터(Footer) 컴포넌트 렌더링 함수
+  const renderFooter = () => {
+    if (isBeforeState) {
+      return (
+        <SmallFooter
+          leftType="secondary"
+          leftTitle="거절"
+          rightTitle="수락"
+          leftOnClick={handleRefuseBtnClick}
+          rightOnClick={handleAcceptBtnClick}
+        />
+      );
+    }
+    if (isHoldState) {
+      return (
+        <SmallFooter
+          leftType="secondary"
+          leftTitle="거절로 변경"
+          rightTitle="수락으로 변경"
+          leftOnClick={handleToRefuseBtnClick}
+          rightOnClick={handleToAcceptBtnClick}
+        />
+      );
+    }
+    if (isRefusedState) {
+      return (
+        <LargeFooter
+          title="수락으로 변경"
+          type="primary"
+          onClick={handleToAcceptBtnClick}
+        />
+      );
+    }
+    return null;
+  };
+
+  return (
+    <div className={styles.page}>
+      {/* 상단 헤더 */}
+      <DefaultHeader
+        title="받은 요청"
+        subBtnTitle={isBeforeState ? "보류" : undefined}
+        onClick={handleGoBack}
+        onSubBtnClick={handleHoldBtnClick}
+      />
+
+      {/* 실제 메인 컨텐츠 */}
+      <div className={styles.content}>
+        {/* 요청 상태 카드 */}
+        {(isCancelState || isExpiredState || isPassState) && (
+          <RequestState
+            isAssignee={false}
+            title={REQUEST_STATE_CONFIG[reqState].title}
+            information={REQUEST_STATE_CONFIG[reqState].information}
+          />
+        )}
+
+        {/* 요청 내용 요약 카드 */}
+        <RequestSummary
+          isAfterInfo={false}
+          hasBeigeBorder={true}
+          title={`${reqUser}님의 요청`}
+          hasTag={true}
+          type={reqType}
+          infoList={infoList}
+          message={reqMsg}
+        />
+
+        {/* 응답 기한 */}
+        {(isBeforeState || isHoldState || isRefusedState) && (
+          <DueDateState
+            isResponse={true}
+            title="응답 기한"
+            dueDate={resDueDate}
+          />
+        )}
+
+        {/* 안내 가이드 텍스트 */}
+        {(isHoldState || isRefusedState) && (
+          <span className={`${styles.guideTxt} typoBodySmall`}>
+            보류 중인 요청사항이에요.
+            <br />
+            보류 중 요청자가 취소할 경우, 응답할 수 없어요.
+          </span>
+        )}
+
+        {(isCancelState || isExpiredState || isPassState) && (
+          <span className={`${styles.guideTxt} typoBodySmall`}>
+            더 이상 응답할 수 없어요.
+          </span>
+        )}
+      </div>
+
+      {/* 하단 Footer */}
+      {renderFooter()}
+    </div>
+  );
 }
 
 export default RequestTarget;
