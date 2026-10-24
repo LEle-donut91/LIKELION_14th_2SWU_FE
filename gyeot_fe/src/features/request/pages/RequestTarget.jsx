@@ -10,6 +10,7 @@ import RequestState from "@/features/request/components/State/RequestState";
 import SmallFooter from "@/features/request/components/Footer/SmallFooter";
 import LargeFooter from "@/features/request/components/Footer/LargeFooter";
 import { useRequestNav } from "@/features/request/hooks/useRequestNav";
+import { REQUEST_STATE_CONFIG } from "@/features/request/constants/requestConstants";
 
 function RequestTarget() {
   const { handleGoBack, handleGoNext } = useRequestNav();
@@ -80,39 +81,64 @@ function RequestTarget() {
     handleGoNext("/request/assignee");
   };
 
+  // 하단 푸터(Footer) 컴포넌트 렌더링 함수
+  const renderFooter = () => {
+    if (isBeforeState) {
+      return (
+        <SmallFooter
+          leftType="secondary"
+          leftTitle="거절"
+          rightTitle="수락"
+          leftOnClick={handleRefuseBtnClick}
+          rightOnClick={handleAcceptBtnClick}
+        />
+      );
+    }
+    if (isHoldState) {
+      return (
+        <SmallFooter
+          leftType="secondary"
+          leftTitle="거절로 변경"
+          rightTitle="수락으로 변경"
+          leftOnClick={handleToRefuseBtnClick}
+          rightOnClick={handleToAcceptBtnClick}
+        />
+      );
+    }
+    if (isRefusedState) {
+      return (
+        <LargeFooter
+          title="수락으로 변경"
+          type="primary"
+          onClick={handleToAcceptBtnClick}
+        />
+      );
+    }
+    return null;
+  };
+
   return (
     <div className={styles.page}>
+      {/* 상단 헤더 */}
       <DefaultHeader
         title="받은 요청"
         subBtnTitle={isBeforeState ? "보류" : undefined}
         onClick={handleGoBack}
         onSubBtnClick={handleHoldBtnClick}
       />
+
+      {/* 실제 메인 컨텐츠 */}
       <div className={styles.content}>
-        {isCancelState && (
+        {/* 요청 상태 카드 */}
+        {(isCancelState || isExpiredState || isPassState) && (
           <RequestState
             isAssignee={false}
-            title="요청 취소"
-            information="요청자가 취소했어요."
+            title={REQUEST_STATE_CONFIG[reqState].title}
+            information={REQUEST_STATE_CONFIG[reqState].information}
           />
         )}
 
-        {isExpiredState && (
-          <RequestState
-            isAssignee={false}
-            title="요청 만료"
-            information="요청이 만료됐어요."
-          />
-        )}
-
-        {isPassState && (
-          <RequestState
-            isAssignee={false}
-            title="요청 취소"
-            information="다른 사용자에게 요청이 넘어갔어요."
-          />
-        )}
-
+        {/* 요청 내용 요약 카드 */}
         <RequestSummary
           isAfterInfo={false}
           hasBeigeBorder={true}
@@ -122,6 +148,8 @@ function RequestTarget() {
           infoList={infoList}
           message={reqMsg}
         />
+
+        {/* 응답 기한 */}
         {(isBeforeState || isHoldState || isRefusedState) && (
           <DueDateState
             isResponse={true}
@@ -130,6 +158,7 @@ function RequestTarget() {
           />
         )}
 
+        {/* 안내 가이드 텍스트 */}
         {(isHoldState || isRefusedState) && (
           <span className={`${styles.guideTxt} typoBodySmall`}>
             보류 중인 요청사항이에요.
@@ -145,33 +174,8 @@ function RequestTarget() {
         )}
       </div>
 
-      {isBeforeState && (
-        <SmallFooter
-          leftType="secondary"
-          leftTitle="거절"
-          rightTitle="수락"
-          leftOnClick={handleRefuseBtnClick}
-          rightOnClick={handleAcceptBtnClick}
-        />
-      )}
-
-      {isHoldState && (
-        <SmallFooter
-          leftType="secondary"
-          leftTitle="거절로 변경"
-          rightTitle="수락으로 변경"
-          leftOnClick={handleToRefuseBtnClick}
-          rightOnClick={handleToAcceptBtnClick}
-        />
-      )}
-
-      {isRefusedState && (
-        <LargeFooter
-          title="수락으로 변경"
-          type="primary"
-          onClick={handleToAcceptBtnClick}
-        />
-      )}
+      {/* 하단 Footer */}
+      {renderFooter()}
     </div>
   );
 }
