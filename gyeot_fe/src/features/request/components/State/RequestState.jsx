@@ -4,9 +4,9 @@ import styles from "@/features/request/components/State/RequestState.module.css"
  * @param title 타이틀
  * @param information 상세 정보
  */
-function RequestState({ isRequester, title, information }) {
+function RequestState({ isAssignee, title, information }) {
   return (
-    <div className={`${isRequester ? styles.isRequester : styles.isAssignee}`}>
+    <div className={`${isAssignee ? styles.isAssignee : styles.isRequester}`}>
       <span className="typoBodyStrong">{title}</span>
       <span className="typoCaptionMedium">- {information}</span>
     </div>
