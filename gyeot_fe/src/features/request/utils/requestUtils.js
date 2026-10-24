@@ -37,3 +37,12 @@ export const getDateTimeText = (dateTimeObj) => {
 
   return `${datePart} ${timePart}`.trim();
 };
+
+// 화면에 보여줄 응답 기한 텍스트 가공
+export const getDueDateText = (dueDate) => {
+  if (!dueDate) return "선택";
+  const { days, hours, minutes } = dueDate;
+  if (!days && !hours && !minutes) return "선택";
+
+  return `${days ? `${days}일 ` : ""}${hours ? `${hours}시간 ` : ""}${minutes ? `${minutes}분` : ""}`.trim();
+};
