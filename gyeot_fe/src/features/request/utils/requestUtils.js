@@ -37,3 +37,18 @@ export const getDateTimeText = (dateTimeObj) => {
 
   return `${datePart} ${timePart}`.trim();
 };
+
+// (요청 대상 리스트, 선택된 요청 대상의 ID)를 인자로 받아, 요청 대상 텍스트 가공
+export const getSelectedUserId = (userLst, userId) => {
+  const selectedUser = userLst?.find((item) => item.id === userId);
+  return selectedUser?.userName || "한 명 선택";
+};
+
+// 화면에 보여줄 응답 기한 텍스트 가공
+export const getDueDateText = (dueDate) => {
+  if (!dueDate) return "선택";
+  const { days, hours, minutes } = dueDate;
+  if (!days && !hours && !minutes) return "선택";
+
+  return `${days ? `${days}일 ` : ""}${hours ? `${hours}시간 ` : ""}${minutes ? `${minutes}분` : ""}`.trim();
+};

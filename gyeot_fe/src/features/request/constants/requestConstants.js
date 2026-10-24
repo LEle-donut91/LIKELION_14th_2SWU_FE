@@ -3,6 +3,7 @@ export const DATE_TIME_SECTIONS = [
   { type: "date", title: "날짜" },
   { type: "time", title: "시간" },
 ];
+export const DUE_DATE_SECTIONS = [{ type: "dueDate", title: "응답기한" }];
 
 // 민감정보 항목의 ID 목록 정의
 export const SENSITIVE_KEYS = [
