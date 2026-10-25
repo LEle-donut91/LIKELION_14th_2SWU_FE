@@ -1,0 +1,159 @@
+/* 모달 바깥쪽 영역 */
+.overlayContent {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--color-opacity-400);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 실제 모달 영역 */
+.modalContent {
+  border-radius: 20px;
+  background-color: var(--color-base-000);
+  display: flex;
+  flex-direction: column;
+  padding: 20px 16px 16px;
+  gap: 16px;
+}
+
+.modalTitle {
+  color: var(--color-olive-600);
+  text-align: center;
+}
+
+.resCard {
+  /* 그림자 컬러도 CSS 변수에 추가 필요 */
+  box-shadow: 0px 0px 4px rgba(192, 192, 192, 0.16);
+  border-radius: 16px;
+  background-color: var(--color-gray-100);
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  gap: 16px;
+}
+
+.profile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  color: var(--color-gray-900);
+}
+
+.userImg {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+
+  /* CSS 변수에 추가 필요 */
+  background-color: #d9d9d9;
+}
+
+.resContainer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+}
+
+.resMainTxt {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-gray-900);
+}
+
+.tag {
+  border-radius: 999px;
+  background-color: var(--color-beige-500);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 8px;
+  text-align: center;
+  color: var(--color-base-000);
+}
+
+.resSubTxt {
+  display: flex;
+  align-items: center;
+  color: var(--color-gray-700);
+}
+
+.pointIcon {
+  height: 16px;
+  width: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6.7px 1.3px;
+  box-sizing: border-box;
+}
+
+.ellipse {
+  align-self: stretch;
+  width: 2.7px;
+  border-radius: 50%;
+  background-color: var(--color-gray-700);
+}
+
+.infoTxt {
+  text-align: center;
+  color: var(--color-gray-900);
+}
+
+.btnContainer {
+  display: flex;
+  gap: 6px;
+}
+
+.modalBtn {
+  /* 1. 버튼 기본 설정 */
+  /* 배경, 테두리 제거 */
+  background: none;
+  border: none;
+
+  /* 여백 및 패딩 제거 */
+  padding: 0;
+  margin: 0;
+
+  /* 커서 설정 */
+  cursor: pointer;
+
+  /* 기타 브라우저 기본 스타일 제거 */
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  /* 추가 설정 */
+  width: 158px;
+
+  /* 그림자 컬러 CSS 변수에 추가 필요 */
+  box-shadow: 0px 0px 4px rgba(192, 192, 192, 0.16);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  box-sizing: border-box;
+}
+
+.cancelBtn {
+  background-color: var(--color-base-000);
+  border: 1px solid var(--color-olive-200);
+  color: var(--color-olive-900);
+}
+
+.confirmBtn {
+  background-color: var(--color-olive-500);
+  border: 1px solid var(--color-olive-500);
+  color: var(--color-base-000);
+}
