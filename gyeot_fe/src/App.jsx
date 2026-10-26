@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import ErrorBoundary from "@/shared/components/ErrorBoundary";
 import ErrorFallback from "@/shared/components/ErrorFallback";
 import Test from "@/features/test/pages/Test";
+import ModalTest from "@/features/test/pages/ModalTest";
 
 // 나의 사람 및 보호자
 import Start from "@/features/relation/pages/Start";
@@ -47,7 +48,6 @@ import RequestTarget from "@/features/request/pages/RequestTarget";
 import ReceivedInfo from "@/features/request/pages/ReceivedInfo";
 import RequestEditForm from "@/features/request/pages/RequestEditForm";
 import RequestEditCheck from "@/features/request/pages/RequestEditCheck";
-import RequestModal from "@/features/request/pages/RequestModal";
 import AssigneeReconfirm from "@/features/request/pages/AssigneeReconfirm";
 import AskAgain from "@/features/request/pages/AskAgain";
 
@@ -64,8 +64,9 @@ function App() {
         >
           <BrowserRouter>
             <Routes>
-              {/* CSS 변수 테스트용 페이지 */}
+              {/* CSS 변수 테스트, M-01 모달 테스트 */}
               <Route path="/test" element={<Test />} />
+              <Route path="/modal-test" element={<ModalTest/>}/>
 
               {/* 나의 사람 및 보호자 */}
               <Route path="/" element={<Start />} />  {/* A-01 */}
@@ -111,9 +112,8 @@ function App() {
               <Route path="/request/received-info" element={<ReceivedInfo />} />  {/* H-03-01-01 */}
               <Route path="/request/edit-form" element={<RequestEditForm />} />  {/* H-03-01-02 */}
               <Route path="/request/edit-check" element={<RequestEditCheck />} />  {/* H-03-01-02 */}
-              <Route path="/request/modal" element={<RequestModal />} />  {/* M-01 */}
               <Route path="/request/assignee-reconfirm" element={<AssigneeReconfirm />} />  {/* N-05 */}
-              <Route path="/request/ask-again" element={<AskAgain />} />  {/* N-06 */}
+              <Route path="/request/ask-again/:id" element={<AskAgain />} />  {/* N-06 */}
             </Routes>
           </BrowserRouter>
         </ErrorBoundary>
