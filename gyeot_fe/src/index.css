@@ -47,6 +47,7 @@
   --color-base-999: #000000;
 
   /* 2) Gray */
+  --color-gray-100: #f8f8f8;
   --color-gray-100: #e8e7e5;
   --color-gray-200: #d3d2d0;
   --color-gray-300: #b4b2ad;
@@ -85,6 +86,10 @@
   --color-opacity-100: #2424221a;
   --color-opacity-200: #24242233;
   --color-opacity-400: #24242266;
+
+  /* 7) 기타 컬러 */
+  --color-box-shadow: rgba(192, 192, 192, 0.16); /* 그림자 컬러 */
+  --color-user-profile: #d9d9d9; /* 사용자 프로필 배경 컬러 */
 }
 
 /* =======================================================
