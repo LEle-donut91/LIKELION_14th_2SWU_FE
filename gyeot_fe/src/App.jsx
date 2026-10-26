@@ -104,15 +104,16 @@ function App() {
               {/* 요청 */}
               {/* N-07은 features/request/Modal/DefaultModal.jsx로 구현 */}
               <Route path="/request" element={<Request />} />  {/* H-03-02 */}
-              <Route path="/request/info-preview" element={<InfoPreview />} />  {/* H-03-02-01 */}
-              <Route path="/request/send" element={<RequestSend />} />  {/* H-03-02-01 */}
-              <Route path="/request/assignee" element={<RequestAssignee />} />  {/* H-03-01 */}
-              <Route path="/request/requester" element={<RequestRequester />} />  {/* H-03-01-A */}
-              <Route path="/request/target" element={<RequestTarget />} />  {/* H-03-01-B */}
-              <Route path="/request/received-info" element={<ReceivedInfo />} />  {/* H-03-01-01 */}
-              <Route path="/request/edit-form" element={<RequestEditForm />} />  {/* H-03-01-02 */}
-              <Route path="/request/edit-check" element={<RequestEditCheck />} />  {/* H-03-01-02 */}
-              <Route path="/request/assignee-reconfirm" element={<AssigneeReconfirm />} />  {/* N-05 */}
+              <Route path="/request/:id" element={<Request />} />  {/* H-03-02 */}
+              <Route path="/request/info-preview/:id" element={<InfoPreview />} />  {/* H-03-02-01 */}
+              <Route path="/request/send/:id" element={<RequestSend />} />  {/* H-03-02-01 */}
+              <Route path="/request/assignee/:id" element={<RequestAssignee />} />  {/* H-03-01 */}
+              <Route path="/request/requester/:id" element={<RequestRequester />} />  {/* H-03-01-A */}
+              <Route path="/request/target/:id" element={<RequestTarget />} />  {/* H-03-01-B */}
+              <Route path="/request/received-info/:id" element={<ReceivedInfo />} />  {/* H-03-01-01 */}
+              <Route path="/request/edit-form/:id" element={<RequestEditForm />} />  {/* H-03-01-02 */}
+              <Route path="/request/edit-check/:id" element={<RequestEditCheck />} />  {/* H-03-01-02 */}
+              <Route path="/request/assignee-reconfirm/:id" element={<AssigneeReconfirm />} />  {/* N-05 */}
               <Route path="/request/ask-again/:id" element={<AskAgain />} />  {/* N-06 */}
             </Routes>
           </BrowserRouter>
