@@ -31,7 +31,7 @@ function UserOption({
               <span className={`${styles.userNameTxt} typoBodyStrong`}>
                 {userName}
               </span>
-              {isGuardian === "true" && (
+              {isGuardian && (
                 <div className={styles.guardianTag}>
                   <span className={`${styles.guardianTxt} typoCaptionMedium`}>
                     보호자
