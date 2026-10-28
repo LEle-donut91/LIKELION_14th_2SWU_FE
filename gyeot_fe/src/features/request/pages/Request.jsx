@@ -83,12 +83,12 @@ function Request() {
   };
 
   return (
-    <div className="page">
+    <div className={styles.page}>
       {/* 헤더 */}
       <StepHeader title="요청 작성" step="1" />
 
       {/* 메인 컨텐츠 */}
-      <main>
+      <main className={styles.content}>
         {/* 상황 */}
         <SelectSection
           title="상황 *"
