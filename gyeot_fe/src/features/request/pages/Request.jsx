@@ -21,15 +21,17 @@ const DATE_TIME_SECTIONS = [
   { type: "time", title: "시간" },
 ];
 const DUE_DATE_SECTIONS = [{ type: "dueDate", title: "응답기한" }];
+import { useParams } from "react-router-dom";
 
 function Request() {
   const { handleGoBack, handleGoNext } = useRequestNav();
+  const paramsId = useParams().id;
 
   // JSON 데이터 변수에 저장
   const {situation, user} = requestWriteData;
 
   // 각 선택 항목에 대한 상태(State) 정의
-  const [situationId, setSituationId] = useState(null);
+  const [situationId, setSituationId] = useState(paramsId);
   const [userId, setUserId] = useState(null);
   const [startDateTime, setStartDateTime] = useState(null);
   const [endDateTime, setEndDateTime] = useState(null);
