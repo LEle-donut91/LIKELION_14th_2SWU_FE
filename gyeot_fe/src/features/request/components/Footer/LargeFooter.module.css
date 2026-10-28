@@ -33,7 +33,7 @@
   padding: 16px;
 
   /* 그림자 컬러 CSS 변수로 추가 필요 */
-  box-shadow: 0px 0px 4px rgba(192, 192, 192, 0.16);
+  box-shadow: 0px 0px 4px var(--color-box-shadow);
 }
 
 /* primary 버튼 */
