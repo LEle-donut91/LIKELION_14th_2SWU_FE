@@ -1,6 +1,5 @@
-import unselectedRadio from "@/features/request/assets/unselectedRadio.svg";
-import selectedRadio from "@/features/request/assets/selectedRadio.svg";
-import circle from "@/features/request/assets/circle.svg";
+import iconRadioOff from "@/shared/assets/icons/IconRadioOff.svg";
+import iconRadioOn from "@/shared/assets/icons/IconRadioOn.svg";
 import styles from "@/features/request/components/Option/SituationOption.module.css";
 
 function SituationOption({
@@ -33,14 +32,14 @@ function SituationOption({
                 <span className="typoCaptionMedium">
                   {startDate} - {endDate}
                 </span>
-                <div className={styles.circleContainer}>
-                  <img src={circle} />
+                <div className={styles.pointContainer}>
+                  <div className={styles.pointDiv}/>
                 </div>
                 <span className="typoCaptionMedium">참여자 {joinCount}명</span>
               </div>
             </div>
 
-            <img src={isSelected ? selectedRadio : unselectedRadio} />
+            <img className={`${isSelected ? styles.radioOnImg : styles.radioOffImg}`} src={isSelected ? iconRadioOn : iconRadioOff} />
           </label>
         );
       })}
