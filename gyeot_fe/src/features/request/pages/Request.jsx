@@ -32,7 +32,7 @@ function Request() {
   const [endDateTime, setEndDateTime] = useState(null);
   const [locationValue, setLocationValue] = useState(null);
   const [contentValue, setContentValue] = useState(null);
-  const [dueDate, setDueDate] = useState(null);
+  const [dueDate, setDueDate] = useState({ days: "1" });
 
   // 각 Sheet의 열림/닫힘 상태(State) 정의
   const [isSituationSheetOpen, setSituationSheetOpen] = useState(false);
