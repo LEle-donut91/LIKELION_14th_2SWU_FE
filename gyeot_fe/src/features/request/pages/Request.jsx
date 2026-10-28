@@ -6,7 +6,6 @@ import LargeFooter from "@/features/request/components/Footer/LargeFooter";
 import RadioSection from "@/features/request/components/Section/RadioSection";
 import SelectSection from "@/features/request/components/Section/SelectSection";
 import InputSection from "@/features/request/components/Section/InputSection";
-import requestWriteData from "@/features/request/api/requestWriteData.json";
 import DefaultSheet from "@/features/request/components/Sheet/DefaultSheet";
 import TimeSheet from "@/features/request/components/Sheet/TimeSheet";
 import SituationOption from "@/features/request/components/Option/SituationOption";
@@ -17,17 +16,21 @@ import { useRequestNav } from "@/features/request/hooks/useRequestNav";
 import { useParams } from "react-router-dom";
 import { getSelectUser, getSelectedSituation, getDateTimeText, getDueDateText } from "@/features/request/utils/requestUtils";
 import { DATE_TIME_SECTIONS, DUE_DATE_SECTIONS } from "@/features/request/constants/requestConstants";
+import { getReqFormService, postReqFormIdService, postReqFormService } from "../services/createService";
+import { getReqFormApi, postReqFormApi } from "../api/createApi";
 
 function Request() {
   const { handleGoBack, handleGoNext } = useRequestNav();
   const paramsId = useParams().id;
 
-  // JSON 데이터 변수에 저장
-  const {situation, user} = requestWriteData;
+  // TODO: API 연동 로직 수정 필요
+    const resRawData = getReqFormApi();
+    const { situation, user } = getReqFormService(resRawData);
 
   // 각 선택 항목에 대한 상태(State) 정의
   const [situationId, setSituationId] = useState(paramsId);
   const [userId, setUserId] = useState(null);
+  const [helpType, setHelpType] = useState(null);
   const [startDateTime, setStartDateTime] = useState(null);
   const [endDateTime, setEndDateTime] = useState(null);
   const [locationValue, setLocationValue] = useState(null);
@@ -54,12 +57,24 @@ function Request() {
 
   // Footer 버튼 눌렀을 때 실행될 핸들러
   const handleFooterBtnClick = () => {
-    // API 연동 로직 추가 필요
-    const TEMP_ID = "1" // 임시 ID 사용
+    // TODO: API 연동 로직 수정 필요
+    const form = {
+      situationId,
+      userId,
+      helpType,
+      startDateTime,
+      endDateTime,
+      locationValue,
+      contentValue,
+      dueDate,
+    };
+
+    const reqRefinedData = postReqFormService(form);
+    const resRawData = postReqFormApi(reqRefinedData);
+    const { reqId } = postReqFormIdService(resRawData);
 
     // [공개 정보 미리보기] 페이지로 이동
-    handleGoNext(`/request/info-preview/${TEMP_ID}`)
-
+    handleGoNext(`/request/info-preview/${reqId}`)
   }
 
   return (
