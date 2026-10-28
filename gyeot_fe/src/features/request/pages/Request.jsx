@@ -6,8 +6,7 @@ import LargeFooter from "@/features/request/components/Footer/LargeFooter";
 import RadioSection from "@/features/request/components/Section/RadioSection";
 import SelectSection from "@/features/request/components/Section/SelectSection";
 import InputSection from "@/features/request/components/Section/InputSection";
-import situationData from "@/features/request/api/situationData.json";
-import userData from "@/features/request/api/userData.json";
+import requestWriteData from "@/features/request/api/requestWriteData.json";
 import DefaultSheet from "@/features/request/components/Sheet/DefaultSheet";
 import TimeSheet from "@/features/request/components/Sheet/TimeSheet";
 import SituationOption from "@/features/request/components/Option/SituationOption";
@@ -23,6 +22,9 @@ const DATE_TIME_SECTIONS = [
 const DUE_DATE_SECTIONS = [{ type: "dueDate", title: "응답기한" }];
 
 function Request() {
+  // JSON 데이터 변수에 저장
+  const {situation, user} = requestWriteData;
+
   // 각 선택 항목에 대한 상태(State) 정의
   const [situationId, setSituationId] = useState(null);
   const [userId, setUserId] = useState(null);
@@ -42,10 +44,10 @@ function Request() {
   const [dateTarget, setDateTarget] = useState(null);
 
   // 선택된 ID를 통해 화면에 보여줄 텍스트(title) 찾기
-  const selectedSituation = situationData.find(
+  const selectedSituation = situation?.find(
     (item) => item.id === situationId,
   );
-  const selectedUser = userData?.find((item) => item.id === userId);
+  const selectedUser = user?.find((item) => item.id === userId);
 
   // 날짜/시간 객체를 화면에 보여줄 문자열로 가공하는 함수
   const getDateTimeText = (dateTimeObj) => {
@@ -106,7 +108,7 @@ function Request() {
         >
           {(temp, setTemp) => (
             <SituationOption
-              data={situationData}
+              data={situation}
               selectedValue={temp}
               onSelect={setTemp}
             />
@@ -190,7 +192,7 @@ function Request() {
         >
           {(temp, setTemp) => (
             <UserOption
-              data={userData}
+              data={user}
               selectedValue={temp}
               onSelect={setTemp}
             />
