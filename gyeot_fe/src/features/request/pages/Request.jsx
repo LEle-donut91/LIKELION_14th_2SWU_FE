@@ -95,7 +95,10 @@ function Request() {
         </DefaultSheet>
 
         {/* 도움 종류 */}
-        <RadioSection />
+        <RadioSection
+          value={helpType} 
+          onChange={setHelpType}
+        />
 
         {/* 시작 - 종료 */}
         <div className={styles.timeSectionContainer}>
