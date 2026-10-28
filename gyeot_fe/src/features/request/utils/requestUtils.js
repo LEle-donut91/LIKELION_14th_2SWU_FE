@@ -1,5 +1,17 @@
 import { SENSITIVE_KEYS } from "@/features/request/constants/requestConstants.js";
 
+// 선택된 상황 찾기
+export const getSelectedSituation = (situation, situationId) => {
+  const selectedSituation = situation?.find((item) => item.id === situationId);
+  return selectedSituation
+};
+
+// 선택된 요청 대상 찾기
+export const getSelectUser = (user, userId) => {
+  const selectedUser = user?.find((item) => item.id === userId);
+  return selectedUser
+}
+
 // 선택된 ID 목록(checkedList)과 원본 데이터 목록(dataList)을 받아서,
 // 선택된 항목들의 title을 쉼표(,)로 연결하여 반환
 export const getSelectedTitles = (checkedList, dataList) => {

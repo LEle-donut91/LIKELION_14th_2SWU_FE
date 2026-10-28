@@ -14,14 +14,9 @@ import UserOption from "@/features/request/components/Option/UserOption";
 import DateTimeOption from "@/features/request/components/Option/DateTimeOption";
 import { useState } from "react";
 import { useRequestNav } from "@/features/request/hooks/useRequestNav";
-
-// 시트에 주입할 DateTimeOption 입력 그룹 설정
-const DATE_TIME_SECTIONS = [
-  { type: "date", title: "날짜" },
-  { type: "time", title: "시간" },
-];
-const DUE_DATE_SECTIONS = [{ type: "dueDate", title: "응답기한" }];
 import { useParams } from "react-router-dom";
+import { getSelectUser, getSelectedSituation, getDateTimeText, getDueDateText } from "@/features/request/utils/requestUtils";
+import { DATE_TIME_SECTIONS, DUE_DATE_SECTIONS } from "@/features/request/constants/requestConstants";
 
 function Request() {
   const { handleGoBack, handleGoNext } = useRequestNav();
@@ -47,36 +42,6 @@ function Request() {
 
   // 어떤 시트(시작 또는 종료)에서 DateTimeSheet를 열었는지 구분하기 위한 상태
   const [dateTarget, setDateTarget] = useState(null);
-
-  // 선택된 ID를 통해 화면에 보여줄 텍스트(title) 찾기
-  const selectedSituation = situation?.find(
-    (item) => item.id === situationId,
-  );
-  const selectedUser = user?.find((item) => item.id === userId);
-
-  // 날짜/시간 객체를 화면에 보여줄 문자열로 가공하는 함수
-  const getDateTimeText = (dateTimeObj) => {
-    if (!dateTimeObj) return "선택";
-    const { year, month, day, hour, minute } = dateTimeObj;
-    if (!year && !month && !day && !hour && !minute) return "선택";
-
-    const datePart =
-      year || month || day
-        ? `${year || "0000"}.${month || "00"}.${day || "00"}`
-        : "";
-    const timePart = hour || minute ? `${hour || "00"}:${minute || "00"}` : "";
-
-    return `${datePart} ${timePart}`.trim();
-  };
-
-  // 화면에 보여줄 응답 기한 텍스트 가공
-  const getDueDateText = () => {
-    if (!dueDate) return "선택";
-    const { days, hours, minutes } = dueDate;
-    if (!days && !hours && !minutes) return "선택";
-
-    return `${days ? `${days}일 ` : ""}${hours ? `${hours}시간 ` : ""}${minutes ? `${minutes}분` : ""}`.trim();
-  };
 
   // DateTimeSheet에서 확인을 눌렀을 때 실행될 핸들러
   const handleDateTimeConfirm = (value) => {
@@ -107,7 +72,7 @@ function Request() {
         {/* 상황 */}
         <SelectSection
           title="상황 *"
-          text={selectedSituation ? selectedSituation.title : "선택"}
+          text={getSelectedSituation(situation, situationId) ? getSelectedSituation(situation, situationId).title : "선택"}
           border={situationId ? "borderActive" : "borderDefault"}
           width="large"
           onClick={() => setSituationSheetOpen(true)}
@@ -191,7 +156,7 @@ function Request() {
         {/* 요청 대상 */}
         <SelectSection
           title="요청 대상 *"
-          text={selectedUser ? selectedUser.userName : "선택"}
+          text={getSelectUser(user, userId) ? getSelectUser(user, userId).userName : "선택"}
           border={userId ? "borderActive" : "borderDefault"}
           width="large"
           onClick={() => setUserSheetOpen(true)}
@@ -217,7 +182,7 @@ function Request() {
         {/* 응답 기한 */}
         <SelectSection
           title="응답 기한 *"
-          text={getDueDateText()}
+          text={getDueDateText(dueDate)}
           border={dueDate ? "borderActive" : "borderDefault"}
           width="large"
           onClick={() => setDuedateSheetOpen(true)}
