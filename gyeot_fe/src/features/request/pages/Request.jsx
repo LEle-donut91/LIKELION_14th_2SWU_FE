@@ -13,6 +13,7 @@ import SituationOption from "@/features/request/components/Option/SituationOptio
 import UserOption from "@/features/request/components/Option/UserOption";
 import DateTimeOption from "@/features/request/components/Option/DateTimeOption";
 import { useState } from "react";
+import { useRequestNav } from "@/features/request/hooks/useRequestNav";
 
 // 시트에 주입할 DateTimeOption 입력 그룹 설정
 const DATE_TIME_SECTIONS = [
@@ -22,6 +23,8 @@ const DATE_TIME_SECTIONS = [
 const DUE_DATE_SECTIONS = [{ type: "dueDate", title: "응답기한" }];
 
 function Request() {
+  const { handleGoBack, handleGoNext } = useRequestNav();
+
   // JSON 데이터 변수에 저장
   const {situation, user} = requestWriteData;
 
@@ -82,10 +85,20 @@ function Request() {
     }
   };
 
+  // Footer 버튼 눌렀을 때 실행될 핸들러
+  const handleFooterBtnClick = () => {
+    // API 연동 로직 추가 필요
+    const TEMP_ID = "1" // 임시 ID 사용
+
+    // [공개 정보 미리보기] 페이지로 이동
+    handleGoNext(`/request/info-preview/${TEMP_ID}`)
+
+  }
+
   return (
     <div className={styles.page}>
       {/* 헤더 */}
-      <StepHeader title="요청 작성" step="1" />
+      <StepHeader title="요청 작성" step="1" onClick={handleGoBack} />
 
       {/* 메인 컨텐츠 */}
       <main className={styles.content}>
@@ -225,7 +238,7 @@ function Request() {
       </main>
 
       {/* 하단 Footer(버튼) */}
-      <LargeFooter navUrl="/request/info-preview" title="다음" type="primary" />
+      <LargeFooter title="다음" type="primary" onClick={handleFooterBtnClick} />
     </div>
   );
 }
