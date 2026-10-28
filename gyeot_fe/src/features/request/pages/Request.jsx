@@ -73,7 +73,6 @@ function Request() {
         <SelectSection
           title="상황 *"
           text={getSelectedSituation(situation, situationId) ? getSelectedSituation(situation, situationId).title : "선택"}
-          border={situationId ? "borderActive" : "borderDefault"}
           width="large"
           onClick={() => setSituationSheetOpen(true)}
         />
@@ -103,7 +102,6 @@ function Request() {
           <SelectSection
             title="시작 *"
             text={getDateTimeText(startDateTime)}
-            border={startDateTime ? "borderActive" : "borderDefault"}
             width="small"
             onClick={() => {
               setDateTarget("start");
@@ -113,7 +111,6 @@ function Request() {
           <SelectSection
             title="종료 *"
             text={getDateTimeText(endDateTime)}
-            border={endDateTime ? "borderActive" : "borderDefault"}
             width="small"
             onClick={() => {
               setDateTarget("end");
@@ -157,7 +154,6 @@ function Request() {
         <SelectSection
           title="요청 대상 *"
           text={getSelectUser(user, userId) ? getSelectUser(user, userId).userName : "선택"}
-          border={userId ? "borderActive" : "borderDefault"}
           width="large"
           onClick={() => setUserSheetOpen(true)}
         />
@@ -183,7 +179,6 @@ function Request() {
         <SelectSection
           title="응답 기한 *"
           text={getDueDateText(dueDate)}
-          border={dueDate ? "borderActive" : "borderDefault"}
           width="large"
           onClick={() => setDuedateSheetOpen(true)}
         />
