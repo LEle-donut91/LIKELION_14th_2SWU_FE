@@ -1,70 +1,5 @@
 import styles from "@/features/request/components/Option/DateTimeOption.module.css";
-
-// type별 입력 필드 설정 데이터
-const OPTION_CONFIGS = {
-  date: [
-    {
-      placeholder: "0000",
-      maxLength: 4,
-      label: "년",
-      className: styles.yearInput,
-      key: "year",
-    },
-    {
-      placeholder: "00",
-      maxLength: 2,
-      label: "월",
-      className: styles.dateTimeInput,
-      key: "month",
-    },
-    {
-      placeholder: "00",
-      maxLength: 2,
-      label: "일",
-      className: styles.dateTimeInput,
-      key: "day",
-    },
-  ],
-  time: [
-    {
-      placeholder: "00",
-      maxLength: 2,
-      label: "시",
-      className: styles.dateTimeInput,
-      key: "hour",
-    },
-    {
-      placeholder: "00",
-      maxLength: 2,
-      label: "분",
-      className: styles.dateTimeInput,
-      key: "minute",
-    },
-  ],
-  dueDate: [
-    {
-      placeholder: "00",
-      maxLength: 2,
-      label: "일",
-      className: styles.dateTimeInput,
-      key: "days",
-    },
-    {
-      placeholder: "00",
-      maxLength: 2,
-      label: "시간",
-      className: styles.dateTimeInput,
-      key: "hours",
-    },
-    {
-      placeholder: "00",
-      maxLength: 2,
-      label: "분",
-      className: styles.dateTimeInput,
-      key: "minutes",
-    },
-  ],
-};
+import { OPTION_CONFIGS } from "@/features/request/constants/requestConstants";
 
 /**
  * sections: [{ type: "date" | "time" | "dueDate", title: "날짜" }, ...]
@@ -93,7 +28,7 @@ function DateTimeOption({ sections = [], value, onChange }) {
               <div key={field.key} className={styles.dateTimeContainer}>
                 <input
                   type="text"
-                  className={`${field.className} ${styles.baseInput} typoBodyMedium`}
+                  className={`${styles[field.className]} ${styles.baseInput} typoBodyMedium`}
                   placeholder={field.placeholder}
                   maxLength={field.maxLength}
                   value={current[field.key] || ""}

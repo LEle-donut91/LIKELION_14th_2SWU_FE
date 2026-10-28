@@ -1,19 +1,10 @@
 import { useState } from "react";
 import styles from "@/features/request/components/Section/RadioSection.module.css";
+import { OPTIONS } from "@/features/request/constants/requestConstants";
 
 function RadioSection() {
   // 선택된 항목의 값을 관리
   const [selected, setSelected] = useState(null);
-
-  // 도움 종류 option 배열
-  const options = [
-    "병원 동행",
-    "식사",
-    "장보기",
-    "반려동물",
-    "연락/안부",
-    "기타",
-  ];
 
   return (
     <section>
@@ -23,7 +14,7 @@ function RadioSection() {
       {/* 라디오 버튼 container */}
       <div className={styles.radioContainer}>
         {/* 도움 종류 라디오 버튼 */}
-        {options.map((item) => {
+        {OPTIONS.map((item) => {
           // 사용자가 선택한 항목과 현재 그리는 항목 (item)이 같으면 true, 다르면 false
           const isSelected = selected === item;
 
