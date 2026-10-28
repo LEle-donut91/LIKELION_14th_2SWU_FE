@@ -1,5 +1,6 @@
 import styles from "@/features/request/components/Option/DateTimeOption.module.css";
-import { OPTION_CONFIGS } from "@/features/request/constants/requestConstants";
+import { DATE_TIME_OPTION_CONFIGS } from "@/features/request/constants/requestConstants";
+import { getValidatedNumericValue } from "@/features/request/utils/requestUtils";
 
 /**
  * sections: [{ type: "date" | "time" | "dueDate", title: "날짜" }, ...]
@@ -9,7 +10,8 @@ function DateTimeOption({ sections = [], value, onChange }) {
   const current = value ?? {};
 
   const handleChange = (key, e) => {
-    const val = e.target.value.replace(/[^0-9]/g, ""); // 숫자만 입력 가능하도록 처리
+    // 입력된 시간/날짜값 검증 및 보정
+    const val = getValidatedNumericValue(key, e.target.value);
     onChange?.({ ...current, [key]: val });
   };
 
@@ -24,7 +26,7 @@ function DateTimeOption({ sections = [], value, onChange }) {
           )}
 
           <div className={styles.dateTimeGroup}>
-            {(OPTION_CONFIGS[type] || []).map((field) => (
+            {(DATE_TIME_OPTION_CONFIGS[type] || []).map((field) => (
               <div key={field.key} className={styles.dateTimeContainer}>
                 <input
                   type="text"
