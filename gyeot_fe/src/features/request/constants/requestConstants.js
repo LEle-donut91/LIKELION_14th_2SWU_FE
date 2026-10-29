@@ -66,6 +66,12 @@ export const DATE_TIME_KEYS = [...DATE_CONFIGS, ...TIME_CONFIGS].map(
   (item) => item.key
 );
 
+export const DUE_DATE_KEYS = DUE_DATE_CONFIGS.map((item) => item.key);
+export const DUE_DATE_MIN_MINUTES = 60;            // 응답 기한 최소 1시간
+export const DUE_DATE_MAX_MINUTES = 3 * 24 * 60;   // 응답 기한 최대 3일
+export const DUE_DATE_DEFAULT_MINUTES = 24 * 60;   // 기본 24시간
+export const START_MIN_LEAD_MINUTES = 60;          // 시작까지 최소 1시간
+
 // 날짜/시간 입력 필드 최소값
 export const DATE_TIME_MIN_LIMITS = [...DATE_CONFIGS, ...TIME_CONFIGS].reduce(
   (acc, item) => ({ ...acc, [item.key]: item.min }),

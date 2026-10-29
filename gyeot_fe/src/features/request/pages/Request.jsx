@@ -39,7 +39,7 @@ function Request() {
   const paramsId = useParams().id;
 
   // 입력값 전체는 form 하나에 있음 (필드별 타입은 useRequestForm.js 의 RequestForm 참고)
-  const { form, setField, errors, isValid } = useRequestForm(paramsId);
+  const { form, setField, validate } = useRequestForm(paramsId);
 
   // 열려 있는 시트 (한 번에 하나만 열림)
   const [openSheet, setOpenSheet] = useState(null);
@@ -57,8 +57,9 @@ function Request() {
 
   // Footer 버튼 눌렀을 때 실행될 핸들러
   const handleFooterBtnClick = () => {
-    if (!isValid) {
-      const [firstError] = Object.values(errors); // 첫 번째 에러 문구 하나만
+    const errors = validate();
+    const [firstError] = Object.values(errors); // 첫 번째 에러 문구 하나만
+    if (firstError) {
       alert(firstError);
       return;
     }
