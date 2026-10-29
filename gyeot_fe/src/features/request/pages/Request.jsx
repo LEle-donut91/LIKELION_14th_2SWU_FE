@@ -25,8 +25,8 @@ import {
   REQUEST_SHEET,
   DATE_TIME_SECTIONS,
   DUE_DATE_SECTIONS,
-  REQUEST_ROUTES,
 } from "@/features/request/constants/requestConstants";
+import { REQUEST_ROUTES } from "@/features/request/constants/routerConstants";
 import {
   getReqFormService,
   postReqFormIdService,

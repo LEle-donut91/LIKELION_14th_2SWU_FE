@@ -1,5 +1,5 @@
 import styles from "@/features/request/components/Section/RadioSection.module.css";
-import { HELP_TYPE_OPTIONS } from "@/features/request/constants/requestConstants";
+import { HELP_TYPE_OPTIONS, HELP_TYPE_LABELS } from "@/features/request/constants/requestConstants";
 
 function RadioSection({ value, onChange }) {
 
@@ -23,7 +23,7 @@ function RadioSection({ value, onChange }) {
               role="radio"
               aria-checked={isSelected}
             >
-              <span className={`${styles.radioTxt} typoBodySmall`}>{item}</span>
+              <span className={`${styles.radioTxt} typoBodySmall`}>{HELP_TYPE_LABELS[item]} </span>
             </button>
           );
         })}

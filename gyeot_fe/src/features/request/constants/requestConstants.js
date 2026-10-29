@@ -1,18 +1,3 @@
-// 요청 도메인 라우트 (App.jsx의 <Route path> 와 반드시 일치시킬 것)
-// id: 요청 ID
-export const REQUEST_ROUTES = {
-  infoPreview: (id) => `/request/info-preview/${id}`,
-  send: (id) => `/request/send/${id}`,
-  assignee: (id) => `/request/assignee/${id}`,
-  requester: (id) => `/request/requester/${id}`,
-  target: (id) => `/request/target/${id}`,
-  receivedInfo: (id) => `/request/received-info/${id}`,
-  editForm: (id) => `/request/edit-form/${id}`,
-  editCheck: (id) => `/request/edit-check/${id}`,
-  assigneeReconfirm: (id) => `/request/assignee-reconfirm/${id}`,
-  askAgain: (id) => `/request/ask-again/${id}`,
-};
-
 // 열 수 있는 시트 종류. openSheet 는 이 값 중 하나이거나 null(모두 닫힘)
 export const REQUEST_SHEET = {
   SITUATION: "situation",
@@ -35,15 +20,19 @@ export const DATE_TARGET = {
   END: "end",
 };
 
-// 도움 종류 option 배열
-export const HELP_TYPE_OPTIONS = [
-  "병원 동행",
-  "식사",
-  "장보기",
-  "반려동물",
-  "연락/안부",
-  "기타",
-];
+// 도움 종류: 서버 응답/요청에 쓰는 값(key), 한글 매핑(value)
+export const HELP_TYPE_LABELS = {
+  HOSPITAL_ESCORT: "병원 동행",
+  MEAL: "식사",
+  SHOPPING: "장보기",
+  PET: "반려동물",
+  CHECK_IN: "연락/안부",
+  ETC: "기타",
+};
+
+// 라디오 버튼으로 그릴 [도움 종류]값 목록 (위 객체의 선언 순서대로)
+// -> ["HOSPITAL_ESCORT", "MEAL", "SHOPPING", "PET", "CHECK_IN", "ETC"]
+export const HELP_TYPE_OPTIONS = Object.keys(HELP_TYPE_LABELS);
 
 // DateTimeOption 컴포넌트 - 날짜 입력칸 설정
 const DATE_CONFIGS = [
