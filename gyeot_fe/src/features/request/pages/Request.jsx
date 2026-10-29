@@ -10,7 +10,7 @@ import styles from "@/features/request/pages/Request.module.css";
 
 // 일반 라이브러리
 import { useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 
 // Custom Hooks
 import { useRequestNav } from "@/features/request/hooks/useRequestNav";
@@ -58,12 +58,24 @@ import DateTimeOption from "@/features/request/components/Option/DateTimeOption"
 
 // 페이지 컴포넌트
 function Request() {
-  // path parameter, 커스텀 훅 가져오기
-  const { id } = useParams();
+  // useNavigation 커스텀 훅의 함수
   const { handleGoBack, handleGoNext } = useRequestNav();
+
+  // path parameter, useLocation
+  const paramId = useParams().id;
+  const location = useLocation();
+
+  // 이전 페이지에서 전달받은 state 데이터 가져오기 (요청 대상 ID, 응답 기한)
+  const state = location.state || {};
+  const passedUserId = state[REQUEST_FORM_FIELD_KEY.USER_ID];
+  const passedDueDate = state[REQUEST_FORM_FIELD_KEY.DUE_DATE];
+
+  // 입력값 전체는 form 하나 (초기값 전달)
   const { form, setField, validate } = useRequestForm({
-    situationId: id,
-  }); // 입력값 전체는 form 하나
+    situationId: paramId,
+    ...(passedUserId && { userId: passedUserId }),
+    ...(passedDueDate && { userId: passedDueDate }),
+  });
 
   // 열려 있는 시트 (한 번에 하나만 열림)
   const [openSheet, setOpenSheet] = useState(null);
