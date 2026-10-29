@@ -1,8 +1,15 @@
 /**
- * post/get/patch/delete + 요청 내용 + Service
+ * =====================================================================
+ * [H-03-02] 요청 작성
+ * - post/get/patch/delete + 요청 내용 + Api
+ * - 조회 후 데이터 가공
+ * - 폼 제출 전 데이터 가공
+ * 
+ * =====================================================================
  */
 
 // TODO: API 연동 로직 수정 필요
+// [H-03-02] 요청 작성 - 데이터 조회 후 가공
 export const getReqFormService = (raw) => {
   if (!raw) return { situation: [], user: [] };
 
@@ -26,6 +33,7 @@ export const getReqFormService = (raw) => {
 };
 
 // TODO: API 연동 로직 수정 필요
+// [H-03-02] 요청 작성 - 폼 제출 전 데이터 가공
 export const postReqFormService = (raw) => ({
   situationId: raw.situationId,
   targetUserId: raw.userId,
@@ -37,6 +45,8 @@ export const postReqFormService = (raw) => ({
   responseDue: raw.dueDate
 });
 
+// TODO: API 연동 로직 수정 필요
+// [H-03-02] 요청 작성 - 폼 제출 후 데이터 가공
 export const postReqFormIdService = (raw) => ({
   reqId: raw.requestId,
   msg: raw.message,
