@@ -1,3 +1,18 @@
+/**
+ * =====================================================================
+ * [H-03-02] 요청 작성
+ * =====================================================================
+ */
+
+// 1분(Minute)을 밀리초(Millisecond) 단위로 환산하기 위한 상수
+export const MS_PER_MINUTE = 60 * 1000;
+
+// 시간/응답 기한 관련 Number 타입 상수
+export const DUE_DATE_MIN_MINUTES = 60;            // 응답 기한 최소 1시간
+export const DUE_DATE_MAX_MINUTES = 3 * 24 * 60;   // 응답 기한 최대 3일
+export const DUE_DATE_DEFAULT_MINUTES = 24 * 60;   // 응답 기한 기본값 24시간
+export const START_MIN_LEAD_MINUTES = 60;          // 시작까지 최소 1시간
+
 // 열 수 있는 시트 종류. openSheet 는 이 값 중 하나이거나 null(모두 닫힘)
 export const REQUEST_SHEET = {
   SITUATION: "situation",
@@ -7,8 +22,8 @@ export const REQUEST_SHEET = {
   DUE_DATE: "dueDate",
 };
 
-// 요청 작성 폼 필드 키
-export const REQUEST_FORM_FIELD = {
+// 요청 작성 Form 필드 키
+export const REQUEST_FORM_FIELD_KEY = {
   SITUATION_ID: "situationId",
   USER_ID: "userId",
   HELP_TYPE: "helpType",
@@ -19,11 +34,13 @@ export const REQUEST_FORM_FIELD = {
   DUE_DATE: "dueDate",
 };
 
-// 시트에 주입할 DateTimeOption 입력 그룹 설정
+// 시트에 주입할 DateTimeOption 입력 그룹 설정 (날짜/시간)
 export const DATE_TIME_SECTIONS = [
   { type: "date", title: "날짜" },
   { type: "time", title: "시간" },
 ];
+
+// 시트에 주입할 DateTimeOption 입력 그룹 설정 (응답기한)
 export const DUE_DATE_SECTIONS = [{ type: "dueDate", title: "응답기한" }];
 
 // 시작 시간 입력인지, 종료 시간 입력인지 구분
@@ -42,13 +59,13 @@ export const HELP_TYPE_LABELS = {
   ETC: "기타",
 };
 
-// 라디오 버튼으로 그릴 [도움 종류]값 목록 (위 객체의 선언 순서대로)
+// 라디오 버튼으로 그릴 [도움 종류]값 목록 (HELP_TYPE_LABELS 객체의 선언 순서대로)
 // -> ["HOSPITAL_ESCORT", "MEAL", "SHOPPING", "PET", "CHECK_IN", "ETC"]
 export const HELP_TYPE_OPTIONS = Object.keys(HELP_TYPE_LABELS);
 
 // DateTimeOption 컴포넌트 - 날짜 입력칸 설정
 const DATE_CONFIGS = [
-  { key: "year", placeholder: "0000", maxLength: 4, label: "년", className: "yearInput", min: 1 },
+  { key: "year", placeholder: "2026", maxLength: 4, label: "년", className: "yearInput", min: 1 },
   { key: "month", placeholder: "00", maxLength: 2, label: "월", className: "dateTimeInput", min: 1, max: 12 },
   { key: "day", placeholder: "00", maxLength: 2, label: "일", className: "dateTimeInput", min: 1, max: 31 },
 ];
@@ -78,34 +95,39 @@ export const DATE_TIME_KEYS = [...DATE_CONFIGS, ...TIME_CONFIGS].map(
   (item) => item.key
 );
 
+// 응답 기한 입력 필드의 key 목록 (["days", "hours", "minutes"])
 export const DUE_DATE_KEYS = DUE_DATE_CONFIGS.map((item) => item.key);
-export const DUE_DATE_MIN_MINUTES = 60;            // 응답 기한 최소 1시간
-export const DUE_DATE_MAX_MINUTES = 3 * 24 * 60;   // 응답 기한 최대 3일
-export const DUE_DATE_DEFAULT_MINUTES = 24 * 60;   // 기본 24시간
-export const START_MIN_LEAD_MINUTES = 60;          // 시작까지 최소 1시간
 
-// 날짜/시간 입력 필드 최소값
+// 날짜/시간 입력 필드 최소값 목록
 export const DATE_TIME_MIN_LIMITS = [...DATE_CONFIGS, ...TIME_CONFIGS].reduce(
   (acc, item) => ({ ...acc, [item.key]: item.min }),
   {}
 );
 
-// 응답 기한 입력 필드 최소값
-export const DUE_DATE_MIN_LIMITS = DUE_DATE_CONFIGS.reduce(
-  (acc, item) => ({ ...acc, [item.key]: item.min }),
-  {}
-);
-// 날짜/시간 입력 필드 최대값
+// 날짜/시간 입력 필드 최대값 목록
 export const DATE_TIME_MAX_LIMITS = [...DATE_CONFIGS, ...TIME_CONFIGS].reduce(
   (acc, item) => ({ ...acc, [item.key]: item.max }),
   {}
 );
 
-// 응답 기한 입력 필드 최대값
+// 응답 기한 입력 필드 최소값 목록
+export const DUE_DATE_MIN_LIMITS = DUE_DATE_CONFIGS.reduce(
+  (acc, item) => ({ ...acc, [item.key]: item.min }),
+  {}
+);
+
+// 응답 기한 입력 필드 최대값 목록
 export const DUE_DATE_MAX_LIMITS = DUE_DATE_CONFIGS.reduce(
   (acc, item) => ({ ...acc, [item.key]: item.max }),
   {}
 );
+
+/**
+ * =====================================================================
+ * TODO: 추후 주석 추가
+ * =====================================================================
+ */
+
 
 // 민감정보 항목의 ID 목록 정의
 export const SENSITIVE_KEYS = [

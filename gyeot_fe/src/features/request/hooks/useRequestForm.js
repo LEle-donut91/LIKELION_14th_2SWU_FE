@@ -1,11 +1,21 @@
 import { useState } from "react";
 import {
+  MS_PER_MINUTE,
   DATE_TIME_KEYS,
   DUE_DATE_KEYS,
   DUE_DATE_MAX_MINUTES,
   DUE_DATE_MIN_MINUTES,
   START_MIN_LEAD_MINUTES,
 } from "@/features/request/constants/requestConstants";
+
+/**
+ * =====================================================================
+ * [H-03-02] 요청 작성
+ * - 사용자가 입력 폼 데이터(State)를 통합 관리
+ * - 사용자가 입력 폼 데이터의 유효성 검사 -> 에러 목록(객체 형태) 반환
+ * 
+ * =====================================================================
+ */
 
 /**
  * 날짜+시간 값. 모든 필드는 "문자열"이며, 입력 전/범위 밖 값은 null
@@ -40,7 +50,10 @@ import {
  * @property {DueDateValue} dueDate         응답 기한. 기본 { days: "1" } (24시간)
  */
 
-/** @type {RequestForm} */
+/** 
+ * @type {RequestForm}
+ * 입력 Form 초기값 설정
+ */
 const INITIAL_FORM = {
   situationId: null,
   userId: null,
@@ -52,36 +65,54 @@ const INITIAL_FORM = {
   dueDate: { days: "1" },
 };
 
-const MS_PER_MINUTE = 60 * 1000;
-
-/** 5개 필드가 전부 채워졌는지 (null / undefined / "" 모두 미입력으로 취급) */
+// 시간/날짜 입력 칸의 5개 필드가 전부 채워졌는지 체크 (null / undefined / "" 은 모두 미입력으로 취급)
 export const isDateTimeComplete = (v) =>
   !!v && DATE_TIME_KEYS.every((k) => v[k] != null && v[k] !== "");
 
-/** DateTimeValue -> Date (미완성이면 null) */
+// 응답 기한 입력 칸의 3개 필드 중 1개 이상 입력했는지 체크 (null / undefined / "" 은 모두 미입력으로 취급)
+const isDueDateEntered = (d) =>
+  DUE_DATE_KEYS.some((k) => d?.[k] != null && d?.[k] !== "");
+
+// 시간/날짜 입력값 객체 (DateTimeValue)를 Date 타입으로 변환
 const toDate = (v) =>
   isDateTimeComplete(v)
     ? new Date(+v.year, +v.month - 1, +v.day, +v.hour, +v.minute)
     : null;
 
-/** 응답 기한을 하나라도 입력했는지 (null / undefined / "" 모두 미입력으로 취급) */
-const isDueDateEntered = (d) =>
-  DUE_DATE_KEYS.some((k) => d?.[k] != null && d?.[k] !== "");
-
-/** 응답 기한을 분 단위 총합으로 환산 (없는 키/null은 0으로 취급) */
-const getDueDateMinutes = (d) =>
+// 응답 기한 입력값 객체 (DueDateValue)를 분 단위 총합으로 환산 (없는 키/null은 0으로 취급)
+const toMinutes = (d) =>
   (parseInt(d?.days, 10) || 0) * 24 * 60 +
   (parseInt(d?.hours, 10) || 0) * 60 +
   (parseInt(d?.minutes, 10) || 0);
 
 /**
- * 검증. 통과하면 빈 객체, 문제 있으면 { 필드명: "이유" }
- * 시간(now)에 따라 결과가 달라지므로, 렌더마다 계산하지 말고 버튼 클릭 시점에 호출할 것.
- * 에러는 화면 위에서 아래 순서로 쌓이므로, Object.values(errors)[0] 이 가장 위쪽 문제.
+ * * [validateRequestForm 에러 조건 및 메시지 정리]
+ * 
+ * 1. 시작 일시 (startDateTime)
+ *    - 미입력 시: "시작 일시를 모두 입력해 주세요."
+ *    - 과거 시간 설정 시: "이미 지난 시간은 시작 시간으로 설정할 수 없어요."
+ *    - 여유 시간 부족 시 (< 1시간): "시작 시간은 지금으로부터 최소 1시간 이후여야 해요."
  *
+ * 2. 종료 일시 (endDateTime)
+ *    - 미입력 시: "종료 일시를 모두 입력해 주세요."
+ *    - 시작 시간보다 빠르거나 같을 때 (end <= start): "종료 시간은 시작 시간보다 늦어야 해요."
+ *
+ * 3. 장소 (location)
+ *    - 미입력 또는 공백 시: "장소를 입력해 주세요."
+ *
+ * 4. 요청 대상 (userId)
+ *    - 미선택 시: "요청 대상을 선택해 주세요."
+ *
+ * 5. 응답 기한 (dueDate)
+ *    - 미입력 시: "응답 기한을 입력해 주세요."
+ *    - 최소 기한 미달 (< 1시간): "응답 기한은 최소 1시간 이상이어야 해요."
+ *    - 최대 기한 초과 (> 3일): "응답 기한은 최대 3일까지 설정할 수 있어요."
+ *    - 시작 시간을 초과할 때 (현재+기한 > 시작시간): "응답 기한은 시작 시간을 넘을 수 없어요."
+ * 
  * @param {RequestForm} form
  * @param {Date} now
  */
+// Form 입력값 검증 함수
 export const validateRequestForm = (form, now) => {
   const errors = {};
 
@@ -122,7 +153,7 @@ export const validateRequestForm = (form, now) => {
   if (!isDueDateEntered(form.dueDate)) {
     errors.dueDate = "응답 기한을 입력해 주세요.";
   } else {
-    const dueMinutes = getDueDateMinutes(form.dueDate);
+    const dueMinutes = toMinutes(form.dueDate);
 
     if (dueMinutes < DUE_DATE_MIN_MINUTES) {
       errors.dueDate = "응답 기한은 최소 1시간 이상이어야 해요.";
@@ -147,7 +178,9 @@ export const validateRequestForm = (form, now) => {
  *   setField: <K extends keyof RequestForm>(key: K, value: RequestForm[K]) => void,
  *   validate: () => Record<string, string>,
  * }}
+ * 
  */
+// 사용자 입력 개별 필드 state 값 업데이트
 export function useRequestForm(initialSituationId) {
   const [form, setForm] = useState(() => ({
     ...INITIAL_FORM,

@@ -1,5 +1,12 @@
-// 요청 도메인 라우트 (App.jsx의 <Route path> 와 반드시 일치시킬 것)
-// id: 요청 ID
+/**
+ * =====================================================================
+ * [request/ 공통] 요청 도메인 라우트
+ * - App.jsx의 <Route path> 와 반드시 일치시킬 것
+ * - id: 요청 ID
+ * 
+ * =====================================================================
+ */
+
 export const REQUEST_ROUTES = {
   infoPreview: (id) => `/request/info-preview/${id}`,
   send: (id) => `/request/send/${id}`,

@@ -1,6 +1,50 @@
-// H-03-02
+/**
+ * =====================================================================
+ * [H-03-02] 요청 작성
+ *  - 페이지 컴포넌트
+ * =====================================================================
+ */
+
+// CSS 스타일 
 import styles from "@/features/request/pages/Request.module.css";
 
+// 일반 라이브러리
+import { useMemo, useState } from "react";
+import { useParams } from "react-router-dom";
+
+// Custom Hooks
+import { useRequestNav } from "@/features/request/hooks/useRequestNav";
+import { useRequestForm } from "@/features/request/hooks/useRequestForm";
+
+// Constants
+import { REQUEST_ROUTES } from "@/features/request/constants/routerConstants";
+import {
+  REQUEST_FORM_FIELD_KEY,
+  REQUEST_SHEET,
+  DATE_TIME_SECTIONS,
+  DUE_DATE_SECTIONS,
+} from "@/features/request/constants/requestConstants";
+
+// Utils
+import {
+  getSelectedSituationText,
+  getSelectedUserText,
+  getDateTimeText,
+  getDueDateText,
+} from "@/features/request/utils/requestUtils";
+
+// API, Services
+import {
+  getReqFormApi,
+  postReqFormApi,
+} from "@/features/request/api/createApi";
+import {
+  getReqFormService,
+  postReqFormIdService,
+  postReqFormService,
+} from "@/features/request/services/createService";
+
+// 일반 Components
 import StepHeader from "@/features/request/components/Header/StepHeader";
 import LargeFooter from "@/features/request/components/Footer/LargeFooter";
 import RadioSection from "@/features/request/components/Section/RadioSection";
@@ -11,50 +55,24 @@ import TimeSheet from "@/features/request/components/Sheet/TimeSheet";
 import SituationOption from "@/features/request/components/Option/SituationOption";
 import UserOption from "@/features/request/components/Option/UserOption";
 import DateTimeOption from "@/features/request/components/Option/DateTimeOption";
-import { useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
-import { useRequestNav } from "@/features/request/hooks/useRequestNav";
-import { useRequestForm } from "@/features/request/hooks/useRequestForm";
-import {
-  getSelectUser,
-  getSelectedSituation,
-  getDateTimeText,
-  getDueDateText,
-} from "@/features/request/utils/requestUtils";
-import {
-  REQUEST_FORM_FIELD,
-  REQUEST_SHEET,
-  DATE_TIME_SECTIONS,
-  DUE_DATE_SECTIONS,
-} from "@/features/request/constants/requestConstants";
-import { REQUEST_ROUTES } from "@/features/request/constants/routerConstants";
-import {
-  getReqFormService,
-  postReqFormIdService,
-  postReqFormService,
-} from "../services/createService";
-import { getReqFormApi, postReqFormApi } from "../api/createApi";
 
+// 페이지 컴포넌트
 function Request() {
+  // path parameter, 커스텀 훅 가져오기
+  const { id } = useParams();
   const { handleGoBack, handleGoNext } = useRequestNav();
-  const paramsId = useParams().id;
-
-  // 입력값 전체는 form 하나에 있음 (필드별 타입은 useRequestForm.js 의 RequestForm 참고)
-  const { form, setField, validate } = useRequestForm(paramsId);
+  const { form, setField, validate } = useRequestForm(id); // 입력값 전체는 form 하나
 
   // 열려 있는 시트 (한 번에 하나만 열림)
   const [openSheet, setOpenSheet] = useState(null);
   const closeSheet = () => setOpenSheet(null);
 
   // TODO: API 연동 시 useEffect로 교체 (지금은 mock 이라 렌더마다 호출돼도 문제 없음)
+  // [H-03-02] 요청 작성 - 데이터 조회
   const { situation, user } = useMemo(
     () => getReqFormService(getReqFormApi()),
     [],
   );
-
-  // 화면 표시용 파생값 (state 아님)
-  const selectedSituation = getSelectedSituation(situation, form.situationId);
-  const selectedUser = getSelectUser(user, form.userId);
 
   // Footer 버튼 눌렀을 때 실행될 핸들러
   const handleFooterBtnClick = () => {
@@ -66,6 +84,7 @@ function Request() {
     }
 
     // TODO: API 연동 로직 수정 필요
+    // [H-03-02] 요청 작성 - 폼 제출
     const reqRefinedData = postReqFormService(form);
     const resRawData = postReqFormApi(reqRefinedData);
     const { reqId } = postReqFormIdService(resRawData);
@@ -84,7 +103,7 @@ function Request() {
         {/* 상황 */}
         <SelectSection
           title="상황 *"
-          text={selectedSituation?.title ?? "선택"}
+          text={getSelectedSituationText(situation, form.situationId)}
           width="large"
           onClick={() => setOpenSheet(REQUEST_SHEET.SITUATION)}
         />
@@ -94,7 +113,7 @@ function Request() {
           title="상황"
           description="상황에 참여한 사람들에게만 요청을 보낼 수 있어요."
           value={form.situationId}
-          onConfirm={(v) => setField(REQUEST_FORM_FIELD.SITUATION_ID, v)}
+          onConfirm={(v) => setField(REQUEST_FORM_FIELD_KEY.SITUATION_ID, v)}
         >
           {(temp, setTemp) => (
             <SituationOption
@@ -108,7 +127,7 @@ function Request() {
         {/* 도움 종류 */}
         <RadioSection
           value={form.helpType}
-          onChange={(v) => setField(REQUEST_FORM_FIELD.HELP_TYPE, v)}
+          onChange={(v) => setField(REQUEST_FORM_FIELD_KEY.HELP_TYPE, v)}
         />
 
         {/* 시작 - 종료 */}
@@ -130,7 +149,7 @@ function Request() {
           isOpen={openSheet === REQUEST_SHEET.START}
           onClose={closeSheet}
           value={form.startDateTime}
-          onConfirm={(v) => setField(REQUEST_FORM_FIELD.START_DATE_TIME, v)}
+          onConfirm={(v) => setField(REQUEST_FORM_FIELD_KEY.START_DATE_TIME, v)}
         >
           {(temp, setTemp) => (
             <DateTimeOption
@@ -144,7 +163,7 @@ function Request() {
           isOpen={openSheet === REQUEST_SHEET.END}
           onClose={closeSheet}
           value={form.endDateTime}
-          onConfirm={(v) => setField(REQUEST_FORM_FIELD.END_DATE_TIME, v)}
+          onConfirm={(v) => setField(REQUEST_FORM_FIELD_KEY.END_DATE_TIME, v)}
         >
           {(temp, setTemp) => (
             <DateTimeOption
@@ -160,7 +179,9 @@ function Request() {
           title="장소 *"
           size="small"
           value={form.location}
-          onChange={(e) => setField(REQUEST_FORM_FIELD.LOCATION, e.target.value || null)}
+          onChange={(e) =>
+            setField(REQUEST_FORM_FIELD_KEY.LOCATION, e.target.value || null)
+          }
         />
 
         {/* 부탁 내용 */}
@@ -168,13 +189,15 @@ function Request() {
           title="부탁 내용"
           size="large"
           value={form.content}
-          onChange={(e) => setField(REQUEST_FORM_FIELD.CONTENT, e.target.value || null)}
+          onChange={(e) =>
+            setField(REQUEST_FORM_FIELD_KEY.CONTENT, e.target.value || null)
+          }
         />
 
         {/* 요청 대상 */}
         <SelectSection
           title="요청 대상 *"
-          text={selectedUser?.userName ?? "선택"}
+          text={getSelectedUserText(user, form.userId)}
           width="large"
           onClick={() => setOpenSheet(REQUEST_SHEET.USER)}
         />
@@ -184,7 +207,7 @@ function Request() {
           title="요청 대상"
           description="상황에 참여한 사람들에게만 요청을 보낼 수 있어요."
           value={form.userId}
-          onConfirm={(v) => setField(REQUEST_FORM_FIELD.USER_ID, v)}
+          onConfirm={(v) => setField(REQUEST_FORM_FIELD_KEY.USER_ID, v)}
         >
           {(temp, setTemp) => (
             <UserOption data={user} selectedValue={temp} onSelect={setTemp} />
@@ -202,7 +225,7 @@ function Request() {
           isOpen={openSheet === REQUEST_SHEET.DUE_DATE}
           onClose={closeSheet}
           value={form.dueDate}
-          onConfirm={(v) => setField(REQUEST_FORM_FIELD.DUE_DATE, v)}
+          onConfirm={(v) => setField(REQUEST_FORM_FIELD_KEY.DUE_DATE, v)}
         >
           {(temp, setTemp) => (
             <DateTimeOption
