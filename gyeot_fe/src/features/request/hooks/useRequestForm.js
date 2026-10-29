@@ -91,7 +91,6 @@ export const validateRequestForm = (form, now) => {
 
   // 시작 일시
   const start = toDate(form.startDateTime);
-  console.log(now)
   let isStartValid = false;
   if (!start) {
     errors.startDateTime = "시작 일시를 모두 입력해 주세요.";
@@ -108,8 +107,12 @@ export const validateRequestForm = (form, now) => {
   }
 
   // 종료 일시
+  const end = toDate(form.endDateTime);
   if (!isDateTimeComplete(form.endDateTime)) {
     errors.endDateTime = "종료 일시를 모두 입력해 주세요.";
+  } else if (isStartValid && end <= start) {
+    // 시작 일시가 정상이고, 종료 일시가 시작 일시보다 빠르거나 같을 때
+    errors.endDateTime = "종료 시간은 시작 시간보다 늦어야 해요.";
   }
 
   if (!form.location?.trim()) errors.location = "장소를 입력해 주세요.";
