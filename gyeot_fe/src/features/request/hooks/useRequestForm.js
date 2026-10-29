@@ -66,8 +66,9 @@ const isDueDateValid = (d) =>
 export const validateRequestForm = (form) => {
   const errors = {};
 
-  if (!form.situationId) errors.situationId = "상황을 선택해 주세요.";
-  if (!form.helpType) errors.helpType = "도움 종류를 선택해 주세요.";
+  // 필수 항목은 시간, 장소, 요청 대상, 응답 기한만
+  // if (!form.situationId) errors.situationId = "상황을 선택해 주세요.";
+  // if (!form.helpType) errors.helpType = "도움 종류를 선택해 주세요.";
 
   if (!isDateTimeComplete(form.startDateTime)) {
     errors.startDateTime = "시작 일시를 모두 입력해 주세요.";

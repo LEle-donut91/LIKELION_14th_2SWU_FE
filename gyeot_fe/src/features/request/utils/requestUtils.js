@@ -62,7 +62,7 @@ export const getDateTimeText = (dateTimeObj) => {
   if (!year || !month || !day || !hour || !minute) return "선택";
 
   const datePart = `${year}.${pad(month)}.${pad(day)}`;
-  const timePart = `${pad(hour)}.${pad(minute)}`;
+  const timePart = `${pad(hour)}:${pad(minute)}`;
   return `${datePart} ${timePart}`;
 };
 
