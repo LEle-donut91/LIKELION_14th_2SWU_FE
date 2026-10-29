@@ -6,6 +6,7 @@ import {
   DUE_DATE_MAX_MINUTES,
   DUE_DATE_MIN_MINUTES,
   START_MIN_LEAD_MINUTES,
+  REQUEST_FORM_FIELD_KEY,
 } from "@/features/request/constants/requestConstants";
 
 /**
@@ -49,6 +50,15 @@ import {
  * @property {string|null} content          부탁 내용. 미입력 = null
  * @property {DueDateValue} dueDate         응답 기한. 기본 { days: "1" } (24시간)
  */
+
+// REQUEST_FORM_FIELD_KEY 구조분해 할당 (유효성 검사가 필요한 필드만 가져옴)
+const {
+  USER_ID,
+  START_DATE_TIME,
+  END_DATE_TIME,
+  LOCATION,
+  DUE_DATE,
+} = REQUEST_FORM_FIELD_KEY;
 
 /**
  * @type {RequestForm}
@@ -118,11 +128,11 @@ export const validateRequestForm = (form, now, fields = null) => {
   const errors = {};
 
   const targetFields = fields || [
-    "startDateTime",
-    "endDateTime",
-    "location",
-    "userId",
-    "dueDate",
+    START_DATE_TIME,
+    END_DATE_TIME,
+    LOCATION,
+    USER_ID,
+    DUE_DATE,
   ];
 
   // 필수 항목은 시간/장소/요청대상/응답 기한 뿐
@@ -130,7 +140,7 @@ export const validateRequestForm = (form, now, fields = null) => {
   // if (!form.helpType) errors.helpType = "도움 종류를 선택해 주세요.";
 
   // 1. 시작 일시
-  if (targetFields.includes("startDateTime")) {
+  if (targetFields.includes(START_DATE_TIME)) {
     const start = toDate(form.startDateTime);
     if (!start) {
       errors.startDateTime = "시작 일시를 모두 입력해 주세요.";
@@ -147,7 +157,7 @@ export const validateRequestForm = (form, now, fields = null) => {
   }
 
   // 2. 종료 일시
-  if (targetFields.includes("endDateTime")) {
+  if (targetFields.includes(END_DATE_TIME)) {
     const start = toDate(form.startDateTime);
     const end = toDate(form.endDateTime);
     if (!isDateTimeComplete(form.endDateTime)) {
@@ -158,17 +168,17 @@ export const validateRequestForm = (form, now, fields = null) => {
   }
 
   // 3. 장소
-  if (targetFields.includes("location")) {
+  if (targetFields.includes(LOCATION)) {
     if (!form.location?.trim()) errors.location = "장소를 입력해 주세요.";
   }
 
   // 4. 요청 대상
-  if (targetFields.includes("userId")) {
+  if (targetFields.includes(USER_ID)) {
     if (!form.userId) errors.userId = "요청 대상을 선택해 주세요.";
   }
 
   // 5. 응답 기한
-  if (targetFields.includes("dueDate")) {
+  if (targetFields.includes(DUE_DATE)) {
     if (!isDueDateEntered(form.dueDate)) {
       errors.dueDate = "응답 기한을 입력해 주세요.";
     } else {
