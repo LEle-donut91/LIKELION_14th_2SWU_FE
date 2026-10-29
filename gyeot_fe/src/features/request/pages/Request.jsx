@@ -11,72 +11,66 @@ import TimeSheet from "@/features/request/components/Sheet/TimeSheet";
 import SituationOption from "@/features/request/components/Option/SituationOption";
 import UserOption from "@/features/request/components/Option/UserOption";
 import DateTimeOption from "@/features/request/components/Option/DateTimeOption";
-import { useState } from "react";
-import { useRequestNav } from "@/features/request/hooks/useRequestNav";
+import { useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getSelectUser, getSelectedSituation, getDateTimeText, getDueDateText } from "@/features/request/utils/requestUtils";
-import { DATE_TIME_SECTIONS, DUE_DATE_SECTIONS } from "@/features/request/constants/requestConstants";
-import { getReqFormService, postReqFormIdService, postReqFormService } from "../services/createService";
+import { useRequestNav } from "@/features/request/hooks/useRequestNav";
+import { useRequestForm } from "@/features/request/hooks/useRequestForm";
+import {
+  getSelectUser,
+  getSelectedSituation,
+  getDateTimeText,
+  getDueDateText,
+} from "@/features/request/utils/requestUtils";
+import {
+  REQUEST_SHEET,
+  DATE_TIME_SECTIONS,
+  DUE_DATE_SECTIONS,
+  REQUEST_ROUTES,
+} from "@/features/request/constants/requestConstants";
+import {
+  getReqFormService,
+  postReqFormIdService,
+  postReqFormService,
+} from "../services/createService";
 import { getReqFormApi, postReqFormApi } from "../api/createApi";
-import { DATE_TARGET, REQUEST_ROUTES } from "../constants/requestConstants";
 
 function Request() {
   const { handleGoBack, handleGoNext } = useRequestNav();
   const paramsId = useParams().id;
 
-  // TODO: API 연동 로직 수정 필요
-    const resRawData = getReqFormApi();
-    const { situation, user } = getReqFormService(resRawData);
+  // 입력값 전체는 form 하나에 있음 (필드별 타입은 useRequestForm.js 의 RequestForm 참고)
+  const { form, setField, errors, isValid } = useRequestForm(paramsId);
 
-  // 각 선택 항목에 대한 상태(State) 정의
-  const [situationId, setSituationId] = useState(paramsId);
-  const [userId, setUserId] = useState(null);
-  const [helpType, setHelpType] = useState(null);
-  const [startDateTime, setStartDateTime] = useState(null);
-  const [endDateTime, setEndDateTime] = useState(null);
-  const [locationValue, setLocationValue] = useState(null);
-  const [contentValue, setContentValue] = useState(null);
-  const [dueDate, setDueDate] = useState({ days: "1" });
+  // 열려 있는 시트 (한 번에 하나만 열림)
+  const [openSheet, setOpenSheet] = useState(null);
+  const closeSheet = () => setOpenSheet(null);
 
-  // 각 Sheet의 열림/닫힘 상태(State) 정의
-  const [isSituationSheetOpen, setSituationSheetOpen] = useState(false);
-  const [isUserSheetOpen, setUserSheetOpen] = useState(false);
-  const [isDateTimeSheetOpen, setDateTimeSheetOpen] = useState(false);
-  const [isDuedateSheetOpen, setDuedateSheetOpen] = useState(false);
+  // TODO: API 연동 시 useEffect로 교체 (지금은 mock 이라 렌더마다 호출돼도 문제 없음)
+  const { situation, user } = useMemo(
+    () => getReqFormService(getReqFormApi()),
+    [],
+  );
 
-  // 어떤 시트(시작 또는 종료)에서 DateTimeSheet를 열었는지 구분하기 위한 상태
-  const [dateTarget, setDateTarget] = useState(null);
-
-  // DateTimeSheet에서 확인을 눌렀을 때 실행될 핸들러
-  const handleDateTimeConfirm = (value) => {
-    if (dateTarget === DATE_TARGET.START) {
-      setStartDateTime(value);
-    } else if (dateTarget === DATE_TARGET.END) {
-      setEndDateTime(value);
-    }
-  };
+  // 화면 표시용 파생값 (state 아님)
+  const selectedSituation = getSelectedSituation(situation, form.situationId);
+  const selectedUser = getSelectUser(user, form.userId);
 
   // Footer 버튼 눌렀을 때 실행될 핸들러
   const handleFooterBtnClick = () => {
-    // TODO: API 연동 로직 수정 필요
-    const form = {
-      situationId,
-      userId,
-      helpType,
-      startDateTime,
-      endDateTime,
-      locationValue,
-      contentValue,
-      dueDate,
-    };
+    if (!isValid) {
+      const [firstError] = Object.values(errors); // 첫 번째 에러 문구 하나만
+      alert(firstError);
+      return;
+    }
 
+    // TODO: API 연동 로직 수정 필요
     const reqRefinedData = postReqFormService(form);
     const resRawData = postReqFormApi(reqRefinedData);
     const { reqId } = postReqFormIdService(resRawData);
 
     // [공개 정보 미리보기] 페이지로 이동
-    handleGoNext(REQUEST_ROUTES.infoPreview(reqId))
-  }
+    handleGoNext(REQUEST_ROUTES.infoPreview(reqId));
+  };
 
   return (
     <div className={styles.page}>
@@ -88,18 +82,17 @@ function Request() {
         {/* 상황 */}
         <SelectSection
           title="상황 *"
-          text={getSelectedSituation(situation, situationId) ? getSelectedSituation(situation, situationId).title : "선택"}
+          text={selectedSituation?.title ?? "선택"}
           width="large"
-          onClick={() => setSituationSheetOpen(true)}
+          onClick={() => setOpenSheet(REQUEST_SHEET.SITUATION)}
         />
-
         <DefaultSheet
-          isOpen={isSituationSheetOpen}
-          onClose={() => setSituationSheetOpen(false)}
+          isOpen={openSheet === REQUEST_SHEET.SITUATION}
+          onClose={closeSheet}
           title="상황"
           description="상황에 참여한 사람들에게만 요청을 보낼 수 있어요."
-          value={situationId}
-          onConfirm={setSituationId}
+          value={form.situationId}
+          onConfirm={(v) => setField("situationId", v)}
         >
           {(temp, setTemp) => (
             <SituationOption
@@ -112,37 +105,44 @@ function Request() {
 
         {/* 도움 종류 */}
         <RadioSection
-          value={helpType} 
-          onChange={setHelpType}
+          value={form.helpType}
+          onChange={(v) => setField("helpType", v)}
         />
 
         {/* 시작 - 종료 */}
         <div className={styles.timeSectionContainer}>
           <SelectSection
             title="시작 *"
-            text={getDateTimeText(startDateTime)}
+            text={getDateTimeText(form.startDateTime)}
             width="small"
-            onClick={() => {
-              setDateTarget("start");
-              setDateTimeSheetOpen(true);
-            }}
+            onClick={() => setOpenSheet(REQUEST_SHEET.START)}
           />
           <SelectSection
             title="종료 *"
-            text={getDateTimeText(endDateTime)}
+            text={getDateTimeText(form.endDateTime)}
             width="small"
-            onClick={() => {
-              setDateTarget("end");
-              setDateTimeSheetOpen(true);
-            }}
+            onClick={() => setOpenSheet(REQUEST_SHEET.END)}
           />
         </div>
-
         <TimeSheet
-          isOpen={isDateTimeSheetOpen}
-          onClose={() => setDateTimeSheetOpen(false)}
-          value={dateTarget === "start" ? startDateTime : endDateTime}
-          onConfirm={handleDateTimeConfirm}
+          isOpen={openSheet === REQUEST_SHEET.START}
+          onClose={closeSheet}
+          value={form.startDateTime}
+          onConfirm={(v) => setField("startDateTime", v)}
+        >
+          {(temp, setTemp) => (
+            <DateTimeOption
+              sections={DATE_TIME_SECTIONS}
+              value={temp}
+              onChange={setTemp}
+            />
+          )}
+        </TimeSheet>
+        <TimeSheet
+          isOpen={openSheet === REQUEST_SHEET.END}
+          onClose={closeSheet}
+          value={form.endDateTime}
+          onConfirm={(v) => setField("endDateTime", v)}
         >
           {(temp, setTemp) => (
             <DateTimeOption
@@ -157,56 +157,50 @@ function Request() {
         <InputSection
           title="장소 *"
           size="small"
-          value={locationValue}
-          onChange={(e) => setLocationValue(e.target.value)}
+          value={form.location}
+          onChange={(e) => setField("location", e.target.value || null)}
         />
 
         {/* 부탁 내용 */}
         <InputSection
           title="부탁 내용"
           size="large"
-          value={contentValue}
-          onChange={(e) => setContentValue(e.target.value)}
+          value={form.content}
+          onChange={(e) => setField("content", e.target.value || null)}
         />
 
         {/* 요청 대상 */}
         <SelectSection
           title="요청 대상 *"
-          text={getSelectUser(user, userId) ? getSelectUser(user, userId).userName : "선택"}
+          text={selectedUser?.userName ?? "선택"}
           width="large"
-          onClick={() => setUserSheetOpen(true)}
+          onClick={() => setOpenSheet(REQUEST_SHEET.USER)}
         />
-
         <DefaultSheet
-          isOpen={isUserSheetOpen}
-          onClose={() => setUserSheetOpen(false)}
+          isOpen={openSheet === REQUEST_SHEET.USER}
+          onClose={closeSheet}
           title="요청 대상"
           description="상황에 참여한 사람들에게만 요청을 보낼 수 있어요."
-          value={userId}
-          onConfirm={setUserId}
+          value={form.userId}
+          onConfirm={(v) => setField("userId", v)}
         >
           {(temp, setTemp) => (
-            <UserOption
-              data={user}
-              selectedValue={temp}
-              onSelect={setTemp}
-            />
+            <UserOption data={user} selectedValue={temp} onSelect={setTemp} />
           )}
         </DefaultSheet>
 
         {/* 응답 기한 */}
         <SelectSection
           title="응답 기한 *"
-          text={getDueDateText(dueDate)}
+          text={getDueDateText(form.dueDate)}
           width="large"
-          onClick={() => setDuedateSheetOpen(true)}
+          onClick={() => setOpenSheet(REQUEST_SHEET.DUE_DATE)}
         />
-
         <TimeSheet
-          isOpen={isDuedateSheetOpen}
-          onClose={() => setDuedateSheetOpen(false)}
-          value={dueDate}
-          onConfirm={setDueDate}
+          isOpen={openSheet === REQUEST_SHEET.DUE_DATE}
+          onClose={closeSheet}
+          value={form.dueDate}
+          onConfirm={(v) => setField("dueDate", v)}
         >
           {(temp, setTemp) => (
             <DateTimeOption

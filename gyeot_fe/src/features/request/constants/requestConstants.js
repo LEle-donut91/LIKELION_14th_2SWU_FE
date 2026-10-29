@@ -13,6 +13,15 @@ export const REQUEST_ROUTES = {
   askAgain: (id) => `/request/ask-again/${id}`,
 };
 
+// 열 수 있는 시트 종류. openSheet 는 이 값 중 하나이거나 null(모두 닫힘)
+export const REQUEST_SHEET = {
+  SITUATION: "situation",
+  USER: "user",
+  START: "start",
+  END: "end",
+  DUE_DATE: "dueDate",
+};
+
 // 시트에 주입할 DateTimeOption 입력 그룹 설정
 export const DATE_TIME_SECTIONS = [
   { type: "date", title: "날짜" },
