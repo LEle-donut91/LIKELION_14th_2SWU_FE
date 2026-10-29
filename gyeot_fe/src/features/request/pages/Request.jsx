@@ -61,7 +61,9 @@ function Request() {
   // path parameter, 커스텀 훅 가져오기
   const { id } = useParams();
   const { handleGoBack, handleGoNext } = useRequestNav();
-  const { form, setField, validate } = useRequestForm(id); // 입력값 전체는 form 하나
+  const { form, setField, validate } = useRequestForm({
+    situationId: id,
+  }); // 입력값 전체는 form 하나
 
   // 열려 있는 시트 (한 번에 하나만 열림)
   const [openSheet, setOpenSheet] = useState(null);

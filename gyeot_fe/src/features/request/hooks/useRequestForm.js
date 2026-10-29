@@ -13,7 +13,7 @@ import {
  * [H-03-02] 요청 작성
  * - 사용자가 입력 폼 데이터(State)를 통합 관리
  * - 사용자가 입력 폼 데이터의 유효성 검사 -> 에러 목록(객체 형태) 반환
- * 
+ *
  * =====================================================================
  */
 
@@ -50,7 +50,7 @@ import {
  * @property {DueDateValue} dueDate         응답 기한. 기본 { days: "1" } (24시간)
  */
 
-/** 
+/**
  * @type {RequestForm}
  * 입력 Form 초기값 설정
  */
@@ -87,7 +87,7 @@ const toMinutes = (d) =>
 
 /**
  * * [validateRequestForm 에러 조건 및 메시지 정리]
- * 
+ *
  * 1. 시작 일시 (startDateTime)
  *    - 미입력 시: "시작 일시를 모두 입력해 주세요."
  *    - 과거 시간 설정 시: "이미 지난 시간은 시작 시간으로 설정할 수 없어요."
@@ -108,62 +108,82 @@ const toMinutes = (d) =>
  *    - 최소 기한 미달 (< 1시간): "응답 기한은 최소 1시간 이상이어야 해요."
  *    - 최대 기한 초과 (> 3일): "응답 기한은 최대 3일까지 설정할 수 있어요."
  *    - 시작 시간을 초과할 때 (현재+기한 > 시작시간): "응답 기한은 시작 시간을 넘을 수 없어요."
- * 
- * @param {RequestForm} form
+ *
+ * @param {Partial<RequestForm>} form
  * @param {Date} now
+ * @param {string[]} [fields] 검증하고 싶은 필드 배열 (없으면 전체 검증)
  */
-// Form 입력값 검증 함수
-export const validateRequestForm = (form, now) => {
+// 전체 폼 또는 일부 항목 검증 함수
+export const validateRequestForm = (form, now, fields = null) => {
   const errors = {};
+
+  const targetFields = fields || [
+    "startDateTime",
+    "endDateTime",
+    "location",
+    "userId",
+    "dueDate",
+  ];
 
   // 필수 항목은 시간/장소/요청대상/응답 기한 뿐
   // if (!form.situationId) errors.situationId = "상황을 선택해 주세요.";
   // if (!form.helpType) errors.helpType = "도움 종류를 선택해 주세요.";
 
-  // 시작 일시
-  const start = toDate(form.startDateTime);
-  let isStartValid = false;
-  if (!start) {
-    errors.startDateTime = "시작 일시를 모두 입력해 주세요.";
-  } else {
-    const leadMinutes = (start - now) / MS_PER_MINUTE;
-    if (leadMinutes <= 0) {
-      errors.startDateTime = "이미 지난 시간은 시작 시간으로 설정할 수 없어요.";
-    } else if (leadMinutes < START_MIN_LEAD_MINUTES) {
-      errors.startDateTime =
-        "시작 시간은 지금으로부터 최소 1시간 이후여야 해요.";
+  // 1. 시작 일시
+  if (targetFields.includes("startDateTime")) {
+    const start = toDate(form.startDateTime);
+    if (!start) {
+      errors.startDateTime = "시작 일시를 모두 입력해 주세요.";
     } else {
-      isStartValid = true;
+      const leadMinutes = (start - now) / MS_PER_MINUTE;
+      if (leadMinutes <= 0) {
+        errors.startDateTime =
+          "이미 지난 시간은 시작 시간으로 설정할 수 없어요.";
+      } else if (leadMinutes < START_MIN_LEAD_MINUTES) {
+        errors.startDateTime =
+          "시작 시간은 지금으로부터 최소 1시간 이후여야 해요.";
+      }
     }
   }
 
-  // 종료 일시
-  const end = toDate(form.endDateTime);
-  if (!isDateTimeComplete(form.endDateTime)) {
-    errors.endDateTime = "종료 일시를 모두 입력해 주세요.";
-  } else if (isStartValid && end <= start) {
-    // 시작 일시가 정상이고, 종료 일시가 시작 일시보다 빠르거나 같을 때
-    errors.endDateTime = "종료 시간은 시작 시간보다 늦어야 해요.";
+  // 2. 종료 일시
+  if (targetFields.includes("endDateTime")) {
+    const start = toDate(form.startDateTime);
+    const end = toDate(form.endDateTime);
+    if (!isDateTimeComplete(form.endDateTime)) {
+      errors.endDateTime = "종료 일시를 모두 입력해 주세요.";
+    } else if (start && end <= start) {
+      errors.endDateTime = "종료 시간은 시작 시간보다 늦어야 해요.";
+    }
   }
 
-  if (!form.location?.trim()) errors.location = "장소를 입력해 주세요.";
-  if (!form.userId) errors.userId = "요청 대상을 선택해 주세요.";
+  // 3. 장소
+  if (targetFields.includes("location")) {
+    if (!form.location?.trim()) errors.location = "장소를 입력해 주세요.";
+  }
 
-  // 응답 기한
-  if (!isDueDateEntered(form.dueDate)) {
-    errors.dueDate = "응답 기한을 입력해 주세요.";
-  } else {
-    const dueMinutes = toMinutes(form.dueDate);
+  // 4. 요청 대상
+  if (targetFields.includes("userId")) {
+    if (!form.userId) errors.userId = "요청 대상을 선택해 주세요.";
+  }
 
-    if (dueMinutes < DUE_DATE_MIN_MINUTES) {
-      errors.dueDate = "응답 기한은 최소 1시간 이상이어야 해요.";
-    } else if (dueMinutes > DUE_DATE_MAX_MINUTES) {
-      errors.dueDate = "응답 기한은 최대 3일까지 설정할 수 있어요.";
-    } else if (isStartValid) {
-      // 지금 + 기한이 시작 시간을 넘으면 안 됨 (시작 시간 자체가 틀렸으면 비교하지 않음)
-      const deadline = new Date(now.getTime() + dueMinutes * MS_PER_MINUTE);
-      if (deadline > start) {
-        errors.dueDate = "응답 기한은 시작 시간을 넘을 수 없어요.";
+  // 5. 응답 기한
+  if (targetFields.includes("dueDate")) {
+    if (!isDueDateEntered(form.dueDate)) {
+      errors.dueDate = "응답 기한을 입력해 주세요.";
+    } else {
+      const dueMinutes = toMinutes(form.dueDate);
+      const start = toDate(form.startDateTime);
+
+      if (dueMinutes < DUE_DATE_MIN_MINUTES) {
+        errors.dueDate = "응답 기한은 최소 1시간 이상이어야 해요.";
+      } else if (dueMinutes > DUE_DATE_MAX_MINUTES) {
+        errors.dueDate = "응답 기한은 최대 3일까지 설정할 수 있어요.";
+      } else if (start) {
+        const deadline = new Date(now.getTime() + dueMinutes * MS_PER_MINUTE);
+        if (deadline > start) {
+          errors.dueDate = "응답 기한은 시작 시간을 넘을 수 없어요.";
+        }
       }
     }
   }
@@ -172,26 +192,24 @@ export const validateRequestForm = (form, now) => {
 };
 
 /**
- * @param {string} [initialSituationId] 라우트 파라미터(/request/:id)로 받은 상황 id
- * @returns {{
- *   form: RequestForm,
- *   setField: <K extends keyof RequestForm>(key: K, value: RequestForm[K]) => void,
- *   validate: () => Record<string, string>,
- * }}
- * 
+ * 훅 하나로 초기값을 오버라이드
+ * @param {Partial<RequestForm>} [initialValues]
+ *
  */
 // 사용자 입력 개별 필드 state 값 업데이트
-export function useRequestForm(initialSituationId) {
+export function useRequestForm(initialValues = {}) {
   const [form, setForm] = useState(() => ({
     ...INITIAL_FORM,
-    situationId: initialSituationId ?? null, // undefined 대신 null로 통일
+    ...initialValues,
   }));
 
   const setField = (key, value) =>
     setForm((prev) => ({ ...prev, [key]: value }));
 
   // 버튼 클릭 시점의 시각으로 검증
-  const validate = () => validateRequestForm(form, new Date());
+  // 특정 필드만 골라서 검증할 수 있도록 fields 인자 추가 지원
+  const validate = (fields = null) =>
+    validateRequestForm(form, new Date(), fields);
 
-  return { form, setField, validate };
+  return { form, setForm, setField, validate };
 }
