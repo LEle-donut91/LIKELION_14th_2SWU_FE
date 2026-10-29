@@ -79,13 +79,19 @@ export const getDueDateText = (dueDate) => {
   const hours = parseInt(dueDate.hours, 10) || 0;
   const minutes = parseInt(dueDate.minutes, 10) || 0;
 
+  // 아무것도 입력하지 않았거나, 0일 0시간 0분으로 입력했을 때 -> "선택" 출력
+  if (days === 0 && hours === 0 && minutes === 0) {
+    return "선택";
+  }
+
   // 정확히 1일 0시간 0분일 때만 "24시간 (기본)" 출력
   if (days === 1 && hours === 0 && minutes === 0) {
     return "24시간 (기본)";
   }
 
   // 그 외의 경우 조합해서 출력 (예: "2일 3시간", "1일 30분")
-  let text = `${days}일`;
+  let text = "";
+  if (days > 0) text += `${days}일`;
   if (hours > 0) text += ` ${hours}시간`;
   if (minutes > 0) text += ` ${minutes}분`;
 

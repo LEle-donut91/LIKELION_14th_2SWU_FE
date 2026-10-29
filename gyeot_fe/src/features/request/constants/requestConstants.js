@@ -7,6 +7,18 @@ export const REQUEST_SHEET = {
   DUE_DATE: "dueDate",
 };
 
+// 요청 작성 폼 필드 키
+export const REQUEST_FORM_FIELD = {
+  SITUATION_ID: "situationId",
+  USER_ID: "userId",
+  HELP_TYPE: "helpType",
+  START_DATE_TIME: "startDateTime",
+  END_DATE_TIME: "endDateTime",
+  LOCATION: "location",
+  CONTENT: "content",
+  DUE_DATE: "dueDate",
+};
+
 // 시트에 주입할 DateTimeOption 입력 그룹 설정
 export const DATE_TIME_SECTIONS = [
   { type: "date", title: "날짜" },

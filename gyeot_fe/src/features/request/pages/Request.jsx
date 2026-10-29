@@ -22,6 +22,7 @@ import {
   getDueDateText,
 } from "@/features/request/utils/requestUtils";
 import {
+  REQUEST_FORM_FIELD,
   REQUEST_SHEET,
   DATE_TIME_SECTIONS,
   DUE_DATE_SECTIONS,
@@ -93,7 +94,7 @@ function Request() {
           title="상황"
           description="상황에 참여한 사람들에게만 요청을 보낼 수 있어요."
           value={form.situationId}
-          onConfirm={(v) => setField("situationId", v)}
+          onConfirm={(v) => setField(REQUEST_FORM_FIELD.SITUATION_ID, v)}
         >
           {(temp, setTemp) => (
             <SituationOption
@@ -107,7 +108,7 @@ function Request() {
         {/* 도움 종류 */}
         <RadioSection
           value={form.helpType}
-          onChange={(v) => setField("helpType", v)}
+          onChange={(v) => setField(REQUEST_FORM_FIELD.HELP_TYPE, v)}
         />
 
         {/* 시작 - 종료 */}
@@ -129,7 +130,7 @@ function Request() {
           isOpen={openSheet === REQUEST_SHEET.START}
           onClose={closeSheet}
           value={form.startDateTime}
-          onConfirm={(v) => setField("startDateTime", v)}
+          onConfirm={(v) => setField(REQUEST_FORM_FIELD.START_DATE_TIME, v)}
         >
           {(temp, setTemp) => (
             <DateTimeOption
@@ -143,7 +144,7 @@ function Request() {
           isOpen={openSheet === REQUEST_SHEET.END}
           onClose={closeSheet}
           value={form.endDateTime}
-          onConfirm={(v) => setField("endDateTime", v)}
+          onConfirm={(v) => setField(REQUEST_FORM_FIELD.END_DATE_TIME, v)}
         >
           {(temp, setTemp) => (
             <DateTimeOption
@@ -159,7 +160,7 @@ function Request() {
           title="장소 *"
           size="small"
           value={form.location}
-          onChange={(e) => setField("location", e.target.value || null)}
+          onChange={(e) => setField(REQUEST_FORM_FIELD.LOCATION, e.target.value || null)}
         />
 
         {/* 부탁 내용 */}
@@ -167,7 +168,7 @@ function Request() {
           title="부탁 내용"
           size="large"
           value={form.content}
-          onChange={(e) => setField("content", e.target.value || null)}
+          onChange={(e) => setField(REQUEST_FORM_FIELD.CONTENT, e.target.value || null)}
         />
 
         {/* 요청 대상 */}
@@ -183,7 +184,7 @@ function Request() {
           title="요청 대상"
           description="상황에 참여한 사람들에게만 요청을 보낼 수 있어요."
           value={form.userId}
-          onConfirm={(v) => setField("userId", v)}
+          onConfirm={(v) => setField(REQUEST_FORM_FIELD.USER_ID, v)}
         >
           {(temp, setTemp) => (
             <UserOption data={user} selectedValue={temp} onSelect={setTemp} />
@@ -201,7 +202,7 @@ function Request() {
           isOpen={openSheet === REQUEST_SHEET.DUE_DATE}
           onClose={closeSheet}
           value={form.dueDate}
-          onConfirm={(v) => setField("dueDate", v)}
+          onConfirm={(v) => setField(REQUEST_FORM_FIELD.DUE_DATE, v)}
         >
           {(temp, setTemp) => (
             <DateTimeOption
