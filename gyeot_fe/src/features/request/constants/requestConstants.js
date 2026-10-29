@@ -63,6 +63,11 @@ export const DATE_TIME_OPTION_CONFIGS = {
   dueDate: DUE_DATE_CONFIGS,
 };
 
+// 날짜/시간 입력 필드의 key 목록 (["year", "month", "day", "hour", "minute"])
+export const DATE_TIME_KEYS = [...DATE_CONFIGS, ...TIME_CONFIGS].map(
+  (item) => item.key
+);
+
 // 날짜/시간 입력 필드 최소값
 export const DATE_TIME_MIN_LIMITS = [...DATE_CONFIGS, ...TIME_CONFIGS].reduce(
   (acc, item) => ({ ...acc, [item.key]: item.min }),
