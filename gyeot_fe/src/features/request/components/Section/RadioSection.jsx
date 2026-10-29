@@ -1,5 +1,5 @@
 import styles from "@/features/request/components/Section/RadioSection.module.css";
-import { OPTIONS } from "@/features/request/constants/requestConstants";
+import { HELP_TYPE_OPTIONS } from "@/features/request/constants/requestConstants";
 
 function RadioSection({ value, onChange }) {
 
@@ -11,7 +11,7 @@ function RadioSection({ value, onChange }) {
       {/* 라디오 버튼 container */}
       <div className={styles.radioContainer}>
         {/* 도움 종류 라디오 버튼 */}
-        {OPTIONS.map((item) => {
+        {HELP_TYPE_OPTIONS.map((item) => {
           // 사용자가 선택한 항목과 현재 그리는 항목 (item)이 같으면 true, 다르면 false
           const isSelected = value === item;
 

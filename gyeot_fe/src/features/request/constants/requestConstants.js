@@ -14,11 +14,11 @@ export const REQUEST_ROUTES = {
 };
 
 // 시트에 주입할 DateTimeOption 입력 그룹 설정
-export const DATE_TIME_SECTIONS_CONFIG = [
+export const DATE_TIME_SECTIONS = [
   { type: "date", title: "날짜" },
   { type: "time", title: "시간" },
 ];
-export const DUE_DATE_SECTIONS_CONFIG = [{ type: "dueDate", title: "응답기한" }];
+export const DUE_DATE_SECTIONS = [{ type: "dueDate", title: "응답기한" }];
 
 // 시작 시간 입력인지, 종료 시간 입력인지 구분
 export const DATE_TARGET = {
