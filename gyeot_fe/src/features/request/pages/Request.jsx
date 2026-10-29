@@ -18,6 +18,7 @@ import { getSelectUser, getSelectedSituation, getDateTimeText, getDueDateText } 
 import { DATE_TIME_SECTIONS, DUE_DATE_SECTIONS } from "@/features/request/constants/requestConstants";
 import { getReqFormService, postReqFormIdService, postReqFormService } from "../services/createService";
 import { getReqFormApi, postReqFormApi } from "../api/createApi";
+import { DATE_TARGET, REQUEST_ROUTES } from "../constants/requestConstants";
 
 function Request() {
   const { handleGoBack, handleGoNext } = useRequestNav();
@@ -48,9 +49,9 @@ function Request() {
 
   // DateTimeSheet에서 확인을 눌렀을 때 실행될 핸들러
   const handleDateTimeConfirm = (value) => {
-    if (dateTarget === "start") {
+    if (dateTarget === DATE_TARGET.START) {
       setStartDateTime(value);
-    } else if (dateTarget === "end") {
+    } else if (dateTarget === DATE_TARGET.END) {
       setEndDateTime(value);
     }
   };
@@ -74,7 +75,7 @@ function Request() {
     const { reqId } = postReqFormIdService(resRawData);
 
     // [공개 정보 미리보기] 페이지로 이동
-    handleGoNext(`/request/info-preview/${reqId}`)
+    handleGoNext(REQUEST_ROUTES.infoPreview(reqId))
   }
 
   return (
