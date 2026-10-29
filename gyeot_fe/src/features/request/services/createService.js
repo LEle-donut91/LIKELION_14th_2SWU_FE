@@ -4,7 +4,7 @@
 
 // TODO: API 연동 로직 수정 필요
 export const getReqFormService = (raw) => {
-  if (!raw) return { situations: [], users: [] };
+  if (!raw) return { situation: [], user: [] };
 
   return {
     // 상황 목록 매핑
@@ -32,8 +32,8 @@ export const postReqFormService = (raw) => ({
   helpType: raw.helpType,
   startAt: raw.startDateTime,
   endAt: raw.endDateTime,
-  location: raw.locationValue,
-  content: raw.contentValue,
+  location: raw.location,
+  content: raw.content,
   responseDue: raw.dueDate
 });
 
