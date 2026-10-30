@@ -105,7 +105,6 @@ const toMinutes = (d) =>
  *
  * 2. 종료 일시 (endDateTime)
  *    - 미입력 시: "종료 일시를 모두 입력해 주세요."
- *    - 시작 시간보다 빠르거나 같을 때 (end <= start): "종료 시간은 시작 시간보다 늦어야 해요."
  *
  * 3. 장소 (location)
  *    - 미입력 또는 공백 시: "장소를 입력해 주세요."
@@ -158,13 +157,14 @@ export const validateRequestForm = (form, now, fields = null) => {
 
   // 2. 종료 일시
   if (targetFields.includes(END_DATE_TIME)) {
-    const start = toDate(form.startDateTime);
-    const end = toDate(form.endDateTime);
+    // const start = toDate(form.startDateTime);
+    // const end = toDate(form.endDateTime);
     if (!isDateTimeComplete(form.endDateTime)) {
       errors.endDateTime = "종료 일시를 모두 입력해 주세요.";
-    } else if (start && end <= start) {
-      errors.endDateTime = "종료 시간은 시작 시간보다 늦어야 해요.";
     }
+    // else if (start && end <= start) {
+    //   errors.endDateTime = "종료 시간은 시작 시간보다 늦어야 해요.";
+    // }
   }
 
   // 3. 장소
