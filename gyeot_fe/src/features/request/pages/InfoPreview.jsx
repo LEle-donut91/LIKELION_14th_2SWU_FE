@@ -46,7 +46,7 @@ import DefaultModal from "@/features/request/components/Modal/DefaultModal";
 // 페이지 컴포넌트
 function InfoPreview() {
   // useNavigation 커스텀 훅의 함수
-  const { handleGoNextWithTarget, handleGoBack } = useRequestNav();
+  const { handleGoNext, handleGoBack } = useRequestNav();
 
   // path parameter (tempId)
   const paramId = useParams().id;
@@ -75,7 +75,7 @@ function InfoPreview() {
     const reqRefinedData = postInfoPreviewService(paramId, form);
     postInfoPreviewApi(reqRefinedData);
 
-    handleGoNextWithTarget(REQUEST_ROUTES.send(paramId));
+    handleGoNext(REQUEST_ROUTES.send(paramId), true);
   };
 
   // 요청 보내기 버튼 클릭 핸들러 (민감정보가 있으면 확인 모달을 먼저 띄움)

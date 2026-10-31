@@ -4,16 +4,17 @@ import styles from "@/features/request/pages/RequestSend.module.css";
 import LargeFooter from "@/features/request/components/Footer/LargeFooter";
 import { useRequestNav } from "@/features/request//hooks/useRequestNav";
 import resImgSend from "@/shared/assets/images/resImgSend.png";
+import { REQUEST_ROUTES } from "@/features/request/constants/routerConstants";
 
 function RequestSend() {
   // navigation 커스텀 훅 불러오기
-  const { handleGoBackToTarget } = useRequestNav();
+  const { handleGoBack, handleGoNext } = useRequestNav();
 
   return (
     <div className={styles.page}>
       <DefaultHeader
         title="요청 작성"
-        onClick={() => handleGoBackToTarget(true)}
+        onClick={() => handleGoBack(true)}
       />
       <main className={styles.content}>
         <img className={styles.requestSendImg} src={resImgSend} />
@@ -24,7 +25,7 @@ function RequestSend() {
       <LargeFooter
         title="닫기"
         type="primary"
-        onClick={() => handleGoBackToTarget(true)}
+        onClick={() => handleGoNext(REQUEST_ROUTES.home, true)}
       />
     </div>
   );
