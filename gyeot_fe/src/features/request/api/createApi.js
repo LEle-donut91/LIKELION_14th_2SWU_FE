@@ -1,5 +1,7 @@
 import getReqFormMock from "@/features/request/mock/Request/getReqFormMock";
 import postReqFormMock from "@/features/request/mock/Request/postReqFormMock";
+import getInfoPreviewMock from "@/features/request/mock/InfoPreview/getInfoPreviewMock";
+import postInfoPreviewMock from "@/features/request/mock/InfoPreview/postInfoPreviewMock";
 
 /**
  * =====================================================================
@@ -21,6 +23,28 @@ export const getReqFormApi = () => {
 export const postReqFormApi = (payload) => {
   console.log("전송한 Payload:", payload);
   return postReqFormMock;
+};
+
+/**
+ * =====================================================================
+ * [H-03-02-01] 공개 정보 미리보기
+ * - 데이터 조회 & 공개 정보 제출
+ *
+ * =====================================================================
+ */
+
+// TODO: API 연동 로직 수정 필요
+// [H-03-02-01] 공개 정보 미리보기 - 데이터 조회
+export const getInfoPreviewApi = (tempId) => {
+  console.log(tempId);
+  return getInfoPreviewMock;
+};
+
+// TODO: API 연동 로직 수정 필요
+// [H-03-02-01] 공개 정보 미리보기 - 공개 정보 제출
+export const postInfoPreviewApi = (payload) => {
+  console.log("전송한 Payload:", payload);
+  return postInfoPreviewMock;
 };
 
 /*

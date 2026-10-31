@@ -1,3 +1,6 @@
+import { getUpdatedAtText } from "@/features/request/utils/requestUtils";
+import { CHECK_ITEM_ID } from "@/features/request/constants/requestConstants";
+
 /**
  * =====================================================================
  * [H-03-02] 요청 작성
@@ -52,4 +55,154 @@ export const postReqFormService = (raw) => ({
 export const postReqFormIdService = (raw) => ({
   reqId: raw.requestId,
   msg: raw.message,
+});
+
+/**
+ * =====================================================================
+ * [H-03-02-01] 공개 정보 미리보기
+ * - post/get/patch/delete + 요청 내용 + Api
+ * - 조회 후 데이터 가공
+ * - 폼 제출 전 데이터 가공
+ *
+ * =====================================================================
+ */
+
+// TODO: API 연동 로직 수정 필요
+// [H-03-02-01] 공개 정보 미리보기 - 데이터 조회 후 가공
+// 반환: { userName, userPart, dueDate, sections: { basicInfo: [...], healthInfo: [...], lifeInfo: [...], messageInfo: [...] } }
+// 각 항목: { id, label, title, description, isDefault } (CheckOption / getSelectedTitles 에서 바로 사용)
+export const getInfoPreviewService = (raw) => {
+  if (!raw) {
+    return {
+      userName: "",
+      userPart: "",
+      dueDate: "",
+      sections: {
+        basicInfo: [],
+        healthInfo: [],
+        lifeInfo: [],
+        messageInfo: [],
+      },
+    };
+  }
+
+  // 섹션별 항목 꺼내기
+  const { birthDate, bloodType } = raw.basicInfo;
+  const { disease, medicine, allergy, caution } = raw.healthInfo;
+  const { address, entranceMethod, pet } = raw.lifeInfo;
+  const { preference, document } = raw.messageInfo;
+
+  return {
+    userName: raw.userName,
+    userPart: raw.userPart,
+    dueDate: raw.dueDate,
+
+    sections: {
+      // 1. 기본 정보
+      basicInfo: [
+        {
+          id: CHECK_ITEM_ID.BIRTH_DATE,
+          label: "생년월일",
+          title: "생년월일",
+          description: `${birthDate.value} 출생${getUpdatedAtText(birthDate.updatedAt)}`,
+          isDefault: birthDate.isDefault,
+        },
+        {
+          id: CHECK_ITEM_ID.BLOOD_TYPE,
+          label: "혈액형",
+          title: "혈액형",
+          description: `${bloodType.value}${getUpdatedAtText(bloodType.updatedAt)}`,
+          isDefault: bloodType.isDefault,
+        },
+      ],
+
+      // 2. 건강 정보
+      healthInfo: [
+        {
+          id: CHECK_ITEM_ID.DISEASE,
+          label: "질환",
+          title: disease.name,
+          description: `${disease.diagnosedYear} 진단${getUpdatedAtText(disease.updatedAt)}`,
+          isDefault: disease.isDefault,
+        },
+        {
+          id: CHECK_ITEM_ID.MEDICINE,
+          label: "복용약",
+          title: medicine.name,
+          description: `${medicine.dosage}${getUpdatedAtText(medicine.updatedAt)}`,
+          isDefault: medicine.isDefault,
+        },
+        {
+          id: CHECK_ITEM_ID.ALLERGY,
+          label: "알러지",
+          title: `${allergy.name} 알러지`,
+          description: `${allergy.reaction}${getUpdatedAtText(allergy.updatedAt)}`,
+          isDefault: allergy.isDefault,
+        },
+        {
+          id: CHECK_ITEM_ID.CAUTION,
+          label: "주의사항",
+          title: `${caution.name} 주의사항`,
+          description: `${caution.instruction}${getUpdatedAtText(caution.updatedAt)}`,
+          isDefault: caution.isDefault,
+        },
+      ],
+
+      // 3. 생활 정보
+      lifeInfo: [
+        {
+          id: CHECK_ITEM_ID.ADDRESS,
+          label: "주소",
+          title: "주소",
+          description: `${address.value}${getUpdatedAtText(address.updatedAt)}`,
+          isDefault: address.isDefault,
+        },
+        {
+          id: CHECK_ITEM_ID.ENTRANCE_METHOD,
+          label: "출입 방법",
+          title: "출입 방법",
+          description: `${entranceMethod.value}${getUpdatedAtText(entranceMethod.updatedAt)}`,
+          isDefault: entranceMethod.isDefault,
+        },
+        {
+          id: CHECK_ITEM_ID.PET,
+          label: "반려동물 정보",
+          title: `반려동물 (${pet.name})`,
+          description: `${pet.care}${getUpdatedAtText(pet.updatedAt)}`,
+          isDefault: pet.isDefault,
+        },
+      ],
+
+      // 4. 미리 남기는 말
+      messageInfo: [
+        {
+          id: CHECK_ITEM_ID.PREFERENCE,
+          label: "선호",
+          title: "선호",
+          description: `${preference.value}${getUpdatedAtText(preference.updatedAt)}`,
+          isDefault: preference.isDefault,
+        },
+        {
+          id: CHECK_ITEM_ID.DOCUMENT,
+          label: "문서",
+          title: "문서",
+          description: `${document.value}${getUpdatedAtText(document.updatedAt)}`,
+          isDefault: document.isDefault,
+        },
+      ],
+    },
+  };
+};
+
+// TODO: API 연동 로직 수정 필요
+// [H-03-02-01] 공개 정보 미리보기 - 제출 전 데이터 가공
+// form: { basicInfo: [...ids], healthInfo: [...], lifeInfo: [...], messageInfo: [...] }
+export const postInfoPreviewService = (requestId, form) => ({
+  requestId,
+  sharedInfo: {
+    basicInfo: form.basicInfo,
+    healthInfo: form.healthInfo,
+    lifeInfo: form.lifeInfo,
+    messageInfo: form.messageInfo,
+  },
 });
