@@ -21,7 +21,7 @@ import {
 // 장소/부탁 내용(input/textarea)이 read only인지 체크
 // 상황이나 도움 종류 중 하나라도 없으면 true(읽기 전용), 둘 다 있으면 false
 export const isReadOnly = (form) => 
-  !(form[REQUEST_FORM_FIELD_KEY.SITUATION_ID] || form[REQUEST_FORM_FIELD_KEY.HELP_TYPE]);
+  !(form[REQUEST_FORM_FIELD_KEY.SITUATION_ID] && form[REQUEST_FORM_FIELD_KEY.HELP_TYPE]);
 
 // 선행 조건 미충족 시 토스트를 띄우고 false 반환 (충족 시 true 반환)
 export const isPrerequisiteEnsured = (form, showToast) => {
