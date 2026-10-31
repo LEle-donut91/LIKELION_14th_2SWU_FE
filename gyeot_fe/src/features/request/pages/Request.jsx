@@ -74,7 +74,7 @@ function Request() {
   const { form, setField, validate } = useRequestForm({
     situationId: paramId,
     ...(passedUserId && { userId: passedUserId }),
-    ...(passedDueDate && { userId: passedDueDate }),
+    ...(passedDueDate && { dueDate: passedDueDate }),
   });
 
   // 열려 있는 시트 (한 번에 하나만 열림)
