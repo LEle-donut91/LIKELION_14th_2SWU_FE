@@ -1,14 +1,42 @@
-import { SENSITIVE_KEYS } from "@/features/request/constants/requestConstants.js";
-import { DATE_TIME_MAX_LIMITS, DATE_TIME_MIN_LIMITS, DUE_DATE_MAX_LIMITS, DUE_DATE_MIN_LIMITS } from "../constants/requestConstants";
+import {
+  SENSITIVE_KEYS,
+  DATE_TIME_MAX_LIMITS,
+  DATE_TIME_MIN_LIMITS,
+  DUE_DATE_MAX_LIMITS,
+  DUE_DATE_MIN_LIMITS,
+  REQUEST_FORM_FIELD_KEY,
+  REQUEST_PREREQUISITE_TOAST_MESSAGE,
+} from "../constants/requestConstants";
 
 /**
- * =====================================================================
+ * =========================================================================
  * [H-03-02] 요청 작성
+ * - 선행 조건(상황/도움 종류를 모두 선택) 충족 여부 체크 및 관련 토스트 메시지 반환
  * - 사용자가 입력한 데이터 값 보정
  * - 사용자 입력값 기반 텍스트 UI 가공
  * 
- * =====================================================================
+ * =========================================================================
  */
+
+// 장소/부탁 내용(input/textarea)이 read only인지 체크
+// 상황이나 도움 종류 중 하나라도 없으면 true(읽기 전용), 둘 다 있으면 false
+export const isReadOnly = (form) => 
+  !(form[REQUEST_FORM_FIELD_KEY.SITUATION_ID] || form[REQUEST_FORM_FIELD_KEY.HELP_TYPE]);
+
+// 선행 조건 미충족 시 토스트를 띄우고 false 반환 (충족 시 true 반환)
+export const isPrerequisiteEnsured = (form, showToast) => {
+  if (!form[REQUEST_FORM_FIELD_KEY.SITUATION_ID]) {
+    showToast(REQUEST_PREREQUISITE_TOAST_MESSAGE.SITUATION_REQUIRED);
+    return false;
+  }
+  
+  if (!form[REQUEST_FORM_FIELD_KEY.HELP_TYPE]) {
+    showToast(REQUEST_PREREQUISITE_TOAST_MESSAGE.HELP_TYPE_REQUIRED);
+    return false;
+  }
+  
+  return true;
+};
 
 // 입력된 시간, 날짜 값에서 숫자만 남기고, 필드(key)별 최대값/유효성에 맞게 값을 보정
 export const getValidatedNumericValue = (key, rawValue) => {

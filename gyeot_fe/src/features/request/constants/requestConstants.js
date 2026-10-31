@@ -42,6 +42,12 @@ export const REQUEST_FORM_FIELD_KEY = {
   DUE_DATE: "dueDate",
 };
 
+// 요청 폼 입력 시 - 선행 조건 관련 토스트 메시지
+export const REQUEST_PREREQUISITE_TOAST_MESSAGE = {
+  SITUATION_REQUIRED: "상황을 먼저 선택해 주세요.",
+  HELP_TYPE_REQUIRED: "도움 종류를 먼저 선택해 주세요.",
+};
+
 // 시트에 주입할 DateTimeOption 입력 그룹 설정 (날짜/시간)
 export const DATE_TIME_SECTIONS = [
   { type: "date", title: "날짜" },

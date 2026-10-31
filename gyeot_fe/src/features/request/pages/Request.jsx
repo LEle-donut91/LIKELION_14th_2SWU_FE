@@ -5,7 +5,7 @@
  * =====================================================================
  */
 
-// CSS 스타일 
+// CSS 스타일
 import styles from "@/features/request/pages/Request.module.css";
 
 // 일반 라이브러리
@@ -15,6 +15,7 @@ import { useLocation, useParams } from "react-router-dom";
 // Custom Hooks
 import { useRequestNav } from "@/features/request/hooks/useRequestNav";
 import { useRequestForm } from "@/features/request/hooks/useRequestForm";
+import { useToast } from "@/features/request/hooks/useToast";
 
 // Constants
 import { REQUEST_ROUTES } from "@/features/request/constants/routerConstants";
@@ -31,6 +32,8 @@ import {
   getSelectedUserText,
   getDateTimeText,
   getDueDateText,
+  isReadOnly,
+  isPrerequisiteEnsured,
 } from "@/features/request/utils/requestUtils";
 
 // API, Services
@@ -55,6 +58,7 @@ import TimeSheet from "@/features/request/components/Sheet/TimeSheet";
 import SituationOption from "@/features/request/components/Option/SituationOption";
 import UserOption from "@/features/request/components/Option/UserOption";
 import DateTimeOption from "@/features/request/components/Option/DateTimeOption";
+import DefaultToast from "@/features/request/components/Toast/DefaultToast";
 
 // 페이지 컴포넌트
 function Request() {
@@ -77,9 +81,18 @@ function Request() {
     ...(passedDueDate && { dueDate: passedDueDate }),
   });
 
+  // 토스트 메시지
+  const { toast, showToast, hideToast } = useToast();
+
   // 열려 있는 시트 (한 번에 하나만 열림)
   const [openSheet, setOpenSheet] = useState(null);
   const closeSheet = () => setOpenSheet(null);
+
+  // 하위 항목 (시작/종료/요청 대상/응답 기한) 시트 열기 핸들러
+  const handleSubItemOpenSheet = (sheet) => {
+    // 선행 조건(상황/도움 종류를 모두 선택)을 만족했을 때만 시트 열기
+    if (isPrerequisiteEnsured(form, showToast)) setOpenSheet(sheet);
+  };
 
   // TODO: API 연동 시 useEffect로 교체 (지금은 mock 이라 렌더마다 호출돼도 문제 없음)
   // [H-03-02] 요청 작성 - 데이터 조회
@@ -90,10 +103,11 @@ function Request() {
 
   // Footer 버튼 눌렀을 때 실행될 핸들러
   const handleFooterBtnClick = () => {
+    // 입력값 유효성 검사 (첫 번째 에러 문구 하나만 토스트로)
     const errors = validate();
-    const [firstError] = Object.values(errors); // 첫 번째 에러 문구 하나만
+    const [firstError] = Object.values(errors);
     if (firstError) {
-      alert(firstError);
+      showToast(firstError);
       return;
     }
 
@@ -150,13 +164,13 @@ function Request() {
             title="시작 *"
             text={getDateTimeText(form.startDateTime)}
             width="small"
-            onClick={() => setOpenSheet(REQUEST_SHEET.START)}
+            onClick={() => handleSubItemOpenSheet(REQUEST_SHEET.START)}
           />
           <SelectSection
             title="종료 *"
             text={getDateTimeText(form.endDateTime)}
             width="small"
-            onClick={() => setOpenSheet(REQUEST_SHEET.END)}
+            onClick={() => handleSubItemOpenSheet(REQUEST_SHEET.END)}
           />
         </div>
         <TimeSheet
@@ -189,20 +203,28 @@ function Request() {
         </TimeSheet>
 
         {/* 장소 */}
+        {/* 선행 조건(상황/도움 종류를 모두 선택) 미충족 시 readOnly */}
+        {/* 선행 조건(상황/도움 종류를 모두 선택)을 만족했을 때만 입력 가능 (onFocus) */}
         <InputSection
           title="장소 *"
           size="small"
           value={form.location}
+          readOnly={isReadOnly(form)}
+          onFocus={() => isPrerequisiteEnsured(form, showToast)}
           onChange={(e) =>
             setField(REQUEST_FORM_FIELD_KEY.LOCATION, e.target.value || null)
           }
         />
 
         {/* 부탁 내용 */}
+        {/* 선행 조건(상황/도움 종류를 모두 선택) 미충족 시 readOnly */}
+        {/* 선행 조건(상황/도움 종류를 모두 선택)을 만족했을 때만 입력 가능 (onFocus) */}
         <InputSection
           title="부탁 내용"
           size="large"
           value={form.content}
+          readOnly={isReadOnly(form)}
+          onFocus={() => isPrerequisiteEnsured(form, showToast)}
           onChange={(e) =>
             setField(REQUEST_FORM_FIELD_KEY.CONTENT, e.target.value || null)
           }
@@ -213,7 +235,7 @@ function Request() {
           title="요청 대상 *"
           text={getSelectedUserText(user, form.userId)}
           width="large"
-          onClick={() => setOpenSheet(REQUEST_SHEET.USER)}
+          onClick={() => handleSubItemOpenSheet(REQUEST_SHEET.USER)}
         />
         <DefaultSheet
           isOpen={openSheet === REQUEST_SHEET.USER}
@@ -233,7 +255,7 @@ function Request() {
           title="응답 기한 *"
           text={getDueDateText(form.dueDate)}
           width="large"
-          onClick={() => setOpenSheet(REQUEST_SHEET.DUE_DATE)}
+          onClick={() => handleSubItemOpenSheet(REQUEST_SHEET.DUE_DATE)}
         />
         <TimeSheet
           isOpen={openSheet === REQUEST_SHEET.DUE_DATE}
@@ -253,6 +275,15 @@ function Request() {
 
       {/* 하단 Footer(버튼) */}
       <LargeFooter title="다음" type="primary" onClick={handleFooterBtnClick} />
+
+      {/* 토스트 (key 가 바뀌면 새로 마운트되어 타이머가 다시 시작됨) */}
+      {toast && (
+        <DefaultToast
+          key={toast.id}
+          message={toast.message}
+          onHide={hideToast}
+        />
+      )}
     </div>
   );
 }

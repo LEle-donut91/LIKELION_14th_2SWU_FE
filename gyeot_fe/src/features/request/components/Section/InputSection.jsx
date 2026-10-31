@@ -1,6 +1,6 @@
 import styles from "@/features/request/components/Section/InputSection.module.css";
 
-function InputSection({ title, size, value, onChange }) {
+function InputSection({ title, size, value, onChange, onFocus, readOnly }) {
   return (
     <section className={styles.inputSection}>
       {/* section 타이틀 */}
@@ -13,6 +13,8 @@ function InputSection({ title, size, value, onChange }) {
           placeholder="입력"
           value={value}
           onChange={onChange}
+          onFocus={onFocus}
+          readOnly={readOnly}
         />
       ) : (
         <input
@@ -21,6 +23,8 @@ function InputSection({ title, size, value, onChange }) {
           placeholder="입력"
           value={value}
           onChange={onChange}
+          onFocus={onFocus}
+          readOnly={readOnly}
         />
       )}
     </section>
