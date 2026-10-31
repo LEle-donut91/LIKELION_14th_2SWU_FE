@@ -15,6 +15,18 @@
   gap: 16px;
 }
 
+.sectionGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.groupTitle {
+  color: var(--color-gray-900);
+  margin-top: 32px;
+  margin-bottom: 8px;
+}
+
 .defaultTxt {
   margin-top: 32px;
   text-align: center;

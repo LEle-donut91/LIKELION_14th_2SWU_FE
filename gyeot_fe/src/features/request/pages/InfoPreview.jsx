@@ -107,6 +107,8 @@ function InfoPreview() {
           dueDate={`~ ${dueDate}`}
         />
 
+        <div className={styles.sectionGroup} >
+          <span className={`${styles.groupTitle} typoTitleMedium`} >공유 정보</span>
         {/* 기본 정보 / 건강 정보 / 생활 정보 / 미리 남기는 말 */}
         {INFO_PREVIEW_SECTIONS.map(({ key, title, description }) => (
           <Fragment key={key}>
@@ -134,6 +136,7 @@ function InfoPreview() {
             </DefaultSheet>
           </Fragment>
         ))}
+        </div>
 
         <span className={`${styles.defaultTxt} typoBodySmall`}>
           {isDefaultChecked && (

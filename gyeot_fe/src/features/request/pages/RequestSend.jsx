@@ -18,7 +18,7 @@ function RequestSend() {
       />
       <main className={styles.content}>
         <img className={styles.requestSendImg} src={resImgSend} />
-        <span className={`${styles.requetSendTxt} typoDisplaySmall`}>
+        <span className={`${styles.requestSendTxt} typoDisplaySmall`}>
           발송이 완료되었어요.
         </span>
       </main>

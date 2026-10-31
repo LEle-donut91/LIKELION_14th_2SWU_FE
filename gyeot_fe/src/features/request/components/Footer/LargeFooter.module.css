@@ -31,8 +31,6 @@
   border-radius: 16px;
   background-color: var(--color-olive-500);
   padding: 16px;
-
-  /* 그림자 컬러 CSS 변수로 추가 필요 */
   box-shadow: 0px 0px 4px var(--color-box-shadow);
 }
 
