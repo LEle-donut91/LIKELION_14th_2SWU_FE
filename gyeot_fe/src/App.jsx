@@ -102,11 +102,7 @@ function App() {
               <Route path="/situation/past/detail" element={<PastSituationDetail />} />  {/* N-04 */}
 
               {/* 요청 */}
-              {/* [H-03-02] 요청 작성 (ID 유무에 따라 분기) */}
-              <Route path="/request" element={<Request />} />  {/* 상황 ID (Path Parameter)가 없는 경우) */}
-              <Route path="/request/:id" element={<Request />} />  {/* 상황 ID를 Path Parameter로 받는 경우 */}
-
-              {/* [H-03-02] 외의 페이지 */}
+              <Route path="/request/:id" element={<Request />} />  {/* H-03-02 (상황 ID를 Path Parameter로 받음) */}
               <Route path="/request/info-preview/:id" element={<InfoPreview />} />  {/* H-03-02-01 (정보확인) */}
               <Route path="/request/send/:id" element={<RequestSend />} />  {/* H-03-02-01 (완료) */}
               <Route path="/request/assignee/:id" element={<RequestAssignee />} />  {/* H-03-01 */}

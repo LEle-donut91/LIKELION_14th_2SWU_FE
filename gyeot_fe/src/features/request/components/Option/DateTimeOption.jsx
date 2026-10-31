@@ -1,70 +1,6 @@
 import styles from "@/features/request/components/Option/DateTimeOption.module.css";
-
-// type별 입력 필드 설정 데이터
-const OPTION_CONFIGS = {
-  date: [
-    {
-      placeholder: "0000",
-      maxLength: 4,
-      label: "년",
-      className: styles.yearInput,
-      key: "year",
-    },
-    {
-      placeholder: "00",
-      maxLength: 2,
-      label: "월",
-      className: styles.dateTimeInput,
-      key: "month",
-    },
-    {
-      placeholder: "00",
-      maxLength: 2,
-      label: "일",
-      className: styles.dateTimeInput,
-      key: "day",
-    },
-  ],
-  time: [
-    {
-      placeholder: "00",
-      maxLength: 2,
-      label: "시",
-      className: styles.dateTimeInput,
-      key: "hour",
-    },
-    {
-      placeholder: "00",
-      maxLength: 2,
-      label: "분",
-      className: styles.dateTimeInput,
-      key: "minute",
-    },
-  ],
-  dueDate: [
-    {
-      placeholder: "00",
-      maxLength: 2,
-      label: "일",
-      className: styles.dateTimeInput,
-      key: "days",
-    },
-    {
-      placeholder: "00",
-      maxLength: 2,
-      label: "시간",
-      className: styles.dateTimeInput,
-      key: "hours",
-    },
-    {
-      placeholder: "00",
-      maxLength: 2,
-      label: "분",
-      className: styles.dateTimeInput,
-      key: "minutes",
-    },
-  ],
-};
+import { DATE_TIME_OPTION_CONFIGS } from "@/features/request/constants/requestConstants";
+import { getValidatedNumericValue } from "@/features/request/utils/requestUtils";
 
 /**
  * sections: [{ type: "date" | "time" | "dueDate", title: "날짜" }, ...]
@@ -74,7 +10,8 @@ function DateTimeOption({ sections = [], value, onChange }) {
   const current = value ?? {};
 
   const handleChange = (key, e) => {
-    const val = e.target.value.replace(/[^0-9]/g, ""); // 숫자만 입력 가능하도록 처리
+    // 입력된 시간/날짜값 검증 및 보정
+    const val = getValidatedNumericValue(key, e.target.value);
     onChange?.({ ...current, [key]: val });
   };
 
@@ -89,11 +26,11 @@ function DateTimeOption({ sections = [], value, onChange }) {
           )}
 
           <div className={styles.dateTimeGroup}>
-            {(OPTION_CONFIGS[type] || []).map((field) => (
+            {(DATE_TIME_OPTION_CONFIGS[type] || []).map((field) => (
               <div key={field.key} className={styles.dateTimeContainer}>
                 <input
                   type="text"
-                  className={`${field.className} ${styles.baseInput} typoBodyMedium`}
+                  className={`${styles[field.className]} ${styles.baseInput} typoBodyMedium`}
                   placeholder={field.placeholder}
                   maxLength={field.maxLength}
                   value={current[field.key] || ""}

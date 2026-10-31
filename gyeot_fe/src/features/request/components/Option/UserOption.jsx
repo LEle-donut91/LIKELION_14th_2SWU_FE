@@ -1,7 +1,6 @@
-import unselectedRadio from "@/features/request/assets/unselectedRadio.svg";
-import selectedRadio from "@/features/request/assets/selectedRadio.svg";
-import userImg from "@/features/request/assets/userImg.svg";
 import styles from "@/features/request/components/Option/UserOption.module.css";
+import iconRadioOff from "@/shared/assets/icons/IconRadioOff.svg";
+import iconRadioOn from "@/shared/assets/icons/IconRadioOn.svg";
 
 function UserOption({
   data = [], // 요청 대상 목록 [{ id, userName, isGuardian }, ...]
@@ -27,12 +26,12 @@ function UserOption({
               checked={isSelected}
               onChange={() => onSelect(id)}
             />
-            <img className={styles.userImg} src={userImg} />
+            <div className={styles.userProfile} />
             <div className={styles.txtContainer}>
               <span className={`${styles.userNameTxt} typoBodyStrong`}>
                 {userName}
               </span>
-              {isGuardian === "true" && (
+              {isGuardian && (
                 <div className={styles.guardianTag}>
                   <span className={`${styles.guardianTxt} typoCaptionMedium`}>
                     보호자
@@ -41,7 +40,10 @@ function UserOption({
               )}
             </div>
 
-            <img src={isSelected ? selectedRadio : unselectedRadio} />
+            <img
+              className={`${isSelected ? styles.radioOnImg : styles.radioOffImg}`}
+              src={isSelected ? iconRadioOn : iconRadioOff}
+            />
           </label>
         );
       })}

@@ -1,0 +1,35 @@
+{
+  "situation": [
+    {
+      "id": "1",
+      "title": "출장 부재",
+      "startDate": "9/28(월)",
+      "endDate": "10/10(토)",
+      "joinCount": "2"
+    },
+    {
+      "id": "2",
+      "title": "수술 회복",
+      "startDate": "9/1(화)",
+      "endDate": "10/2(금)",
+      "joinCount": "4"
+    }
+  ],
+  "user": [
+    {
+      "id": "1",
+      "userName": "사용자명1",
+      "isGuardian": true
+    },
+    {
+      "id": "2",
+      "userName": "사용자명2",
+      "isGuardian": false
+    },
+    {
+      "id": "3",
+      "userName": "사용자명3",
+      "isGuardian": false
+    }
+  ]
+}

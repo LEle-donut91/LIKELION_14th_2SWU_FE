@@ -33,11 +33,32 @@
 
 .subTxtContainer {
   display: flex;
+  align-items: center;
 }
 
-.circleContainer {
+.pointContainer {
+  width: 16px;
+  height: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0px 6.67px;
+  padding: 6.7px 1.3px;
+  box-sizing: border-box;
+}
+
+.pointDiv {
+  align-self: stretch;
+  width: 2.7px;
+  border-radius: 50%;
+  background-color: var(--color-gray-900);
+}
+
+.radioOnImg {
+  filter: brightness(0) saturate(100%) invert(39%) sepia(54%) saturate(515%)
+    hue-rotate(41deg) brightness(94%) contrast(85%);
+}
+
+.radioOffImg {
+  filter: brightness(0) saturate(100%) invert(54%) sepia(9%) saturate(160%)
+    hue-rotate(13deg) brightness(96%) contrast(90%);
 }

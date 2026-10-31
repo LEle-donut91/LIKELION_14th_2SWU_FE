@@ -20,9 +20,11 @@
   display: none;
 }
 
-.userImg {
+.userProfile {
   width: 40px;
   height: 40px;
+  border-radius: 999px;
+  background-color: var(--color-user-profile);
 }
 
 .txtContainer {
@@ -52,4 +54,14 @@
 
 .guardianTxt {
   color: var(--color-base-000);
+}
+
+.radioOnImg {
+  filter: brightness(0) saturate(100%) invert(39%) sepia(54%) saturate(515%)
+    hue-rotate(41deg) brightness(94%) contrast(85%);
+}
+
+.radioOffImg {
+  filter: brightness(0) saturate(100%) invert(54%) sepia(9%) saturate(160%)
+    hue-rotate(13deg) brightness(96%) contrast(90%);
 }

@@ -16,6 +16,10 @@
   padding: 16px;
   border: 1px solid var(--color-opacity-200);
   outline: none;
+  color: var(--color-gray-900);
+}
+
+.sectionInput::placeholder {
   color: var(--color-gray-500);
 }
 
@@ -30,6 +34,10 @@
   padding: 16px;
   border: 1px solid var(--color-opacity-200);
   outline: none;
+  color: var(--color-gray-900);
+}
+
+.sectionTextarea::placeholder {
   color: var(--color-gray-500);
 }
 

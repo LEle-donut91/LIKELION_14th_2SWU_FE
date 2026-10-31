@@ -1,4 +1,126 @@
-import { SENSITIVE_KEYS } from "@/features/request/constants/requestConstants.js";
+import {
+  SENSITIVE_KEYS,
+  DATE_TIME_MAX_LIMITS,
+  DATE_TIME_MIN_LIMITS,
+  DUE_DATE_MAX_LIMITS,
+  DUE_DATE_MIN_LIMITS,
+  REQUEST_FORM_FIELD_KEY,
+  REQUEST_PREREQUISITE_TOAST_MESSAGE,
+} from "../constants/requestConstants";
+
+/**
+ * =========================================================================
+ * [H-03-02] 요청 작성
+ * - 선행 조건(상황/도움 종류를 모두 선택) 충족 여부 체크 및 관련 토스트 메시지 반환
+ * - 사용자가 입력한 데이터 값 보정
+ * - 사용자 입력값 기반 텍스트 UI 가공
+ *
+ * =========================================================================
+ */
+
+// 장소/부탁 내용(input/textarea)이 read only인지 체크
+// 상황이나 도움 종류 중 하나라도 없으면 true(읽기 전용), 둘 다 있으면 false
+export const isReadOnly = (form) =>
+  !(
+    form[REQUEST_FORM_FIELD_KEY.SITUATION_ID] &&
+    form[REQUEST_FORM_FIELD_KEY.HELP_TYPE]
+  );
+
+// 선행 조건 미충족 시 토스트를 띄우고 false 반환 (충족 시 true 반환)
+export const isPrerequisiteEnsured = (form, showToast) => {
+  if (!form[REQUEST_FORM_FIELD_KEY.SITUATION_ID]) {
+    showToast(REQUEST_PREREQUISITE_TOAST_MESSAGE.SITUATION_REQUIRED);
+    return false;
+  }
+
+  if (!form[REQUEST_FORM_FIELD_KEY.HELP_TYPE]) {
+    showToast(REQUEST_PREREQUISITE_TOAST_MESSAGE.HELP_TYPE_REQUIRED);
+    return false;
+  }
+
+  return true;
+};
+
+// 입력된 시간, 날짜 값에서 숫자만 남기고, 필드(key)별 최대값/유효성에 맞게 값을 보정
+export const getValidatedNumericValue = (key, rawValue) => {
+  let val = rawValue.replace(/[^0-9]/g, ""); // 숫자만 입력 가능
+  if (val === "") return "";
+
+  let num = parseInt(val, 10);
+
+  // 최소값 미만 또는 최대값 초과 시 "" 반환
+  const minLimit = DUE_DATE_MIN_LIMITS[key] || DATE_TIME_MIN_LIMITS[key];
+  const maxLimit = DUE_DATE_MAX_LIMITS[key] || DATE_TIME_MAX_LIMITS[key];
+  if (num < minLimit || num > maxLimit) return "";
+
+  return String(num);
+};
+
+// 선택된 상황을 화면 표시용 문자열로 가공
+export const getSelectedSituationText = (situation, situationId) => {
+  const selectedSituation = situation?.find((item) => item.id === situationId);
+  return selectedSituation?.title || "선택"; // 없으면 "선택" 출력
+};
+
+// 선택된 요청 대상을 화면 표시용 문자열로 가공
+export const getSelectedUserText = (user, userId) => {
+  const selectedUser = user?.find((item) => item.id === userId);
+  return selectedUser?.userName || "한 명 선택"; // 없으면 "한 명 선택" 출력
+};
+
+// 입력된 날짜/시간 객체를 화면 표시용 문자열(YY/MM/DD HH:mm)로 가공
+export const getDateTimeText = (dateTimeObj) => {
+  // 없으면 "선택" 출력
+  if (!dateTimeObj) return "선택";
+  const { year, month, day, hour, minute } = dateTimeObj;
+
+  // 월, 일, 시, 분이 한 자리일 때 앞에 '0'을 붙여줌 (예: "1" -> "01")
+  const pad = (value) => String(value).padStart(2, "0");
+
+  if (!year || !month || !day || !hour || !minute) return "선택";
+
+  // year가 4자리 숫자라면 뒤 2자리만 잘라내고, 아니면 원래 값 사용
+  const formattedYear =
+    String(year).length === 4 ? String(year).slice(-2) : year;
+
+  const datePart = `${formattedYear}/${pad(month)}/${pad(day)}`;
+  const timePart = `${pad(hour)}:${pad(minute)}`;
+  return `${datePart} ${timePart}`;
+};
+
+// 입력된 응답 기한 객체를 화면 표시용 문자열 (N일 N시간 N분)으로 가공
+export const getDueDateText = (dueDate) => {
+  // 없으면 "선택" 출력
+  if (!dueDate) return "선택";
+  const days = parseInt(dueDate.days, 10) || 0;
+  const hours = parseInt(dueDate.hours, 10) || 0;
+  const minutes = parseInt(dueDate.minutes, 10) || 0;
+
+  // 아무것도 입력하지 않았거나, 0일 0시간 0분으로 입력했을 때 -> "선택" 출력
+  if (days === 0 && hours === 0 && minutes === 0) {
+    return "선택";
+  }
+
+  // 정확히 1일 0시간 0분일 때만 "24시간 (기본)" 출력
+  if (days === 1 && hours === 0 && minutes === 0) {
+    return "24시간 (기본)";
+  }
+
+  // 그 외의 경우 조합해서 출력 (예: "2일 3시간", "1일 30분")
+  let text = "";
+  if (days > 0) text += `${days}일`;
+  if (hours > 0) text += ` ${hours}시간`;
+  if (minutes > 0) text += ` ${minutes}분`;
+
+  return text;
+};
+
+/**
+ * =====================================================================
+ * TODO: 추후 주석 추가
+ *
+ * =====================================================================
+ */
 
 // 선택된 ID 목록(checkedList)과 원본 데이터 목록(dataList)을 받아서,
 // 선택된 항목들의 title을 쉼표(,)로 연결하여 반환
@@ -23,32 +145,9 @@ export const checkSensitiveIncluded = (healthList = [], lifeList = []) => {
   return isHealthSensitiveSelected || isLifeSensitiveSelected;
 };
 
-// 날짜/시간 객체를 화면 표시용 문자열(YYYY.MM.DD HH:mm)로 가공
-export const getDateTimeText = (dateTimeObj) => {
-  if (!dateTimeObj) return "선택";
-  const { year, month, day, hour, minute } = dateTimeObj;
-  if (!year && !month && !day && !hour && !minute) return "선택";
-
-  const datePart =
-    year || month || day
-      ? `${year || "0000"}.${month || "00"}.${day || "00"}`
-      : "";
-  const timePart = hour || minute ? `${hour || "00"}:${minute || "00"}` : "";
-
-  return `${datePart} ${timePart}`.trim();
-};
-
+// TODO: 아래 함수는 추후 삭제
 // (요청 대상 리스트, 선택된 요청 대상의 ID)를 인자로 받아, 요청 대상 텍스트 가공
 export const getSelectedUserId = (userLst, userId) => {
   const selectedUser = userLst?.find((item) => item.id === userId);
   return selectedUser?.userName || "한 명 선택";
-};
-
-// 화면에 보여줄 응답 기한 텍스트 가공
-export const getDueDateText = (dueDate) => {
-  if (!dueDate) return "선택";
-  const { days, hours, minutes } = dueDate;
-  if (!days && !hours && !minutes) return "선택";
-
-  return `${days ? `${days}일 ` : ""}${hours ? `${hours}시간 ` : ""}${minutes ? `${minutes}분` : ""}`.trim();
 };
