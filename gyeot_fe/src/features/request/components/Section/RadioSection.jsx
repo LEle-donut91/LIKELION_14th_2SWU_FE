@@ -1,8 +1,10 @@
 import styles from "@/features/request/components/Section/RadioSection.module.css";
-import { HELP_TYPE_OPTIONS, HELP_TYPE_LABELS } from "@/features/request/constants/requestConstants";
+import {
+  HELP_TYPE_OPTIONS,
+  HELP_TYPE_LABELS,
+} from "@/features/request/constants/requestConstants";
 
 function RadioSection({ value, onChange }) {
-
   return (
     <section>
       {/* section 타이틀 */}
@@ -23,7 +25,9 @@ function RadioSection({ value, onChange }) {
               role="radio"
               aria-checked={isSelected}
             >
-              <span className={`${styles.radioTxt} typoBodySmall`}>{HELP_TYPE_LABELS[item]} </span>
+              <span className={`${styles.radioTxt} typoBodySmall`}>
+                {HELP_TYPE_LABELS[item]}{" "}
+              </span>
             </button>
           );
         })}

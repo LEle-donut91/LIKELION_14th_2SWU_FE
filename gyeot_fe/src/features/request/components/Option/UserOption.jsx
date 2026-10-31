@@ -40,7 +40,10 @@ function UserOption({
               )}
             </div>
 
-            <img className={`${isSelected ? styles.radioOnImg : styles.radioOffImg}`} src={isSelected ? iconRadioOn : iconRadioOff} />
+            <img
+              className={`${isSelected ? styles.radioOnImg : styles.radioOffImg}`}
+              src={isSelected ? iconRadioOn : iconRadioOff}
+            />
           </label>
         );
       })}

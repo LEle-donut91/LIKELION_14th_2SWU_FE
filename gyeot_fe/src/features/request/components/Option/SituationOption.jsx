@@ -33,13 +33,16 @@ function SituationOption({
                   {startDate} - {endDate}
                 </span>
                 <div className={styles.pointContainer}>
-                  <div className={styles.pointDiv}/>
+                  <div className={styles.pointDiv} />
                 </div>
                 <span className="typoCaptionMedium">참여자 {joinCount}명</span>
               </div>
             </div>
 
-            <img className={`${isSelected ? styles.radioOnImg : styles.radioOffImg}`} src={isSelected ? iconRadioOn : iconRadioOff} />
+            <img
+              className={`${isSelected ? styles.radioOnImg : styles.radioOffImg}`}
+              src={isSelected ? iconRadioOn : iconRadioOff}
+            />
           </label>
         );
       })}

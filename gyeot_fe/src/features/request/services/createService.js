@@ -4,7 +4,7 @@
  * - post/get/patch/delete + 요청 내용 + Api
  * - 조회 후 데이터 가공
  * - 폼 제출 전 데이터 가공
- * 
+ *
  * =====================================================================
  */
 
@@ -15,20 +15,22 @@ export const getReqFormService = (raw) => {
 
   return {
     // 상황 목록 매핑
-    situation: raw.situation?.map((item) => ({
-      id: item.id,
-      title: item.title,
-      startDate: item.startDate,
-      endDate: item.endDate,
-      joinCount: Number(item.joinCount),
-    })) || [],
+    situation:
+      raw.situation?.map((item) => ({
+        id: item.id,
+        title: item.title,
+        startDate: item.startDate,
+        endDate: item.endDate,
+        joinCount: Number(item.joinCount),
+      })) || [],
 
     // 사용자 목록 매핑
-    user: raw.user?.map((user) => ({
-      id: user.id,
-      userName: user.userName,
-      isGuardian: user.isGuardian, 
-    })) || [],
+    user:
+      raw.user?.map((user) => ({
+        id: user.id,
+        userName: user.userName,
+        isGuardian: user.isGuardian,
+      })) || [],
   };
 };
 
@@ -42,7 +44,7 @@ export const postReqFormService = (raw) => ({
   endAt: raw.endDateTime,
   location: raw.location,
   content: raw.content,
-  responseDue: raw.dueDate
+  responseDue: raw.dueDate,
 });
 
 // TODO: API 연동 로직 수정 필요
