@@ -37,7 +37,7 @@ export const getSelectedUserText = (user, userId) => {
   return selectedUser?.userName || "한 명 선택"; // 없으면 "한 명 선택" 출력
 };
 
-// 입력된 날짜/시간 객체를 화면 표시용 문자열(YYYY.MM.DD HH:mm)로 가공
+// 입력된 날짜/시간 객체를 화면 표시용 문자열(YY/MM/DD HH:mm)로 가공
 export const getDateTimeText = (dateTimeObj) => {
   // 없으면 "선택" 출력
   if (!dateTimeObj) return "선택";
@@ -48,7 +48,10 @@ export const getDateTimeText = (dateTimeObj) => {
 
   if (!year || !month || !day || !hour || !minute) return "선택";
 
-  const datePart = `${year}.${pad(month)}.${pad(day)}`;
+  // year가 4자리 숫자라면 뒤 2자리만 잘라내고, 아니면 원래 값 사용
+  const formattedYear = String(year).length === 4 ? String(year).slice(-2) : year;
+
+  const datePart = `${formattedYear}/${pad(month)}/${pad(day)}`;
   const timePart = `${pad(hour)}:${pad(minute)}`;
   return `${datePart} ${timePart}`;
 };
