@@ -59,7 +59,8 @@ function InfoPreview() {
   );
 
   // 체크된 항목은 form 하나로 관리 (isDefault 항목이 초기 체크 상태)
-  const { form, setField, isSensitiveIncluded } = useCheckForm(sections);
+  const { form, setField, isSensitiveIncluded, isDefaultChecked } =
+    useCheckForm(sections);
 
   // 열려 있는 시트 (한 번에 하나만 열림) - 값은 CHECK_FORM_FIELD_KEY 중 하나
   const [openSheet, setOpenSheet] = useState(null);
@@ -135,8 +136,12 @@ function InfoPreview() {
         ))}
 
         <span className={`${styles.defaultTxt} typoBodySmall`}>
-          기본값이 선택되어 있어요.
-          <br />
+          {isDefaultChecked && (
+            <>
+              기본값이 선택되어 있어요.
+              <br />
+            </>
+          )}
           공유한 정보는 요청이 끝나면 자동 회수돼요.
         </span>
       </main>

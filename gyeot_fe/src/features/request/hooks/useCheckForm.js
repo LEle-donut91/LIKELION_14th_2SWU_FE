@@ -1,12 +1,16 @@
 import { useState } from "react";
 import { CHECK_FORM_FIELD_KEY } from "@/features/request/constants/requestConstants";
-import { checkSensitiveIncluded } from "@/features/request/utils/requestUtils";
+import {
+  checkSensitiveIncluded,
+  isSameIdList,
+} from "@/features/request/utils/requestUtils";
 
 /**
  * =====================================================================
  * [H-03-02-01] 공개 정보 미리보기
  * - 사용자가 체크한 공개 정보(State)를 통합 관리
  * - 민감정보 포함 여부 반환
+ * - 기본값(isDefault) 그대로인지 여부 반환
  *
  * =====================================================================
  */
@@ -21,8 +25,8 @@ import { checkSensitiveIncluded } from "@/features/request/utils/requestUtils";
  * @property {string[]} messageInfo
  */
 
-// sections({ basicInfo: [item...], ... })에서 isDefault가 true인 항목의 id만 모아 초기값 생성
-const getInitialForm = (sections) =>
+// sections({ basicInfo: [item...], ... })에서 isDefault가 true인 항목의 id만 모아 기본값 생성
+const getDefaultForm = (sections) =>
   Object.fromEntries(
     Object.entries(sections).map(([key, items]) => [
       key,
@@ -36,8 +40,12 @@ const getInitialForm = (sections) =>
  */
 export function useCheckForm(sections = {}, initialValues = {}) {
   // TODO: API 연동 시 sections가 비동기로 들어온다면, 데이터 로딩 완료 후에 이 훅을 쓰는 컴포넌트를 렌더링하거나 key로 리마운트할 것 (초기값은 첫 렌더에만 계산됨)
+
+  // 서버가 내려준 기본값 (비교 기준, 변하지 않음)
+  const [defaultForm] = useState(() => getDefaultForm(sections));
+
   const [form, setForm] = useState(() => ({
-    ...getInitialForm(sections),
+    ...defaultForm,
     ...initialValues,
   }));
 
@@ -51,5 +59,10 @@ export function useCheckForm(sections = {}, initialValues = {}) {
     form[CHECK_FORM_FIELD_KEY.LIFE],
   );
 
-  return { form, setForm, setField, isSensitiveIncluded };
+  // 모든 그룹이 기본값과 동일한지 (하나라도 다르면 false)
+  const isDefaultChecked = Object.keys(defaultForm).every((key) =>
+    isSameIdList(form[key], defaultForm[key]),
+  );
+
+  return { form, setForm, setField, isSensitiveIncluded, isDefaultChecked };
 }
