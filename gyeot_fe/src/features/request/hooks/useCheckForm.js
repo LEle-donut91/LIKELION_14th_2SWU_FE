@@ -2,7 +2,6 @@ import { useState } from "react";
 import { CHECK_FORM_FIELD_KEY } from "@/features/request/constants/requestConstants";
 import {
   checkSensitiveIncluded,
-  isSameIdList,
 } from "@/features/request/utils/requestUtils";
 
 /**
@@ -60,9 +59,16 @@ export function useCheckForm(sections = {}, initialValues = {}) {
   );
 
   // 모든 그룹이 기본값과 동일한지 (하나라도 다르면 false)
-  const isDefaultChecked = Object.keys(defaultForm).every((key) =>
-    isSameIdList(form[key], defaultForm[key]),
-  );
+  const isDefaultChecked = Object.keys(defaultForm).every((key) => {
+    const checked = form[key];
+    const defaults = defaultForm[key];
+
+    // 개수가 같고, 기본값의 모든 항목이 체크되어 있으면 동일 (순서는 무시)
+    return (
+      checked.length === defaults.length &&
+      defaults.every((id) => checked.includes(id))
+    );
+  });
 
   return { form, setForm, setField, isSensitiveIncluded, isDefaultChecked };
 }
