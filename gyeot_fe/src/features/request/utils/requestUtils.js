@@ -121,6 +121,9 @@ export const getDueDateText = (dueDate) => {
  *
  * =====================================================================
  */
+// 갱신일이 있을 때만 ", 갱신 9/20" 형태의 문자열 반환 (없으면 빈 문자열)
+export const getUpdatedAtText = (updatedAt) =>
+  updatedAt ? `, 갱신 ${updatedAt}` : "";
 
 // 선택된 ID 목록(checkedList)과 원본 데이터 목록(dataList)을 받아서,
 // 선택된 항목들의 title을 쉼표(,)로 연결하여 반환
