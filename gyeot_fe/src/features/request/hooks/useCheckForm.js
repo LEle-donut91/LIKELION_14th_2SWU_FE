@@ -1,8 +1,4 @@
 import { useState } from "react";
-import { CHECK_FORM_FIELD_KEY } from "@/features/request/constants/requestConstants";
-import {
-  checkSensitiveIncluded,
-} from "@/features/request/utils/requestUtils";
 
 /**
  * =====================================================================
@@ -52,10 +48,11 @@ export function useCheckForm(sections = {}, initialValues = {}) {
   const setField = (key, value) =>
     setForm((prev) => ({ ...prev, [key]: value }));
 
-  // 건강/생활 정보 중 민감정보가 체크되어 있는지
-  const isSensitiveIncluded = checkSensitiveIncluded(
-    form[CHECK_FORM_FIELD_KEY.HEALTH],
-    form[CHECK_FORM_FIELD_KEY.LIFE],
+  // 체크된 항목 중 서버가 민감정보(isSensitive)로 내려준 항목이 있는지 (모든 그룹 대상)
+  const isSensitiveIncluded = Object.keys(sections).some((key) =>
+    sections[key].some(
+      (item) => item.isSensitive && form[key]?.includes(item.id),
+    ),
   );
 
   // 모든 그룹이 기본값과 동일한지 (하나라도 다르면 false)
