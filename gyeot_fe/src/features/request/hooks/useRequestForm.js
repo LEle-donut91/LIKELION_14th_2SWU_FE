@@ -53,10 +53,12 @@ import {
 
 // REQUEST_FORM_FIELD_KEY 구조분해 할당 (유효성 검사가 필요한 필드만 가져옴)
 const {
-  USER_ID,
+  SITUATION_ID,
+  HELP_TYPE,
   START_DATE_TIME,
   END_DATE_TIME,
   LOCATION,
+  USER_ID,
   DUE_DATE,
 } = REQUEST_FORM_FIELD_KEY;
 
@@ -127,6 +129,8 @@ export const validateRequestForm = (form, now, fields = null) => {
   const errors = {};
 
   const targetFields = fields || [
+    SITUATION_ID,
+    HELP_TYPE,
     START_DATE_TIME,
     END_DATE_TIME,
     LOCATION,
@@ -134,11 +138,18 @@ export const validateRequestForm = (form, now, fields = null) => {
     DUE_DATE,
   ];
 
-  // 필수 항목은 시간/장소/요청대상/응답 기한 뿐
-  // if (!form.situationId) errors.situationId = "상황을 선택해 주세요.";
-  // if (!form.helpType) errors.helpType = "도움 종류를 선택해 주세요.";
+  // 필수 항목은 상황, 종류, 시간, 장소, 요청대상, 응답 기한
+  // 1. 상황
+  if (targetFields.includes(SITUATION_ID)) {
+    if (!form.situationId) errors.situationId = "상황을 선택해 주세요.";
+  }
 
-  // 1. 시작 일시
+  // 2. 도움 종류
+  if (targetFields.includes(HELP_TYPE)) {
+    if (!form.helpType) errors.helpType = "도움 종류를 선택해 주세요.";
+  }
+
+  // 3. 시작 일시
   if (targetFields.includes(START_DATE_TIME)) {
     const start = toDate(form.startDateTime);
     if (!start) {
@@ -155,7 +166,7 @@ export const validateRequestForm = (form, now, fields = null) => {
     }
   }
 
-  // 2. 종료 일시
+  // 4. 종료 일시
   if (targetFields.includes(END_DATE_TIME)) {
     // const start = toDate(form.startDateTime);
     // const end = toDate(form.endDateTime);
@@ -167,17 +178,17 @@ export const validateRequestForm = (form, now, fields = null) => {
     // }
   }
 
-  // 3. 장소
+  // 5. 장소
   if (targetFields.includes(LOCATION)) {
     if (!form.location?.trim()) errors.location = "장소를 입력해 주세요.";
   }
 
-  // 4. 요청 대상
+  // 6. 요청 대상
   if (targetFields.includes(USER_ID)) {
     if (!form.userId) errors.userId = "요청 대상을 선택해 주세요.";
   }
 
-  // 5. 응답 기한
+  // 7. 응답 기한
   if (targetFields.includes(DUE_DATE)) {
     if (!isDueDateEntered(form.dueDate)) {
       errors.dueDate = "응답 기한을 입력해 주세요.";
