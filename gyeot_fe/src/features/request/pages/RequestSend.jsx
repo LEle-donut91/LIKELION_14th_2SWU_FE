@@ -14,7 +14,7 @@ function RequestSend() {
     <div className={styles.page}>
       <DefaultHeader
         title="요청 작성"
-        onClick={() => handleGoBack(true)}
+        onClick={handleGoBack}
       />
       <main className={styles.content}>
         <img className={styles.requestSendImg} src={resImgSend} />

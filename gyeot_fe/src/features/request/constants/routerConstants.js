@@ -10,7 +10,7 @@
 
 export const REQUEST_ROUTES = {
   // 홈 (TODO: 추후 shared/로 이동)
-  home: () => `/home`,
+  home: "/home",
 
   // 상황 ID
   request: (id) => `/request/${id}`,
