@@ -117,8 +117,8 @@ export const getDueDateText = (dueDate) => {
 
 /**
  * =====================================================================
- * TODO: 추후 주석 추가
- *
+ * [H-03-02-01] 공개 정보 미리보기
+ * - 사용자 입력값(체크한 항목) 기반 텍스트 UI 가공
  * =====================================================================
  */
 
@@ -133,6 +133,7 @@ export const getSelectedTitles = (checkedList, dataList) => {
     .join(", ");
 };
 
+// TODO : API 명세서 확인 후 삭제 여부 검토
 // 사용자가 체크한 항목 중 민감정보가 포함되어 있으면 true 반환 (아니라면 false)
 export const checkSensitiveIncluded = (healthList = [], lifeList = []) => {
   const isHealthSensitiveSelected = healthList.some((id) =>

@@ -46,7 +46,10 @@ function CheckOption({
             </div>
 
             <div className={styles.imgContainer}>
-              <img className={isChecked ? styles.checkOnImg : styles.checkOffImg} src={isChecked ? iconCheckOn : iconCheckOff} />
+              <img
+                className={isChecked ? styles.checkOnImg : styles.checkOffImg}
+                src={isChecked ? iconCheckOn : iconCheckOff}
+              />
             </div>
           </label>
         );

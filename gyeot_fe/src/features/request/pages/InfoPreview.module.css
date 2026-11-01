@@ -1,11 +1,8 @@
 /* 전체 페이지 */
 .page {
   width: 100%;
-  height: 100%;
-
-  /* index.css의 CSS 변수 형태로 수정 필요 */
-  background-color: #f8f8f8;
-
+  min-height: 100vh;
+  background-color: var(--color-gray-050);
   display: flex;
   flex-direction: column;
 }
@@ -18,7 +15,20 @@
   gap: 16px;
 }
 
+.sectionGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.groupTitle {
+  color: var(--color-gray-900);
+  margin-top: 32px;
+  margin-bottom: 8px;
+}
+
 .defaultTxt {
   margin-top: 32px;
   text-align: center;
+  color: var(--color-gray-700);
 }

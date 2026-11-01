@@ -200,18 +200,81 @@ export const DUE_DATE_MAX_LIMITS = DUE_DATE_CONFIGS.reduce(
 
 /**
  * =====================================================================
- * TODO: 추후 주석 추가
+ * [H-03-02-01] 공개 정보 미리보기
  * =====================================================================
  */
 
+// 공개 정보 체크 Form 필드 키 (기본 정보 / 건강 정보 / 생활 정보 / 미리 남기는 말)
+export const CHECK_FORM_FIELD_KEY = {
+  BASIC: "basicInfo",
+  HEALTH: "healthInfo",
+  LIFE: "lifeInfo",
+  MESSAGE: "messageInfo",
+};
+
+// 공개 정보 섹션 설정 (화면에 그릴 순서대로)
+// - key: CHECK_FORM_FIELD_KEY 값 (form, sections, openSheet의 키로 공용 사용)
+// - title / description: SafetyCardGroup, DefaultSheet에 표시할 문구
+export const INFO_PREVIEW_SECTIONS = [
+  {
+    key: CHECK_FORM_FIELD_KEY.BASIC,
+    title: "기본 정보",
+    description: "생년월일, 혈액형이 포함되어 있어요.",
+  },
+  {
+    key: CHECK_FORM_FIELD_KEY.HEALTH,
+    title: "건강 정보",
+    description: "질환, 복용약, 알러지, 주의사항이 포함되어 있어요.",
+  },
+  {
+    key: CHECK_FORM_FIELD_KEY.LIFE,
+    title: "생활 정보",
+    description: "주소, 출입 방법, 반려동물 정보가 포함되어 있어요.",
+  },
+  {
+    key: CHECK_FORM_FIELD_KEY.MESSAGE,
+    title: "미리 남기는 말",
+    description: "기타 정보가 포함되어 있어요.",
+  },
+];
+
+// 공개 정보 항목 ID (API 응답 JSON의 항목 키와 동일)
+export const CHECK_ITEM_ID = {
+  // 기본 정보
+  BIRTH_DATE: "birthDate",
+  BLOOD_TYPE: "bloodType",
+
+  // 건강 정보
+  DISEASE: "disease",
+  MEDICINE: "medicine",
+  ALLERGY: "allergy",
+  CAUTION: "caution",
+
+  // 생활 정보
+  ADDRESS: "address",
+  ENTRANCE_METHOD: "entranceMethod",
+  PET: "pet",
+
+  // 미리 남기는 말
+  PREFERENCE: "preference",
+  DOCUMENT: "document",
+};
+
+// TODO : API 명세서 확인 후 삭제 여부 검토
 // 민감정보 항목의 ID 목록 정의
 export const SENSITIVE_KEYS = [
-  "disease",
-  "medicine",
-  "allergy",
-  "address",
-  "entranceMethod",
+  CHECK_ITEM_ID.DISEASE,
+  CHECK_ITEM_ID.MEDICINE,
+  CHECK_ITEM_ID.ALLERGY,
+  CHECK_ITEM_ID.ADDRESS,
+  CHECK_ITEM_ID.ENTRANCE_METHOD,
 ];
+
+/**
+ * =====================================================================
+ * TODO: 주석 수정 필요
+ * =====================================================================
+ */
 
 // [H-03-01-B] 요청 상태에 따른 RequestState 컴포넌트 설정 데이터 매핑
 export const REQUEST_STATE_CONFIG = {
