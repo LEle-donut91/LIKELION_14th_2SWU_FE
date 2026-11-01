@@ -208,8 +208,8 @@ export const getInfoPreviewService = (raw) => {
 // TODO: API 연동 로직 수정 필요
 // [H-03-02-01] 공개 정보 미리보기 - 제출 전 데이터 가공
 // form: { basicInfo: [...ids], healthInfo: [...], lifeInfo: [...], messageInfo: [...] }
-export const postInfoPreviewService = (requestId, form) => ({
-  requestId,
+export const postInfoPreviewService = (tempId, form) => ({
+  tempId,
   sharedInfo: {
     basicInfo: form.basicInfo,
     healthInfo: form.healthInfo,
