@@ -276,7 +276,6 @@ export const SENSITIVE_KEYS = [
  * =====================================================================
  */
 
-
 // [H-03-01-B] 요청 상태에 따른 RequestState 컴포넌트 설정 데이터 매핑
 export const REQUEST_STATE_CONFIG = {
   cancel: { title: "요청 취소", information: "요청자가 취소했어요." },

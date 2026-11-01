@@ -107,35 +107,37 @@ function InfoPreview() {
           dueDate={`~ ${dueDate}`}
         />
 
-        <div className={styles.sectionGroup} >
-          <span className={`${styles.groupTitle} typoTitleMedium`} >공유 정보</span>
-        {/* 기본 정보 / 건강 정보 / 생활 정보 / 미리 남기는 말 */}
-        {INFO_PREVIEW_SECTIONS.map(({ key, title, description }) => (
-          <Fragment key={key}>
-            <SafetyCardGroup
-              title={title}
-              information={getSelectedTitles(form[key], sections[key])}
-              onClick={() => setOpenSheet(key)}
-            />
+        <div className={styles.sectionGroup}>
+          <span className={`${styles.groupTitle} typoTitleMedium`}>
+            공유 정보
+          </span>
+          {/* 기본 정보 / 건강 정보 / 생활 정보 / 미리 남기는 말 */}
+          {INFO_PREVIEW_SECTIONS.map(({ key, title, description }) => (
+            <Fragment key={key}>
+              <SafetyCardGroup
+                title={title}
+                information={getSelectedTitles(form[key], sections[key])}
+                onClick={() => setOpenSheet(key)}
+              />
 
-            <DefaultSheet
-              isOpen={openSheet === key}
-              onClose={closeSheet}
-              title={title}
-              description={description}
-              value={form[key]}
-              onConfirm={(v) => setField(key, v)}
-            >
-              {(temp, setTemp) => (
-                <CheckOption
-                  data={sections[key]}
-                  checkedValue={temp}
-                  onChecked={setTemp}
-                />
-              )}
-            </DefaultSheet>
-          </Fragment>
-        ))}
+              <DefaultSheet
+                isOpen={openSheet === key}
+                onClose={closeSheet}
+                title={title}
+                description={description}
+                value={form[key]}
+                onConfirm={(v) => setField(key, v)}
+              >
+                {(temp, setTemp) => (
+                  <CheckOption
+                    data={sections[key]}
+                    checkedValue={temp}
+                    onChecked={setTemp}
+                  />
+                )}
+              </DefaultSheet>
+            </Fragment>
+          ))}
         </div>
 
         <span className={`${styles.defaultTxt} typoBodySmall`}>

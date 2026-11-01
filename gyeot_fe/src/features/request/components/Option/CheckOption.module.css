@@ -39,9 +39,11 @@
 }
 
 .checkOnImg {
-  filter: brightness(0) saturate(100%) invert(39%) sepia(82%) saturate(361%) hue-rotate(41deg) brightness(89%) contrast(85%);
+  filter: brightness(0) saturate(100%) invert(39%) sepia(82%) saturate(361%)
+    hue-rotate(41deg) brightness(89%) contrast(85%);
 }
 
 .checkOffImg {
-filter: brightness(0) saturate(100%) invert(57%) sepia(5%) saturate(284%) hue-rotate(13deg) brightness(91%) contrast(90%);
+  filter: brightness(0) saturate(100%) invert(57%) sepia(5%) saturate(284%)
+    hue-rotate(13deg) brightness(91%) contrast(90%);
 }
