@@ -260,6 +260,7 @@ export const CHECK_ITEM_ID = {
   DOCUMENT: "document",
 };
 
+// TODO : API 명세서 확인 후 삭제 여부 검토
 // 민감정보 항목의 ID 목록 정의
 export const SENSITIVE_KEYS = [
   CHECK_ITEM_ID.DISEASE,
@@ -268,6 +269,13 @@ export const SENSITIVE_KEYS = [
   CHECK_ITEM_ID.ADDRESS,
   CHECK_ITEM_ID.ENTRANCE_METHOD,
 ];
+
+/**
+ * =====================================================================
+ * TODO: 주석 수정 필요
+ * =====================================================================
+ */
+
 
 // [H-03-01-B] 요청 상태에 따른 RequestState 컴포넌트 설정 데이터 매핑
 export const REQUEST_STATE_CONFIG = {
