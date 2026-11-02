@@ -1,49 +1,58 @@
-// H-03-01-02
+/**
+ * =====================================================================
+ * [H-03-01-02] 요청 수정 (내용 확인)
+ *  - 페이지 컴포넌트
+ * =====================================================================
+ */
+
+// CSS 스타일
 import styles from "@/features/request/pages/RequestEditCheck.module.css";
+
+// 일반 라이브러리
+import { useMemo } from "react";
+import { useParams } from "react-router-dom";
+
+// Custom Hooks
+import { useRequestNav } from "@/features/request/hooks/useRequestNav";
+
+// API, Services
+import {
+  getEditCheckApi,
+  postEditReconfirmApi,
+} from "@/features/request/api/requesterApi";
+import {
+  getEditCheckService,
+} from "@/features/request/services/requesterService";
+
+// 일반 Components
 import StepHeader from "@/features/request/components/Header/StepHeader";
 import RequestSummary from "@/features/request/components/Request/RequestSummary";
 import UserInfo from "@/features/request/components/User/UserInfo";
 import LargeFooter from "@/features/request/components/Footer/LargeFooter";
-import editCheckData from "@/features/request/api/editCheckData";
-import iconDate from "@/shared/assets/icons/iconDate.svg";
-import iconLocation from "@/shared/assets/icons/iconLocation.svg";
-import iconHealthy from "@/shared/assets/icons/iconHealthy.svg";
 import iconToggle from "@/shared/assets/icons/iconToggle.svg";
-import { useRequestNav } from "@/features/request/hooks/useRequestNav";
 
+// 페이지 컴포넌트
 function RequestEditCheck() {
-  // JSON 데이터 변수에 각각 저장
-  const { userName, userPart, beforeInfo, afterInfo } = editCheckData;
-  const {
-    time: beforeTime,
-    location: beforeLocation,
-    message: beforeMessage,
-  } = beforeInfo;
-  const {
-    time: afterTime,
-    location: afterLocation,
-    message: afterMessage,
-  } = afterInfo;
+  // useNavigation 커스텀 훅의 함수
+  const { handleGoBack, handleGoBackTwice } = useRequestNav();
 
-  // RequestSummary에 넘겨줄 infoList 배열 구성
-  // 부모 컴포넌트에서 동적으로 아이콘, 라벨, 값을 묶어서 전달
-  const beforeInfoList = [
-    { icon: iconDate, label: "일정", value: beforeTime },
-    { icon: iconLocation, label: "장소", value: beforeLocation },
-    { icon: iconHealthy, label: "정보", value: beforeMessage },
-  ];
-  const afterInfoList = [
-    { icon: iconDate, label: "일정", value: afterTime },
-    { icon: iconLocation, label: "장소", value: afterLocation },
-    { icon: iconHealthy, label: "정보", value: afterMessage },
-  ];
+  // path parameter (요청 ID)
+  const paramId = useParams().id;
 
-  const { handleGoBack, handleGoNext } = useRequestNav();
+  // TODO: API 연동 시 useEffect로 교체 (지금은 mock 이라 렌더마다 호출돼도 문제 없음)
+  // [H-03-01-02] 요청 수정 내용 확인 - 데이터 조회
+  const { userName, userPart, beforeInfoList, afterInfoList } = useMemo(
+    () => getEditCheckService(getEditCheckApi(paramId)),
+    [paramId],
+  );
+
+  // TODO: API 연동 로직 수정 필요
+  // [H-03-01-02] 재확인 요청 후 [요청 상세 · 요청자 뷰]로 이동
   const handleReconfirmBtnClick = () => {
-    // API 호출 로직 추가 필요
+    postEditReconfirmApi(paramId);
 
-    // H-03-01-A (요청 상세 · 요청자 뷰)로 이동
-    handleGoNext("/request/requester");
+    // [요청 상세 · 요청자 뷰]로 이동
+    handleGoBackTwice();
   };
 
   return (
