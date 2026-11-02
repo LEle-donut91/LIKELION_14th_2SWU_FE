@@ -89,7 +89,7 @@ const isDueDateEntered = (d) =>
   DUE_DATE_KEYS.some((k) => d?.[k] != null && d?.[k] !== "");
 
 // 시간/날짜 입력값 객체 (DateTimeValue)를 Date 타입으로 변환
-const toDate = (v) =>
+export const toDate = (v) =>
   isDateTimeComplete(v)
     ? new Date(+v.year, +v.month - 1, +v.day, +v.hour, +v.minute)
     : null;
