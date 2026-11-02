@@ -1,0 +1,40 @@
+{
+  "situationId": "1",
+  "requestId": "1",
+  "lastReqSummary": {
+    "type": "병원 동행",
+    "time": "10/2(목) 14:00 - 15:00",
+    "location": "슈슈병원",
+    "info": "생년월일, 복용약 외 1건",
+    "message": "병원에 가야하는 일이 생겼는데, 혼자 가기에 부담스러워요. 같이 가면 큰 도움이 될 것 같아요!"
+  },
+  "userRecord": [
+    {
+      "name": "민재",
+      "part": "나의 사람",
+      "state": "어려움, 마감"
+    },
+    {
+      "name": "서연",
+      "part": "보호자",
+      "state": "수락"
+    }
+  ],
+  "userLst": [
+    {
+      "id": "1",
+      "userName": "사용자명1",
+      "isGuardian": "true"
+    },
+    {
+      "id": "2",
+      "userName": "사용자명2",
+      "isGuardian": "false"
+    },
+    {
+      "id": "3",
+      "userName": "사용자명3",
+      "isGuardian": "false"
+    }
+  ]
+}
