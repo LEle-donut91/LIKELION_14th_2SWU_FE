@@ -59,10 +59,11 @@ export const postEditFormService = (requestId, requestForm, checkForm) => ({
 
 // TODO: API 연동 로직 수정 필요
 // [H-03-01-02] 요청 수정 내용 확인 - 데이터 조회 후 가공
-// 반환: { situationId, requestId, userName, userPart, beforeInfoList, afterInfoList }
+// 반환: { situationId, requestId, isConfirmRequired, userName, userPart, beforeInfoList, afterInfoList }
 export const getEditCheckService = (raw) => ({
   situationId: raw?.situationId ?? "",
   requestId: raw?.requestId ?? "",
+  isConfirmRequired: raw?.isAccepted ?? false,
   userName: raw?.userName ?? "",
   userPart: raw?.userPart ?? "",
   beforeInfoList: [

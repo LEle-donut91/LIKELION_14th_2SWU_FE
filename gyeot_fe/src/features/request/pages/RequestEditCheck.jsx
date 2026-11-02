@@ -43,10 +43,13 @@ function RequestEditCheck() {
 
   // TODO: API 연동 시 useEffect로 교체 (지금은 mock 이라 렌더마다 호출돼도 문제 없음)
   // [H-03-01-02] 요청 수정 내용 확인 - 데이터 조회
-  const { userName, userPart, beforeInfoList, afterInfoList } = useMemo(
-    () => getEditCheckService(getEditCheckApi(paramId)),
-    [paramId],
-  );
+  const {
+    userName,
+    isConfirmRequired,
+    userPart,
+    beforeInfoList,
+    afterInfoList,
+  } = useMemo(() => getEditCheckService(getEditCheckApi(paramId)), [paramId]);
 
   // TODO: API 연동 로직 수정 필요
   // [H-03-01-02] 재확인 요청 후 [요청 상세 · 요청자 뷰]로 이동
@@ -98,16 +101,18 @@ function RequestEditCheck() {
         />
 
         {/* 가이드 Text */}
-        <span className={`${styles.guideTxt} typoBodySmall`}>
-          확인 전까지 기존 내용과 접근 권한이 유지돼요.
-          <br />
-          담당자 거절 시, 요청이 취소되고 접근 권한이 회수돼요.
-        </span>
+        {isConfirmRequired && (
+          <span className={`${styles.guideTxt} typoBodySmall`}>
+            확인 전까지 기존 내용과 접근 권한이 유지돼요.
+            <br />
+            담당자 거절 시, 요청이 취소되고 접근 권한이 회수돼요.
+          </span>
+        )}
       </main>
 
       {/* 하단 Footer */}
       <LargeFooter
-        title="재확인 요청"
+        title={isConfirmRequired ? "재확인 요청" : "요청 수정"}
         type="primary"
         onClick={handleReconfirmBtnClick}
       />
