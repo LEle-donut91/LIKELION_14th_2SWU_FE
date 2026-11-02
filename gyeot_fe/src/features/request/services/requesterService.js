@@ -95,6 +95,8 @@ export const getEditCheckService = (raw) => ({
  * =====================================================================
  * [N-06] 다시 부탁하기
  * - 데이터 조회 후 가공
+ * - 폼 제출 전 보낼 데이터 가공
+ * - 폼 제출 후 받은 데이터 가공
  *
  * =====================================================================
  */
@@ -138,7 +140,10 @@ export const getAskAgainService = (raw, now = new Date()) => {
         isGuardian: user.isGuardian,
       })) || [],
 
+    // 응답 기한 고정 여부
     isDueDateFixed,
+
+    // 폼 초기값 설정
     initialRequestForm: {
       startDateTime: startAt,
       ...(isDueDateFixed && { dueDate: null }),

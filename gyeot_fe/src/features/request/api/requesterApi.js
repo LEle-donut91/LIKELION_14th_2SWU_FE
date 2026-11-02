@@ -65,7 +65,8 @@ export const patchRequestCancelApi = (requestId) => {
 
 // TODO: API 연동 로직 수정 필요
 // [N-06] 다시 부탁하기 - 이전 요청 내용, 대상 이력, 새 요청 대상 조회
-// 응답: { situationId, requestId, lastReqSummary, userRecord, userLst }
+// 응답: { situationId, requestId, lastReqSummary: { type, time, startAt, location, info, message }, userRecord, userLst }
+// - startAt: 시작 일시 (DateTimeValue). 시작까지 1시간 미만이면 응답 기한이 시작 시간까지로 고정됨
 export const getAskAgainApi = (requestId) => {
   console.log(requestId);
   return getAskAgainMock;
