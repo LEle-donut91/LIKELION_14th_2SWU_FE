@@ -1,67 +1,125 @@
-// N-06
+/**
+ * =====================================================================
+ * [N-06] 다시 부탁하기
+ *  - 페이지 컴포넌트
+ * =====================================================================
+ */
+
+// CSS 스타일
 import styles from "@/features/request/pages/AskAgain.module.css";
-import iconDate from "@/shared/assets/icons/iconDate.svg";
-import iconLocation from "@/shared/assets/icons/iconLocation.svg";
-import iconHealthy from "@/shared/assets/icons/iconHealthy.svg";
+
+// 일반 라이브러리
+import { useMemo, useState } from "react";
+import { useParams } from "react-router-dom";
+
+// Custom Hooks
+import { useRequestNav } from "@/features/request/hooks/useRequestNav";
+import { useRequestForm } from "@/features/request/hooks/useRequestForm";
+import { useToast } from "@/features/request/hooks/useToast";
+
+// Constants
+import { REQUEST_ROUTES } from "@/features/request/constants/routerConstants";
+import {
+  REQUEST_FORM_FIELD_KEY,
+  REQUEST_SHEET,
+  DUE_DATE_SECTIONS,
+  ASK_AGAIN_VALIDATE_FIELDS_FIXED,
+  ASK_AGAIN_VALIDATE_FIELDS_FLEXIBLE,
+  FIXED_DUE_DATE_TOAST_MESSAGE,
+} from "@/features/request/constants/requestConstants";
+
+// Utils
+import {
+  getSelectedUserText,
+  getDueDateText,
+} from "@/features/request/utils/requestUtils";
+
+// API, Services
+import {
+  getAskAgainApi,
+  postAskAgainApi,
+} from "@/features/request/api/requesterApi";
+import {
+  getAskAgainService,
+  postAskAgainService,
+  postAskAgainIdService,
+} from "@/features/request/services/requesterService";
+
+// 일반 Components
 import DefaultHeader from "@/features/request/components/Header/DefaultHeader";
 import RequestSummary from "@/features/request/components/Request/RequestSummary";
 import UserInfo from "@/features/request/components/User/UserInfo";
 import SelectSection from "@/features/request/components/Section/SelectSection";
-import LargeFooter from "@/features/request/components/Footer/LargeFooter";
-import askAgainData from "@/features/request/api/askAgainData";
-import {
-  getDueDateText,
-  getSelectedUserId,
-} from "@/features/request/utils/requestUtils";
-import { useState } from "react";
-import { DUE_DATE_SECTIONS } from "@/features/request/constants/requestConstants";
-import DateTimeOption from "@/features/request/components/Option/DateTimeOption";
-import UserOption from "@/features/request/components/Option/UserOption";
 import DefaultSheet from "@/features/request/components/Sheet/DefaultSheet";
 import TimeSheet from "@/features/request/components/Sheet/TimeSheet";
-import { useRequestNav } from "@/features/request/hooks/useRequestNav";
+import UserOption from "@/features/request/components/Option/UserOption";
+import DateTimeOption from "@/features/request/components/Option/DateTimeOption";
+import LargeFooter from "@/features/request/components/Footer/LargeFooter";
+import DefaultToast from "@/features/request/components/Toast/DefaultToast";
 
+// 페이지 컴포넌트
 function AskAgain() {
+  // useNavigation 커스텀 훅의 함수
   const { handleGoNext, handleGoBack } = useRequestNav();
 
-  // JSON 데이터 변수에 저장
+  // path parameter (이전 요청 ID)
+  const paramId = useParams().id;
+
+  // TODO: API 연동 시 useEffect로 교체 (지금은 mock 이라 렌더마다 호출돼도 문제 없음)
+  // [N-06] 다시 부탁하기 - 데이터 조회
   const {
     reqType,
-    reqTime,
-    reqLocation,
-    reqInfo,
     reqMsg,
+    infoList,
     userRecord,
     userLst,
-  } = askAgainData;
+    isDueDateFixed,
+    initialRequestForm,
+  } = useMemo(() => getAskAgainService(getAskAgainApi(paramId)), [paramId]);
 
-  const {
-    name: userRecordName,
-    part: userRecordPart,
-    state: userRecordState,
-  } = userRecord;
+  // 새 요청 대상 / 응답 기한 입력값 (시작 1시간 미만이면 dueDate 초기값이 null)
+  const { form, setField, validate } = useRequestForm(initialRequestForm);
 
-  // RequestSummary에 넘겨줄 infoList 배열 구성
-  // 부모 컴포넌트에서 동적으로 아이콘, 라벨, 값을 묶어서 전달
-  const infoList = [
-    { icon: iconDate, label: "시간", value: reqTime },
-    { icon: iconLocation, label: "장소", value: reqLocation },
-    { icon: iconHealthy, label: "정보", value: reqInfo },
-  ];
+  // 토스트 메시지
+  const { toast, showToast, hideToast } = useToast();
 
-  // 각 선택 항목에 대한 상태(State) 정의
-  const [userId, setUserId] = useState(null);
-  const [dueDate, setDueDate] = useState(null);
+  // 열려 있는 시트 (한 번에 하나만 열림)
+  const [openSheet, setOpenSheet] = useState(null);
+  const closeSheet = () => setOpenSheet(null);
 
-  // 각 Sheet의 열림/닫힘 상태(State) 정의
-  const [isUserSheetOpen, setUserSheetOpen] = useState(false);
-  const [isDuedateSheetOpen, setDuedateSheetOpen] = useState(false);
+  // 응답 기한 항목 클릭 핸들러
+  // - 시작까지 1시간 미만이면 시트를 열지 않고 안내 토스트만 노출
+  const handleDueDateClick = () => {
+    if (isDueDateFixed) {
+      showToast(FIXED_DUE_DATE_TOAST_MESSAGE);
+      return;
+    }
+    setOpenSheet(REQUEST_SHEET.DUE_DATE);
+  };
 
-  // 다음 버튼 클릭 이벤트 핸들러
+  // 다음 버튼 클릭 핸들러
   const handleNextBtnClick = () => {
-    // API 호출 로직 추가 필요
+    // 검증할 필드 설정
+    const fields = isDueDateFixed
+      ? ASK_AGAIN_VALIDATE_FIELDS_FIXED
+      : ASK_AGAIN_VALIDATE_FIELDS_FLEXIBLE;
 
-    handleGoNext("/request/info-preview");
+    // 입력값 유효성 검사 (첫 번째 에러 문구 하나만 토스트로)
+    const errors = validate(fields);
+    const [firstError] = Object.values(errors);
+    if (firstError) {
+      showToast(firstError);
+      return;
+    }
+
+    // TODO: API 연동 로직 수정 필요
+    // [N-06] 다시 부탁하기 - 폼 제출
+    const reqRefinedData = postAskAgainService(paramId, form);
+    const resRawData = postAskAgainApi(reqRefinedData);
+    const { tempId } = postAskAgainIdService(resRawData);
+
+    // [공개 정보 미리보기] 페이지로 이동
+    handleGoNext(REQUEST_ROUTES.infoPreview(tempId));
   };
 
   return (
@@ -73,7 +131,7 @@ function AskAgain() {
         {/* 요청 요약 카드 */}
         <RequestSummary
           isAfterInfo={false}
-          hasBeighBorder={true}
+          hasBeigeBorder={true}
           title="이전 요청 내용"
           hasTag={true}
           type={reqType}
@@ -86,29 +144,32 @@ function AskAgain() {
           <span className={`${styles.userTitle} typoBodyStrong`}>
             대상 이력
           </span>
-          <UserInfo
-            isAgain={true}
-            state={userRecordState}
-            userName={userRecordName}
-            part={userRecordPart}
-          />
+          {userRecord.map(({ name, part, state }, index) => (
+            <UserInfo
+              key={`${name}-${index}`}
+              isAgain={true}
+              state={state}
+              userName={name}
+              part={part}
+            />
+          ))}
         </div>
 
         {/* 새 요청 대상 */}
         <SelectSection
-          title="새 요청 대상 *"
-          text={getSelectedUserId(userLst, userId)}
-          border={userId ? "borderActive" : "borderDefault"}
+          title="새 요청 대상"
+          isRequired
+          text={getSelectedUserText(userLst, form.userId)}
           width="large"
-          onClick={() => setUserSheetOpen(true)}
+          onClick={() => setOpenSheet(REQUEST_SHEET.USER)}
         />
         <DefaultSheet
-          isOpen={isUserSheetOpen}
-          onClose={() => setUserSheetOpen(false)}
+          isOpen={openSheet === REQUEST_SHEET.USER}
+          onClose={closeSheet}
           title="요청 대상"
           description="상황에 참여한 사람들에게만 요청을 보낼 수 있어요."
-          value={userId}
-          onConfirm={setUserId}
+          value={form.userId}
+          onConfirm={(v) => setField(REQUEST_FORM_FIELD_KEY.USER_ID, v)}
         >
           {(temp, setTemp) => (
             <UserOption
@@ -119,19 +180,19 @@ function AskAgain() {
           )}
         </DefaultSheet>
 
-        {/* 응답 기한 */}
+        {/* 응답 기한 (시작까지 1시간 미만이면 "시작 시간까지"로 고정) */}
         <SelectSection
-          title="응답 기한 *"
-          text={getDueDateText(dueDate)}
-          border={dueDate ? "borderActive" : "borderDefault"}
+          title="응답 기한"
+          isRequired
+          text={getDueDateText(form.dueDate, isDueDateFixed)}
           width="large"
-          onClick={() => setDuedateSheetOpen(true)}
+          onClick={handleDueDateClick}
         />
         <TimeSheet
-          isOpen={isDuedateSheetOpen}
-          onClose={() => setDuedateSheetOpen(false)}
-          value={dueDate}
-          onConfirm={setDueDate}
+          isOpen={openSheet === REQUEST_SHEET.DUE_DATE}
+          onClose={closeSheet}
+          value={form.dueDate}
+          onConfirm={(v) => setField(REQUEST_FORM_FIELD_KEY.DUE_DATE, v)}
         >
           {(temp, setTemp) => (
             <DateTimeOption
@@ -145,6 +206,15 @@ function AskAgain() {
 
       {/* 하단 푸터 */}
       <LargeFooter title="다음" type="primary" onClick={handleNextBtnClick} />
+
+      {/* 토스트 (key 가 바뀌면 새로 마운트되어 타이머가 다시 시작됨) */}
+      {toast && (
+        <DefaultToast
+          key={toast.id}
+          message={toast.message}
+          onHide={hideToast}
+        />
+      )}
     </div>
   );
 }
