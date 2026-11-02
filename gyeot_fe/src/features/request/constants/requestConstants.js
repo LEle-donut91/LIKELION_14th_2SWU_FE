@@ -293,9 +293,7 @@ export const EDIT_FORM_VALIDATE_FIELDS = [
  */
 
 // 검증할 필드 (응답 기한이 고정된 경우)
-export const ASK_AGAIN_VALIDATE_FIELDS_FIXED = [
-  REQUEST_FORM_FIELD_KEY.USER_ID,
-];
+export const ASK_AGAIN_VALIDATE_FIELDS_FIXED = [REQUEST_FORM_FIELD_KEY.USER_ID];
 
 // 검증할 필드 (응답 기한이 고정되지 않은 경우)
 export const ASK_AGAIN_VALIDATE_FIELDS_FLEXIBLE = [
@@ -304,7 +302,8 @@ export const ASK_AGAIN_VALIDATE_FIELDS_FLEXIBLE = [
 ];
 
 // 시작까지 1시간 미만일 때 응답 기한 고정 문구
-export const FIXED_DUE_DATE_TOAST_MESSAGE = "시작까지 1시간 미만이라 응답 기한은 시작 시간까지로 고정돼요";
+export const FIXED_DUE_DATE_TOAST_MESSAGE =
+  "시작까지 1시간 미만이라 응답 기한은 시작 시간까지로 고정돼요";
 
 /**
  * =====================================================================
