@@ -85,3 +85,65 @@ export const getEditCheckService = (raw) => ({
     { icon: iconHealthy, label: "정보", value: raw?.afterInfo?.message ?? "" },
   ],
 });
+
+/**
+ * =====================================================================
+ * [N-06] 다시 부탁하기
+ * - 데이터 조회 후 가공
+ *
+ * =====================================================================
+ */
+
+// TODO: API 연동 로직 수정 필요
+// [N-06] 다시 부탁하기 - 이전 요청 내용, 대상 이력, 새 요청 대상 조회 후 데이터 가공
+export const getAskAgainService = (raw) => ({
+  situationId: raw?.situationId ?? "",
+  requestId: raw?.requestId ?? "",
+  reqType: raw?.lastReqSummary?.type ?? "",
+  reqMsg: raw?.lastReqSummary?.message ?? "",
+
+  // [이전 요청 내용]의 시간/장소/정보
+  infoList: [
+    { icon: iconDate, label: "일정", value: raw?.lastReqSummary?.time ?? "" },
+    {
+      icon: iconLocation,
+      label: "장소",
+      value: raw?.lastReqSummary?.location ?? "",
+    },
+    {
+      icon: iconHealthy,
+      label: "정보",
+      value: raw?.lastReqSummary?.info ?? "",
+    },
+  ],
+
+  // [대상 이력] 목록 매핑
+  userRecord:
+    raw?.userRecord?.map((user) => ({
+      name: user.name,
+      part: user.part,
+      state: user.state,
+    })) || [],
+
+  // [새 요청 대상] 목록 매핑
+  userLst:
+    raw.userLst?.map((user) => ({
+      id: user.id,
+      userName: user.userName,
+      isGuardian: user.isGuardian,
+    })) || [],
+});
+
+// TODO: API 연동 로직 수정 필요
+// [N-06] 다시 부탁하기 - 폼 제출 전 데이터 가공
+export const postAskAgainService = (raw) => ({
+  targetUserId: raw.userId,
+  responseDue: raw.dueDate,
+});
+
+// TODO: API 연동 로직 수정 필요
+// [N-06] 다시 부탁하기 - 폼 제출 후 데이터 가공
+export const postAskAgainIdService = (raw) => ({
+  tempId: raw.tempId,
+  msg: raw.message,
+});
