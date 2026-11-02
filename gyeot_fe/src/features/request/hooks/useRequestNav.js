@@ -20,8 +20,8 @@ export function useRequestNav() {
 
   // 두 페이지 전으로 이동하는 함수
   const handleGoBackTwice = (replace = false) => {
-  navigate(-2, { replace });
-};
+    navigate(-2, { replace });
+  };
 
   // 다음 화면으로 이동하는 함수 (인자로 받은 nextpath로 이동)
   const handleGoNext = (nextPath, replace = false) => {

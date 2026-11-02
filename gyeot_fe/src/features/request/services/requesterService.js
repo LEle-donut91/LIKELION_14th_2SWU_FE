@@ -85,4 +85,3 @@ export const getEditCheckService = (raw) => ({
     { icon: iconHealthy, label: "정보", value: raw?.afterInfo?.message ?? "" },
   ],
 });
-

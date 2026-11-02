@@ -1,6 +1,14 @@
 import styles from "@/features/request/components/Section/InputSection.module.css";
 
-function InputSection({ title, isRequired, size, value, onChange, onFocus, readOnly }) {
+function InputSection({
+  title,
+  isRequired,
+  size,
+  value,
+  onChange,
+  onFocus,
+  readOnly,
+}) {
   return (
     <section className={styles.inputSection}>
       {/* section 타이틀 (isRequired가 true일 때만 필수 표시 "*" 추가) */}
