@@ -1,7 +1,7 @@
 import styles from "@/features/request/components/Section/SelectSection.module.css";
 import iconDown from "@/shared/assets/icons/iconDown.svg";
 
-function SelectSection({ title, text, width, onClick }) {
+function SelectSection({ title, isRequired, text, width, onClick }) {
   // 텍스트가 존재하고 "한 명 선택/선택"이 아닐 때만 active 스타일 적용
   const isSelected =
     text && text !== "선택" && text !== "한 명 선택" && text.trim() !== "";
@@ -10,8 +10,16 @@ function SelectSection({ title, text, width, onClick }) {
 
   return (
     <section className={styles.selectSection}>
-      {/* section 타이틀 */}
-      <span className={`${styles.sectionTitle} typoBodyStrong`}>{title}</span>
+      {/* section 타이틀 (isRequired가 true일 때만 필수 표시 "*" 추가) */}
+      <span className={`${styles.sectionTitle} typoBodyStrong`}>
+        {title}
+        {isRequired && (
+          <>
+            {" "}
+            <span className={styles.requiredMark}>*</span>
+          </>
+        )}
+      </span>
 
       {/* 버튼 (선택 시트 표시) */}
       <button

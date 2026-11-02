@@ -12,9 +12,7 @@ import {
  * =========================================================================
  * [H-03-02] 요청 작성
  * - 선행 조건(상황/도움 종류를 모두 선택) 충족 여부 체크 및 관련 토스트 메시지 반환
- * - 사용자가 입력한 데이터 값 보정
- * - 사용자 입력값 기반 텍스트 UI 가공
- *
+ * - 사용자 입력값 기반 텍스트 UI 가공 (상황)
  * =========================================================================
  */
 
@@ -41,7 +39,24 @@ export const isPrerequisiteEnsured = (form, showToast) => {
   return true;
 };
 
-// 입력된 시간, 날짜 값에서 숫자만 남기고, 필드(key)별 최대값/유효성에 맞게 값을 보정
+// 선택된 상황을 화면 표시용 문자열로 가공
+export const getSelectedSituationText = (situation, situationId) => {
+  const selectedSituation = situation?.find((item) => item.id === situationId);
+  return selectedSituation?.title || "선택"; // 없으면 "선택" 출력
+};
+
+/**
+ * =========================================================================
+ * [H-03-02] 요청 작성
+ * [H-03-01-02] 요청 수정 · 취소
+ * [N-06] 다시 부탁하기
+ * - 사용자가 입력한 데이터 값 보정 (시작/종료의 날짜 입력값, 시간 입력값)
+ * - 사용자 입력값 기반 텍스트 UI 가공 (시작, 종료, 요청 대상, 응답 기한)
+ *
+ * =========================================================================
+ */
+
+// 시작/종료 Section에 입력된 시간, 날짜 값에서 숫자만 남기고, 필드(key)별 최대값/유효성에 맞게 값을 보정
 export const getValidatedNumericValue = (key, rawValue) => {
   let val = rawValue.replace(/[^0-9]/g, ""); // 숫자만 입력 가능
   if (val === "") return "";
@@ -54,18 +69,6 @@ export const getValidatedNumericValue = (key, rawValue) => {
   if (num < minLimit || num > maxLimit) return "";
 
   return String(num);
-};
-
-// 선택된 상황을 화면 표시용 문자열로 가공
-export const getSelectedSituationText = (situation, situationId) => {
-  const selectedSituation = situation?.find((item) => item.id === situationId);
-  return selectedSituation?.title || "선택"; // 없으면 "선택" 출력
-};
-
-// 선택된 요청 대상을 화면 표시용 문자열로 가공
-export const getSelectedUserText = (user, userId) => {
-  const selectedUser = user?.find((item) => item.id === userId);
-  return selectedUser?.userName || "한 명 선택"; // 없으면 "한 명 선택" 출력
 };
 
 // 입력된 날짜/시간 객체를 화면 표시용 문자열(YY/MM/DD HH:mm)로 가공
@@ -86,6 +89,12 @@ export const getDateTimeText = (dateTimeObj) => {
   const datePart = `${formattedYear}/${pad(month)}/${pad(day)}`;
   const timePart = `${pad(hour)}:${pad(minute)}`;
   return `${datePart} ${timePart}`;
+};
+
+// 선택된 요청 대상을 화면 표시용 문자열로 가공
+export const getSelectedUserText = (user, userId) => {
+  const selectedUser = user?.find((item) => item.id === userId);
+  return selectedUser?.userName || "한 명 선택"; // 없으면 "한 명 선택" 출력
 };
 
 // 입력된 응답 기한 객체를 화면 표시용 문자열 (N일 N시간 N분)으로 가공
@@ -118,6 +127,7 @@ export const getDueDateText = (dueDate) => {
 /**
  * =====================================================================
  * [H-03-02-01] 공개 정보 미리보기
+ * [H-03-01-02] 요청 수정 · 취소
  * - 사용자 입력값(체크한 항목) 기반 텍스트 UI 가공
  * =====================================================================
  */

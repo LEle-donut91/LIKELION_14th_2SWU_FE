@@ -11,7 +11,9 @@ import {
 
 /**
  * ==============================================================================================================================
- * [H-03-02] 요청 작성 -> 다른 페이지에서도 재사용할 예정 (TODO : 주석 수정 필요)
+ * [H-03-02] 요청 작성
+ * [H-03-01-02] 요청 수정 · 취소
+ * [N-06] 다시 부탁하기
  * - 사용자가 입력 폼 데이터(State)를 통합 관리
  * - 사용자가 입력 폼 데이터의 유효성 검사 -> 에러 목록(객체 형태) 반환
  * - 선행 조건(상황/도움 종류를 모두 선택) 충족 여부 체크 로직은 [H-03-02] 요청 작성 (Request.jsx)에서만 사용하므로 requestUtils.js에 정의
@@ -40,7 +42,7 @@ import {
  */
 
 /**
- * 요청 작성 폼 전체 (이 객체가 /request 화면의 유일한 "입력값" state)
+ * 요청 작성 폼 전체
  * @typedef {Object} RequestForm
  * @property {string|null} situationId      상황 id. 예) "1"  (미선택 = null)
  * @property {string|null} userId           요청 대상 id. 예) "2"  (미선택 = null)
@@ -52,7 +54,7 @@ import {
  * @property {DueDateValue} dueDate         응답 기한. 기본 { days: "1" } (24시간)
  */
 
-// REQUEST_FORM_FIELD_KEY 구조분해 할당 (유효성 검사가 필요한 필드만 가져옴)
+// REQUEST_FORM_FIELD_KEY 구조분해 할당 (유효성 검사 후보 필드만 가져옴)
 const {
   SITUATION_ID,
   HELP_TYPE,

@@ -5,6 +5,11 @@
 
 .sectionTitle {
   padding: 0px 0px 8px;
+  color: var(--color-gray-900);
+}
+
+.requiredMark {
+  color: var(--color-red-700);
 }
 
 .sectionInput {
