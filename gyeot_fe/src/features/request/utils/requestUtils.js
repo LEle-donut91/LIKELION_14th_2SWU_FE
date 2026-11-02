@@ -98,7 +98,10 @@ export const getSelectedUserText = (user, userId) => {
 };
 
 // 입력된 응답 기한 객체를 화면 표시용 문자열 (N일 N시간 N분)으로 가공
-export const getDueDateText = (dueDate) => {
+export const getDueDateText = (dueDate, isFixed = false) => {
+  // 응답 기한이 고정된 경우 "시작 시간까지" 출력
+  if (isFixed) return "시작 시간까지";
+
   // 없으면 "선택" 출력
   if (!dueDate) return "선택";
   const days = parseInt(dueDate.days, 10) || 0;
@@ -154,11 +157,4 @@ export const checkSensitiveIncluded = (healthList = [], lifeList = []) => {
   );
 
   return isHealthSensitiveSelected || isLifeSensitiveSelected;
-};
-
-// TODO: 아래 함수는 추후 삭제
-// (요청 대상 리스트, 선택된 요청 대상의 ID)를 인자로 받아, 요청 대상 텍스트 가공
-export const getSelectedUserId = (userLst, userId) => {
-  const selectedUser = userLst?.find((item) => item.id === userId);
-  return selectedUser?.userName || "한 명 선택";
 };
