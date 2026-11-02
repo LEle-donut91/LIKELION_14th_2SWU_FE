@@ -288,6 +288,26 @@ export const EDIT_FORM_VALIDATE_FIELDS = [
 
 /**
  * =====================================================================
+ * [N-06] 다시 부탁하기
+ * =====================================================================
+ */
+
+// 검증할 필드 (응답 기한이 고정된 경우)
+export const ASK_AGAIN_VALIDATE_FIELDS_FIXED = [
+  REQUEST_FORM_FIELD_KEY.USER_ID,
+];
+
+// 검증할 필드 (응답 기한이 고정되지 않은 경우)
+export const ASK_AGAIN_VALIDATE_FIELDS_FLEXIBLE = [
+  REQUEST_FORM_FIELD_KEY.USER_ID,
+  REQUEST_FORM_FIELD_KEY.DUE_DATE,
+];
+
+// 시작까지 1시간 미만일 때 응답 기한 고정 문구
+export const FIXED_DUE_DATE_TOAST_MESSAGE = "시작까지 1시간 미만이라 응답 기한은 시작 시간까지로 고정돼요";
+
+/**
+ * =====================================================================
  * TODO: 주석 수정 필요
  * =====================================================================
  */
