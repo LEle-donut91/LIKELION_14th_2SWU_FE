@@ -1,281 +1,144 @@
-// H-03-01-02
+/**
+ * =====================================================================
+ * [H-03-01-02] 요청 수정 (입력)
+ *  - 페이지 컴포넌트
+ * =====================================================================
+ */
 
+// CSS 스타일
 import styles from "@/features/request/pages/RequestEditForm.module.css";
 
+// 일반 라이브러리
+import { Fragment, useMemo, useState } from "react";
+import { useParams } from "react-router-dom";
+
+// Custom Hooks
+import { useRequestNav } from "@/features/request/hooks/useRequestNav";
+import { useRequestForm } from "@/features/request/hooks/useRequestForm";
+import { useCheckForm } from "@/features/request/hooks/useCheckForm";
+import { useToast } from "@/features/request/hooks/useToast";
+
+// Constants
+import { REQUEST_ROUTES } from "@/features/request/constants/routerConstants";
+import {
+  REQUEST_FORM_FIELD_KEY,
+  REQUEST_SHEET,
+  DATE_TIME_SECTIONS,
+  INFO_PREVIEW_SECTIONS,
+  EDIT_FORM_VALIDATE_FIELDS,
+} from "@/features/request/constants/requestConstants";
+
+// Utils
+import {
+  getDateTimeText,
+  getSelectedTitles,
+} from "@/features/request/utils/requestUtils";
+
+// API, Services
+import {
+  getEditFormApi,
+  postEditFormApi,
+  patchRequestCancelApi,
+} from "@/features/request/api/requesterApi";
+import {
+  getEditFormService,
+  postEditFormService,
+} from "@/features/request/services/requesterService";
+
+// 일반 Components
 import StepHeader from "@/features/request/components/Header/StepHeader";
 import SelectSection from "@/features/request/components/Section/SelectSection";
 import InputSection from "@/features/request/components/Section/InputSection";
 import TimeSheet from "@/features/request/components/Sheet/TimeSheet";
 import DateTimeOption from "@/features/request/components/Option/DateTimeOption";
 import DefaultSheet from "@/features/request/components/Sheet/DefaultSheet";
-import { useState } from "react";
 import CheckOption from "@/features/request/components/Option/CheckOption";
 import SafetyCardGroup from "@/features/request/components/SafetyCard/SafetyCardGroup";
-import { useRequestNav } from "@/features/request/hooks/useRequestNav";
-import requestSafetyCardData from "@/features/request/api/requestSafetyCardData.json";
 import SmallFooter from "@/features/request/components/Footer/SmallFooter";
 import DefaultModal from "@/features/request/components/Modal/DefaultModal";
-import {
-  getSelectedTitles,
-  checkSensitiveIncluded,
-  getDateTimeText,
-} from "@/features/request/utils/requestUtils.js";
-import { DATE_TIME_SECTIONS } from "@/features/request/constants/requestConstants.js";
+import DefaultToast from "@/features/request/components/Toast/DefaultToast";
 
+// 페이지 컴포넌트
 function RequestEditForm() {
-  /* JSON 데이터 꺼내서 변수에 각각 저장 */
-  const { basicInfo, healthInfo, lifeInfo, messageInfo } =
-    requestSafetyCardData;
+  // useNavigation 커스텀 훅의 함수
+  const { handleGoBack, handleGoNext } = useRequestNav();
 
-  // 기본 정보
-  const {
-    value: birthDateValue,
-    isDefault: isBirthDateDefault,
-    updatedAt: birthDateUpdatedAt,
-  } = basicInfo.birthDate;
-  const {
-    value: bloodTypeValue,
-    isDefault: isBloodTypeDefault,
-    updatedAt: bloodTypeUpdatedAt,
-  } = basicInfo.bloodType;
+  // path parameter (요청 ID)
+  const paramId = useParams().id;
 
-  // 건강 정보
-  const {
-    name: diseaseName,
-    diagnosedYear: diseaseDiagnosedYear,
-    isDefault: isDiseaseDefault,
-    updatedAt: diseaseUpdatedAt,
-  } = healthInfo.disease;
-  const {
-    name: medicineName,
-    dosage: medicineDosage,
-    isDefault: isMedicineDefault,
-    updatedAt: medicineUpdatedAt,
-  } = healthInfo.medicine;
-  const {
-    name: allergyName,
-    reaction: allergyReaction,
-    isDefault: isAllergyDefault,
-    updatedAt: allergyUpdatedAt,
-  } = healthInfo.allergy;
-  const {
-    name: cautionName,
-    instruction: cautionInstruction,
-    isDefault: isCautionDefault,
-    updatedAt: cautionUpdatedAt,
-  } = healthInfo.caution;
-
-  // 생활 정보
-  const {
-    value: addressValue,
-    isDefault: isAddressDefault,
-    updatedAt: addressUpdatedAt,
-  } = lifeInfo.address;
-  const {
-    value: entranceMethodValue,
-    isDefault: isEntranceMethodDefault,
-    updatedAt: entranceMethodUpdatedAt,
-  } = lifeInfo.entranceMethod;
-  const {
-    name: petName,
-    care: petCare,
-    isDefault: isPetDefault,
-    updatedAt: petUpdatedAt,
-  } = lifeInfo.pet;
-
-  // 미리 남기는 말
-  const {
-    value: preferenceValue,
-    isDefault: isPreferenceDefault,
-    updatedAt: preferenceUpdatedAt,
-  } = messageInfo.preference;
-  const {
-    value: documentValue,
-    isDefault: isDocumentDefault,
-    updatedAt: documentUpdatedAt,
-  } = messageInfo.document;
-
-  // 1. [기본정보] CheckOption용 배열
-  const basicInfoData = [
-    {
-      id: "birthDate",
-      label: "생년월일",
-      title: "생년월일",
-      isDefault: isBirthDateDefault,
-      description: `${birthDateValue} 출생${
-        birthDateUpdatedAt ? `, 갱신 ${birthDateUpdatedAt}` : ""
-      }`,
-    },
-    {
-      id: "bloodType",
-      label: "혈액형",
-      title: "혈액형",
-      isDefault: isBloodTypeDefault,
-      description: `${bloodTypeValue}${
-        bloodTypeUpdatedAt ? `, 갱신 ${bloodTypeUpdatedAt}` : ""
-      }`,
-    },
-  ];
-
-  // 2. [건강정보] CheckOption용 배열
-  const healthInfoData = [
-    {
-      id: "disease",
-      label: "질환",
-      title: diseaseName,
-      isDefault: isDiseaseDefault,
-      description: `${diseaseDiagnosedYear} 진단${
-        diseaseUpdatedAt ? `, 갱신 ${diseaseUpdatedAt}` : ""
-      }`,
-    },
-    {
-      id: "medicine",
-      label: "복용약",
-      title: medicineName,
-      isDefault: isMedicineDefault,
-      description: `${medicineDosage}${
-        medicineUpdatedAt ? `, 갱신 ${medicineUpdatedAt}` : ""
-      }`,
-    },
-    {
-      id: "allergy",
-      label: "알러지",
-      title: `${allergyName} 알러지`,
-      isDefault: isAllergyDefault,
-      description: `${allergyReaction}${
-        allergyUpdatedAt ? `, 갱신 ${allergyUpdatedAt}` : ""
-      }`,
-    },
-    {
-      id: "caution",
-      label: "주의사항",
-      title: `${cautionName} 주의사항`,
-      isDefault: isCautionDefault,
-      description: `${cautionInstruction}${
-        cautionUpdatedAt ? `, 갱신 ${cautionUpdatedAt}` : ""
-      }`,
-    },
-  ];
-
-  // 3. [생활정보] CheckOption용 배열
-  const lifeInfoData = [
-    {
-      id: "address",
-      label: "주소",
-      title: "주소",
-      isDefault: isAddressDefault,
-      description: `${addressValue}${
-        addressUpdatedAt ? `, 갱신 ${addressUpdatedAt}` : ""
-      }`,
-    },
-    {
-      id: "entranceMethod",
-      label: "출입 방법",
-      title: "출입 방법",
-      isDefault: isEntranceMethodDefault,
-      description: `${entranceMethodValue}${
-        entranceMethodUpdatedAt ? `, 갱신 ${entranceMethodUpdatedAt}` : ""
-      }`,
-    },
-    {
-      id: "pet",
-      label: "반려동물 정보",
-      title: `반려동물 (${petName})`,
-      isDefault: isPetDefault,
-      description: `${petCare}${petUpdatedAt ? `, 갱신 ${petUpdatedAt}` : ""}`,
-    },
-  ];
-
-  // 4. [미리 남기는 말] CheckOption용 배열
-  const messageInfoData = [
-    {
-      id: "preference",
-      label: "선호",
-      title: "선호",
-      isDefault: isPreferenceDefault,
-      description: `${preferenceValue}${
-        preferenceUpdatedAt ? `, 갱신 ${preferenceUpdatedAt}` : ""
-      }`,
-    },
-    {
-      id: "document",
-      label: "문서",
-      title: "문서",
-      isDefault: isDocumentDefault,
-      description: `${documentValue}${
-        documentUpdatedAt ? `, 갱신 ${documentUpdatedAt}` : ""
-      }`,
-    },
-  ];
-
-  // 각 선택 항목에 대한 상태(State) 정의
-  const [startDateTime, setStartDateTime] = useState(null);
-  const [endDateTime, setEndDateTime] = useState(null);
-  const [locationValue, setLocationValue] = useState(null);
-
-  // 각 선택 항목에 대한 상태(State) 정의 (isDefault가 true인 항목들의 id를 초기값으로 설정)
-  const [checkedBasicLst, setCheckedBasicLst] = useState(
-    basicInfoData.filter((item) => item.isDefault).map((item) => item.id),
-  );
-  const [checkedHealthLst, setCheckedHealthLst] = useState(
-    healthInfoData.filter((item) => item.isDefault).map((item) => item.id),
-  );
-  const [checkedLifeLst, setCheckedLifeLst] = useState(
-    lifeInfoData.filter((item) => item.isDefault).map((item) => item.id),
-  );
-  const [checkedMessageLst, setCheckedMessageLst] = useState(
-    messageInfoData.filter((item) => item.isDefault).map((item) => item.id),
+  // TODO: API 연동 시 useEffect로 교체 (지금은 mock 이라 렌더마다 호출돼도 문제 없음)
+  // [H-03-01-02] 요청 수정 - 데이터 조회 (GET 1회)
+  const { userName, dueDate, sections, initialRequestForm } = useMemo(
+    () => getEditFormService(getEditFormApi(paramId)),
+    [paramId],
   );
 
-  // 각 Sheet의 열림/닫힘 상태(State) 정의
-  const [isDateTimeSheetOpen, setDateTimeSheetOpen] = useState(false);
-  const [isBasicSheetOpen, setBasicSheetOpen] = useState(false);
-  const [isHealthSheetOpen, setHealthSheetOpen] = useState(false);
-  const [isLifeSheetOpen, setLifeSheetOpen] = useState(false);
-  const [isMessageSheetOpen, setMessageSheetOpen] = useState(false);
+  // 시작/종료/장소 입력값 (isEditing이 true면 기존 수정안이 초기값)
+  const {
+    form: requestForm,
+    setField: setRequestField,
+    validate,
+  } = useRequestForm(initialRequestForm);
 
-  // 어떤 시트(시작 또는 종료)에서 DateTimeSheet를 열었는지 구분하기 위한 상태
-  const [dateTarget, setDateTarget] = useState(null);
+  // 공유 정보 체크값 (sections 각 항목의 isDefault가 초기 체크 상태)
+  const {
+    form: checkForm,
+    setField: setCheckField,
+    isSensitiveIncluded,
+  } = useCheckForm(sections);
 
-  // 모달의 열림/닫힘 상태(State) 정의
+  // 토스트 메시지
+  const { toast, showToast, hideToast } = useToast();
+
+  // 열려 있는 시트 (한 번에 하나만 열림) - REQUEST_SHEET(START/END) 또는 CHECK_FORM_FIELD_KEY 중 하나
+  const [openSheet, setOpenSheet] = useState(null);
+  const closeSheet = () => setOpenSheet(null);
+
+  // 모달의 열림/닫힘 상태
   const [isCancelModalOpen, setCancelModalOpen] = useState(false);
   const [isSensitiveModalOpen, setSensitiveModalOpen] = useState(false);
 
-  // DateTimeSheet에서 확인을 눌렀을 때 실행될 핸들러
-  const handleDateTimeConfirm = (value) => {
-    if (dateTarget === "start") {
-      setStartDateTime(value);
-    } else if (dateTarget === "end") {
-      setEndDateTime(value);
-    }
-  };
+  // TODO: API 연동 로직 수정 필요
+  // [H-03-01-02] 수정안 저장 후 [요청 수정 내용 확인] 페이지로 이동
+  const handleGoEditCheck = () => {
+    const reqRefinedData = postEditFormService(paramId, requestForm, checkForm);
+    postEditFormApi(reqRefinedData);
 
-  const { handleGoBack, handleGoNext } = useRequestNav();
+    handleGoNext(REQUEST_ROUTES.editCheck(paramId));
+  };
 
   // 다음 버튼 클릭 핸들러
   const handleNextBtnClick = () => {
-    if (checkSensitiveIncluded(checkedHealthLst, checkedLifeLst)) {
-      console.log("민감정보 포함");
-      setSensitiveModalOpen(!isSensitiveModalOpen);
+    // 입력값 유효성 검사 (첫 번째 에러 문구 하나만 토스트로)
+    const errors = validate(EDIT_FORM_VALIDATE_FIELDS);
+    const [firstError] = Object.values(errors);
+    if (firstError) {
+      showToast(firstError);
       return;
     }
-    console.log("민감정보 미포함");
-    handleGoNext("/request/edit-check");
+
+    // 민감정보가 있으면 확인 모달을 먼저 띄움
+    if (isSensitiveIncluded) {
+      setSensitiveModalOpen(true);
+      return;
+    }
+    handleGoEditCheck();
   };
 
   // 민감 정보 확인 모달의 확인 버튼
   const handleSensitiveConfirm = () => {
-    setSensitiveModalOpen(false); // 모달 닫기
-    handleGoNext("/request/edit-check"); // 다음 페이지로 이동
+    setSensitiveModalOpen(false);
+    handleGoEditCheck();
   };
 
+  // TODO: API 연동 로직 수정 필요
   // 요청 취소 모달의 확인 버튼
   const handleCancelConfirm = () => {
-    console.log("요청 취소 모달의 confirm 버튼(요청 취소) 클릭");
-    // API 호출 로직 추가 필요
-
-    // 모달 닫기
+    patchRequestCancelApi(paramId);
     setCancelModalOpen(false);
+
+    // [요청 상세 · 요청자 뷰]로 이동
+    handleGoBack();
   };
 
   return (
@@ -289,31 +152,44 @@ function RequestEditForm() {
         <div className={styles.timeSectionContainer}>
           <SelectSection
             title="시작 *"
-            text={getDateTimeText(startDateTime)}
-            border={startDateTime ? "borderActive" : "borderDefault"}
+            text={getDateTimeText(requestForm.startDateTime)}
+            border={
+              requestForm.startDateTime ? "borderActive" : "borderDefault"
+            }
             width="small"
-            onClick={() => {
-              setDateTarget("start");
-              setDateTimeSheetOpen(true);
-            }}
+            onClick={() => setOpenSheet(REQUEST_SHEET.START)}
           />
           <SelectSection
             title="종료 *"
-            text={getDateTimeText(endDateTime)}
-            border={endDateTime ? "borderActive" : "borderDefault"}
+            text={getDateTimeText(requestForm.endDateTime)}
+            border={requestForm.endDateTime ? "borderActive" : "borderDefault"}
             width="small"
-            onClick={() => {
-              setDateTarget("end");
-              setDateTimeSheetOpen(true);
-            }}
+            onClick={() => setOpenSheet(REQUEST_SHEET.END)}
           />
         </div>
-
         <TimeSheet
-          isOpen={isDateTimeSheetOpen}
-          onClose={() => setDateTimeSheetOpen(false)}
-          value={dateTarget === "start" ? startDateTime : endDateTime}
-          onConfirm={handleDateTimeConfirm}
+          isOpen={openSheet === REQUEST_SHEET.START}
+          onClose={closeSheet}
+          value={requestForm.startDateTime}
+          onConfirm={(v) =>
+            setRequestField(REQUEST_FORM_FIELD_KEY.START_DATE_TIME, v)
+          }
+        >
+          {(temp, setTemp) => (
+            <DateTimeOption
+              sections={DATE_TIME_SECTIONS}
+              value={temp}
+              onChange={setTemp}
+            />
+          )}
+        </TimeSheet>
+        <TimeSheet
+          isOpen={openSheet === REQUEST_SHEET.END}
+          onClose={closeSheet}
+          value={requestForm.endDateTime}
+          onConfirm={(v) =>
+            setRequestField(REQUEST_FORM_FIELD_KEY.END_DATE_TIME, v)
+          }
         >
           {(temp, setTemp) => (
             <DateTimeOption
@@ -328,106 +204,46 @@ function RequestEditForm() {
         <InputSection
           title="장소 *"
           size="small"
-          value={locationValue}
-          onChange={(e) => setLocationValue(e.target.value)}
+          value={requestForm.location}
+          onChange={(e) =>
+            setRequestField(
+              REQUEST_FORM_FIELD_KEY.LOCATION,
+              e.target.value || null,
+            )
+          }
         />
 
-        <div className={styles.safetyCardGroupLst}>
-          {/* 기본 정보 */}
-          <SafetyCardGroup
-            title="기본 정보"
-            information={getSelectedTitles(checkedBasicLst, basicInfoData)}
-            onClick={() => setBasicSheetOpen(true)}
-          />
-
-          <DefaultSheet
-            isOpen={isBasicSheetOpen}
-            onClose={() => setBasicSheetOpen(false)}
-            title="기본 정보"
-            description="생년월일, 혈액형이 포함되어 있어요."
-            value={checkedBasicLst}
-            onConfirm={setCheckedBasicLst}
-          >
-            {(temp, setTemp) => (
-              <CheckOption
-                data={basicInfoData}
-                checkedValue={temp}
-                onChecked={setTemp}
+        <div className={styles.sectionGroup}>
+          <span className={`${styles.groupTitle} typoTitleMedium`}>
+            공유 정보
+          </span>
+          {/* 기본 정보 / 건강 정보 / 생활 정보 / 미리 남기는 말 */}
+          {INFO_PREVIEW_SECTIONS.map(({ key, title, description }) => (
+            <Fragment key={key}>
+              <SafetyCardGroup
+                title={title}
+                information={getSelectedTitles(checkForm[key], sections[key])}
+                onClick={() => setOpenSheet(key)}
               />
-            )}
-          </DefaultSheet>
 
-          {/* 건강 정보 */}
-          <SafetyCardGroup
-            title="건강 정보"
-            information={getSelectedTitles(checkedHealthLst, healthInfoData)}
-            onClick={() => setHealthSheetOpen(true)}
-          />
-
-          <DefaultSheet
-            isOpen={isHealthSheetOpen}
-            onClose={() => setHealthSheetOpen(false)}
-            title="건강 정보"
-            description="질환, 복용약, 알러지, 주의사항이 포함되어 있어요."
-            value={checkedHealthLst}
-            onConfirm={setCheckedHealthLst}
-          >
-            {(temp, setTemp) => (
-              <CheckOption
-                data={healthInfoData}
-                checkedValue={temp}
-                onChecked={setTemp}
-              />
-            )}
-          </DefaultSheet>
-
-          {/* 생활 정보 */}
-          <SafetyCardGroup
-            title="생활 정보"
-            information={getSelectedTitles(checkedLifeLst, lifeInfoData)}
-            onClick={() => setLifeSheetOpen(true)}
-          />
-
-          <DefaultSheet
-            isOpen={isLifeSheetOpen}
-            onClose={() => setLifeSheetOpen(false)}
-            title="생활 정보"
-            description="주소, 출입 방법, 반려동물 정보가 포함되어 있어요."
-            value={checkedLifeLst}
-            onConfirm={setCheckedLifeLst}
-          >
-            {(temp, setTemp) => (
-              <CheckOption
-                data={lifeInfoData}
-                checkedValue={temp}
-                onChecked={setTemp}
-              />
-            )}
-          </DefaultSheet>
-
-          {/* 미리 남기는 말 */}
-          <SafetyCardGroup
-            title="미리 남기는 말"
-            information={getSelectedTitles(checkedMessageLst, messageInfoData)}
-            onClick={() => setMessageSheetOpen(true)}
-          />
-
-          <DefaultSheet
-            isOpen={isMessageSheetOpen}
-            onClose={() => setMessageSheetOpen(false)}
-            title="미리 남기는 말"
-            description="기타 정보가 포함되어 있어요."
-            value={checkedMessageLst}
-            onConfirm={setCheckedMessageLst}
-          >
-            {(temp, setTemp) => (
-              <CheckOption
-                data={messageInfoData}
-                checkedValue={temp}
-                onChecked={setTemp}
-              />
-            )}
-          </DefaultSheet>
+              <DefaultSheet
+                isOpen={openSheet === key}
+                onClose={closeSheet}
+                title={title}
+                description={description}
+                value={checkForm[key]}
+                onConfirm={(v) => setCheckField(key, v)}
+              >
+                {(temp, setTemp) => (
+                  <CheckOption
+                    data={sections[key]}
+                    checkedValue={temp}
+                    onChecked={setTemp}
+                  />
+                )}
+              </DefaultSheet>
+            </Fragment>
+          ))}
         </div>
       </main>
 
@@ -436,7 +252,7 @@ function RequestEditForm() {
         leftType="tertiary"
         leftTitle="요청 취소"
         rightTitle="다음"
-        leftOnClick={() => setCancelModalOpen(!isCancelModalOpen)}
+        leftOnClick={() => setCancelModalOpen(true)}
         rightOnClick={handleNextBtnClick}
       />
 
@@ -468,14 +284,22 @@ function RequestEditForm() {
           <>
             민감 정보가 포함되어 있어요.
             <br />
-            {requestSafetyCardData.userName}님에게{" "}
-            {requestSafetyCardData.dueDate}까지 정보를 공유할까요?
+            {userName}님에게 {dueDate}까지 정보를 공유할까요?
           </>
         }
         cancelTxt="취소"
         confirmTxt="공유"
         onConfirmClick={handleSensitiveConfirm}
       />
+
+      {/* 토스트 (key 가 바뀌면 새로 마운트되어 타이머가 다시 시작됨) */}
+      {toast && (
+        <DefaultToast
+          key={toast.id}
+          message={toast.message}
+          onHide={hideToast}
+        />
+      )}
     </div>
   );
 }
