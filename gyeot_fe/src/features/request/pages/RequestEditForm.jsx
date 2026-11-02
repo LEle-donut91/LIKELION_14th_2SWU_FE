@@ -151,7 +151,8 @@ function RequestEditForm() {
         {/* 시작 - 종료 */}
         <div className={styles.timeSectionContainer}>
           <SelectSection
-            title="시작 *"
+            title="시작"
+            isRequired
             text={getDateTimeText(requestForm.startDateTime)}
             border={
               requestForm.startDateTime ? "borderActive" : "borderDefault"
@@ -160,7 +161,8 @@ function RequestEditForm() {
             onClick={() => setOpenSheet(REQUEST_SHEET.START)}
           />
           <SelectSection
-            title="종료 *"
+            title="종료"
+            isRequired
             text={getDateTimeText(requestForm.endDateTime)}
             border={requestForm.endDateTime ? "borderActive" : "borderDefault"}
             width="small"
@@ -202,7 +204,8 @@ function RequestEditForm() {
 
         {/* 장소 */}
         <InputSection
-          title="장소 *"
+          title="장소"
+          isRequired
           size="small"
           value={requestForm.location}
           onChange={(e) =>

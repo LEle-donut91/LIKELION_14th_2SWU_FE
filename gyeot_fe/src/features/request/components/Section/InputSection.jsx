@@ -1,11 +1,18 @@
 import styles from "@/features/request/components/Section/InputSection.module.css";
 
-function InputSection({ title, size, value, onChange, onFocus, readOnly }) {
+function InputSection({ title, isRequired, size, value, onChange, onFocus, readOnly }) {
   return (
     <section className={styles.inputSection}>
-      {/* section 타이틀 */}
-      <span className={`${styles.sectionTitle} typoBodyStrong`}>{title}</span>
-
+      {/* section 타이틀 (isRequired가 true일 때만 필수 표시 "*" 추가) */}
+      <span className={`${styles.sectionTitle} typoBodyStrong`}>
+        {title}
+        {isRequired && (
+          <>
+            {" "}
+            <span className={styles.requiredMark}>*</span>
+          </>
+        )}
+      </span>
       {/* 내용 입력 칸 (size 값에 따라 input 또는 textarea 렌더링) */}
       {size === "large" ? (
         <textarea
