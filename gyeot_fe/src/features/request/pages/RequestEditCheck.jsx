@@ -8,6 +8,9 @@
 // CSS 스타일
 import styles from "@/features/request/pages/RequestEditCheck.module.css";
 
+// icons/images
+import iconToggle from "@/shared/assets/icons/iconToggle.svg";
+
 // 일반 라이브러리
 import { useMemo } from "react";
 import { useParams } from "react-router-dom";
@@ -29,7 +32,6 @@ import StepHeader from "@/features/request/components/Header/StepHeader";
 import RequestSummary from "@/features/request/components/Request/RequestSummary";
 import UserInfo from "@/features/request/components/User/UserInfo";
 import LargeFooter from "@/features/request/components/Footer/LargeFooter";
-import iconToggle from "@/shared/assets/icons/iconToggle.svg";
 
 // 페이지 컴포넌트
 function RequestEditCheck() {

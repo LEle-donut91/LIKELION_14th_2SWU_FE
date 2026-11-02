@@ -12,6 +12,46 @@ export const TOAST_DURATION = 3000;
  * =====================================================================
  */
 
+// 요청 폼 입력 시 - 선행 조건 관련 토스트 메시지
+export const REQUEST_PREREQUISITE_TOAST_MESSAGE = {
+  SITUATION_REQUIRED: "상황을 먼저 선택해 주세요.",
+  HELP_TYPE_REQUIRED: "도움 종류를 먼저 선택해 주세요.",
+};
+
+// 도움 종류: 서버 응답/요청에 쓰는 값(key), 한글 매핑(value)
+export const HELP_TYPE_LABELS = {
+  HOSPITAL_ESCORT: "병원 동행",
+  MEAL: "식사",
+  SHOPPING: "장보기",
+  PET: "반려동물",
+  CHECK_IN: "연락/안부",
+  ETC: "기타",
+};
+
+// 라디오 버튼으로 그릴 [도움 종류]값 목록 (HELP_TYPE_LABELS 객체의 선언 순서대로)
+// -> ["HOSPITAL_ESCORT", "MEAL", "SHOPPING", "PET", "CHECK_IN", "ETC"]
+export const HELP_TYPE_OPTIONS = Object.keys(HELP_TYPE_LABELS);
+
+/**
+ * =====================================================================
+ * [H-03-02] 요청 작성
+ * [H-03-01-02] 요청 수정 · 취소
+ * [N-06] 다시 부탁하기
+ * =====================================================================
+ */
+
+// 요청 작성 Form 필드 키
+export const REQUEST_FORM_FIELD_KEY = {
+  SITUATION_ID: "situationId",
+  USER_ID: "userId",
+  HELP_TYPE: "helpType",
+  START_DATE_TIME: "startDateTime",
+  END_DATE_TIME: "endDateTime",
+  LOCATION: "location",
+  CONTENT: "content",
+  DUE_DATE: "dueDate",
+};
+
 // 1분(Minute)을 밀리초(Millisecond) 단위로 환산하기 위한 상수
 export const MS_PER_MINUTE = 60 * 1000;
 
@@ -30,24 +70,6 @@ export const REQUEST_SHEET = {
   DUE_DATE: "dueDate",
 };
 
-// 요청 작성 Form 필드 키
-export const REQUEST_FORM_FIELD_KEY = {
-  SITUATION_ID: "situationId",
-  USER_ID: "userId",
-  HELP_TYPE: "helpType",
-  START_DATE_TIME: "startDateTime",
-  END_DATE_TIME: "endDateTime",
-  LOCATION: "location",
-  CONTENT: "content",
-  DUE_DATE: "dueDate",
-};
-
-// 요청 폼 입력 시 - 선행 조건 관련 토스트 메시지
-export const REQUEST_PREREQUISITE_TOAST_MESSAGE = {
-  SITUATION_REQUIRED: "상황을 먼저 선택해 주세요.",
-  HELP_TYPE_REQUIRED: "도움 종류를 먼저 선택해 주세요.",
-};
-
 // 시트에 주입할 DateTimeOption 입력 그룹 설정 (날짜/시간)
 export const DATE_TIME_SECTIONS = [
   { type: "date", title: "날짜" },
@@ -56,26 +78,6 @@ export const DATE_TIME_SECTIONS = [
 
 // 시트에 주입할 DateTimeOption 입력 그룹 설정 (응답기한)
 export const DUE_DATE_SECTIONS = [{ type: "dueDate", title: "응답기한" }];
-
-// 시작 시간 입력인지, 종료 시간 입력인지 구분
-export const DATE_TARGET = {
-  START: "start",
-  END: "end",
-};
-
-// 도움 종류: 서버 응답/요청에 쓰는 값(key), 한글 매핑(value)
-export const HELP_TYPE_LABELS = {
-  HOSPITAL_ESCORT: "병원 동행",
-  MEAL: "식사",
-  SHOPPING: "장보기",
-  PET: "반려동물",
-  CHECK_IN: "연락/안부",
-  ETC: "기타",
-};
-
-// 라디오 버튼으로 그릴 [도움 종류]값 목록 (HELP_TYPE_LABELS 객체의 선언 순서대로)
-// -> ["HOSPITAL_ESCORT", "MEAL", "SHOPPING", "PET", "CHECK_IN", "ETC"]
-export const HELP_TYPE_OPTIONS = Object.keys(HELP_TYPE_LABELS);
 
 // DateTimeOption 컴포넌트 - 날짜 입력칸 설정
 const DATE_CONFIGS = [
@@ -201,6 +203,7 @@ export const DUE_DATE_MAX_LIMITS = DUE_DATE_CONFIGS.reduce(
 /**
  * =====================================================================
  * [H-03-02-01] 공개 정보 미리보기
+ * [H-03-01-02] 요청 수정 · 취소
  * =====================================================================
  */
 
@@ -272,7 +275,7 @@ export const SENSITIVE_KEYS = [
 
 /**
  * =====================================================================
- * [H-03-01-02] 요청 수정
+ * [H-03-01-02] 요청 수정 · 취소
  * =====================================================================
  */
 
