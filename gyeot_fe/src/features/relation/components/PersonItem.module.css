@@ -1,0 +1,76 @@
+/* 한 줄 아이템 레이아웃 */
+.item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 0;
+  background: none;
+  border: none;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  cursor: default;
+}
+
+/* button으로 렌더링될 때만 포인터 */
+button.item {
+  cursor: pointer;
+}
+
+/* 원형 이니셜 아바타 */
+.avatar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #ece6da;
+  font-size: 12px;
+  font-weight: 600;
+  color: #5b4a36;
+}
+
+/* 아바타 색상 */
+.beige {
+  background: #ece6da;
+  color: #5b4a36;
+}
+
+.olive {
+  background: var(--olive-100, #eff2ea);
+  color: var(--olive-700, #47592c);
+}
+
+.gray {
+  background: #eeeeec;
+  color: #555;
+}
+
+/* 이름 + 보조 텍스트 세로 배치 */
+.info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #222;
+}
+
+.sub {
+  font-size: 11px;
+  color: #8a8a8a;
+}
+
+/* 오른쪽 화살표 */
+.arrow {
+  flex-shrink: 0;
+  color: #9a9a9a;
+}
