@@ -1,74 +1,90 @@
 // H-03-01-A
 import styles from "@/features/request/pages/RequestRequester.module.css";
+import { useMemo, useState } from "react";
+import { useParams } from "react-router-dom";
+
+// icons/images
+import iconResGradientRadial from "@/shared/assets/icons/iconResGradientRadial.svg";
+import resImgWith from "@/shared/assets/images/resImgWith.png";
+
+// Custom Hooks
+import { useRequestNav } from "@/features/request/hooks/useRequestNav";
+
+// Constants
+import { REQUEST_ROUTES } from "@/features/request/constants/routerConstants";
+import {
+  REQUESTER_CANCEL_BTN_TITLE,
+  REQUESTER_FOOTER_CONFIG,
+} from "@/features/request/constants/requestConstants";
+
+// API, Services
+import {
+  getRequesterApi,
+  patchEditWithdrawApi,
+  patchRequestDoneApi,
+  patchRequestCancelApi,
+} from "@/features/request/api/requesterApi";
+import { getRequesterService } from "@/features/request/services/requesterService";
+
+// Components
+import DefaultHeader from "@/features/request/components/Header/DefaultHeader";
 import SmallFooter from "@/features/request/components/Footer/SmallFooter";
+import LargeFooter from "@/features/request/components/Footer/LargeFooter";
 import RequestStep from "@/features/request/components/Request/RequestStep";
 import RequestSummary from "@/features/request/components/Request/RequestSummary";
 import DueDateState from "@/features/request/components/State/DueDateState";
 import RequestState from "@/features/request/components/State/RequestState";
 import UserOrder from "@/features/request/components/User/UserOrder";
 import UserState from "@/features/request/components/User/UserState";
-import DefaultHeader from "@/features/request/components/Header/DefaultHeader";
-import iconLocation from "@/shared/assets/icons/iconLocation.svg";
-import iconDate from "@/shared/assets/icons/iconDate.svg";
-import iconResGradientRadial from "@/shared/assets/icons/iconResGradientRadial.svg";
-import resImgWith from "@/shared/assets/images/resImgWith.png";
-import requesterData from "@/features/request/api/requesterData.json";
-import LargeFooter from "@/features/request/components/Footer/LargeFooter";
-import { useRequestNav } from "@/features/request/hooks/useRequestNav";
 import DefaultModal from "@/features/request/components/Modal/DefaultModal";
-import { useState } from "react";
 
 function RequestRequester() {
-  const [isModalOpen, setModalOpen] = useState(false); // "요청 취소" 모달 열기/닫기 상태
-  const [isSameModalOpen, setSameModalOpen] = useState(false); // "같은 내용 요청" 모달 열기/닫기 상태
-  const { handleGoBack, handleGoNext } = useRequestNav(); // navigation 커스텀 훅의 함수 불러오기
+  const paramId = useParams().id; // path parameter (요청 ID)
+  const { handleGoBack, handleGoNext } = useRequestNav();
 
-  // JSON 데이터 불러오기
+  const [isCancelModalOpen, setCancelModalOpen] = useState(false); // "요청 취소" 모달
+  const [isSameModalOpen, setSameModalOpen] = useState(false); // "같은 내용 요청" 모달
+
+  // TODO: API 연동 시 useEffect로 교체 (지금은 mock 이라 렌더마다 호출돼도 문제 없음)
+  // [H-03-01] 요청 상세(요청자 뷰) - 데이터 조회 (가공/조건 계산은 service에서 처리)
   const {
     requestState,
     userName,
     requestType,
-    time,
-    location,
     message,
     dueDate,
-    assignStatus,
-    changeStatus,
+    infoList,
     userList,
-  } = requesterData;
-  const isAssignedNoti = assignStatus.isAssignedNoti;
-  const reason = assignStatus.reason;
-  const isChanged = changeStatus.isChanged;
-  const isChangedConfirm = changeStatus.isChangedConfirm;
+    flags,
+    notices,
+    footerKey,
+    orderTitle,
+    userStateText,
+  } = useMemo(() => getRequesterService(getRequesterApi(paramId)), [paramId]);
 
-  // reason 텍스트 매핑 객체 (영어 -> 한글)
-  const REASON_TEXT_MAP = {
-    DIFFICULTY: "진행 어려움 응답",
-    EXPIRED: "응답 기한 경과",
+  // 푸터 버튼 action 이름 -> 클릭 핸들러 (REQUESTER_FOOTER_CONFIG의 action 값과 연결)
+  const footerActions = {
+    edit: () => handleGoNext(REQUEST_ROUTES.editForm(paramId)),
+    askAgain: () => handleGoNext(REQUEST_ROUTES.askAgain(paramId)),
+    withdraw: () => {
+      // API 호출 로직 수정 필요
+      patchEditWithdrawApi(paramId);
+      // TODO: 수정 철회 후 데이터 재조회
+    },
+    done: () => {
+      // API 호출 로직 수정 필요
+      patchRequestDoneApi(paramId);
+      // TODO: 완료 후 데이터 재조회
+    },
+    sameRequest: () => setSameModalOpen(true),
   };
 
-  // RequestSummary에 넘겨줄 infoList 배열 구성
-  // 부모 컴포넌트에서 동적으로 아이콘, 라벨, 값을 묶어서 전달
-  const infoList = [
-    { icon: iconDate, label: "시간", value: time },
-    { icon: iconLocation, label: "장소", value: location },
-  ];
-
-  // 버튼 클릭 이벤트 핸들러
-  const handleEditBtnClick = () => handleGoNext("/request/edit");
-  const handleAskAgainBtnClick = () => handleGoNext("/request/ask-again");
-  const handleDoneBtnClick = () => {
-    console.log("완료 버튼 클릭");
-    // API 요청 로직 추가 필요
-  };
-
+  // API 호출 로직 수정 필요
   // [요청 취소 모달의 확인 버튼] 클릭 이벤트 핸들러
-  const handleModalConfirmClick = () => {
-    console.log("모달의 confirm 버튼(요청 취소) 클릭");
-    // API 호출 로직 추가 필요
-
-    // 모달 닫기
-    setModalOpen(false);
+  const handleCancelConfirm = () => {
+    patchRequestCancelApi(paramId);
+    setCancelModalOpen(false);
+    // TODO: 취소 후 데이터 재조회
   };
 
   // [같은 내용 요청 모달의 확인 버튼] 클릭 이벤트 핸들러
@@ -81,105 +97,55 @@ function RequestRequester() {
     handleGoNext("/request");
   };
 
-  // 조건부 변수 정리
-  const isAccpetState = requestState === "accept";
-  const isRequestState = requestState === "request";
-  const isProgressState = requestState === "progress";
-  const isDoneState = requestState === "done";
-  const isCancelState = requestState === "cancel";
-  const hasUserState =
-    isDoneState || (isAccpetState && isChanged && !isChangedConfirm);
-
-  // 푸터 렌더링 함수
+  // 푸터 렌더링 (설정은 REQUESTER_FOOTER_CONFIG, 종류는 service에서 결정)
   const renderFooter = () => {
-    if (isRequestState) {
-      return isAssignedNoti ? (
+    const config = REQUESTER_FOOTER_CONFIG[footerKey];
+    if (!config) return null;
+
+    if (config.size === "small") {
+      return (
         <SmallFooter
-          leftType="secondary"
-          leftTitle="수정"
-          rightTitle="다른사람 요청"
-          leftOnClick={handleEditBtnClick}
-          rightOnClick={handleAskAgainBtnClick}
-        />
-      ) : (
-        <LargeFooter
-          title="수정"
-          type="secondary"
-          onClick={handleEditBtnClick}
+          leftType={config.leftType}
+          rightType={config.rightType}
+          leftTitle={config.leftTitle}
+          rightTitle={config.rightTitle}
+          leftOnClick={footerActions[config.leftAction]}
+          rightOnClick={footerActions[config.rightAction]}
         />
       );
     }
 
-    if (isAccpetState) {
-      return (
-        <LargeFooter
-          title="수정"
-          type="secondary"
-          onClick={handleEditBtnClick}
-        />
-      );
-    }
-
-    if (isProgressState) {
-      return (
-        <LargeFooter title="완료" type="primary" onClick={handleDoneBtnClick} />
-      );
-    }
-
-    if (isDoneState || isCancelState) {
-      return (
-        <LargeFooter
-          title="같은 내용 요청"
-          type="secondary"
-          onClick={() => setSameModalOpen(!isSameModalOpen)}
-        />
-      );
-    }
-
-    return null;
+    return (
+      <LargeFooter
+        title={config.title}
+        type={config.type}
+        onClick={footerActions[config.action]}
+      />
+    );
   };
 
   return (
     <div className={styles.page}>
       <DefaultHeader
         title="요청 상세"
-        // requestState가 "request/accept/progress"일때만 "취소" 버튼 타이틀 전달, 그 외에는 undefined
         subBtnTitle={
-          isRequestState || isAccpetState || isProgressState
-            ? "취소"
-            : undefined
+          flags.isCancelable ? REQUESTER_CANCEL_BTN_TITLE : undefined
         }
-        onClick={handleGoBack}
-        onSubBtnClick={() => setModalOpen(!isModalOpen)}
+        onClick={() => handleGoBack()}
+        onSubBtnClick={() => setCancelModalOpen(true)}
       />
 
-      {/* 실제 컨텐츠 위치 */}
       <div className={styles.content}>
         <div className={styles.stepContainer}>
           <RequestStep isRequester={true} state={requestState} />
         </div>
 
-        {/* 요청 취소 상태 */}
-        {isCancelState && (
-          <div className={styles.requestStateContainer}>
-            <RequestState
-              isRequester={true}
-              title="요청 취소"
-              information="직접 취소했어요."
-            />
+        {/* 알림 (요청 취소 / 담당자 없음 / 수정 무효) */}
+        {notices.map(({ key, title, information }) => (
+          <div className={styles.requestStateContainer} key={key}>
+            <RequestState title={title} information={information} />
           </div>
-        )}
-
-        {/* 담당자 없음 상태 */}
-        {isRequestState && isAssignedNoti && (
-          <div className={styles.requestStateContainer}>
-            <RequestState
-              isRequester={true}
-              title="담당자 없음"
-              information={REASON_TEXT_MAP[reason]}
-            />
-          </div>
-        )}
+        ))}
 
         {/* 요청 내용 요약 카드 */}
         <RequestSummary
@@ -188,11 +154,11 @@ function RequestRequester() {
           hasTag={true}
           type={requestType}
           infoList={infoList}
-          message={!isProgressState ? message : undefined}
+          message={flags.showMessage ? message : undefined}
         />
 
         {/* 응답 기한 */}
-        {isRequestState && (
+        {flags.showDueDate && (
           <div className={styles.dueDateContainer}>
             <DueDateState
               isResponse={true}
@@ -202,38 +168,22 @@ function RequestRequester() {
           </div>
         )}
 
-        {/* 요청 대상 상태 컴포넌트 */}
-        {hasUserState && (
+        {/* 요청 대상 상태 */}
+        {flags.showUserState && (
           <div className={styles.useStateContainer}>
-            <UserState
-              userName={userName}
-              userState={
-                isDoneState
-                  ? "*요청사항을 완료했어요!"
-                  : "*수정사항을 확인 중이에요."
-              }
-            />
+            <UserState userName={userName} userState={userStateText} />
           </div>
         )}
 
-        {/* 요청 대상 응답 기록 컴포넌트 */}
-        {(isRequestState || isCancelState) && (
+        {/* 요청 대상 응답 기록 */}
+        {flags.showUserOrder && (
           <div className={styles.orderContainer}>
-            <UserOrder
-              title={
-                isRequestState && isAssignedNoti
-                  ? "부탁 순서"
-                  : isCancelState
-                    ? "부탁 순서"
-                    : "요청 순서"
-              }
-              orderList={userList}
-            />
+            <UserOrder title={orderTitle} orderList={userList} />
           </div>
         )}
 
         {/* 진행 중 화면 */}
-        {isProgressState && (
+        {flags.showProgress && (
           <div className={styles.progressContainer}>
             <div className={styles.imgContainer}>
               <img className={styles.imgBg} src={iconResGradientRadial} />
@@ -253,8 +203,8 @@ function RequestRequester() {
 
       {/* 요청 취소 모달 */}
       <DefaultModal
-        modalOpen={isModalOpen}
-        setModalOpen={setModalOpen}
+        modalOpen={isCancelModalOpen}
+        setModalOpen={setCancelModalOpen}
         title="요청 취소"
         description={
           <>
@@ -267,7 +217,7 @@ function RequestRequester() {
         }
         cancelTxt="돌아가기"
         confirmTxt="요청 취소"
-        onConfirmClick={handleModalConfirmClick}
+        onConfirmClick={handleCancelConfirm}
       />
 
       {/* 같은 내용 요청 모달 */}

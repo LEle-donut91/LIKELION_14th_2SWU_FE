@@ -2,6 +2,7 @@ import styles from "@/features/request/components/Footer/SmallFooter.module.css"
 
 function SmallFooter({
   leftType,
+  rightType="primary",
   leftTitle,
   rightTitle,
   leftOnClick,
@@ -17,7 +18,7 @@ function SmallFooter({
       </button>
       <button
         onClick={rightOnClick}
-        className={`${styles.btn} ${styles.primary}`}
+        className={`${styles.btn} ${styles[rightType]}`}
       >
         <span className="typoBodyStrong">{rightTitle}</span>
       </button>
