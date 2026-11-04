@@ -25,13 +25,15 @@ import {
   DUE_DATE_SECTIONS,
   ASK_AGAIN_VALIDATE_FIELDS_FIXED,
   ASK_AGAIN_VALIDATE_FIELDS_FLEXIBLE,
-  FIXED_DUE_DATE_TOAST_MESSAGE,
 } from "@/features/request/constants/requestConstants";
 
 // Utils
 import {
   getSelectedUserText,
   getDueDateText,
+  isStartTimeEnsured,
+  isDueDateFixed,
+  isDueDateEditable,
 } from "@/features/request/utils/requestUtils";
 
 // API, Services
@@ -67,18 +69,16 @@ function AskAgain() {
 
   // TODO: API 연동 시 useEffect로 교체 (지금은 mock 이라 렌더마다 호출돼도 문제 없음)
   // [N-06] 다시 부탁하기 - 데이터 조회
-  const {
-    reqType,
-    reqMsg,
-    infoList,
-    userRecord,
-    userLst,
-    isDueDateFixed,
-    initialRequestForm,
-  } = useMemo(() => getAskAgainService(getAskAgainApi(paramId)), [paramId]);
+  const { reqType, reqMsg, infoList, userRecord, userLst, startAt } = useMemo(
+    () => getAskAgainService(getAskAgainApi(paramId)),
+    [paramId],
+  );
 
-  // 새 요청 대상 / 응답 기한 입력값 (시작 1시간 미만이면 dueDate 초기값이 null)
-  const { form, setField, validate } = useRequestForm(initialRequestForm);
+  // 새 요청 대상 / 응답 기한 입력값 (시작 1시간 미만이면 응답 기한이 null로 고정됨)
+  const { form, setField, validate } = useRequestForm(
+    { startDateTime: startAt },
+    { lockDueDate: true },
+  );
 
   // 토스트 메시지
   const { toast, showToast, hideToast } = useToast();
@@ -88,19 +88,19 @@ function AskAgain() {
   const closeSheet = () => setOpenSheet(null);
 
   // 응답 기한 항목 클릭 핸들러
-  // - 시작까지 1시간 미만이면 시트를 열지 않고 안내 토스트만 노출
+  // - 응답 기한이 고정되어 있으면 시트를 열지 않고 안내 토스트만 노출
   const handleDueDateClick = () => {
-    if (isDueDateFixed) {
-      showToast(FIXED_DUE_DATE_TOAST_MESSAGE);
-      return;
-    }
+    if (!isDueDateEditable(form, showToast)) return;
     setOpenSheet(REQUEST_SHEET.DUE_DATE);
   };
 
   // 다음 버튼 클릭 핸들러
   const handleNextBtnClick = () => {
+    // 시작 시간이 이미 지났으면 토스트만 노출하고 종료
+    if (!isStartTimeEnsured(form.startDateTime, showToast)) return;
+
     // 검증할 필드 설정
-    const fields = isDueDateFixed
+    const fields = isDueDateFixed(form)
       ? ASK_AGAIN_VALIDATE_FIELDS_FIXED
       : ASK_AGAIN_VALIDATE_FIELDS_FLEXIBLE;
 
@@ -184,12 +184,12 @@ function AskAgain() {
         <SelectSection
           title="응답 기한"
           isRequired
-          text={getDueDateText(form.dueDate, isDueDateFixed)}
+          text={getDueDateText(form.dueDate, isDueDateFixed(form))}
           width="large"
           onClick={handleDueDateClick}
         />
         <TimeSheet
-          isOpen={openSheet === REQUEST_SHEET.DUE_DATE}
+          isOpen={openSheet === REQUEST_SHEET.DUE_DATE && !isDueDateFixed(form)}
           onClose={closeSheet}
           value={form.dueDate}
           onConfirm={(v) => setField(REQUEST_FORM_FIELD_KEY.DUE_DATE, v)}

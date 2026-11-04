@@ -1,9 +1,4 @@
 import { getInfoPreviewService } from "@/features/request/services/createService";
-import { toDate } from "@/features/request/hooks/useRequestForm";
-import {
-  MS_PER_MINUTE,
-  START_MIN_LEAD_MINUTES,
-} from "@/features/request/constants/requestConstants";
 import iconDate from "@/shared/assets/icons/iconDate.svg";
 import iconLocation from "@/shared/assets/icons/iconLocation.svg";
 import iconHealthy from "@/shared/assets/icons/iconHealthy.svg";
@@ -102,20 +97,15 @@ export const getEditCheckService = (raw) => ({
  */
 
 // [N-06] 다시 부탁하기 - 데이터 조회 후 가공
-export const getAskAgainService = (raw, now = new Date()) => {
+export const getAskAgainService = (raw) => {
   const summary = raw?.lastReqSummary;
-  const startAt = summary?.startAt ?? null;
-
-  // 시작까지 1시간 미만이면 응답 기한 고정 (startAt이 불완전하면 toDate가 null → false)
-  const start = toDate(startAt);
-  const isDueDateFixed =
-    !!start && (start - now) / MS_PER_MINUTE < START_MIN_LEAD_MINUTES;
 
   return {
     situationId: raw?.situationId ?? "",
     requestId: raw?.requestId ?? "",
     reqType: summary?.type ?? "",
     reqMsg: summary?.message ?? "",
+    startAt: summary?.startAt ?? null,
 
     // [이전 요청 내용]의 시간/장소/정보
     infoList: [
@@ -139,15 +129,6 @@ export const getAskAgainService = (raw, now = new Date()) => {
         userName: user.userName,
         isGuardian: user.isGuardian,
       })) || [],
-
-    // 응답 기한 고정 여부
-    isDueDateFixed,
-
-    // 폼 초기값 설정
-    initialRequestForm: {
-      startDateTime: startAt,
-      ...(isDueDateFixed && { dueDate: null }),
-    },
   };
 };
 

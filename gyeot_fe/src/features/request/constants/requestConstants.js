@@ -6,6 +6,9 @@
 // 토스트 노출 시간(ms)
 export const TOAST_DURATION = 3000;
 
+// setTimeout이 지원하는 최대 지연 시간 (약 24.8일, 초과하면 즉시 실행됨)
+export const MAX_TIMEOUT_MS = 2 ** 31 - 1;
+
 /**
  * =====================================================================
  * [H-03-02] 요청 작성
@@ -304,6 +307,10 @@ export const ASK_AGAIN_VALIDATE_FIELDS_FLEXIBLE = [
 // 시작까지 1시간 미만일 때 응답 기한 고정 문구
 export const FIXED_DUE_DATE_TOAST_MESSAGE =
   "시작까지 1시간 미만이라 응답 기한은 시작 시간까지로 고정돼요";
+
+// 시작 시간이 이미 지난 경우 문구
+export const START_PASSED_TOAST_MESSAGE =
+  "시작 시간이 지나서 다시 부탁하기를 보낼 수 없어요.";
 
 /**
  * =====================================================================
