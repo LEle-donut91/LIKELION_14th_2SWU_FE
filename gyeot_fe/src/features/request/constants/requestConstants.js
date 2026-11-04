@@ -327,6 +327,22 @@ export const REQUEST_STATE = {
   CANCEL: "cancel",
 };
 
+// 요청 진행 단계 순서 (요청 -> 수락 -> 진행 -> 완료)
+export const REQUEST_STEP_ORDER = [
+  REQUEST_STATE.REQUEST,
+  REQUEST_STATE.ACCEPT,
+  REQUEST_STATE.PROGRESS,
+  REQUEST_STATE.DONE,
+];
+
+// 요청 진행 단계 라벨
+export const REQUEST_STEP_LABELS = {
+  [REQUEST_STATE.REQUEST]: "요청",
+  [REQUEST_STATE.ACCEPT]: "수락",
+  [REQUEST_STATE.PROGRESS]: "진행",
+  [REQUEST_STATE.DONE]: "완료",
+};
+
 // 요청 수정 상태 (서버 값)
 export const CHANGE_STATE = {
   BEFORE_EDIT: "BEFORE_EDIT", // 수정 전
