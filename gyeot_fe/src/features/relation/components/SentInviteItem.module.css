@@ -1,0 +1,57 @@
+/* 아이템 사이 구분선 */
+.wrap + .wrap {
+  border-top: 1px solid #f0ede6;
+}
+
+/* 상태 배지 공통 */
+.badge {
+  flex-shrink: 0;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 9px;
+  font-weight: 600;
+}
+
+.pending {
+  background: #f3ecdd;
+  color: #8b6b3d;
+}
+
+.accepted {
+  background: var(--olive-500, #849952);
+  color: #fff;
+}
+
+.rejected {
+  background: #f1f1ef;
+  color: #6f6f6f;
+}
+
+.expired {
+  background: #fff;
+  border: 1px solid #222;
+  color: #222;
+}
+
+/* 취소/다시 초대 버튼 줄 (아바타 너비만큼 들여쓰기) */
+.actions {
+  display: flex;
+  gap: 8px;
+  padding: 0 0 12px 40px;
+}
+
+.btn {
+  flex: 1;
+  height: 32px;
+  background: #fff;
+  border: 1px solid #d9d3c7;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #222;
+  cursor: pointer;
+}
+
+.cancel {
+  color: #c0392b;
+}

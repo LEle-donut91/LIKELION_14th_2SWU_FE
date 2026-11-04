@@ -1,0 +1,74 @@
+/* 페이지 전체 (바텀 내비 높이만큼 하단 여백) */
+.page {
+  min-height: 100%; /* 모바일 프레임(App.module.css) 높이 기준 */
+  padding: 0 16px 100px;
+  background: #fcfbfa; /* 페이지 배경 (시안 기준) */
+}
+
+/* 카드 리스트 세로 간격 */
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0 0 10px;
+  padding: 0;
+  list-style: none;
+}
+
+/* 보호자 배지 */
+.guardianBadge {
+  flex-shrink: 0;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: #8b7355;
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--beige-200, #ccbea5); /* 보호자 글씨 베이지-200 */
+}
+
+/* 초록 메인 버튼 */
+.primaryBtn {
+  width: 100%;
+  height: 40px;
+  background: var(--olive-500, #849952);
+  border: none;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  cursor: pointer;
+}
+
+/* 비활성 (보호자 3명) */
+.primaryBtn:disabled {
+  background: #e8e7e5; /* 시안 기준 */
+  color: #a5a29c;
+  cursor: not-allowed;
+}
+
+/* 비활성 안내 문구 */
+.notice {
+  margin: 10px 0 0;
+  font-size: 11px;
+  line-height: 1.5;
+  color: #6f6f6f;
+}
+
+/* 흰색 테두리 버튼 */
+.outlineBtn {
+  width: 100%;
+  height: 40px;
+  margin-top: 10px;
+  background: #fff;
+  border: 1px solid #d9d3c7;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--olive-700, #47592c); /* 초대 버튼 글자 올리브 */
+  cursor: pointer;
+}
+
+/* 카드 안 아이템 사이 구분선 */
+.divided > * + * {
+  border-top: 1px solid #f0ede6;
+}
