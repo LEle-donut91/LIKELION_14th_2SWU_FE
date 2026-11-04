@@ -1,5 +1,13 @@
-// H-03-01-A
+/**
+ * =====================================================================
+ * [H-03-01-A] 요청 상세 · 요청자 뷰
+ * - 페이지 컴포넌트
+ * =====================================================================
+ */
+
 import styles from "@/features/request/pages/RequestRequester.module.css";
+
+// 일반 라이브러리
 import { useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 
@@ -26,7 +34,7 @@ import {
 } from "@/features/request/api/requesterApi";
 import { getRequesterService } from "@/features/request/services/requesterService";
 
-// Components
+// 일반 Components
 import DefaultHeader from "@/features/request/components/Header/DefaultHeader";
 import SmallFooter from "@/features/request/components/Footer/SmallFooter";
 import LargeFooter from "@/features/request/components/Footer/LargeFooter";
