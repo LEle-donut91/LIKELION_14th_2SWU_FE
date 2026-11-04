@@ -171,9 +171,7 @@ export const getRequesterService = (raw) => {
   const flags = getRequesterFlags({
     requestState: raw?.requestState ?? "",
     isAssignedNoti: raw?.assignStatus?.isAssignedNoti ?? false,
-    isChanged: raw?.changeStatus?.isChanged ?? false,
-    isChangedConfirm: raw?.changeStatus?.isChangedConfirm ?? false,
-    isEditInvalid: raw?.changeStatus?.isEditInvalid ?? false,
+    changeState: raw?.changeState ?? "",
   });
 
   return {

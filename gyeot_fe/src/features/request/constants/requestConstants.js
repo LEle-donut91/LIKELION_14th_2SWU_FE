@@ -327,10 +327,18 @@ export const REQUEST_STATE = {
   CANCEL: "cancel",
 };
 
+// 요청 수정 상태 (서버 값)
+export const CHANGE_STATE = {
+  BEFORE_EDIT: "BEFORE_EDIT", // 수정 전
+  RECONFIRMING: "RECONFIRMING", // 재확인 중
+  RECONFIRMED: "RECONFIRMED", // 재확인 수락
+  INVALID: "INVALID", // 수정 무효
+};
+
 // 담당자 없음 사유 (서버 값 -> 한글)
 export const REQUESTER_REASON_TEXT = {
   DIFFICULTY: "진행 어려움 응답",
-  EXPIRED: "응답 기한 경과",
+  EXPIRED: "응답 기한 지남",
 };
 
 // [UserOrder] 요청 순서 카드의 상태 값 / 한글 텍스트 (UserOrder.jsx에서 이동)

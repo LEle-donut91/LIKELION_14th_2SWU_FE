@@ -14,11 +14,7 @@
     "isAssignedNoti": true,
     "reason": "DIFFICULTY"
   },
-  "changeStatus": {
-    "isChanged": true,
-    "isChangedConfirm": false,
-    "isEditInvalid": false
-  },
+  "changeState": "INVALID",
   "userList": [
     { "order": "1", "userName": "민재", "state": "EXPIRED" },
     { "order": "2", "userName": "예진", "state": "WAITING" },

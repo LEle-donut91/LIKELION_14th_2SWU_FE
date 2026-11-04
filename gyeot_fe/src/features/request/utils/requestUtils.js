@@ -18,6 +18,7 @@ import {
   REQUESTER_NOTICE_KEY,
   REQUESTER_ORDER_TITLE,
   REQUESTER_USER_STATE_TEXT,
+  CHANGE_STATE,
 } from "../constants/requestConstants";
 
 /**
@@ -283,9 +284,7 @@ export const isStartTimeEnsured = (
 export const getRequesterFlags = ({
   requestState,
   isAssignedNoti,
-  isChanged,
-  isChangedConfirm,
-  isEditInvalid,
+  changeState,
 }) => {
   const isRequestState = requestState === REQUEST_STATE.REQUEST;
   const isAcceptState = requestState === REQUEST_STATE.ACCEPT;
@@ -293,8 +292,9 @@ export const getRequesterFlags = ({
   const isDoneState = requestState === REQUEST_STATE.DONE;
   const isCancelState = requestState === REQUEST_STATE.CANCEL;
 
-  // 수락 상태에서 수정안을 담당자가 확인 중인 상태 (수정 무효면 확인할 수정안이 없으므로 제외)
-  const isEditPending = isAcceptState && isChanged && !isChangedConfirm && !isEditInvalid;
+  // 수정 상태
+  const isEditPending = isAcceptState && changeState === CHANGE_STATE.RECONFIRMING; // 수정안을 담당자가 확인 중
+  const isEditInvalid = (isAcceptState || isProgressState) && changeState === CHANGE_STATE.INVALID; // 수정 무효
 
   return {
     isRequestState,
@@ -316,28 +316,26 @@ export const getRequesterFlags = ({
   };
 };
 
-// 요청 상태 카드 (RequestState) 노출 규칙 - 순서대로 평가, 조건에 맞는 알림은 모두 노출
-// 규칙 추가/변경은 여기 when 조건만 수정
-const REQUESTER_NOTICE_RULES = [
+// 노출할 요청 상태 카드(RequestState) 목록 반환: [{ key, title, information }]
+export const getRequesterNotices = (flags, ctx = {}) => {
+  const noticeKeys = [];
+
   // 요청 취소 - 직접 취소했어요.
-  { key: REQUESTER_NOTICE_KEY.CANCEL, when: (f) => f.isCancelState },
+  if (flags.isCancelState) {
+    noticeKeys.push(REQUESTER_NOTICE_KEY.CANCEL);
+  }
 
-  // 담당자 없음 - 진행 어려움 응답
-  {
-    key: REQUESTER_NOTICE_KEY.NO_ASSIGNEE,
-    when: (f) => f.isRequestState && f.isAssignedNoti,
-  },
+  // 담당자 없음 - 진행 어려움 응답 / 응답 기한 경과
+  if (flags.isRequestState && flags.isAssignedNoti) {
+    noticeKeys.push(REQUESTER_NOTICE_KEY.NO_ASSIGNEE);
+  }
 
-  // TODO: 주석 추가 필요
-  {
-    key: REQUESTER_NOTICE_KEY.EDIT_INVALID,
-    when: (f) => f.isEditInvalid && (f.isAcceptState || f.isProgressState),
-  },
-];
+  // 수정 무효 - 수정이 반영되지 않았어요
+  if (flags.isEditInvalid) {
+    noticeKeys.push(REQUESTER_NOTICE_KEY.EDIT_INVALID);
+  }
 
-// 노출할 알림 목록 반환: [{ key, title, information }]
-export const getRequesterNotices = (flags, ctx = {}) =>
-  REQUESTER_NOTICE_RULES.filter(({ when }) => when(flags)).map(({ key }) => {
+  return noticeKeys.map((key) => {
     const { title, information } = REQUESTER_NOTICE_CONFIG[key];
     return {
       key,
@@ -346,6 +344,7 @@ export const getRequesterNotices = (flags, ctx = {}) =>
         typeof information === "function" ? information(ctx) : information,
     };
   });
+};
 
 // 상태별 푸터 종류 결정 (없으면 null)
 export const getRequesterFooterKey = (flags) => {
