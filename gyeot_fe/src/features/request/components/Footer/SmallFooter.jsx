@@ -2,7 +2,7 @@ import styles from "@/features/request/components/Footer/SmallFooter.module.css"
 
 function SmallFooter({
   leftType,
-  rightType="primary",
+  rightType = "primary",
   leftTitle,
   rightTitle,
   leftOnClick,

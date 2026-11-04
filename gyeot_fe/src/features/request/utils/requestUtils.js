@@ -293,8 +293,10 @@ export const getRequesterFlags = ({
   const isCancelState = requestState === REQUEST_STATE.CANCEL;
 
   // 수정 상태
-  const isEditPending = isAcceptState && changeState === CHANGE_STATE.RECONFIRMING; // 수정안을 담당자가 확인 중
-  const isEditInvalid = (isAcceptState || isProgressState) && changeState === CHANGE_STATE.INVALID; // 수정 무효
+  const isEditPending =
+    isAcceptState && changeState === CHANGE_STATE.RECONFIRMING; // 수정안을 담당자가 확인 중
+  const isEditInvalid =
+    (isAcceptState || isProgressState) && changeState === CHANGE_STATE.INVALID; // 수정 무효
 
   return {
     isRequestState,
