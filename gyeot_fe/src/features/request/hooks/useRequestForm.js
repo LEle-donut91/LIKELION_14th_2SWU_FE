@@ -1,13 +1,20 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   MS_PER_MINUTE,
-  DATE_TIME_KEYS,
-  DUE_DATE_KEYS,
+  MAX_TIMEOUT_MS,
   DUE_DATE_MAX_MINUTES,
   DUE_DATE_MIN_MINUTES,
   START_MIN_LEAD_MINUTES,
   REQUEST_FORM_FIELD_KEY,
 } from "@/features/request/constants/requestConstants";
+import {
+  isDateTimeComplete,
+  isDueDateEntered,
+  toDate,
+  toMinutes,
+  getInitialDueDate,
+  getMsUntilStartLeadTooShort,
+} from "@/features/request/utils/requestUtils";
 
 /**
  * ==============================================================================================================================
@@ -79,26 +86,6 @@ const INITIAL_FORM = {
   content: null,
   dueDate: { days: "1" },
 };
-
-// 시간/날짜 입력 칸의 5개 필드가 전부 채워졌는지 체크 (null / undefined / "" 은 모두 미입력으로 취급)
-export const isDateTimeComplete = (v) =>
-  !!v && DATE_TIME_KEYS.every((k) => v[k] != null && v[k] !== "");
-
-// 응답 기한 입력 칸의 3개 필드 중 1개 이상 입력했는지 체크 (null / undefined / "" 은 모두 미입력으로 취급)
-const isDueDateEntered = (d) =>
-  DUE_DATE_KEYS.some((k) => d?.[k] != null && d?.[k] !== "");
-
-// 시간/날짜 입력값 객체 (DateTimeValue)를 Date 타입으로 변환
-const toDate = (v) =>
-  isDateTimeComplete(v)
-    ? new Date(+v.year, +v.month - 1, +v.day, +v.hour, +v.minute)
-    : null;
-
-// 응답 기한 입력값 객체 (DueDateValue)를 분 단위 총합으로 환산 (없는 키/null은 0으로 취급)
-const toMinutes = (d) =>
-  (parseInt(d?.days, 10) || 0) * 24 * 60 +
-  (parseInt(d?.hours, 10) || 0) * 60 +
-  (parseInt(d?.minutes, 10) || 0);
 
 /**
  * * [validateRequestForm 에러 조건 및 메시지 정리]
@@ -222,16 +209,46 @@ export const validateRequestForm = (form, now, fields = null) => {
 };
 
 /**
- * 훅 하나로 초기값을 오버라이드
  * @param {Partial<RequestForm>} [initialValues]
- *
+ * @param {Object} [options]
+ * @param {boolean} [options.lockDueDate] 시작까지 1시간 미만이면 응답 기한을 null로 고정 ([N-06] 다시 부탁하기)
+ *   - 마운트 시점에 이미 1시간 미만이면 초기값을 null로 설정
+ *   - 화면을 열어둔 사이 1시간 미만이 되면 그 시점에 null로 전환
  */
-// 사용자 입력 개별 필드 state 값 업데이트
-export function useRequestForm(initialValues = {}) {
+export function useRequestForm(
+  initialValues = {},
+  { lockDueDate = false } = {},
+) {
   const [form, setForm] = useState(() => ({
     ...INITIAL_FORM,
     ...initialValues,
+    ...(lockDueDate && {
+      dueDate: getInitialDueDate(
+        initialValues.startDateTime,
+        INITIAL_FORM.dueDate,
+      ),
+    }),
   }));
+
+  // 화면을 열어둔 사이 시작까지 1시간 미만이 되면, 그 시점에 응답 기한을 고정(null)으로 전환
+  useEffect(() => {
+    // 다시 부탁하기 (lockDueDate = true)가 아니라면, 하단 코드 실행 안 하고 바로 리턴
+    if (!lockDueDate) return;
+
+    const msUntilFixed = getMsUntilStartLeadTooShort(form.startDateTime);
+    if (
+      msUntilFixed === null ||
+      msUntilFixed < 0 ||
+      msUntilFixed > MAX_TIMEOUT_MS
+    )
+      return;
+
+    const timerId = setTimeout(
+      () => setForm((prev) => ({ ...prev, dueDate: null })),
+      msUntilFixed,
+    );
+    return () => clearTimeout(timerId);
+  }, [lockDueDate, form.startDateTime]);
 
   const setField = (key, value) =>
     setForm((prev) => ({ ...prev, [key]: value }));

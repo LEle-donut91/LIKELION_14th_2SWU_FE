@@ -1,11 +1,17 @@
 import {
   SENSITIVE_KEYS,
+  DATE_TIME_KEYS,
+  DUE_DATE_KEYS,
   DATE_TIME_MAX_LIMITS,
   DATE_TIME_MIN_LIMITS,
   DUE_DATE_MAX_LIMITS,
   DUE_DATE_MIN_LIMITS,
+  MS_PER_MINUTE,
+  START_MIN_LEAD_MINUTES,
   REQUEST_FORM_FIELD_KEY,
   REQUEST_PREREQUISITE_TOAST_MESSAGE,
+  FIXED_DUE_DATE_TOAST_MESSAGE,
+  START_PASSED_TOAST_MESSAGE,
 } from "../constants/requestConstants";
 
 /**
@@ -46,14 +52,15 @@ export const getSelectedSituationText = (situation, situationId) => {
 };
 
 /**
- * =========================================================================
+ * ==============================================================================
  * [H-03-02] 요청 작성
  * [H-03-01-02] 요청 수정 · 취소
  * [N-06] 다시 부탁하기
  * - 사용자가 입력한 데이터 값 보정 (시작/종료의 날짜 입력값, 시간 입력값)
  * - 사용자 입력값 기반 텍스트 UI 가공 (시작, 종료, 요청 대상, 응답 기한)
- *
- * =========================================================================
+ * - 시간/날짜 입력값 (DateTimeValue), 응답 기한 입력값 (DueDateValue) 입력됐는지 체크
+ * - Date 타입, minute로 변환
+ * ==============================================================================
  */
 
 // 시작/종료 Section에 입력된 시간, 날짜 값에서 숫자만 남기고, 필드(key)별 최대값/유효성에 맞게 값을 보정
@@ -98,7 +105,10 @@ export const getSelectedUserText = (user, userId) => {
 };
 
 // 입력된 응답 기한 객체를 화면 표시용 문자열 (N일 N시간 N분)으로 가공
-export const getDueDateText = (dueDate) => {
+export const getDueDateText = (dueDate, isFixed = false) => {
+  // 응답 기한이 고정된 경우 "시작 시간까지" 출력
+  if (isFixed) return "시작 시간까지";
+
   // 없으면 "선택" 출력
   if (!dueDate) return "선택";
   const days = parseInt(dueDate.days, 10) || 0;
@@ -123,6 +133,26 @@ export const getDueDateText = (dueDate) => {
 
   return text;
 };
+
+// 시간/날짜 입력 칸의 5개 필드가 전부 채워졌는지 체크 (null / undefined / "" 은 모두 미입력으로 취급)
+export const isDateTimeComplete = (v) =>
+  !!v && DATE_TIME_KEYS.every((k) => v[k] != null && v[k] !== "");
+
+// 응답 기한 입력 칸의 3개 필드 중 1개 이상 입력했는지 체크 (null / undefined / "" 은 모두 미입력으로 취급)
+export const isDueDateEntered = (d) =>
+  DUE_DATE_KEYS.some((k) => d?.[k] != null && d?.[k] !== "");
+
+// 시간/날짜 입력값 객체 (DateTimeValue)를 Date 타입으로 변환
+export const toDate = (v) =>
+  isDateTimeComplete(v)
+    ? new Date(+v.year, +v.month - 1, +v.day, +v.hour, +v.minute)
+    : null;
+
+// 응답 기한 입력값 객체 (DueDateValue)를 분 단위 총합으로 환산 (없는 키/null은 0으로 취급)
+export const toMinutes = (d) =>
+  (parseInt(d?.days, 10) || 0) * 24 * 60 +
+  (parseInt(d?.hours, 10) || 0) * 60 +
+  (parseInt(d?.minutes, 10) || 0);
 
 /**
  * =====================================================================
@@ -156,9 +186,58 @@ export const checkSensitiveIncluded = (healthList = [], lifeList = []) => {
   return isHealthSensitiveSelected || isLifeSensitiveSelected;
 };
 
-// TODO: 아래 함수는 추후 삭제
-// (요청 대상 리스트, 선택된 요청 대상의 ID)를 인자로 받아, 요청 대상 텍스트 가공
-export const getSelectedUserId = (userLst, userId) => {
-  const selectedUser = userLst?.find((item) => item.id === userId);
-  return selectedUser?.userName || "한 명 선택";
+/**
+ * =========================================================================
+ * [N-06] 다시 부탁하기
+ * - 시작 시간 경과 / 응답 기한 고정 여부 체크 및 관련 토스트 메시지 반환
+ * =========================================================================
+ */
+
+// 시작까지 남은 시간이 1시간 미만이 되는 시점까지 남은 밀리초
+// (시작 일시가 불완전하면 null, 이미 1시간 미만이면 음수)
+export const getMsUntilStartLeadTooShort = (
+  startDateTime,
+  now = new Date(),
+) => {
+  const start = toDate(startDateTime);
+  return start ? start - now - START_MIN_LEAD_MINUTES * MS_PER_MINUTE : null;
+};
+
+// 시작까지 남은 시간이 최소 여유 시간(1시간) 미만인지 체크 (시작 일시가 불완전하면 false)
+const isStartLeadTooShort = (startDateTime, now = new Date()) => {
+  const ms = getMsUntilStartLeadTooShort(startDateTime, now);
+  return ms !== null && ms < 0;
+};
+
+// 응답 기한 초기값 반환: 시작까지 1시간 미만이면 null (서버에서 처리), 아니면 기본값
+export const getInitialDueDate = (
+  startDateTime,
+  defaultDueDate,
+  now = new Date(),
+) => (isStartLeadTooShort(startDateTime, now) ? null : defaultDueDate);
+
+// 응답 기한이 고정되어 있는지 체크 (useRequestForm이 dueDate를 null로 설정한 경우)
+export const isDueDateFixed = (form) => form.dueDate === null;
+
+// 응답 기한이 고정되어 있으면 토스트를 띄우고 false 반환 (수정 가능하면 true 반환)
+export const isDueDateEditable = (form, showToast) => {
+  if (isDueDateFixed(form)) {
+    showToast(FIXED_DUE_DATE_TOAST_MESSAGE);
+    return false;
+  }
+  return true;
+};
+
+// 시작 시간이 이미 지났으면 토스트를 띄우고 false 반환 (아니면 true 반환)
+export const isStartTimeEnsured = (
+  startDateTime,
+  showToast,
+  now = new Date(),
+) => {
+  const start = toDate(startDateTime);
+  if (start && start <= now) {
+    showToast(START_PASSED_TOAST_MESSAGE);
+    return false;
+  }
+  return true;
 };

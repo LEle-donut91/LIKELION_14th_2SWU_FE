@@ -85,3 +85,64 @@ export const getEditCheckService = (raw) => ({
     { icon: iconHealthy, label: "정보", value: raw?.afterInfo?.message ?? "" },
   ],
 });
+
+/**
+ * =====================================================================
+ * [N-06] 다시 부탁하기
+ * - 데이터 조회 후 가공
+ * - 폼 제출 전 보낼 데이터 가공
+ * - 폼 제출 후 받은 데이터 가공
+ *
+ * =====================================================================
+ */
+
+// [N-06] 다시 부탁하기 - 데이터 조회 후 가공
+export const getAskAgainService = (raw) => {
+  const summary = raw?.lastReqSummary;
+
+  return {
+    situationId: raw?.situationId ?? "",
+    requestId: raw?.requestId ?? "",
+    reqType: summary?.type ?? "",
+    reqMsg: summary?.message ?? "",
+    startAt: summary?.startAt ?? null,
+
+    // [이전 요청 내용]의 시간/장소/정보
+    infoList: [
+      { icon: iconDate, label: "일정", value: summary?.time ?? "" },
+      { icon: iconLocation, label: "장소", value: summary?.location ?? "" },
+      { icon: iconHealthy, label: "정보", value: summary?.info ?? "" },
+    ],
+
+    // [대상 이력] 목록 매핑
+    userRecord:
+      raw?.userRecord?.map((user) => ({
+        name: user.name,
+        part: user.part,
+        state: user.state,
+      })) || [],
+
+    // [새 요청 대상] 목록 매핑
+    userLst:
+      raw?.userLst?.map((user) => ({
+        id: user.id,
+        userName: user.userName,
+        isGuardian: user.isGuardian,
+      })) || [],
+  };
+};
+
+// [N-06] 다시 부탁하기 - 폼 제출 전 데이터 가공
+// form: useRequestForm의 form / 응답 기한 고정 시 dueDate가 null → responseDue: null (서버에서 처리)
+export const postAskAgainService = (requestId, form) => ({
+  requestId,
+  targetUserId: form.userId,
+  responseDue: form.dueDate ?? null,
+});
+
+// TODO: API 연동 로직 수정 필요
+// [N-06] 다시 부탁하기 - 폼 제출 후 데이터 가공
+export const postAskAgainIdService = (raw) => ({
+  tempId: raw.tempId,
+  msg: raw.message,
+});
