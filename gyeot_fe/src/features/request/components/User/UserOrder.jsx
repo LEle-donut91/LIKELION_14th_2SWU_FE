@@ -1,12 +1,8 @@
 import styles from "@/features/request/components/User/UserOrder.module.css";
-
-// 영어 상태 값을 한글 텍스트로 변환해 주는 매핑 객체
-const STATE_TEXT_MAP = {
-  EXPIRED: "기한 경과",
-  WAITING: "응답 대기",
-  DIFFICULTY: "어려움",
-  CANCEL: "취소",
-};
+import {
+  USER_ORDER_STATE,
+  USER_ORDER_STATE_TEXT,
+} from "@/features/request/constants/requestConstants";
 
 function UserOrder({ title, orderList }) {
   return (
@@ -14,16 +10,18 @@ function UserOrder({ title, orderList }) {
       <span className={`${styles.title} typoTitleMedium`}>{title}</span>
       <div className={styles.cardList}>
         {/* 배열을 받아 map 메서드로 card div들을 동적 렌더링 */}
-        {orderList.map((item, index) => {
-          // state에 대응하는 한글 텍스트를 가져오고, 없으면 state 그대로 출력
-          const stateText = STATE_TEXT_MAP[item.state] || item.state;
+        {orderList.map((item) => {
+          // 매핑된 한글 텍스트, 없으면 state 그대로 출력
+          const stateText = USER_ORDER_STATE_TEXT[item.state] || item.state;
 
-          // EXPIRED("기한 경과")일 때만 expiredTag, 나머지는 모두 defaultTag 적용
+          // EXPIRED일 때만 expiredTag, 나머지는 defaultTag
           const tagStyle =
-            item.state === "EXPIRED" ? styles.expiredTag : styles.defaultTag;
+            item.state === USER_ORDER_STATE.EXPIRED
+              ? styles.expiredTag
+              : styles.defaultTag;
 
           return (
-            <div className={styles.card} key={index}>
+            <div className={styles.card} key={item.order}>
               <div className={styles.titleGroup}>
                 <div className={`${styles.order} typoCaptionMedium`}>
                   {item.order}
