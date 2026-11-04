@@ -1,3 +1,11 @@
+import {
+  getRequesterFlags,
+  getRequesterFooterKey,
+  getRequesterNotices,
+  getRequesterOrderTitle,
+  getRequesterUserStateText,
+} from "@/features/request/utils/requestUtils";
+
 import { getInfoPreviewService } from "@/features/request/services/createService";
 import iconDate from "@/shared/assets/icons/iconDate.svg";
 import iconLocation from "@/shared/assets/icons/iconLocation.svg";
@@ -146,3 +154,53 @@ export const postAskAgainIdService = (raw) => ({
   tempId: raw.tempId,
   msg: raw.message,
 });
+
+
+/**
+ * =====================================================================
+ * [H-03-01] 요청 상세 · 요청자 뷰
+ * - 조회 후 데이터 가공 (화면 조건 계산 포함)
+ * =====================================================================
+ */
+
+// TODO: API 연동 로직 수정 필요
+// [H-03-01] 요청 상세(요청자 뷰) - 데이터 조회 후 가공
+export const getRequesterService = (raw) => {
+  const reason = raw?.assignStatus?.reason ?? "";
+
+  const flags = getRequesterFlags({
+    requestState: raw?.requestState ?? "",
+    isAssignedNoti: raw?.assignStatus?.isAssignedNoti ?? false,
+    isChanged: raw?.changeStatus?.isChanged ?? false,
+    isChangedConfirm: raw?.changeStatus?.isChangedConfirm ?? false,
+    isEditInvalid: raw?.changeStatus?.isEditInvalid ?? false,
+  });
+
+  return {
+    situationId: raw?.situationId ?? "",
+    requestId: raw?.requestId ?? "",
+    requestState: raw?.requestState ?? "",
+    userName: raw?.userName ?? "",
+    userId: raw?.userId ?? "",
+    requestType: raw?.requestType ?? "",
+    message: raw?.message ?? "",
+    dueDate: raw?.dueDate ?? "",
+    initialDueDate: raw?.initialDueDate ?? "",
+
+    // RequestSummary에 넘길 시간/장소 목록
+    infoList: [
+      { icon: iconDate, label: "시간", value: raw?.time ?? "" },
+      { icon: iconLocation, label: "장소", value: raw?.location ?? "" },
+    ],
+
+    // UserOrder에 넘길 목록
+    userList: raw?.userList ?? [],
+
+    // 화면 조건 / 문구 / 푸터
+    flags,
+    notices: getRequesterNotices(flags, { reason }),
+    footerKey: getRequesterFooterKey(flags),
+    orderTitle: getRequesterOrderTitle(flags),
+    userStateText: getRequesterUserStateText(flags),
+  };
+};
