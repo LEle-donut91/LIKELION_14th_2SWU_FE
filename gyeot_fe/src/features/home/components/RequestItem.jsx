@@ -1,5 +1,5 @@
 import styles from "@/features/home/components/RequestItem.module.css";
-import DotSeparatedText from "@/features/home/components/DotSeparatedText";
+import DotSeparatedText from "@/shared/components/DotSeparatedText/DotSeparatedText";
 
 // 요청 리스트 아이템 공통 틀
 // ReceivedRequestItem(프로필 있음) · SentRequestItem(프로필 없음)에서 사용

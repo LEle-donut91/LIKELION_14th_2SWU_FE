@@ -1,4 +1,4 @@
-import styles from "@/features/home/components/ProgressBar.module.css";
+import styles from "@/shared/components/SituationCard/ProgressBar.module.css";
 
 // 진행률 바 (두께 4px, olive-400 + gray-100)
 function ProgressBar({ rate }) {

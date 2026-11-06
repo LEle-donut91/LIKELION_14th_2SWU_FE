@@ -2,7 +2,7 @@ import RequestItem from "@/features/home/components/RequestItem";
 import {
   formatDateTime,
   getRemainingText,
-} from "@/features/home/utils/homeFormat";
+} from "@/shared/utils/dateFormat";
 
 // 응답이 필요한 요청 (니드 리스트)
 function ReceivedRequestItem({ request, onClick }) {

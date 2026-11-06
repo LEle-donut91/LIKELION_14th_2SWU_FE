@@ -1,6 +1,6 @@
 import styles from "@/features/home/components/ScheduleItem.module.css";
-import DotSeparatedText from "@/features/home/components/DotSeparatedText";
-import { formatDateTime } from "@/features/home/utils/homeFormat";
+import DotSeparatedText from "@/shared/components/DotSeparatedText/DotSeparatedText";
+import { formatDateTime } from "@/shared/utils/dateFormat";
 
 // 다가오는 일정 (스케줄 리스트)
 function ScheduleItem({ schedule }) {

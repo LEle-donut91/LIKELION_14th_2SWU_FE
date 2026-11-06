@@ -1,7 +1,7 @@
 import { Fragment } from "react";
-import styles from "@/features/home/components/DotSeparatedText.module.css";
-import MaskIcon from "@/features/home/components/MaskIcon";
-import iconPoint from "@/shared/assets/icons/IconPoint.svg";
+import styles from "@/shared/components/DotSeparatedText/DotSeparatedText.module.css";
+import MaskIcon from "@/shared/components/MaskIcon/MaskIcon";
+import iconPoint from "@/shared/assets/icons/iconPoint.svg";
 
 // 텍스트 목록을 점(•) 아이콘으로 구분해 한 줄로 표시
 // 예: ["10/1(목) 22:00", "슈슈 병원"] → 10/1(목) 22:00 • 슈슈 병원
