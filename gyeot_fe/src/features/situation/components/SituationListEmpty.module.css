@@ -1,0 +1,21 @@
+/* 빈 상태 영역: 패딩 위 45, 아래 31, 좌우 16 (시안 버튼 위치 기준) */
+.situationListEmpty {
+  position: relative;
+  padding: 45px 16px 31px;
+}
+
+/* 배경 그라디언트(beige-100): 시안 원본 크기 402x402, 영역 위쪽 기준 가운데 */
+.bgGradient {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 402px;
+  height: 402px;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+/* 그라디언트 위에 일러스트·문구가 보이도록 */
+.situationListEmpty > :not(.bgGradient) {
+  position: relative;
+}

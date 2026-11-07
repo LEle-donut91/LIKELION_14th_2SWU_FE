@@ -2,7 +2,7 @@ import RequestItem from "@/features/home/components/RequestItem";
 import {
   formatDateTime,
   getRemainingText,
-} from "@/features/home/utils/homeFormat";
+} from "@/shared/utils/dateFormat";
 
 // 보낸 요청 (sendlist) - 프로필 없음, 태그 beige-500
 function SentRequestItem({ request, onClick }) {

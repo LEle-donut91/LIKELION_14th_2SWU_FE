@@ -1,5 +1,5 @@
 import styles from "@/features/home/components/SituationTabContent.module.css";
-import SituationCard from "@/features/home/components/SituationCard";
+import SituationCard from "@/shared/components/SituationCard/SituationCard";
 import SituationEmpty from "@/features/home/components/SituationEmpty";
 import HomeSection from "@/features/home/components/HomeSection";
 import ReceivedRequestItem from "@/features/home/components/ReceivedRequestItem";

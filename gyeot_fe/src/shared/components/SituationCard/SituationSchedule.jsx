@@ -1,8 +1,8 @@
-import styles from "@/features/home/components/SituationSchedule.module.css";
-import MaskIcon from "@/features/home/components/MaskIcon";
-import DotSeparatedText from "@/features/home/components/DotSeparatedText";
-import iconRight from "@/shared/assets/icons/IconRight.svg";
-import { formatDateTime } from "@/features/home/utils/homeFormat";
+import styles from "@/shared/components/SituationCard/SituationSchedule.module.css";
+import MaskIcon from "@/shared/components/MaskIcon/MaskIcon";
+import DotSeparatedText from "@/shared/components/DotSeparatedText/DotSeparatedText";
+import iconRight from "@/shared/assets/icons/iconRight.svg";
+import { formatDateTime } from "@/shared/utils/dateFormat";
 
 // 상황 카드 내 스케줄 컨테이너 (다음 일정 요약 + 자세히 보기)
 function SituationSchedule({ nextSchedule, extraScheduleCount, onMoreClick }) {
@@ -35,11 +35,11 @@ function SituationSchedule({ nextSchedule, extraScheduleCount, onMoreClick }) {
 
       <button
         type="button"
-        className={`${styles.btnMore} typoCaptionMedium`}
+        className={`${styles.moreBtn} typoCaptionMedium`}
         onClick={onMoreClick}
       >
         자세히 보기
-        <MaskIcon src={iconRight} size={12} />
+        <MaskIcon src={iconRight} size={16} className={styles.moreIcon} />
       </button>
     </div>
   );

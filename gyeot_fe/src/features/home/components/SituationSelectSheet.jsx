@@ -1,11 +1,11 @@
 import { useState } from "react";
 import styles from "@/features/home/components/SituationSelectSheet.module.css";
-import MaskIcon from "@/features/home/components/MaskIcon";
+import MaskIcon from "@/shared/components/MaskIcon/MaskIcon";
 import ActionButton from "@/features/home/components/ActionButton";
-import DotSeparatedText from "@/features/home/components/DotSeparatedText";
+import DotSeparatedText from "@/shared/components/DotSeparatedText/DotSeparatedText";
 import iconRadioOn from "@/shared/assets/icons/IconRadioOn.svg";
 import iconRadioOff from "@/shared/assets/icons/IconRadioOff.svg";
-import { formatDateRange } from "@/features/home/utils/homeFormat";
+import { formatDateRange } from "@/shared/utils/dateFormat";
 
 // 도움 요청 시 상황 선택 바텀시트 (진행 중 상황이 2개 이상일 때)
 function SituationSelectSheet({ situations, onClose, onConfirm }) {
