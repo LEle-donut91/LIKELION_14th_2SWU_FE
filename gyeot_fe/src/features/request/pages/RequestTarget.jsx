@@ -72,7 +72,7 @@ function RequestTarget() {
     // 수락
     accept: () => {
       patchTargetAcceptApi(paramId);
-      handleGoNext(REQUEST_ROUTES.assignee(paramId));
+      handleGoNext(REQUEST_ROUTES.assignee(paramId), true);
     },
     // 거절로 변경
     changeToRefuse: () => {
@@ -82,7 +82,7 @@ function RequestTarget() {
     // 수락으로 변경
     changeToAccept: () => {
       patchTargetChangeAcceptApi(paramId);
-      handleGoNext(REQUEST_ROUTES.assignee(paramId));
+      handleGoNext(REQUEST_ROUTES.assignee(paramId), true);
     },
   };
 
