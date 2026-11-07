@@ -351,12 +351,6 @@ export const CHANGE_STATE = {
   INVALID: "INVALID", // 수정 무효
 };
 
-// 담당자 없음 사유 (서버 값 -> 한글)
-export const REQUESTER_REASON_TEXT = {
-  DIFFICULTY: "진행 어려움 응답",
-  EXPIRED: "응답 기한 지남",
-};
-
 // [UserOrder] 요청 순서 카드의 상태 값 / 한글 텍스트 (UserOrder.jsx에서 이동)
 export const USER_ORDER_STATE = {
   EXPIRED: "EXPIRED",
@@ -387,28 +381,74 @@ export const REQUESTER_USER_STATE_TEXT = {
 // 헤더 우측 버튼 문구
 export const REQUESTER_CANCEL_BTN_TITLE = "취소";
 
-// 알림(RequestState) 종류
+// 담당자 없음 사유 (서버 값: noAssignedReason)
+export const NO_ASSIGNEE_REASON = {
+  REJECTED: "REJECTED", // 요청 거절
+  EXPIRED: "EXPIRED", // 기한 지남
+  ACCEPT_WITHDRAWN: "ACCEPT_WITHDRAWN", // 수락 철회
+  LEFT_SITUATION: "LEFT_SITUATION", // 상황 나가기
+  RELATION_RELEASED: "RELATION_RELEASED", // 관계 해제
+};
+
+// 요청 취소 사유 (서버 값: cancelReason)
+export const CANCEL_REASON = {
+  SELF: "SELF", // 직접 취소
+  EXPIRED: "EXPIRED", // 담당자 없음으로 만료
+  REJECTED: "REJECTED", // 담당자 거절
+};
+
+// 알림(RequestState) 종류 - React key 및 노출 규칙 구분용
 export const REQUESTER_NOTICE_KEY = {
   CANCEL: "cancel",
   NO_ASSIGNEE: "noAssignee",
   EDIT_INVALID: "editInvalid",
 };
 
-// 알림(RequestState) 문구 설정 - 기획/디자인 변경 시 여기 문구만 수정
-// information: string 또는 (ctx) => string (ctx: { reason })
-export const REQUESTER_NOTICE_CONFIG = {
-  [REQUESTER_NOTICE_KEY.CANCEL]: {
+// 알림(RequestState) 문구 설정
+// [담당자 없음] 사유별 제목/본문
+export const NO_ASSIGNEE_NOTICE_CONFIG = {
+  [NO_ASSIGNEE_REASON.REJECTED]: {
+    title: "요청 거절",
+    information: "진행이 어렵다고 응답했어요.",
+  },
+  [NO_ASSIGNEE_REASON.EXPIRED]: {
+    title: "기한 지남",
+    information: "상대방이 응답하지 않았어요.",
+  },
+  [NO_ASSIGNEE_REASON.ACCEPT_WITHDRAWN]: {
+    title: "수락 철회",
+    information: "상대방이 수락을 취소했어요.",
+  },
+  [NO_ASSIGNEE_REASON.LEFT_SITUATION]: {
+    title: "상황 나가기",
+    information: "상대방이 상황에서 나갔어요.",
+  },
+  [NO_ASSIGNEE_REASON.RELATION_RELEASED]: {
+    title: "관계 해제",
+    information: "상대방과 관계가 해제됐어요.",
+  },
+};
+
+// [요청 취소] 사유별 제목/본문
+export const CANCEL_NOTICE_CONFIG = {
+  [CANCEL_REASON.SELF]: {
     title: "요청 취소",
     information: "직접 취소했어요.",
   },
-  [REQUESTER_NOTICE_KEY.NO_ASSIGNEE]: {
-    title: "담당자 없음",
-    information: ({ reason }) => REQUESTER_REASON_TEXT[reason],
+  [CANCEL_REASON.EXPIRED]: {
+    title: "만료됨",
+    information: "담당자가 없어 요청이 만료됐어요.",
   },
-  [REQUESTER_NOTICE_KEY.EDIT_INVALID]: {
-    title: "수정 무효",
-    information: "수정이 반영되지 않았어요",
+  [CANCEL_REASON.REJECTED]: {
+    title: "거절함",
+    information: "담당자가 거절해 취소됐어요.",
   },
+};
+
+// [수정 무효] 고정 제목/본문
+export const EDIT_INVALID_NOTICE_CONFIG = {
+  title: "수정 무효",
+  information: "수정이 반영되지 않았어요",
 };
 
 // 푸터 종류

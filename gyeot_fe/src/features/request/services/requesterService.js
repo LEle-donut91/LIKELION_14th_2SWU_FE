@@ -165,11 +165,10 @@ export const postAskAgainIdService = (raw) => ({
 // TODO: API 연동 로직 수정 필요
 // [H-03-01] 요청 상세(요청자 뷰) - 데이터 조회 후 가공
 export const getRequesterService = (raw) => {
-  const reason = raw?.assignStatus?.reason ?? "";
-
+  const noAssignedReason = raw?.noAssignedReason ?? "";
   const flags = getRequesterFlags({
     requestState: raw?.requestState ?? "",
-    isAssignedNoti: raw?.assignStatus?.isAssignedNoti ?? false,
+    assignReason: noAssignedReason,
     changeState: raw?.changeState ?? "",
   });
 
@@ -195,7 +194,10 @@ export const getRequesterService = (raw) => {
 
     // 화면 조건 / 문구 / 푸터
     flags,
-    notices: getRequesterNotices(flags, { reason }),
+    notices: getRequesterNotices(flags, {
+      assignReason: noAssignedReason,
+      cancelReason: raw?.cancelReason ?? "",
+    }),
     footerKey: getRequesterFooterKey(flags),
     orderTitle: getRequesterOrderTitle(flags),
     userStateText: getRequesterUserStateText(flags),

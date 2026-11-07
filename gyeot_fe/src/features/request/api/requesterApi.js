@@ -100,8 +100,8 @@ export const postAskAgainApi = (payload) => {
 
 // TODO: API 연동 로직 수정 필요
 // [H-03-01] 요청 상세(요청자 뷰) - 데이터 조회
-// 응답: { situationId, requestId, requestState, userName, requestType, time, location, message,
-//        dueDate, assignStatus, changeStatus: { isChanged, isChangedConfirm, isEditInvalid }, userList }
+// 응답: { situationId, requestId, requestState, cancelReason, noAssignedReason, changeState,
+//        userName, userId, requestType, time, location, message, dueDate, initialDueDate, userList }
 export const getRequesterApi = (requestId) => {
   console.log("요청자 데이터 조회:", requestId);
   return getRequesterMock;

@@ -14,7 +14,9 @@ import {
   START_PASSED_TOAST_MESSAGE,
   REQUEST_STATE,
   REQUESTER_FOOTER_KEY,
-  REQUESTER_NOTICE_CONFIG,
+  CANCEL_NOTICE_CONFIG,
+  EDIT_INVALID_NOTICE_CONFIG,
+  NO_ASSIGNEE_NOTICE_CONFIG,
   REQUESTER_NOTICE_KEY,
   REQUESTER_ORDER_TITLE,
   REQUESTER_USER_STATE_TEXT,
@@ -283,7 +285,7 @@ export const isStartTimeEnsured = (
 // 서버 데이터에서 요청자 뷰의 모든 조건부 플래그를 한 곳에서 계산
 export const getRequesterFlags = ({
   requestState,
-  isAssignedNoti,
+  assignReason,
   changeState,
 }) => {
   const isRequestState = requestState === REQUEST_STATE.REQUEST;
@@ -291,6 +293,9 @@ export const getRequesterFlags = ({
   const isProgressState = requestState === REQUEST_STATE.PROGRESS;
   const isDoneState = requestState === REQUEST_STATE.DONE;
   const isCancelState = requestState === REQUEST_STATE.CANCEL;
+
+  // 담당자 없음 사유가 있으면 담당자 없음 상태
+  const isAssignedNoti = Boolean(assignReason);
 
   // 수정 상태
   const isEditPending =
@@ -319,33 +324,29 @@ export const getRequesterFlags = ({
 };
 
 // 노출할 요청 상태 카드(RequestState) 목록 반환: [{ key, title, information }]
+// ctx: { assignReason, cancelReason } (서버 사유 값)
 export const getRequesterNotices = (flags, ctx = {}) => {
-  const noticeKeys = [];
+  const notices = [];
 
-  // 요청 취소 - 직접 취소했어요.
+  // 요청 취소 - 사유별 문구 (직접 취소 / 만료됨 / 거절함)
   if (flags.isCancelState) {
-    noticeKeys.push(REQUESTER_NOTICE_KEY.CANCEL);
+    const config = CANCEL_NOTICE_CONFIG[ctx.cancelReason];
+    notices.push({ key: REQUESTER_NOTICE_KEY.CANCEL, ...config });
   }
 
-  // 담당자 없음 - 진행 어려움 응답 / 응답 기한 경과
+  // 담당자 없음 - 사유별 문구 (요청 거절 / 기한 지남 / 수락 철회 / 상황 나가기 / 관계 해제)
   if (flags.isRequestState && flags.isAssignedNoti) {
-    noticeKeys.push(REQUESTER_NOTICE_KEY.NO_ASSIGNEE);
+    const config = NO_ASSIGNEE_NOTICE_CONFIG[ctx.assignReason];
+    notices.push({ key: REQUESTER_NOTICE_KEY.NO_ASSIGNEE, ...config });
   }
 
   // 수정 무효 - 수정이 반영되지 않았어요
   if (flags.isEditInvalid) {
-    noticeKeys.push(REQUESTER_NOTICE_KEY.EDIT_INVALID);
+    const config = EDIT_INVALID_NOTICE_CONFIG;
+    notices.push({ key: REQUESTER_NOTICE_KEY.EDIT_INVALID, ...config });
   }
 
-  return noticeKeys.map((key) => {
-    const { title, information } = REQUESTER_NOTICE_CONFIG[key];
-    return {
-      key,
-      title,
-      information:
-        typeof information === "function" ? information(ctx) : information,
-    };
-  });
+  return notices;
 };
 
 // 상태별 푸터 종류 결정 (없으면 null)
