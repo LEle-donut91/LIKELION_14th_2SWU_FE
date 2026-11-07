@@ -294,8 +294,8 @@ export const getRequesterFlags = ({
   const isDoneState = requestState === REQUEST_STATE.DONE;
   const isCancelState = requestState === REQUEST_STATE.CANCEL;
 
-  // 담당자 없음 사유가 있으면 담당자 없음 상태
-  const isAssignedNoti = Boolean(assignReason);
+  // 요청됨 상태이면서 담당자 없음 사유가 있으면 -> 담당자 없음 상태
+  const isAssignedNoti = isRequestState && Boolean(assignReason);
 
   // 수정 상태
   const isEditPending =
@@ -335,7 +335,7 @@ export const getRequesterNotices = (flags, ctx = {}) => {
   }
 
   // 담당자 없음 - 사유별 문구 (요청 거절 / 기한 지남 / 수락 철회 / 상황 나가기 / 관계 해제)
-  if (flags.isRequestState && flags.isAssignedNoti) {
+  if (flags.isAssignedNoti) {
     const config = NO_ASSIGNEE_NOTICE_CONFIG[ctx.assignReason];
     notices.push({ key: REQUESTER_NOTICE_KEY.NO_ASSIGNEE, ...config });
   }
@@ -379,7 +379,7 @@ export const getRequesterFooterKey = (flags) => {
 
 // UserOrder(요청 순서, 부탁 순서) 타이틀 결정
 export const getRequesterOrderTitle = (flags) =>
-  flags.isCancelState || (flags.isRequestState && flags.isAssignedNoti)
+  flags.isCancelState || flags.isAssignedNoti
     ? REQUESTER_ORDER_TITLE.ASK_OTHER
     : REQUESTER_ORDER_TITLE.DEFAULT;
 
