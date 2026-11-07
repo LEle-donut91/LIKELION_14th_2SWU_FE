@@ -37,9 +37,6 @@ export const patchRequestCancelApi = (requestId) => {
 
 // TODO: API 연동 로직 수정 필요
 // [H-03-01-02] 요청 수정 - 폼 데이터 조회 (GET 1회)
-// 응답: { situationId, requestId, requestState, userName, userId, requestType, time, location, message,
-//        dueDate, initialDueDate, assignStatus, changeState, userList }
-// - changeState: "BEFORE_EDIT" | "RECONFIRMING" | "RECONFIRMED" | "INVALID"
 export const getEditFormApi = (requestId) => {
   console.log(requestId);
   return getEditFormMock;
