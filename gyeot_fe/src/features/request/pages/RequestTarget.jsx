@@ -119,8 +119,8 @@ function RequestTarget() {
       <DefaultHeader
         title="받은 요청"
         subBtnTitle={flags.showHoldBtn ? "보류" : undefined}
-        onClick={handleGoBack}
-        onSubBtnClick={targetActions.hold}
+        onClick={() => handleGoBack()}
+        onSubBtnClick={flags.showHoldBtn ? targetActions.hold : undefined}
       />
 
       {/* 실제 메인 컨텐츠 */}
