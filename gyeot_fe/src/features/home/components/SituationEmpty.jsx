@@ -1,5 +1,5 @@
 import styles from "@/features/home/components/SituationEmpty.module.css";
-import IllustrationMessage from "@/features/home/components/IllustrationMessage";
+import IllustrationMessage from "@/shared/components/IllustrationMessage/IllustrationMessage";
 import ActionButton from "@/features/home/components/ActionButton";
 import resImgNew from "@/shared/assets/images/resImgNew.png";
 

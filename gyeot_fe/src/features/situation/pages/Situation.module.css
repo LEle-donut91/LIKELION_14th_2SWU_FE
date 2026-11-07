@@ -10,6 +10,11 @@
   );
 }
 
+/* 빈 상태(S-00-2) 페이지 배경: gray-050 */
+.pageEmpty {
+  background: var(--color-gray-050);
+}
+
 /* 헤더 아래 콘텐츠: 진행 중 영역과 지난 상황 영역 간격 16 */
 .content {
   display: flex;
@@ -26,6 +31,18 @@
   padding: 0 16px;
 }
 
+/* 빈 상태 영역: 헤더와 간격 120, 버튼은 안내 영역 바로 아래 (좌우 16) */
+.emptySection {
+  display: flex;
+  flex-direction: column;
+  margin-top: 110px;
+  padding: 0 16px;
+}
+
+.emptySection > :first-child {
+  margin: 0 -16px;
+}
+
 /* 상황 생성하기 (Btn / Secondary / Large) */
 .createBtn {
   width: 100%;
@@ -35,6 +52,15 @@
   background-color: var(--color-olive-200);
   color: var(--color-olive-900);
   cursor: pointer;
+}
+
+/* 빈 상태(S-00-2)의 상황 생성하기: 시안 높이 48 (목록 화면 버튼은 58 유지) */
+.emptySection .createBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 48px;
+  padding: 0 16px;
 }
 
 /* 지난 상황 헤더: 상단 구분선 olive-200 */
