@@ -1,0 +1,222 @@
+/* 페이지 전체 (버튼을 맨 아래로 보내기 위한 세로 배치) */
+.page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  background: #fcfbfa; /* R-00, R-01과 같은 배경 */
+  font-family: var(--font-gothic); /* 팀 기본 폰트 (index.css) */
+}
+
+/* 버튼도 페이지 폰트 따라가게 */
+.page button {
+  font-family: inherit;
+}
+
+/* 공통 헤더 배경을 페이지 배경과 같게 (이 페이지에서만 적용) */
+.page header {
+  background: transparent;
+}
+
+/* 공통 헤더의 '닫기' 글자를 X 아이콘으로 바꾸기 (이 페이지에서만 적용) */
+.page header button[aria-label="닫기"] {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  font-size: 0; /* '닫기' 글자 숨기기 */
+  background: url("../../../shared/assets/icons/iconClose.svg") center / 24px no-repeat;
+  cursor: pointer;
+}
+
+/* 본문 영역 */
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 56px 16px 24px;
+}
+
+/* ===== 서 ─ 링크 ─ 나 ===== */
+.connect {
+  display: flex;
+  align-items: flex-start;
+}
+
+.person {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+/* 원형 아바타 */
+.avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px var(--color-box-shadow);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+/* 보낸 사람 (베이지) */
+.inviter {
+  background: var(--color-beige-100);
+  color: var(--color-beige-800);
+}
+
+/* 나 (올리브) */
+.me {
+  background: var(--color-olive-100);
+  color: var(--color-olive-700);
+}
+
+.personName {
+  font-size: 9px;
+  color: #8a8a8a;
+}
+
+/* 아바타 사이 연결선 (아바타 가운데 높이) */
+.line {
+  width: 18px;
+  height: 1px;
+  margin-top: 25px;
+  background: var(--color-olive-500);
+}
+
+/* 가운데 초록 원 */
+.linkCircle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  margin-top: 16px;
+  border-radius: 50%;
+  background: var(--color-olive-500);
+}
+
+/* 흰 링크 아이콘 (svg 모양대로 흰색 칠하기) */
+.linkIcon {
+  width: 12px;
+  height: 12px;
+  background: #fff;
+  mask-size: contain;
+  -webkit-mask-size: contain;
+  mask-repeat: no-repeat;
+  -webkit-mask-repeat: no-repeat;
+  mask-position: center;
+  -webkit-mask-position: center;
+}
+
+/* 안내 문구 */
+.title {
+  margin: 28px 0 20px;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.5;
+  text-align: center;
+  color: #222;
+}
+
+/* ===== 초대 내용 카드 ===== */
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  padding: 16px 12px 12px;
+  background: #fff;
+  border: 1px solid var(--color-beige-200);
+  border-radius: 16px;
+  box-sizing: border-box;
+}
+
+.cardLabel {
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--color-beige-600);
+}
+
+.message {
+  margin: 4px 0 14px;
+  font-size: 14px;
+  color: #222;
+}
+
+/* 관계 유형 줄 */
+.relationRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--color-olive-100);
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+
+/* 사람 아이콘 (올리브색) */
+.peopleIcon {
+  width: 16px;
+  height: 16px;
+  background: var(--color-olive-700);
+  mask-size: contain;
+  -webkit-mask-size: contain;
+  mask-repeat: no-repeat;
+  -webkit-mask-repeat: no-repeat;
+  mask-position: center;
+  -webkit-mask-position: center;
+}
+
+.relationText {
+  flex: 1;
+  font-size: 12px;
+  font-weight: 700;
+  color: #222;
+}
+
+.relationBadge {
+  padding: 2px 6px;
+  background: var(--color-olive-200);
+  border-radius: 4px;
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--color-olive-700);
+}
+
+/* ===== 하단 버튼 ===== */
+.buttons {
+  display: grid;
+  grid-template-columns: 1fr 2fr; /* 거절 : 수락 = 1 : 2 */
+  gap: 8px;
+  width: 100%;
+  margin-top: auto;
+}
+
+.rejectBtn {
+  height: 44px;
+  background: var(--color-olive-200);
+  border: 1px solid var(--color-olive-300);
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #222;
+  cursor: pointer;
+}
+
+.acceptBtn {
+  height: 44px;
+  background: var(--color-olive-500);
+  border: none;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  cursor: pointer;
+}
