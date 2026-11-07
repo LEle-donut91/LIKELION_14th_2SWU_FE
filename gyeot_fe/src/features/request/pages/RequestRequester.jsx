@@ -23,6 +23,7 @@ import { REQUEST_ROUTES } from "@/features/request/constants/routerConstants";
 import {
   REQUESTER_CANCEL_BTN_TITLE,
   REQUESTER_FOOTER_CONFIG,
+  REQUEST_FORM_FIELD_KEY,
 } from "@/features/request/constants/requestConstants";
 
 // API, Services
@@ -48,7 +49,7 @@ import DefaultModal from "@/features/request/components/Modal/DefaultModal";
 
 function RequestRequester() {
   const paramId = useParams().id; // path parameter (요청 ID)
-  const { handleGoBack, handleGoNext } = useRequestNav();
+  const { handleGoBack, handleGoNext, handleGoNextWithState } = useRequestNav();
 
   const [isCancelModalOpen, setCancelModalOpen] = useState(false); // "요청 취소" 모달
   const [isSameModalOpen, setSameModalOpen] = useState(false); // "같은 내용 요청" 모달
@@ -56,11 +57,14 @@ function RequestRequester() {
   // TODO: API 연동 시 useEffect로 교체 (지금은 mock 이라 렌더마다 호출돼도 문제 없음)
   // [H-03-01] 요청 상세(요청자 뷰) - 데이터 조회 (가공/조건 계산은 service에서 처리)
   const {
+    situationId,
     requestState,
     userName,
+    userId,
     requestType,
     message,
     dueDate,
+    initialDueDate,
     infoList,
     userList,
     flags,
@@ -97,12 +101,13 @@ function RequestRequester() {
 
   // [같은 내용 요청 모달의 확인 버튼] 클릭 이벤트 핸들러
   const handleSameConfirm = () => {
-    console.log("모달의 confirm 버튼(복제 요청) 클릭");
-    // API 호출 로직 추가 필요
+    setSameModalOpen(false); // 모달 닫기
 
-    // 모달 닫고, H-03-02(요청 작성)으로 이동
-    setSameModalOpen(false);
-    handleGoNext("/request");
+    // H-03-02(요청 작성)로 이동하며 "상황 ID, 요청 대상 ID, 응답 기한" 전달
+    handleGoNextWithState(REQUEST_ROUTES.request(situationId), {
+      [REQUEST_FORM_FIELD_KEY.USER_ID]: userId,
+      [REQUEST_FORM_FIELD_KEY.DUE_DATE]: initialDueDate,
+    });
   };
 
   // 푸터 렌더링 (설정은 REQUESTER_FOOTER_CONFIG, 종류는 service에서 결정)
