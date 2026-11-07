@@ -37,15 +37,6 @@ export const STATUS_CARD_LIST = [
   },
 ];
 
-// 상황 카드 하단 태그
-// isActive: 활성화 태그(테두리/배경 olive-200) 여부
-export const SITUATION_TAG = {
-  ACCEPTED: { label: "수락", isActive: false },
-  WAITING: { label: "응답대기", isActive: false },
-  UNASSIGNED: { label: "담당없음", isActive: true },
-  REQUESTED: { label: "응답요청", isActive: true },
-};
-
 // 다가오는 일정 최대 노출 개수 (scr-H-00 주석 12: 가까운 순 2개)
 export const MAX_UPCOMING_SCHEDULE_COUNT = 2;
 

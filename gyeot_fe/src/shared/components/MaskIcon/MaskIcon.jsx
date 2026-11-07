@@ -1,4 +1,4 @@
-import styles from "@/features/home/components/MaskIcon.module.css";
+import styles from "@/shared/components/MaskIcon/MaskIcon.module.css";
 
 // SVG 아이콘을 mask로 그려 color(currentColor)로 색을 바꿀 수 있게 하는 컴포넌트
 // (svg를 컴포넌트로 import하는 라이브러리가 없어 mask 방식 사용)

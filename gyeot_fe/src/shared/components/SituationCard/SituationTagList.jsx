@@ -1,5 +1,5 @@
-import styles from "@/features/home/components/SituationTagList.module.css";
-import { SITUATION_TAG } from "@/features/home/constants/homeConstants";
+import styles from "@/shared/components/SituationCard/SituationTagList.module.css";
+import { SITUATION_TAG } from "@/shared/constants/situationCardConstants";
 
 // 상황 카드 하단 태그 목록 (수락 0건, 담당없음 0건 ...)
 // tags: [{ type, count }]

@@ -1,0 +1,28 @@
+/* 지난 상황 카드: 흰 배경, 라디우스 16, 그림자(CardEffect) */
+.pastList {
+  overflow: hidden;
+  border-radius: 16px;
+  background-color: var(--color-base-000);
+  box-shadow: 0 0 4px var(--color-box-shadow);
+}
+
+/* 목록: 항목 사이와 마지막 항목 아래에 olive-200 구분선 */
+.itemList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.itemList > li {
+  border-bottom: 1px solid var(--color-olive-200);
+}
+
+/* "지난 기록은 여기까지에요" (Display small, 높이 86) */
+.endText {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 86px;
+  margin: 0;
+  color: var(--color-base-999);
+}

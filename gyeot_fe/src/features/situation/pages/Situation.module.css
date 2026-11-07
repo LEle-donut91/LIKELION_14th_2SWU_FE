@@ -1,0 +1,96 @@
+/* 페이지 전체: 흰색 → beige-100 그라데이션, 하단 탭 높이만큼 여백 */
+.page {
+  min-height: 100%;
+  padding-bottom: 104px;
+  box-sizing: border-box;
+  background: linear-gradient(
+    to bottom,
+    var(--color-base-000) 42%,
+    var(--color-beige-100) 187%
+  );
+}
+
+/* 빈 상태(S-00-2) 페이지 배경: gray-050 */
+.pageEmpty {
+  background: var(--color-gray-050);
+}
+
+/* 헤더 아래 콘텐츠: 진행 중 영역과 지난 상황 영역 간격 16 */
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-top: 10px;
+}
+
+/* 진행 중인 상황: 카드 + 생성 버튼 (좌우 16, 간격 16) */
+.ongoingSection {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 0 16px;
+}
+
+/* 빈 상태 영역: 헤더와 간격 120, 버튼은 안내 영역 바로 아래 (좌우 16) */
+.emptySection {
+  display: flex;
+  flex-direction: column;
+  margin-top: 110px;
+  padding: 0 16px;
+}
+
+.emptySection > :first-child {
+  margin: 0 -16px;
+}
+
+/* 상황 생성하기 (Btn / Secondary / Large) */
+.createBtn {
+  width: 100%;
+  padding: 16px;
+  border-radius: 16px;
+  border: 1px solid var(--color-opacity-100);
+  background-color: var(--color-olive-200);
+  color: var(--color-olive-900);
+  cursor: pointer;
+}
+
+/* 빈 상태(S-00-2)의 상황 생성하기: 시안 높이 48 (목록 화면 버튼은 58 유지) */
+.emptySection .createBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 48px;
+  padding: 0 16px;
+}
+
+/* 지난 상황 헤더: 상단 구분선 olive-200 */
+.pastHeader {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 16px 16px 20px;
+  border-top: 1px solid var(--color-olive-200);
+}
+
+.pastTitle {
+  flex: 1;
+  margin: 0;
+  color: var(--color-gray-900);
+}
+
+/* 전체 보기: Display small gray-500, 아이콘 간격 5 */
+.allBtn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--color-gray-500);
+  cursor: pointer;
+}
+
+/* 지난 상황 목록: 좌우 16 (시안에서 헤더 바로 아래에 붙어 있음) */
+.pastListWrapper {
+  padding: 0 16px;
+}
