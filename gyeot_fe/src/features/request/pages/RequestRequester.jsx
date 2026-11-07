@@ -158,6 +158,7 @@ function RequestRequester() {
         {/* 요청 내용 요약 카드 */}
         <RequestSummary
           isAfterInfo={false}
+          hasBeigeBorder={true}
           title={`To. ${userName}`}
           hasTag={true}
           type={requestType}
