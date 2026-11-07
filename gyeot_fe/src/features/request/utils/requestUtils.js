@@ -12,7 +12,40 @@ import {
   REQUEST_PREREQUISITE_TOAST_MESSAGE,
   FIXED_DUE_DATE_TOAST_MESSAGE,
   START_PASSED_TOAST_MESSAGE,
+  REQUEST_STATE,
+  REQUESTER_FOOTER_KEY,
+  CANCEL_NOTICE_CONFIG,
+  EDIT_INVALID_NOTICE_CONFIG,
+  NO_ASSIGNEE_NOTICE_CONFIG,
+  REQUESTER_NOTICE_KEY,
+  REQUESTER_ORDER_TITLE,
+  REQUESTER_USER_STATE_TEXT,
+  CHANGE_STATE,
 } from "../constants/requestConstants";
+
+/**
+ * =====================================================================
+ * [request/ 공통] 타이머용 시간 문자열 처리
+ * =====================================================================
+ */
+
+// 1자리 숫자 앞에 0 붙이기 (예: 1 -> "01")
+export const padTimeUnit = (num) => String(num).padStart(2, "0");
+
+// "HH:MM:SS" -> 초 단위 총합 (비어있거나 숫자가 아니면 0 취급)
+export const parseTimeToSeconds = (timeStr = "") => {
+  const [h, m, s] = String(timeStr)
+    .split(":")
+    .map((v) => parseInt(v, 10) || 0);
+  return (h || 0) * 3600 + (m || 0) * 60 + (s || 0);
+};
+
+// 초 단위 총합 -> { hour, minute, second } (각각 2자리 문자열)
+export const formatSecondsToTime = (totalSeconds) => ({
+  hour: padTimeUnit(Math.floor(totalSeconds / 3600)),
+  minute: padTimeUnit(Math.floor((totalSeconds % 3600) / 60)),
+  second: padTimeUnit(totalSeconds % 60),
+});
 
 /**
  * =========================================================================
@@ -241,3 +274,117 @@ export const isStartTimeEnsured = (
   }
   return true;
 };
+
+/**
+ * =====================================================================
+ * [H-03-01-A] 요청 상세 · 요청자 뷰
+ * - 상태 플래그 / 알림 / 푸터 / 텍스트 결정
+ * =====================================================================
+ */
+
+// 서버 데이터에서 요청자 뷰의 모든 조건부 플래그를 한 곳에서 계산
+export const getRequesterFlags = ({
+  requestState,
+  assignReason,
+  changeState,
+}) => {
+  const isRequestState = requestState === REQUEST_STATE.REQUEST;
+  const isAcceptState = requestState === REQUEST_STATE.ACCEPT;
+  const isProgressState = requestState === REQUEST_STATE.PROGRESS;
+  const isDoneState = requestState === REQUEST_STATE.DONE;
+  const isCancelState = requestState === REQUEST_STATE.CANCEL;
+
+  // 요청됨 상태이면서 담당자 없음 사유가 있으면 -> 담당자 없음 상태
+  const isAssignedNoti = isRequestState && Boolean(assignReason);
+
+  // 수정 상태
+  const isEditPending =
+    isAcceptState && changeState === CHANGE_STATE.RECONFIRMING; // 수정안을 담당자가 확인 중
+  const isEditInvalid =
+    (isAcceptState || isProgressState) && changeState === CHANGE_STATE.INVALID; // 수정 무효
+
+  return {
+    isRequestState,
+    isAcceptState,
+    isProgressState,
+    isDoneState,
+    isCancelState,
+    isAssignedNoti,
+    isEditInvalid,
+    isEditPending,
+
+    // 화면 요소 노출 여부
+    isCancelable: isRequestState || isAcceptState || isProgressState, // 헤더 우측 "취소" 버튼
+    showUserState: isEditPending || isDoneState, // 요청 대상의 상태 카드 (수정사항을 확인 중이에요. 요청사항을 완료했어요!)
+    showDueDate: isRequestState, // 응답 기한 (타이머 형태)
+    showUserOrder: isRequestState || isCancelState, // 요청 순서/부탁 순서
+    showProgress: isProgressState, // 진행 중 표시 (이미지와 하단 안내 텍스트)
+    showMessage: !isProgressState, // 요청 내용의 세부 message 표시
+  };
+};
+
+// 노출할 요청 상태 카드(RequestState) 목록 반환: [{ key, title, information }]
+// ctx: { assignReason, cancelReason } (서버 사유 값)
+export const getRequesterNotices = (flags, ctx = {}) => {
+  const notices = [];
+
+  // 요청 취소 - 사유별 문구 (직접 취소 / 만료됨 / 거절함)
+  if (flags.isCancelState) {
+    const config = CANCEL_NOTICE_CONFIG[ctx.cancelReason];
+    notices.push({ key: REQUESTER_NOTICE_KEY.CANCEL, ...config });
+  }
+
+  // 담당자 없음 - 사유별 문구 (요청 거절 / 기한 지남 / 수락 철회 / 상황 나가기 / 관계 해제)
+  if (flags.isAssignedNoti) {
+    const config = NO_ASSIGNEE_NOTICE_CONFIG[ctx.assignReason];
+    notices.push({ key: REQUESTER_NOTICE_KEY.NO_ASSIGNEE, ...config });
+  }
+
+  // 수정 무효 - 수정이 반영되지 않았어요
+  if (flags.isEditInvalid) {
+    const config = EDIT_INVALID_NOTICE_CONFIG;
+    notices.push({ key: REQUESTER_NOTICE_KEY.EDIT_INVALID, ...config });
+  }
+
+  return notices;
+};
+
+// 상태별 푸터 종류 결정 (없으면 null)
+export const getRequesterFooterKey = (flags) => {
+  // 요청 상태
+  if (flags.isRequestState) {
+    return flags.isAssignedNoti
+      ? REQUESTER_FOOTER_KEY.EDIT_ASK_AGAIN
+      : REQUESTER_FOOTER_KEY.EDIT;
+  }
+
+  // 수락 상태
+  if (flags.isAcceptState) {
+    // 수정안 확인 중이면 [수정, 철회], 아니면 [수정]
+    return flags.isEditPending
+      ? REQUESTER_FOOTER_KEY.EDIT_WITHDRAW
+      : REQUESTER_FOOTER_KEY.EDIT;
+  }
+
+  // 진행 상태
+  if (flags.isProgressState) return REQUESTER_FOOTER_KEY.DONE;
+
+  // 완료 상태, 취소 상태
+  if (flags.isDoneState || flags.isCancelState) {
+    return REQUESTER_FOOTER_KEY.SAME_REQUEST;
+  }
+
+  return null;
+};
+
+// UserOrder(요청 순서, 부탁 순서) 타이틀 결정
+export const getRequesterOrderTitle = (flags) =>
+  flags.isCancelState || flags.isAssignedNoti
+    ? REQUESTER_ORDER_TITLE.ASK_OTHER
+    : REQUESTER_ORDER_TITLE.DEFAULT;
+
+// 요청 대상 상태 문구 결정 (showUserState일 때만 의미 있음)
+export const getRequesterUserStateText = (flags) =>
+  flags.isDoneState
+    ? REQUESTER_USER_STATE_TEXT.DONE
+    : REQUESTER_USER_STATE_TEXT.EDIT_PENDING;

@@ -314,6 +314,194 @@ export const START_PASSED_TOAST_MESSAGE =
 
 /**
  * =====================================================================
+ * [H-03-01-A] 요청 상세 · 요청자 뷰
+ * =====================================================================
+ */
+
+// 요청 진행 상태
+export const REQUEST_STATE = {
+  REQUEST: "REQUEST",
+  ACCEPT: "ACCEPT",
+  PROGRESS: "PROGRESS",
+  DONE: "DONE",
+  CANCEL: "CANCEL",
+};
+
+// 요청 진행 단계 순서 (요청 -> 수락 -> 진행 -> 완료)
+export const REQUEST_STEP_ORDER = [
+  REQUEST_STATE.REQUEST,
+  REQUEST_STATE.ACCEPT,
+  REQUEST_STATE.PROGRESS,
+  REQUEST_STATE.DONE,
+];
+
+// 요청 진행 단계 라벨
+export const REQUEST_STEP_LABELS = {
+  [REQUEST_STATE.REQUEST]: "요청",
+  [REQUEST_STATE.ACCEPT]: "수락",
+  [REQUEST_STATE.PROGRESS]: "진행",
+  [REQUEST_STATE.DONE]: "완료",
+};
+
+// 요청 수정 상태 (서버 값)
+export const CHANGE_STATE = {
+  BEFORE_EDIT: "BEFORE_EDIT", // 수정 전
+  RECONFIRMING: "RECONFIRMING", // 재확인 중
+  RECONFIRMED: "RECONFIRMED", // 재확인 수락
+  INVALID: "INVALID", // 수정 무효
+};
+
+// [UserOrder] 요청 순서 카드의 상태 값 / 한글 텍스트 (UserOrder.jsx에서 이동)
+export const USER_ORDER_STATE = {
+  EXPIRED: "EXPIRED",
+  WAITING: "WAITING",
+  DIFFICULTY: "DIFFICULTY",
+  CANCEL: "CANCEL",
+};
+
+export const USER_ORDER_STATE_TEXT = {
+  [USER_ORDER_STATE.EXPIRED]: "기한 경과",
+  [USER_ORDER_STATE.WAITING]: "응답 대기",
+  [USER_ORDER_STATE.DIFFICULTY]: "어려움",
+  [USER_ORDER_STATE.CANCEL]: "취소",
+};
+
+// 요청 순서 타이틀
+export const REQUESTER_ORDER_TITLE = {
+  ASK_OTHER: "부탁 순서",
+  DEFAULT: "요청 순서",
+};
+
+// 요청 대상 상태 문구
+export const REQUESTER_USER_STATE_TEXT = {
+  DONE: "*요청사항을 완료했어요!",
+  EDIT_PENDING: "*수정사항을 확인 중이에요.",
+};
+
+// 헤더 우측 버튼 문구
+export const REQUESTER_CANCEL_BTN_TITLE = "취소";
+
+// 담당자 없음 사유 (서버 값: noAssignedReason)
+export const NO_ASSIGNEE_REASON = {
+  REJECTED: "REJECTED", // 요청 거절
+  EXPIRED: "EXPIRED", // 기한 지남
+  ACCEPT_WITHDRAWN: "ACCEPT_WITHDRAWN", // 수락 철회
+  LEFT_SITUATION: "LEFT_SITUATION", // 상황 나가기
+  RELATION_RELEASED: "RELATION_RELEASED", // 관계 해제
+};
+
+// 요청 취소 사유 (서버 값: cancelReason)
+export const CANCEL_REASON = {
+  SELF: "SELF", // 직접 취소
+  EXPIRED: "EXPIRED", // 담당자 없음으로 만료
+  REJECTED: "REJECTED", // 담당자 거절
+};
+
+// 알림(RequestState) 종류 - React key 및 노출 규칙 구분용
+export const REQUESTER_NOTICE_KEY = {
+  CANCEL: "cancel",
+  NO_ASSIGNEE: "noAssignee",
+  EDIT_INVALID: "editInvalid",
+};
+
+// 알림(RequestState) 문구 설정
+// [담당자 없음] 사유별 제목/본문
+export const NO_ASSIGNEE_NOTICE_CONFIG = {
+  [NO_ASSIGNEE_REASON.REJECTED]: {
+    title: "요청 거절",
+    information: "진행이 어렵다고 응답했어요.",
+  },
+  [NO_ASSIGNEE_REASON.EXPIRED]: {
+    title: "기한 지남",
+    information: "상대방이 응답하지 않았어요.",
+  },
+  [NO_ASSIGNEE_REASON.ACCEPT_WITHDRAWN]: {
+    title: "수락 철회",
+    information: "상대방이 수락을 취소했어요.",
+  },
+  [NO_ASSIGNEE_REASON.LEFT_SITUATION]: {
+    title: "상황 나가기",
+    information: "상대방이 상황에서 나갔어요.",
+  },
+  [NO_ASSIGNEE_REASON.RELATION_RELEASED]: {
+    title: "관계 해제",
+    information: "상대방과 관계가 해제됐어요.",
+  },
+};
+
+// [요청 취소] 사유별 제목/본문
+export const CANCEL_NOTICE_CONFIG = {
+  [CANCEL_REASON.SELF]: {
+    title: "요청 취소",
+    information: "직접 취소했어요.",
+  },
+  [CANCEL_REASON.EXPIRED]: {
+    title: "만료됨",
+    information: "담당자가 없어 요청이 만료됐어요.",
+  },
+  [CANCEL_REASON.REJECTED]: {
+    title: "거절함",
+    information: "담당자가 거절해 취소됐어요.",
+  },
+};
+
+// [수정 무효] 고정 제목/본문
+export const EDIT_INVALID_NOTICE_CONFIG = {
+  title: "수정 무효",
+  information: "수정이 반영되지 않았어요",
+};
+
+// 푸터 종류
+export const REQUESTER_FOOTER_KEY = {
+  EDIT: "edit",
+  EDIT_ASK_AGAIN: "editAskAgain",
+  EDIT_WITHDRAW: "editWithdraw",
+  DONE: "done",
+  SAME_REQUEST: "sameRequest",
+};
+
+// 푸터 설정 - action 값은 페이지의 footerActions 키와 연결
+export const REQUESTER_FOOTER_CONFIG = {
+  [REQUESTER_FOOTER_KEY.EDIT]: {
+    size: "large",
+    title: "수정",
+    type: "secondary",
+    action: "edit",
+  },
+  [REQUESTER_FOOTER_KEY.EDIT_ASK_AGAIN]: {
+    size: "small",
+    leftType: "secondary",
+    rightType: "primary",
+    leftTitle: "수정",
+    rightTitle: "다른사람 요청",
+    leftAction: "edit",
+    rightAction: "askAgain",
+  },
+  [REQUESTER_FOOTER_KEY.EDIT_WITHDRAW]: {
+    size: "small",
+    leftType: "tertiary",
+    rightType: "secondary",
+    leftTitle: "수정 철회",
+    rightTitle: "수정",
+    leftAction: "withdraw",
+    rightAction: "edit",
+  },
+  [REQUESTER_FOOTER_KEY.DONE]: {
+    size: "large",
+    title: "완료",
+    type: "primary",
+    action: "done",
+  },
+  [REQUESTER_FOOTER_KEY.SAME_REQUEST]: {
+    size: "large",
+    title: "같은 내용 요청",
+    type: "secondary",
+    action: "sameRequest",
+  },
+};
+
+/**
+ * =====================================================================
  * TODO: 주석 수정 필요
  * =====================================================================
  */
