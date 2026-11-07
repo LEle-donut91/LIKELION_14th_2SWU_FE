@@ -320,11 +320,11 @@ export const START_PASSED_TOAST_MESSAGE =
 
 // 요청 진행 상태
 export const REQUEST_STATE = {
-  REQUEST: "request",
-  ACCEPT: "accept",
-  PROGRESS: "progress",
-  DONE: "done",
-  CANCEL: "cancel",
+  REQUEST: "REQUEST",
+  ACCEPT: "ACCEPT",
+  PROGRESS: "PROGRESS",
+  DONE: "DONE",
+  CANCEL: "CANCEL",
 };
 
 // 요청 진행 단계 순서 (요청 -> 수락 -> 진행 -> 완료)

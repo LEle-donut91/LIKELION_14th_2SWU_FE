@@ -7,7 +7,7 @@ import {
 
 /**
  * @param isRequester 현재 사용자가 요청자인지 여부를 나타내는 Boolean(true/false) 값
- * @param state 현재 요청의 진행 상태 (REQUEST_STATE 값: "request", "accept", "progress", "done", "cancel")
+ * @param state 현재 요청의 진행 상태 (REQUEST_STATE 값: "REQUEST", "ACCEPT", "PROGRESS", "DONE", "CANCEL")
  */
 function RequestStep({ isRequester, state }) {
   // 스타일 결정 함수
