@@ -40,8 +40,8 @@ button.item {
 }
 
 .olive {
-  background: var(--olive-100, #eff2ea);
-  color: var(--olive-700, #47592c);
+  background: var(--color-olive-100);
+  color: var(--color-olive-700);
 }
 
 .gray {
