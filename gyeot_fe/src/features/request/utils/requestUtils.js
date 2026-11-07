@@ -21,6 +21,12 @@ import {
   REQUESTER_ORDER_TITLE,
   REQUESTER_USER_STATE_TEXT,
   CHANGE_STATE,
+  TARGET_STATE,
+  TARGET_CLOSED_STATES,
+  TARGET_NOTICE_CONFIG,
+  TARGET_GUIDE_KEY,
+  TARGET_GUIDE_LINES,
+  TARGET_FOOTER_KEY,
 } from "../constants/requestConstants";
 
 /**
@@ -388,3 +394,53 @@ export const getRequesterUserStateText = (flags) =>
   flags.isDoneState
     ? REQUESTER_USER_STATE_TEXT.DONE
     : REQUESTER_USER_STATE_TEXT.EDIT_PENDING;
+
+/**
+ * =====================================================================
+ * [H-03-01-B] 요청 상세 · 대상자 뷰
+ * - 상태 플래그 / 알림 / 푸터 / 안내 문구 결정
+ * =====================================================================
+ */
+
+// 서버 상태값에서 대상자 뷰의 모든 조건부 플래그를 한 곳에서 계산
+export const getTargetFlags = (targetState) => {
+  const isBeforeState = targetState === TARGET_STATE.BEFORE;
+  const isHoldState = targetState === TARGET_STATE.HOLD;
+  const isRefusedState = targetState === TARGET_STATE.REFUSED;
+  const isClosedState = TARGET_CLOSED_STATES.includes(targetState); // cancel / expired / pass
+
+  return {
+    isBeforeState,
+    isHoldState,
+    isRefusedState,
+    isClosedState,
+
+    // 화면 요소 노출 여부
+    showHoldBtn: isBeforeState, // 헤더 우측 "보류" 버튼
+    showNotice: isClosedState, // 요청 상태 카드 (RequestState)
+    showDueDate: isBeforeState || isHoldState || isRefusedState, // 응답 기한 타이머
+    showHoldGuide: isHoldState || isRefusedState, // "보류 중인 요청사항이에요" 안내
+    showClosedGuide: isClosedState, // "더 이상 응답할 수 없어요" 안내
+  };
+};
+
+// 노출할 요청 상태 카드 반환: { title, information } | null
+export const getTargetNotice = (flags, targetState) =>
+  flags.showNotice ? TARGET_NOTICE_CONFIG[targetState] : null;
+
+// 상태별 푸터 종류 결정 (없으면 null)
+export const getTargetFooterKey = (flags) => {
+  if (flags.isBeforeState) return TARGET_FOOTER_KEY.RESPOND;
+  if (flags.isHoldState) return TARGET_FOOTER_KEY.CHANGE;
+  if (flags.isRefusedState) return TARGET_FOOTER_KEY.CHANGE_TO_ACCEPT;
+  return null;
+};
+
+// 안내 가이드 텍스트(줄 단위 배열) 결정 (없으면 빈 배열)
+export const getTargetGuideLines = (flags) => {
+  if (flags.showHoldGuide) return TARGET_GUIDE_LINES[TARGET_GUIDE_KEY.HOLD];
+  if (flags.showClosedGuide) {
+    return TARGET_GUIDE_LINES[TARGET_GUIDE_KEY.CLOSED];
+  }
+  return [];
+};

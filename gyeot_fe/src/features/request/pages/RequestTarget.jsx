@@ -1,120 +1,116 @@
-// H-03-01-B
+/**
+ * =====================================================================
+ * [H-03-01-B] 요청 상세 · 대상자 뷰
+ * - 페이지 컴포넌트
+ * =====================================================================
+ */
+
 import styles from "@/features/request/pages/RequestTarget.module.css";
+
+// 일반 라이브러리
+import { Fragment, useMemo } from "react";
+import { useParams } from "react-router-dom";
+
+// Custom Hooks
+import { useRequestNav } from "@/features/request/hooks/useRequestNav";
+
+// Constants
+import { REQUEST_ROUTES } from "@/features/request/constants/routerConstants";
+import { TARGET_FOOTER_CONFIG } from "@/features/request/constants/requestConstants";
+
+// API, Services
+import {
+  getTargetApi,
+  patchTargetHoldApi,
+  patchTargetRefuseApi,
+  patchTargetAcceptApi,
+  patchTargetChangeRefuseApi,
+  patchTargetChangeAcceptApi,
+} from "@/features/request/api/targetApi";
+import { getTargetService } from "@/features/request/services/targetService";
+
+// 일반 Components
 import DefaultHeader from "@/features/request/components/Header/DefaultHeader";
-import RequestSummary from "@/features/request/components/Request/RequestSummary";
-import DueDateState from "@/features/request/components/State/DueDateState";
-import targetData from "@/features/request/api/targetData";
-import iconLocation from "@/shared/assets/icons/iconLocation.svg";
-import iconDate from "@/shared/assets/icons/iconDate.svg";
-import RequestState from "@/features/request/components/State/RequestState";
 import SmallFooter from "@/features/request/components/Footer/SmallFooter";
 import LargeFooter from "@/features/request/components/Footer/LargeFooter";
-import { useRequestNav } from "@/features/request/hooks/useRequestNav";
-import { REQUEST_STATE_CONFIG } from "@/features/request/constants/requestConstants";
+import RequestSummary from "@/features/request/components/Request/RequestSummary";
+import DueDateState from "@/features/request/components/State/DueDateState";
+import RequestState from "@/features/request/components/State/RequestState";
 
 function RequestTarget() {
+  const paramId = useParams().id; // path parameter (요청 ID)
   const { handleGoBack, handleGoNext } = useRequestNav();
 
-  // JSON 데이터 변수에 저장
+  // TODO: API 연동 시 useEffect로 교체 (지금은 mock 이라 렌더마다 호출돼도 문제 없음)
+  // 요청 상세(대상자 뷰) - 데이터 조회 (가공/조건 계산은 service에서 처리)
   const {
-    reqState,
-    reqUser,
-    reqType,
-    reqTime,
-    reqLocation,
-    reqMsg,
-    resDueDate,
-  } = targetData;
+    userName,
+    requestType,
+    message,
+    dueDate,
+    infoList,
+    flags,
+    notice,
+    footerKey,
+    guideLines,
+  } = useMemo(() => getTargetService(getTargetApi(paramId)), [paramId]);
 
-  // 조건부 변수 정리
-  const isBeforeState = reqState === "before";
-  const isHoldState = reqState === "hold";
-  const isRefusedState = reqState === "refused";
-  const isCancelState = reqState === "cancel";
-  const isExpiredState = reqState === "expired";
-  const isPassState = reqState === "pass";
-
-  // RequestSummary에 넘겨줄 infoList 배열 구성
-  // 부모 컴포넌트에서 동적으로 아이콘, 라벨, 값을 묶어서 전달
-  const infoList = [
-    { icon: iconDate, label: "시간", value: reqTime },
-    { icon: iconLocation, label: "장소", value: reqLocation },
-  ];
-
-  /* 버튼 클릭 이벤트 핸들러 */
-  // 1) "보류" 버튼
-  const handleHoldBtnClick = () => {
-    console.log("보류 버튼 클릭");
-
-    // API 호출 로직 추가 필요
+  // 버튼 action 이름 -> 클릭 핸들러 (TARGET_FOOTER_CONFIG의 action 값과 연결)
+  // TODO: API 연동 로직 수정 필요
+  // TODO: API 연동 시 응답의 isSuccess 확인 후 재조회/이동 처리
+  const targetActions = {
+    // 보류 (헤더 우측 버튼)
+    hold: () => {
+      patchTargetHoldApi(paramId);
+      // TODO: 재조회 필요
+    },
+    // 거절
+    refuse: () => {
+      patchTargetRefuseApi(paramId);
+      // TODO: 재조회 필요
+    },
+    // 수락
+    accept: () => {
+      patchTargetAcceptApi(paramId);
+      handleGoNext(REQUEST_ROUTES.assignee(paramId), true);
+    },
+    // 거절로 변경
+    changeToRefuse: () => {
+      patchTargetChangeRefuseApi(paramId);
+      // TODO: 재조회 필요
+    },
+    // 수락으로 변경
+    changeToAccept: () => {
+      patchTargetChangeAcceptApi(paramId);
+      handleGoNext(REQUEST_ROUTES.assignee(paramId), true);
+    },
   };
 
-  // 2) "거절" 버튼
-  const handleRefuseBtnClick = () => {
-    console.log("거절 버튼 클릭");
-
-    // API 호출 로직 추가 필요
-  };
-
-  // 3) "수락" 버튼
-  const handleAcceptBtnClick = () => {
-    console.log("수락 버튼 클릭");
-
-    // API 호출 로직 추가 필요
-
-    handleGoNext("/request/assignee");
-  };
-
-  // 4) "거절로 변경" 버튼
-  const handleToRefuseBtnClick = () => {
-    console.log("거절로 변경 버튼 클릭");
-
-    // API 호출 로직 추가 필요
-  };
-
-  // 5) "수락으로 변경" 버튼
-  const handleToAcceptBtnClick = () => {
-    console.log("수락으로 변경 버튼 클릭");
-
-    // API 호출 로직 추가 필요
-
-    handleGoNext("/request/assignee");
-  };
-
-  // 하단 푸터(Footer) 컴포넌트 렌더링 함수
+  // 푸터 렌더링 (설정은 TARGET_FOOTER_CONFIG, 종류는 service에서 결정)
   const renderFooter = () => {
-    if (isBeforeState) {
+    const config = TARGET_FOOTER_CONFIG[footerKey];
+    if (!config) return null;
+
+    if (config.size === "small") {
       return (
         <SmallFooter
-          leftType="secondary"
-          leftTitle="거절"
-          rightTitle="수락"
-          leftOnClick={handleRefuseBtnClick}
-          rightOnClick={handleAcceptBtnClick}
+          leftType={config.leftType}
+          rightType={config.rightType}
+          leftTitle={config.leftTitle}
+          rightTitle={config.rightTitle}
+          leftOnClick={targetActions[config.leftAction]}
+          rightOnClick={targetActions[config.rightAction]}
         />
       );
     }
-    if (isHoldState) {
-      return (
-        <SmallFooter
-          leftType="secondary"
-          leftTitle="거절로 변경"
-          rightTitle="수락으로 변경"
-          leftOnClick={handleToRefuseBtnClick}
-          rightOnClick={handleToAcceptBtnClick}
-        />
-      );
-    }
-    if (isRefusedState) {
-      return (
-        <LargeFooter
-          title="수락으로 변경"
-          type="primary"
-          onClick={handleToAcceptBtnClick}
-        />
-      );
-    }
-    return null;
+
+    return (
+      <LargeFooter
+        title={config.title}
+        type={config.type}
+        onClick={targetActions[config.action]}
+      />
+    );
   };
 
   return (
@@ -122,19 +118,19 @@ function RequestTarget() {
       {/* 상단 헤더 */}
       <DefaultHeader
         title="받은 요청"
-        subBtnTitle={isBeforeState ? "보류" : undefined}
-        onClick={handleGoBack}
-        onSubBtnClick={handleHoldBtnClick}
+        subBtnTitle={flags.showHoldBtn ? "보류" : undefined}
+        onClick={() => handleGoBack()}
+        onSubBtnClick={flags.showHoldBtn ? targetActions.hold : undefined}
       />
 
       {/* 실제 메인 컨텐츠 */}
       <div className={styles.content}>
-        {/* 요청 상태 카드 */}
-        {(isCancelState || isExpiredState || isPassState) && (
+        {/* 요청 상태 카드 (요청 취소 / 요청 만료 / 다른 사용자에게 넘어감) */}
+        {notice && (
           <RequestState
             isAssignee={false}
-            title={REQUEST_STATE_CONFIG[reqState].title}
-            information={REQUEST_STATE_CONFIG[reqState].information}
+            title={notice.title}
+            information={notice.information}
           />
         )}
 
@@ -142,34 +138,27 @@ function RequestTarget() {
         <RequestSummary
           isAfterInfo={false}
           hasBeigeBorder={true}
-          title={`${reqUser}님의 요청`}
+          title={`${userName}님의 요청`}
           hasTag={true}
-          type={reqType}
+          type={requestType}
           infoList={infoList}
-          message={reqMsg}
+          message={message}
         />
 
         {/* 응답 기한 */}
-        {(isBeforeState || isHoldState || isRefusedState) && (
-          <DueDateState
-            isResponse={true}
-            title="응답 기한"
-            dueDate={resDueDate}
-          />
+        {flags.showDueDate && (
+          <DueDateState isResponse={true} title="응답 기한" dueDate={dueDate} />
         )}
 
         {/* 안내 가이드 텍스트 */}
-        {(isHoldState || isRefusedState) && (
+        {guideLines.length > 0 && (
           <span className={`${styles.guideTxt} typoBodySmall`}>
-            보류 중인 요청사항이에요.
-            <br />
-            보류 중 요청자가 취소할 경우, 응답할 수 없어요.
-          </span>
-        )}
-
-        {(isCancelState || isExpiredState || isPassState) && (
-          <span className={`${styles.guideTxt} typoBodySmall`}>
-            더 이상 응답할 수 없어요.
+            {guideLines.map((line, index) => (
+              <Fragment key={line}>
+                {index > 0 && <br />}
+                {line}
+              </Fragment>
+            ))}
           </span>
         )}
       </div>
