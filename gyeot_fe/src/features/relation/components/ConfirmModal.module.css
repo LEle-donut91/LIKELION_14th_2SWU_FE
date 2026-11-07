@@ -1,0 +1,65 @@
+/* 어두운 배경 (페이지 전체를 덮음) */
+.overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 24px;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* 흰 모달 박스 */
+.modal {
+  width: 100%;
+  max-width: 280px;
+  padding: 20px 12px 12px;
+  background: #fff;
+  border-radius: 14px;
+  text-align: center;
+}
+
+.title {
+  margin: 0 0 12px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-olive-700);
+}
+
+/* \n 줄바꿈 그대로 보이게 */
+.description {
+  margin: 0 0 16px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #333;
+  white-space: pre-line;
+}
+
+/* 버튼 2개 나란히 */
+.buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.cancelBtn {
+  height: 36px;
+  background: #fff;
+  border: 1px solid var(--color-beige-200);
+  border-radius: 10px;
+  font-size: 12px;
+  color: #222;
+  cursor: pointer;
+}
+
+/* 빨간 확인 버튼 */
+.confirmBtn {
+  height: 36px;
+  background: var(--color-red-700);
+  border: none;
+  border-radius: 10px;
+  font-size: 12px;
+  color: #fff;
+  cursor: pointer;
+}

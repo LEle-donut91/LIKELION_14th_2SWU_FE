@@ -31,3 +31,12 @@ export const MOCK_RELATION = {
     { id: 34, name: "유진", status: "EXPIRED" },
   ],
 };
+
+// 관계 형태 빠른 선택 칩 (R-01)
+export const RELATION_TYPE_CHIPS = ["친구", "연인", "이웃"];
+
+// 초대 메시지 기본 멘트 (R-01)
+export const DEFAULT_INVITE_MESSAGE = "함께 해요";
+
+// 초대 링크 유효 기간(일) (R-01)
+export const INVITE_VALID_DAYS = 7;
