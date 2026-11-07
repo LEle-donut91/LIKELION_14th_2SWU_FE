@@ -22,7 +22,7 @@ export const getTargetService = (raw) => {
   const flags = getTargetFlags(targetState);
 
   return {
-    situationId: raw?.requestId ?? "",
+    situationId: raw?.situationId ?? "",
     requestId: raw?.requestId ?? "",
     targetState,
     userName: raw?.userName ?? "",
