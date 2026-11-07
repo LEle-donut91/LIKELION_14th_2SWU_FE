@@ -3,6 +3,12 @@
   min-height: 100%; /* 모바일 프레임(App.module.css) 높이 기준 */
   padding: 0 16px 100px;
   background: #fcfbfa; /* 페이지 배경 (시안 기준) */
+  font-family: var(--font-gothic); /* 팀 기본 폰트 (index.css) */
+}
+
+/* 버튼도 페이지 폰트 따라가게 (기본값은 브라우저 폰트) */
+.page button {
+  font-family: inherit;
 }
 
 /* 카드 리스트 세로 간격 */
@@ -23,14 +29,14 @@
   background: #8b7355;
   font-size: 9px;
   font-weight: 600;
-  color: var(--beige-200, #ccbea5); /* 보호자 글씨 베이지-200 */
+  color: var(--color-beige-200); /* 보호자 글씨 베이지-200 */
 }
 
 /* 초록 메인 버튼 */
 .primaryBtn {
   width: 100%;
   height: 40px;
-  background: var(--olive-500, #849952);
+  background: var(--color-olive-500);
   border: none;
   border-radius: 10px;
   font-size: 13px;
@@ -41,7 +47,7 @@
 
 /* 비활성 (보호자 3명) */
 .primaryBtn:disabled {
-  background: #e8e7e5; /* 시안 기준 */
+  background: var(--color-gray-100);
   color: #a5a29c;
   cursor: not-allowed;
 }
@@ -64,7 +70,7 @@
   border-radius: 10px;
   font-size: 13px;
   font-weight: 700;
-  color: var(--olive-700, #47592c); /* 초대 버튼 글자 올리브 */
+  color: var(--color-olive-700); /* 초대 버튼 글자 올리브 */
   cursor: pointer;
 }
 
