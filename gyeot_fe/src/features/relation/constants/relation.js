@@ -40,3 +40,37 @@ export const DEFAULT_INVITE_MESSAGE = "함께 해요";
 
 // 초대 링크 유효 기간(일) (R-01)
 export const INVITE_VALID_DAYS = 7;
+
+// 받은 초대 상태별 결과 화면 문구 (R-03)
+export const RECEIVED_INVITE_RESULT = {
+  CANCELED: {
+    badge: "취소됨",
+    title: "취소된 초대예요",
+    description: "보낸 분이 초대를 취소했어요.",
+  },
+  EXPIRED: {
+    badge: "만료",
+    title: "초대 링크가 만료됐어요",
+    description: "초대 링크는 7일 동안만 쓸 수 있어요.\n보낸 분께 다시 초대해달라고 해 주세요.",
+  },
+  ACCEPTED: {
+    badge: "수락",
+    title: "이미 수락한 초대예요",
+    description: "관계 탭에서만 확인할 수 있어요.",
+  },
+  REJECTED: {
+    badge: "거절",
+    title: "이미 거절한 초대예요",
+    description: "다시 연결하려면 보낸 분께 새 초대를 받아 주세요.",
+  },
+};
+
+// 받은 초대 임시 데이터 (R-03)
+// status를 PENDING / CANCELED / EXPIRED / ACCEPTED / REJECTED 로 바꿔서 화면 확인
+export const MOCK_RECEIVED_INVITE = {
+  id: 1,
+  inviterName: "서연",
+  message: "함께 해요",
+  relationLabel: "나의 사람",
+  status: "PENDING",
+};
