@@ -502,16 +502,86 @@ export const REQUESTER_FOOTER_CONFIG = {
 
 /**
  * =====================================================================
- * TODO: 주석 수정 필요
+ * [H-03-01-B] 요청 상세 · 대상자 뷰
  * =====================================================================
  */
 
-// [H-03-01-B] 요청 상태에 따른 RequestState 컴포넌트 설정 데이터 매핑
-export const REQUEST_STATE_CONFIG = {
-  cancel: { title: "요청 취소", information: "요청자가 취소했어요." },
-  expired: { title: "요청 만료", information: "요청이 만료됐어요." },
-  pass: {
+// 대상자 뷰의 요청 상태 (서버 값)
+export const TARGET_STATE = {
+  BEFORE: "BEFORE", // 응답 전
+  HOLD: "HOLD", // 보류
+  REFUSED: "REFUSED", // 거절
+  CANCEL: "CANCEL", // 요청자가 취소
+  EXPIRED: "EXPIRED", // 요청 만료
+  PASS: "PASS", // 다른 사용자에게 넘어감
+};
+
+// 더 이상 응답할 수 없는 상태 목록
+export const TARGET_CLOSED_STATES = [
+  TARGET_STATE.CANCEL,
+  TARGET_STATE.EXPIRED,
+  TARGET_STATE.PASS,
+];
+
+// 알림(RequestState) 문구 설정 - 기획/디자인 변경 시 여기 문구만 수정
+export const TARGET_NOTICE_CONFIG = {
+  [TARGET_STATE.CANCEL]: {
+    title: "요청 취소",
+    information: "요청자가 취소했어요.",
+  },
+  [TARGET_STATE.EXPIRED]: {
+    title: "요청 만료",
+    information: "요청이 만료됐어요.",
+  },
+  [TARGET_STATE.PASS]: {
     title: "요청 취소",
     information: "다른 사용자에게 요청이 넘어갔어요.",
+  },
+};
+
+// 안내 가이드 텍스트 종류 / 문구 (배열의 각 원소 = 한 줄)
+export const TARGET_GUIDE_KEY = {
+  HOLD: "HOLD",
+  CLOSED: "CLOSED",
+};
+
+export const TARGET_GUIDE_LINES = {
+  [TARGET_GUIDE_KEY.HOLD]: [
+    "보류 중인 요청사항이에요.",
+    "보류 중 요청자가 취소할 경우, 응답할 수 없어요.",
+  ],
+  [TARGET_GUIDE_KEY.CLOSED]: ["더 이상 응답할 수 없어요."],
+};
+
+// 푸터 종류
+export const TARGET_FOOTER_KEY = {
+  RESPOND: "RESPOND", // 응답 전: [거절, 수락]
+  CHANGE: "CHANGE", // 보류: [거절로 변경, 수락으로 변경]
+  CHANGE_TO_ACCEPT: "CHANGE_TO_ACCEPT", // 거절: [수락으로 변경]
+};
+
+// 푸터 설정 - action 값은 페이지의 targetActions 키와 연결
+export const TARGET_FOOTER_CONFIG = {
+  [TARGET_FOOTER_KEY.RESPOND]: {
+    size: "small",
+    leftType: "secondary",
+    leftTitle: "거절",
+    rightTitle: "수락",
+    leftAction: "refuse",
+    rightAction: "accept",
+  },
+  [TARGET_FOOTER_KEY.CHANGE]: {
+    size: "small",
+    leftType: "secondary",
+    leftTitle: "거절로 변경",
+    rightTitle: "수락으로 변경",
+    leftAction: "changeToRefuse",
+    rightAction: "changeToAccept",
+  },
+  [TARGET_FOOTER_KEY.CHANGE_TO_ACCEPT]: {
+    size: "large",
+    title: "수락으로 변경",
+    type: "primary",
+    action: "changeToAccept",
   },
 };
