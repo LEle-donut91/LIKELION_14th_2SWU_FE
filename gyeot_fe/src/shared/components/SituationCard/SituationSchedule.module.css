@@ -29,3 +29,8 @@
   color: var(--color-gray-700);
   cursor: pointer;
 }
+
+/* 자세히 보기 아이콘: 시안 기준 gray-400 (글자색 gray-700과 별도) */
+.moreIcon {
+  color: var(--color-gray-400);
+}

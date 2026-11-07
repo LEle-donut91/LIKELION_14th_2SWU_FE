@@ -39,7 +39,7 @@ function SituationSchedule({ nextSchedule, extraScheduleCount, onMoreClick }) {
         onClick={onMoreClick}
       >
         자세히 보기
-        <MaskIcon src={iconRight} size={16} />
+        <MaskIcon src={iconRight} size={16} className={styles.moreIcon} />
       </button>
     </div>
   );
