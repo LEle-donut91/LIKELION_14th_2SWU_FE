@@ -1,0 +1,23 @@
+/* 섹션: 타이틀 ~ 카드 목록*/
+.cardMenuSection {
+  display: flex;
+  flex-direction: column;
+}
+
+/* 섹션 타이틀 */
+.title {
+  margin: 0;
+  color: var(--color-gray-900);
+  padding-bottom: 20px;
+  gap: 8px;
+}
+
+/* 카드 목록: 카드 간 간격 12 */
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
