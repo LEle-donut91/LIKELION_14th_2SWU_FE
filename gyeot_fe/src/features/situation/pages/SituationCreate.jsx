@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "@/features/situation/pages/SituationCreate.module.css";
-import DefaultHeader from "@/shared/components/DefaultHeader/DefaultHeader";
+import SubpageHeader from "@/shared/components/subpage-header/SubpageHeader"; // 팀 공통 서브 헤더
 import SelectSection from "@/shared/components/SelectSection/SelectSection";
 import InputSection from "@/shared/components/InputSection/InputSection";
 import LargeFooter from "@/shared/components/LargeFooter/LargeFooter";
@@ -53,10 +53,6 @@ function SituationCreate() {
   // TODO: API 연동 전까지 목업 데이터 사용
   const acquaintanceList = ACQUAINTANCE_LIST_MOCK;
 
-  const handleBackClick = () => {
-    navigate(-1);
-  };
-
   const handleSheetClose = () => {
     setOpenSheet(null);
   };
@@ -68,7 +64,7 @@ function SituationCreate() {
 
   return (
     <div className={styles.page}>
-      <DefaultHeader title="상황 만들기" onClick={handleBackClick} />
+      <SubpageHeader title="상황 만들기" />
 
       <main className={styles.content}>
         <SelectSection
