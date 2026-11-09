@@ -44,3 +44,10 @@ export const PAST_SITUATION_LIST_MOCK = [
     requestCount: 1,
   },
 ];
+
+// H-01 참여할 지인 목록 (내 사람으로 등록한 지인)
+export const ACQUAINTANCE_LIST_MOCK = [
+  { id: 1, name: "서연", relation: "", isGuardian: true },
+  { id: 2, name: "민재", relation: "친구", isGuardian: false },
+  { id: 3, name: "하은", relation: "이웃", isGuardian: false },
+];
