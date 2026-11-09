@@ -1,0 +1,18 @@
+/* 배경: Home(H-00)과 동일한 선형 그라데이션 */
+.card {
+  position: relative;
+  min-height: 100%;
+  background: linear-gradient(
+    180deg,
+    var(--color-base-000) 0%,
+    var(--color-beige-100) 240%
+  );
+}
+
+/* 메인 콘텐츠 */
+.mainContent {
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+  padding: 16px 16px 240px;
+}
