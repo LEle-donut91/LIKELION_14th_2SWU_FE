@@ -1,0 +1,53 @@
+/* 전체 페이지 (SmallFooter, DefaultToast의 absolute 기준점) */
+.page {
+  position: relative;
+  width: 100%;
+  min-height: 100%;
+  box-sizing: border-box;
+
+  /* index.css */
+  background-color: var(--color-gray-050);
+
+  display: flex;
+  flex-direction: column;
+}
+
+/* 목록 화면 컨텐츠 */
+.listContent {
+  padding: 16px;
+}
+
+/* 기본 정보 카드 목록 */
+.infoList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* 편집 화면 컨텐츠 (하단 SmallFooter 높이만큼 여백 확보) */
+.editContent {
+  padding: 16px 16px 140px;
+}
+
+/* 토스트 위치 조정 영역
+ * - DefaultToast는 부모 기준 bottom 0 + margin-bottom 44px 로 배치됨
+ * - SmallFooter(약 114px)와 겹치지 않도록 이 영역을 위로 띄움 (시안 확정 후 조정) */
+.toastArea {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 72px;
+  height: 0;
+}
+
+/* 토스트 너비를 글자 길이에 맞춤 (화면 절반으로 줄어드는 문제 방지)
+ * - max-width: 문구가 아주 길면 좌우 16px 여백을 남기고 줄바꿈 */
+.toastArea > * {
+  width: max-content;
+  max-width: calc(100% - 32px);
+  box-sizing: border-box;
+}

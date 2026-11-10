@@ -1,0 +1,63 @@
+/* 기본 정보 카드 (CardMenuItem 카드 스타일 기준) */
+.basicInfoItem {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  padding: 16px;
+  box-sizing: border-box;
+  border: 1px solid var(--color-opacity-100);
+  border-radius: 16px;
+  background-color: var(--color-base-000);
+  /* CardEffect: X 0 / Y 0 / 흐림 4 / 스프레드 0 / #C0C0C0 16% */
+  box-shadow: 0 0 4px rgba(192, 192, 192, 0.16);
+}
+
+/* 제목 + 갱신일 뱃지 */
+.titleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+/* 카드 제목 (폰트: index.css의 typoBodyStrong 사용) */
+.title {
+  margin: 0;
+  color: var(--color-gray-900);
+}
+
+/* 갱신일 뱃지 (폰트: index.css의 typoCaptionMedium 사용) */
+.dateBadge {
+  flex-shrink: 0;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background-color: var(--color-beige-100);
+  color: var(--color-gray-900);
+}
+
+/* 값 (폰트: index.css의 typoBodySmall 사용) */
+.description {
+  margin: 0;
+  color: var(--color-gray-500);
+}
+
+/* 수정하기 버튼 (우측 하단) */
+.editBtn {
+  align-self: flex-end;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  margin-top: 8px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--color-gray-700);
+  cursor: pointer;
+}
+
+/* 연필 아이콘 */
+.editIcon {
+  color: var(--color-gray-600);
+}

@@ -12,3 +12,19 @@ export const CARD_SUMMARY_MOCK = {
   },
   sharingCount: 2,
 };
+
+// C-01 기본 정보 목업 데이터
+// TODO: API 스펙 확정 후 응답 형태에 맞춰 교체
+// - 키: BASIC_INFO_KEY 값과 동일
+// - value: 저장값 (생년월일 "YYYY-MM-DD", 혈액형 BLOOD_TYPE_LABELS의 key) / 값이 없으면 null
+// - updatedDate: 항목별 마지막 갱신일 ("YYYY-MM-DD") / 없으면 null
+export const CARD_BASIC_MOCK = {
+  birthDate: {
+    value: "2000-12-30",
+    updatedDate: "2026-09-20",
+  },
+  bloodType: {
+    value: "AB",
+    updatedDate: "2026-09-20",
+  },
+};
