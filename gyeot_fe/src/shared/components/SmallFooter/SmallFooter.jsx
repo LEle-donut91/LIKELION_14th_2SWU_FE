@@ -1,4 +1,4 @@
-import styles from "@/features/request/components/Footer/SmallFooter.module.css";
+import styles from "@/shared/components/SmallFooter/SmallFooter.module.css";
 
 function SmallFooter({
   leftType,

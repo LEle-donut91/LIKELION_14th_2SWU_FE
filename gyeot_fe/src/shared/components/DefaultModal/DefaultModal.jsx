@@ -1,5 +1,5 @@
 import Modal from "react-modal";
-import styles from "@/features/request/components/Modal/DefaultModal.module.css";
+import styles from "@/shared/components/DefaultModal/DefaultModal.module.css";
 
 function DefaultModal({
   modalOpen,
