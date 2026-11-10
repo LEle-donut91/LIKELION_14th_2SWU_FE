@@ -13,8 +13,7 @@ import styles from "@/features/card/pages/CardBasic.module.css";
 import { useState } from "react";
 
 // Custom Hooks
-// TODO: useToast가 shared로 이동하면 경로 변경
-import { useToast } from "@/features/request/hooks/useToast";
+import { useToast } from "@/shared/hooks/useToast";
 
 // Constants
 import {
@@ -47,8 +46,7 @@ import { CARD_BASIC_MOCK } from "@/features/card/mocks/cardMockData";
 import SubpageHeader from "@/shared/components/subpage-header/SubpageHeader";
 import SmallFooter from "@/shared/components/SmallFooter/SmallFooter";
 import DefaultModal from "@/shared/components/DefaultModal/DefaultModal";
-// TODO: DefaultToast가 shared로 이동하면 경로 변경
-import DefaultToast from "@/features/request/components/Toast/DefaultToast";
+import DefaultToast from "@/shared/components/Toast/DefaultToast";
 import BasicInfoItem from "@/features/card/components/BasicInfoItem";
 import BirthDateField from "@/features/card/components/BirthDateField";
 import BloodTypeField from "@/features/card/components/BloodTypeField";
