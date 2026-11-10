@@ -10,6 +10,9 @@ import styles from "@/shared/components/DefaultSheet/DefaultSheet.module.css";
  * - onConfirm           : [확인] 클릭 시 임시 선택 값을 부모에게 전달
  * - children            : (tempValue, setTempValue) => ReactNode
  *                         시트 안에 들어갈 SituationOption / UserOption 등을 부모 컴포넌트에서 직접 주입
+ * - confirmText         : 하단 버튼 문구 (기본값 "확인")
+ * - getIsConfirmDisabled: (tempValue) => boolean, true면 하단 버튼 비활성화 (기본값: 항상 활성)
+ * - description은 없으면 표시하지 않음
  */
 function DefaultSheet({
   isOpen,
@@ -19,6 +22,8 @@ function DefaultSheet({
   value,
   onConfirm,
   children,
+  confirmText = "확인",
+  getIsConfirmDisabled,
 }) {
   // 부모의 실제 상태와 분리하여 시트 내부에서 관리할 임시 상태
   const [tempValue, setTempValue] = useState(value);
@@ -46,15 +51,23 @@ function DefaultSheet({
           {/* 상단 설명 */}
           <div className={styles.txtContainer}>
             <span className="typoTitleMedium">{title}</span>
-            <span className="typoCaptionMedium">{description}</span>
+            {description && (
+              <span className="typoCaptionMedium">{description}</span>
+            )}
           </div>
 
           {/* 주입된 Option 영역 */}
           <div>{children(tempValue, setTempValue)}</div>
 
           {/* 하단 확인 버튼 */}
-          <button className={styles.footerBtn} onClick={handleConfirm}>
-            <span className={`${styles.btnTxt} typoBodyStrong`}>확인</span>
+          <button
+            className={styles.footerBtn}
+            onClick={handleConfirm}
+            disabled={getIsConfirmDisabled?.(tempValue) ?? false}
+          >
+            <span className={`${styles.btnTxt} typoBodyStrong`}>
+              {confirmText}
+            </span>
           </button>
         </Sheet.Content>
       </Sheet.Container>

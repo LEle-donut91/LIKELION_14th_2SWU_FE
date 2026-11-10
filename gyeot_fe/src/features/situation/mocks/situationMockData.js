@@ -51,3 +51,30 @@ export const ACQUAINTANCE_LIST_MOCK = [
   { id: 2, name: "민재", relation: "친구", isGuardian: false },
   { id: 3, name: "하은", relation: "이웃", isGuardian: false },
 ];
+
+// H-03-05 상황 관리 - 정보 주인 시점 참여자 목록
+// relationLabel: 이름 아래 보조 문구 (보호자만 표시)
+export const MANAGE_PARTICIPANT_LIST_MOCK = [
+  { id: 1, name: "서연", relationLabel: "보호자", isGuardian: true },
+  { id: 2, name: "민재", relationLabel: "", isGuardian: false },
+  { id: 3, name: "하은", relationLabel: "", isGuardian: false },
+];
+
+// H-03-05 참여자 추가 시트 - 초대할 수 있는 지인
+export const INVITE_CANDIDATE_LIST_MOCK = [
+  { id: 1, name: "서연", relationText: "서로의 보호자", isGuardian: true },
+  { id: 2, name: "민재", relationText: "나의 사람", isGuardian: false },
+  { id: 3, name: "하은", relationText: "나의 사람", isGuardian: false },
+];
+
+// H-03-05 상황 관리 - 참여자 시점에서 보는 상황
+export const JOINED_SITUATION_MOCK = {
+  id: 21,
+  title: "무릎 수술 회복",
+  startDate: "2026-10-28",
+  endDate: "2026-11-20",
+  ownerName: "지우",
+};
+
+// H-03-05 상황 종료 시트 - 진행 중인 요청 수
+export const ACTIVE_REQUEST_COUNT_MOCK = 2;

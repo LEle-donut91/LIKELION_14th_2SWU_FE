@@ -1,0 +1,60 @@
+/* 어두운 배경(ResDim): opacity-400 */
+.overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-opacity-400);
+  z-index: 1000;
+}
+
+/* 모달: 너비 354, 라디우스 20, 패딩 위 20 좌우 16 아래 16, 간격 16 */
+.modal {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 354px;
+  max-width: calc(100% - 48px);
+  padding: 20px 16px 16px;
+  border-radius: 20px;
+  background-color: var(--color-base-000);
+  box-sizing: border-box;
+  outline: none;
+}
+
+/* 안내 문구: Body strong, olive-600, 가운데 정렬 */
+.message {
+  margin: 0;
+  color: var(--color-olive-600);
+  text-align: center;
+  white-space: pre-line;
+}
+
+.btnContainer {
+  display: flex;
+  gap: 6px;
+}
+
+/* 버튼: 라디우스 16, 패딩 12, 그림자 */
+.modalBtn {
+  flex: 1;
+  padding: 12px;
+  border-radius: 16px;
+  box-shadow: 0 0 4px var(--color-box-shadow);
+  cursor: pointer;
+}
+
+/* 취소: olive-200 배경, 테두리 olive-300, olive-900 */
+.cancelBtn {
+  border: 1px solid var(--color-olive-300);
+  background-color: var(--color-olive-200);
+  color: var(--color-olive-900);
+}
+
+/* 위험 동작(제외 등): red-700 배경, 테두리 olive-500(시안 값), 흰 글자 */
+.confirmBtn {
+  border: 1px solid var(--color-olive-500);
+  background-color: var(--color-red-700);
+  color: var(--color-base-000);
+}

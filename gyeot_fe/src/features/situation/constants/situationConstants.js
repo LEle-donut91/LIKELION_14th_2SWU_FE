@@ -7,6 +7,7 @@ export const SITUATION_NAVIGATION_PATH = {
   SITUATION_DETAIL: "/situation/detail", // H-03 상황 상세
   PAST_SITUATION: "/situation/past", // H-04 지난 상황
   PAST_SITUATION_DETAIL: "/situation/past/detail", // N-04 지난 상황 상세
+  SITUATION_LEAVE: "/situation/leave", // N-09 상황 나가기
 };
 
 // H-01 상황 종류 (종류 선택 시트)
