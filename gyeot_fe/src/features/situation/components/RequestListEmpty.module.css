@@ -1,0 +1,4 @@
+/* 빈 상태(ContainerOnboarding): 위아래 패딩 30 */
+.requestListEmpty {
+  padding: 30px 0;
+}
