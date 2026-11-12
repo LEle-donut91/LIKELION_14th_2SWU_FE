@@ -1,8 +1,16 @@
+import {
+  CANCEL_REASON,
+  NO_ASSIGNEE_REASON,
+  REQUEST_STATE,
+  USER_ORDER_STATE,
+} from "./enumConstants";
+
 /**
  * =====================================================================
  * [request/ 공통] request/ 내에서 공통으로 사용하는 constants
  * =====================================================================
  */
+
 // 토스트 노출 시간(ms)
 export const TOAST_DURATION = 3000;
 
@@ -318,46 +326,27 @@ export const START_PASSED_TOAST_MESSAGE =
  * =====================================================================
  */
 
-// 요청 진행 상태
-export const REQUEST_STATE = {
-  REQUEST: "REQUEST",
-  ACCEPT: "ACCEPT",
-  PROGRESS: "PROGRESS",
-  DONE: "DONE",
-  CANCEL: "CANCEL",
-};
-
 // 요청 진행 단계 순서 (요청 -> 수락 -> 진행 -> 완료)
 export const REQUEST_STEP_ORDER = [
-  REQUEST_STATE.REQUEST,
-  REQUEST_STATE.ACCEPT,
-  REQUEST_STATE.PROGRESS,
-  REQUEST_STATE.DONE,
+  REQUEST_STATE.REQUESTED,
+  REQUEST_STATE.ACCEPTED,
+  REQUEST_STATE.IN_PROGRESS,
+  REQUEST_STATE.COMPLETED,
 ];
 
 // 요청 진행 단계 라벨
 export const REQUEST_STEP_LABELS = {
-  [REQUEST_STATE.REQUEST]: "요청",
-  [REQUEST_STATE.ACCEPT]: "수락",
-  [REQUEST_STATE.PROGRESS]: "진행",
-  [REQUEST_STATE.DONE]: "완료",
+  [REQUEST_STATE.REQUESTED]: "요청",
+  [REQUEST_STATE.ACCEPTED]: "수락",
+  [REQUEST_STATE.IN_PROGRESS]: "진행",
+  [REQUEST_STATE.COMPLETED]: "완료",
 };
 
-// 요청 수정 상태 (서버 값)
-export const CHANGE_STATE = {
-  BEFORE_EDIT: "BEFORE_EDIT", // 수정 전
-  RECONFIRMING: "RECONFIRMING", // 재확인 중
-  RECONFIRMED: "RECONFIRMED", // 재확인 수락
-  INVALID: "INVALID", // 수정 무효
-};
-
-// [UserOrder] 요청 순서 카드의 상태 값 / 한글 텍스트 (UserOrder.jsx에서 이동)
-export const USER_ORDER_STATE = {
-  EXPIRED: "EXPIRED",
-  WAITING: "WAITING",
-  DIFFICULTY: "DIFFICULTY",
-  CANCEL: "CANCEL",
-};
+// 더 이상 진행되지 않는 종료 상태 (취소 / 만료)
+export const REQUEST_ENDED_STATES = [
+  REQUEST_STATE.CANCELED,
+  REQUEST_STATE.EXPIRED,
+];
 
 export const USER_ORDER_STATE_TEXT = {
   [USER_ORDER_STATE.EXPIRED]: "기한 경과",
@@ -380,22 +369,6 @@ export const REQUESTER_USER_STATE_TEXT = {
 
 // 헤더 우측 버튼 문구
 export const REQUESTER_CANCEL_BTN_TITLE = "취소";
-
-// 담당자 없음 사유 (서버 값: noAssignedReason)
-export const NO_ASSIGNEE_REASON = {
-  REJECTED: "REJECTED", // 요청 거절
-  EXPIRED: "EXPIRED", // 기한 지남
-  ACCEPT_WITHDRAWN: "ACCEPT_WITHDRAWN", // 수락 철회
-  LEFT_SITUATION: "LEFT_SITUATION", // 상황 나가기
-  RELATION_RELEASED: "RELATION_RELEASED", // 관계 해제
-};
-
-// 요청 취소 사유 (서버 값: cancelReason)
-export const CANCEL_REASON = {
-  SELF: "SELF", // 직접 취소
-  EXPIRED: "EXPIRED", // 담당자 없음으로 만료
-  REJECTED: "REJECTED", // 담당자 거절
-};
 
 // 알림(RequestState) 종류 - React key 및 노출 규칙 구분용
 export const REQUESTER_NOTICE_KEY = {
@@ -583,5 +556,49 @@ export const TARGET_FOOTER_CONFIG = {
     title: "수락으로 변경",
     type: "primary",
     action: "changeToAccept",
+  },
+};
+
+/**
+ * =====================================================================
+ * [H-03-01] 요청 상세 · 담당자 뷰
+ * =====================================================================
+ */
+
+// 전달받은 정보(SafetyCardGroup) 안내 문구 (요청 상태별, 없으면 "")
+export const ASSIGNEE_SAFETY_INFORMATION = {
+  [REQUEST_STATE.ACCEPTED]: "수락한 이후 확인할 수 있어요.",
+  [REQUEST_STATE.COMPLETED]: "접근이 종료되었어요.",
+};
+
+// 푸터 종류
+export const ASSIGNEE_FOOTER_KEY = {
+  CHECK_CHANGE: "checkChange",
+  START: "start",
+  DONE: "done",
+  PAST_SITUATION: "pastSituation",
+};
+
+// 푸터 설정 - action 값은 페이지의 footerActions 키와 연결
+export const ASSIGNEE_FOOTER_CONFIG = {
+  [ASSIGNEE_FOOTER_KEY.CHECK_CHANGE]: {
+    title: "변경 내용 확인",
+    type: "primary",
+    action: "checkChange",
+  },
+  [ASSIGNEE_FOOTER_KEY.START]: {
+    title: "시작",
+    type: "primary",
+    action: "start",
+  },
+  [ASSIGNEE_FOOTER_KEY.DONE]: {
+    title: "완료",
+    type: "primary",
+    action: "done",
+  },
+  [ASSIGNEE_FOOTER_KEY.PAST_SITUATION]: {
+    title: "지난 상황에서 보기",
+    type: "primary",
+    action: "pastSituation",
   },
 };
