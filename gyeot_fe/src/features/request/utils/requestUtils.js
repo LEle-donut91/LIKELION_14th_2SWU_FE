@@ -296,11 +296,11 @@ export const getRequesterFlags = ({
   assignReason,
   changeState,
 }) => {
-  const isRequestState = requestState === REQUEST_STATE.REQUEST;
-  const isAcceptState = requestState === REQUEST_STATE.ACCEPT;
-  const isProgressState = requestState === REQUEST_STATE.PROGRESS;
-  const isDoneState = requestState === REQUEST_STATE.DONE;
-  const isCancelState = requestState === REQUEST_STATE.CANCEL;
+  const isRequestState = requestState === REQUEST_STATE.REQUESTED;
+  const isAcceptState = requestState === REQUEST_STATE.ACCEPTED;
+  const isProgressState = requestState === REQUEST_STATE.IN_PROGRESS;
+  const isDoneState = requestState === REQUEST_STATE.COMPLETED;
+  const isCancelState = requestState === REQUEST_STATE.CANCELED;
 
   // 요청됨 상태이면서 담당자 없음 사유가 있으면 -> 담당자 없음 상태
   const isAssignedNoti = isRequestState && Boolean(assignReason);
