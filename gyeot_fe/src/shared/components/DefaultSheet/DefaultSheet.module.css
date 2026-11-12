@@ -45,3 +45,10 @@
   color: var(--color-olive-900);
   padding: 16px;
 }
+
+/* 하단 버튼 비활성: gray-100 배경, gray-400 글자 */
+.footerBtn:disabled {
+  background-color: var(--color-gray-100);
+  color: var(--color-gray-400);
+  cursor: default;
+}
