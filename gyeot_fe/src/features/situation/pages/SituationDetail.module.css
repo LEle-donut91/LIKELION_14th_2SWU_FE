@@ -6,12 +6,17 @@
   background-color: var(--color-gray-050);
 }
 
-/* 콘텐츠: 헤더 아래 20, 좌우 16, 아래 128 (하단 버튼 영역), 간격 40 */
+/* 콘텐츠: 헤더 아래 20, 좌우 16, 아래 40, 간격 40 */
 .content {
   display: flex;
   flex-direction: column;
   gap: 40px;
-  padding: 20px 16px 128px;
+  padding: 20px 16px 40px;
+}
+
+/* 하단 '+ 요청 작성' 버튼이 있을 때(정보 주인): 아래 128 */
+.content.hasFooter {
+  padding-bottom: 128px;
 }
 
 /* 상황 카드 + 참여자 태그: 간격 15, 가운데 정렬 */

@@ -121,3 +121,29 @@ export const SITUATION_DETAIL_MOCK = {
     },
   ],
 };
+
+// H-03-02 상황 상세 - 참여자 시점 (지우님의 상황에 내가 참여)
+// requests: 나에게 온 요청 (myRole: TARGET 내가 대상 / ASSIGNEE 내가 담당)
+export const JOINED_SITUATION_DETAIL_MOCK = {
+  id: 21,
+  title: "무릎 수술 회복",
+  startDate: "2026-11-01",
+  endDate: "2026-11-24",
+  ownerName: "지우",
+  participants: [
+    { id: 1, name: "서연", isGuardian: true },
+    { id: 2, name: "민재", isGuardian: false },
+    { id: 3, name: "하은", isGuardian: false },
+  ],
+  requests: [
+    {
+      id: 201,
+      helpType: "HOSPITAL",
+      targetName: "민재",
+      startDateTime: "2026-11-14T14:00:00",
+      endDateTime: "2026-11-14T16:00:00",
+      status: "REQUESTED",
+      myRole: "TARGET",
+    },
+  ],
+};

@@ -10,7 +10,9 @@ export const SITUATION_NAVIGATION_PATH = {
   PAST_SITUATION_DETAIL: "/situation/past/detail", // N-04 지난 상황 상세
   SITUATION_LEAVE: "/situation/leave", // N-09 상황 나가기
   REQUEST_CREATE: "/request", // H-03-02 요청 작성 (뒤에 /상황 ID)
-  REQUEST_REQUESTER_DETAIL: "/request/requester", // H-03-01-A 요청 상세 (뒤에 /요청 ID)
+  REQUEST_REQUESTER_DETAIL: "/request/requester", // H-03-01-A 요청 상세 - 요청자 (뒤에 /요청 ID)
+  REQUEST_TARGET_DETAIL: "/request/target", // H-03-01-B 요청 상세 - 대상자 (뒤에 /요청 ID)
+  REQUEST_ASSIGNEE_DETAIL: "/request/assignee", // H-03-01 요청 상세 - 담당자 (뒤에 /요청 ID)
 };
 
 // H-01 상황 종류 (종류 선택 시트)
@@ -59,4 +61,10 @@ export const REQUEST_STATUS_TAG = {
   ACCEPTED: { label: "수락됨", variant: "accepted" },
   IN_PROGRESS: { label: "진행 중", variant: "inProgress" },
   COMPLETED: { label: "완료", variant: "completed" },
+};
+
+// H-03-02 참여자뷰 - 이 요청에서 나의 역할
+export const MY_REQUEST_ROLE = {
+  TARGET: { label: "내가 대상", path: SITUATION_NAVIGATION_PATH.REQUEST_TARGET_DETAIL },
+  ASSIGNEE: { label: "내가 담당", path: SITUATION_NAVIGATION_PATH.REQUEST_ASSIGNEE_DETAIL },
 };
