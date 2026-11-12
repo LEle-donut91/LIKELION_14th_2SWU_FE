@@ -75,16 +75,20 @@ function RequestAssignee() {
     },
     // 지난 상황에서 보기 -> 상황 ID 전달
     pastSituation: () =>
-      handleGoNextWithState(REQUEST_ROUTES.pastSituationDetail, {
-        situationId,
-      }),
+      handleGoNextWithState(
+        REQUEST_ROUTES.pastSituationDetail,
+        {
+          situationId,
+        },
+        true,
+      ),
   };
 
   // [모달의 철회 버튼] 클릭 이벤트 핸들러
   const handleWithdrawConfirm = () => {
     postAssigneeWithdrawApi(paramId);
     setModalOpen(false);
-    handleGoNext(REQUEST_ROUTES.home);
+    handleGoNext(REQUEST_ROUTES.home, true);
   };
 
   // [전달받은 정보] 클릭 이벤트 핸들러
