@@ -52,9 +52,9 @@
   color: var(--color-olive-900);
 }
 
-/* 위험 동작(제외 등): red-700 배경, 테두리 olive-500(시안 값), 흰 글자 */
+/* 위험 동작(제외 등): red-700 배경, 테두리 없음, 흰 글자 */
 .confirmBtn {
-  border: 1px solid var(--color-olive-500);
+  border: none;
   background-color: var(--color-red-700);
   color: var(--color-base-000);
 }

@@ -60,11 +60,14 @@ export const MANAGE_PARTICIPANT_LIST_MOCK = [
   { id: 3, name: "하은", relationLabel: "", isGuardian: false },
 ];
 
-// H-03-05 참여자 추가 시트 - 초대할 수 있는 지인
+// H-03-05 참여자 추가 시트 - 활성 관계 지인 전체 (이미 참여 중인 사람은 시트에서 '참여 중'으로 표시)
 export const INVITE_CANDIDATE_LIST_MOCK = [
   { id: 1, name: "서연", relationText: "서로의 보호자", isGuardian: true },
   { id: 2, name: "민재", relationText: "나의 사람", isGuardian: false },
   { id: 3, name: "하은", relationText: "나의 사람", isGuardian: false },
+  // 아직 참여하지 않은 지인 (체크해서 추가할 수 있음)
+  { id: 4, name: "지우", relationText: "나의 사람", isGuardian: false },
+  { id: 5, name: "도윤", relationText: "나의 사람", isGuardian: false },
 ];
 
 // H-03-05 상황 관리 - 참여자 시점에서 보는 상황

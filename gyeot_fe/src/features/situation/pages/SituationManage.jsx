@@ -41,24 +41,22 @@ function SituationManage() {
     setOpenSheet(null);
   };
 
-  // 참여자 추가: 시트에서 고른 지인을 목록에 추가
-  const handleParticipantInvite = (candidateId) => {
-    // TODO: 참여자 초대 API 연동
-    const candidate = inviteCandidateList.find(({ id }) => id === candidateId);
-    const isAlreadyJoined = participantList.some(
-      ({ id }) => id === candidateId,
-    );
-    if (!candidate || isAlreadyJoined) return;
+  // 참여자 추가: 시트에서 체크한 지인들을 목록에 추가
+  const handleParticipantInvite = (checkedIdList) => {
+    // TODO: 참여자 추가 API 연동
+    const joinedIdList = participantList.map(({ id }) => id);
+    const newParticipantList = inviteCandidateList
+      .filter(
+        ({ id }) => checkedIdList.includes(id) && !joinedIdList.includes(id),
+      )
+      .map(({ id, name, isGuardian }) => ({
+        id,
+        name,
+        relationLabel: isGuardian ? "보호자" : "",
+        isGuardian,
+      }));
 
-    setParticipantList((prev) => [
-      ...prev,
-      {
-        id: candidate.id,
-        name: candidate.name,
-        relationLabel: candidate.isGuardian ? "보호자" : "",
-        isGuardian: candidate.isGuardian,
-      },
-    ]);
+    setParticipantList((prev) => [...prev, ...newParticipantList]);
   };
 
   // 참여자 제외: 확인 모달에서 '제외'를 누르면 목록에서 제거
@@ -149,15 +147,16 @@ function SituationManage() {
         isOpen={openSheet === "invite"}
         onClose={handleSheetClose}
         title="참여자 추가"
-        value={null}
+        value={[]}
         onConfirm={handleParticipantInvite}
-        confirmText="초대"
-        getIsConfirmDisabled={(selectedId) => selectedId === null}
+        confirmText="추가하기"
+        getIsConfirmDisabled={(checkedIdList) => checkedIdList.length === 0}
       >
         {(tempValue, setTempValue) => (
           <InviteParticipantOption
             people={inviteCandidateList}
-            value={tempValue}
+            joinedIdList={participantList.map(({ id }) => id)}
+            checkedIdList={tempValue}
             onChange={setTempValue}
           />
         )}
