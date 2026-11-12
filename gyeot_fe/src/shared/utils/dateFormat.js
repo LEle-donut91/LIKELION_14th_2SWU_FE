@@ -26,9 +26,45 @@ export const formatDateTime = (value) => {
   return `${formatDate(date)} ${padTwo(date.getHours())}:${padTwo(date.getMinutes())}`;
 };
 
+// 10/2 18:00 (요일 제거)
+export const formatShortDateTime = (value) => {
+  const date = toDate(value);
+  return `${date.getMonth() + 1}/${date.getDate()} ${padTwo(date.getHours())}:${padTwo(date.getMinutes())}`;
+};
+
+// 10/02 18:00 (월/일 2자리 패딩 + 요일 제거)
+export const formatPaddedShortDateTime = (value) => {
+  const date = toDate(value);
+  return `${padTwo(date.getMonth() + 1)}/${padTwo(date.getDate())} ${padTwo(date.getHours())}:${padTwo(date.getMinutes())}`;
+};
+
 // 9/28(월) - 10/10(토)
 export const formatDateRange = (startValue, endValue) =>
   `${formatDate(startValue)} - ${formatDate(endValue)}`;
+
+// 같은 날: 10/1(목) 14:00 - 17:00
+// 다른 날: 10/1(목) 14:00 - 10/2(금) 17:00
+export const formatCompactDateTimeRange = (startValue, endValue) => {
+  const end = toDate(endValue);
+  const isSameDay =
+    toDateOnly(startValue).getTime() === toDateOnly(end).getTime();
+
+  const endText = isSameDay
+    ? `${padTwo(end.getHours())}:${padTwo(end.getMinutes())}`
+    : formatDateTime(end);
+
+  return `${formatDateTime(startValue)} - ${endText}`;
+};
+
+// 9/22 14:00 - 9/22 17:00 (요일 제거)
+export const formatShortDateTimeRange = (startValue, endValue) => {
+  const toShortText = (value) => {
+    const date = toDate(value);
+    return `${date.getMonth() + 1}/${date.getDate()} ${padTwo(date.getHours())}:${padTwo(date.getMinutes())}`;
+  };
+
+  return `${toShortText(startValue)} - ${toShortText(endValue)}`;
+};
 
 // D-9 / D-day / D+1
 export const getDdayText = (endValue, baseValue = new Date()) => {
