@@ -139,7 +139,7 @@ export const JOINED_SITUATION_DETAIL_MOCK = {
     {
       id: 201,
       helpType: "HOSPITAL",
-      targetName: "민재",
+      targetName: "지우", // 참여자 시점: 카드 제목에 상황 주인 이름 (디자인팀 확인 중)
       startDateTime: "2026-11-14T14:00:00",
       endDateTime: "2026-11-14T16:00:00",
       status: "REQUESTED",
