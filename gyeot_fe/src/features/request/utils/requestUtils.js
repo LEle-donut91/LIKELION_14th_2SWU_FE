@@ -12,7 +12,6 @@ import {
   REQUEST_PREREQUISITE_TOAST_MESSAGE,
   FIXED_DUE_DATE_TOAST_MESSAGE,
   START_PASSED_TOAST_MESSAGE,
-  REQUEST_STATE,
   REQUESTER_FOOTER_KEY,
   CANCEL_NOTICE_CONFIG,
   EDIT_INVALID_NOTICE_CONFIG,
@@ -20,14 +19,17 @@ import {
   REQUESTER_NOTICE_KEY,
   REQUESTER_ORDER_TITLE,
   REQUESTER_USER_STATE_TEXT,
-  CHANGE_STATE,
   TARGET_STATE,
   TARGET_CLOSED_STATES,
   TARGET_NOTICE_CONFIG,
   TARGET_GUIDE_KEY,
   TARGET_GUIDE_LINES,
   TARGET_FOOTER_KEY,
+  ASSIGNEE_FOOTER_KEY,
+  ASSIGNEE_SAFETY_INFORMATION,
 } from "../constants/requestConstants";
+
+import { CHANGE_STATE, REQUEST_STATE } from "../constants/enumConstants";
 
 /**
  * =====================================================================
@@ -444,3 +446,43 @@ export const getTargetGuideLines = (flags) => {
   }
   return [];
 };
+
+/**
+ * =====================================================================
+ * [H-03-01] 요청 상세 · 담당자 뷰
+ * - 상태 플래그 / 푸터 / 안내 문구 결정
+ * =====================================================================
+ */
+
+// 담당자 뷰의 모든 조건부 플래그를 한 곳에서 계산
+// isChanged: 담당자가 확인해야 하는 수정안(PENDING)이 있는지
+export const getAssigneeFlags = ({ requestState, isChanged }) => {
+  const isAcceptState = requestState === REQUEST_STATE.ACCEPTED;
+  const isProgressState = requestState === REQUEST_STATE.IN_PROGRESS;
+  const isDoneState = requestState === REQUEST_STATE.COMPLETED;
+
+  return {
+    isAcceptState,
+    isProgressState,
+    isDoneState,
+    isChanged,
+
+    // 화면 요소 노출 여부
+    showWithdrawBtn: isAcceptState, // 헤더 우측 "철회" 버튼
+    showChangedNotice: isChanged, // "요청 수정" 알림
+    showDoneNotice: isDoneState, // "완료된 요청은 다시 열 수 없어요"
+  };
+};
+
+// 상태별 푸터 종류 결정 (없으면 null) - 수정안이 있으면 항상 "변경 내용 확인" 우선
+export const getAssigneeFooterKey = (flags) => {
+  if (flags.isChanged) return ASSIGNEE_FOOTER_KEY.CHECK_CHANGE;
+  if (flags.isAcceptState) return ASSIGNEE_FOOTER_KEY.START;
+  if (flags.isProgressState) return ASSIGNEE_FOOTER_KEY.DONE;
+  if (flags.isDoneState) return ASSIGNEE_FOOTER_KEY.PAST_SITUATION;
+  return null;
+};
+
+// 전달받은 정보(SafetyCardGroup) 안내 문구 결정 (없으면 "")
+export const getAssigneeSafetyInformation = (requestState) =>
+  ASSIGNEE_SAFETY_INFORMATION[requestState] ?? "";
