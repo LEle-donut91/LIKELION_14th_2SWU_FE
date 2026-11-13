@@ -2,10 +2,15 @@ import {
   getAssigneeFlags,
   getAssigneeFooterKey,
   getAssigneeSafetyInformation,
+  getReceivedInfoCardTitle,
+  getReceivedInfoValue,
+  getReceivedInfoBadgeText,
+  getReceivedInfoUnavailableMessage,
 } from "@/features/request/utils/requestUtils";
 import {
   formatCompactDateTimeRange,
   formatShortDateTimeRange,
+  formatPaddedShortDateTime,
 } from "@/shared/utils/dateFormat";
 
 import { PROPOSAL_STATUS } from "@/features/request/constants/enumConstants";
@@ -99,5 +104,47 @@ export const getAssigneeReconfirmService = (raw) => {
       { icon: iconLocation, label: "장소", value: after?.place ?? "" },
       { icon: iconHealthy, label: "정보", value: after?.information ?? "" },
     ],
+  };
+};
+
+/**
+ * =====================================================================
+ * [H-03-01-01] 전달받은 정보
+ * - 조회 후 데이터 가공
+ * =====================================================================
+ */
+
+// TODO: API 연동 로직 수정 필요
+// [H-03-01-01] 전달받은 정보 - 데이터 조회 후 가공
+// 반환: { requestId, isAccessible, dueDate, unavailableMessage, safetyCardDetails }
+// - safetyCardDetails: SafetyCardDetail에 넘길 [{ title, cardList }]
+export const getReceivedInfoService = (raw) => {
+  const isAccessible = Boolean(raw?.accessible);
+
+  return {
+    requestId: raw?.requestId ?? "",
+    isAccessible,
+
+    // 접근 기한 (볼 수 없을 때도 접근 종료 화면에 표시)
+    dueDate: raw?.accessUntil
+      ? `~ ${formatPaddedShortDateTime(raw.accessUntil)} (종료 시점)`
+      : "",
+
+    // 접근 종료 화면 문구 (볼 수 있으면 "")
+    unavailableMessage: isAccessible
+      ? ""
+      : getReceivedInfoUnavailableMessage(raw?.unavailableReason),
+
+    // 분류별 항목 -> SafetyCardDetail props
+    safetyCardDetails: (raw?.categories ?? []).map((category) => ({
+      title: category.categoryName,
+      cardList: (category.items ?? []).map((item) => ({
+        id: item.informationId,
+        cardTitle: getReceivedInfoCardTitle(item),
+        isSensitive: Boolean(item.sensitive),
+        firstInfo: getReceivedInfoValue(item.informationValue),
+        secondInfo: getReceivedInfoBadgeText(item),
+      })),
+    })),
   };
 };

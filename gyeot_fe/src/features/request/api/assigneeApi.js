@@ -5,6 +5,7 @@ import postAssigneeWithdrawMock from "@/features/request/mock/RequestAssignee/po
 import getAssigneeReconfirmMock from "@/features/request/mock/AssigneeReconfirm/getAssigneeReconfirmMock";
 import postAssigneeReconfirmAcceptMock from "@/features/request/mock/AssigneeReconfirm/postAssigneeReconfirmAcceptMock";
 import postAssigneeReconfirmRejectMock from "@/features/request/mock/AssigneeReconfirm/postAssigneeReconfirmRejectMock";
+import getReceivedInfoMock from "@/features/request/mock/ReceivedInfo/getReceivedInfoMock";
 
 /**
  * =====================================================================
@@ -71,4 +72,20 @@ export const postAssigneeReconfirmAcceptApi = (requestId, proposalId) => {
 export const postAssigneeReconfirmRejectApi = (requestId, proposalId) => {
   console.log("변경 내용 거절:", requestId, proposalId);
   return postAssigneeReconfirmRejectMock;
+};
+
+/**
+ * =====================================================================
+ * [H-03-01-01] 전달받은 정보
+ * - 데이터 조회
+ * =====================================================================
+ */
+
+// TODO: API 연동 로직 수정 필요
+// [H-03-01-01] 전달받은 정보 - 데이터 조회
+// - 실제 연동 시 envelope({ status, code, message, data })에서 data만 반환할 것
+// - 404 SHARED_INFO_NOT_FOUND: 오류 문구를 띄우고 이전 화면으로 돌아갈 것
+export const getReceivedInfoApi = (requestId) => {
+  console.log("전달받은 정보 조회:", requestId);
+  return getReceivedInfoMock;
 };
