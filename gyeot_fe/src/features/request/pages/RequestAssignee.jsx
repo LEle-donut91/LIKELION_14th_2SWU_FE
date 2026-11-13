@@ -47,6 +47,7 @@ function RequestAssignee() {
   const {
     situationId,
     requestState,
+    requestType,
     userName,
     message,
     infoList,
@@ -123,6 +124,9 @@ function RequestAssignee() {
         {/* 요청 내용 요약 카드 */}
         <RequestSummary
           isAfterInfo={false}
+          hasBeigeBorder={true}
+          hasTag={true}
+          type={requestType}
           title={`${userName}님의 요청`}
           infoList={infoList}
           message={message}

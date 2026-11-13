@@ -5,6 +5,7 @@ import {
 } from "@/features/request/utils/requestUtils";
 import { formatCompactDateTimeRange } from "@/shared/utils/dateFormat";
 import { PROPOSAL_STATUS } from "@/features/request/constants/enumConstants";
+import { HELP_TYPE_LABELS } from "@/features/request/constants/requestConstants";
 
 import iconDate from "@/shared/assets/icons/iconDate.svg";
 import iconLocation from "@/shared/assets/icons/iconLocation.svg";
@@ -30,6 +31,7 @@ export const getAssigneeService = (raw) => {
     situationId: raw?.situationId ?? "",
     requestId: raw?.requestId ?? "",
     requestState,
+    requestType: HELP_TYPE_LABELS[raw?.helpType] ?? "",
     userName: raw?.requester?.name ?? "",
     message: raw?.description ?? "",
 

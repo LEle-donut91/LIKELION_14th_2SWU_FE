@@ -72,3 +72,13 @@ export const DISPLAY_STATUS = {
   CANCELED: "CANCELED",
   EXPIRED: "EXPIRED",
 };
+
+// 도움 종류 (helpType)
+export const HELP_TYPE = {
+  HOSPITAL: "HOSPITAL",
+  MEAL: "MEAL",
+  GROCERY: "GROCERY",
+  PET_CARE: "PET_CARE",
+  CHECK_IN: "CHECK_IN",
+  OTHER: "OTHER",
+};

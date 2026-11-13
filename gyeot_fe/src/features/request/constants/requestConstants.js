@@ -1,4 +1,5 @@
 import {
+  HELP_TYPE,
   CANCEL_REASON,
   NO_ASSIGNEE_REASON,
   REQUEST_STATE,
@@ -31,16 +32,16 @@ export const REQUEST_PREREQUISITE_TOAST_MESSAGE = {
 
 // 도움 종류: 서버 응답/요청에 쓰는 값(key), 한글 매핑(value)
 export const HELP_TYPE_LABELS = {
-  HOSPITAL_ESCORT: "병원 동행",
-  MEAL: "식사",
-  SHOPPING: "장보기",
-  PET: "반려동물",
-  CHECK_IN: "연락/안부",
-  ETC: "기타",
+  [HELP_TYPE.HOSPITAL]: "병원 동행",
+  [HELP_TYPE.MEAL]: "식사",
+  [HELP_TYPE.GROCERY]: "장보기",
+  [HELP_TYPE.PET_CARE]: "반려동물",
+  [HELP_TYPE.CHECK_IN]: "연락/안부",
+  [HELP_TYPE.OTHER]: "기타",
 };
 
 // 라디오 버튼으로 그릴 [도움 종류]값 목록 (HELP_TYPE_LABELS 객체의 선언 순서대로)
-// -> ["HOSPITAL_ESCORT", "MEAL", "SHOPPING", "PET", "CHECK_IN", "ETC"]
+// -> ["HOSPITAL", "MEAL", "GROCERY", "PET_CARE", "CHECK_IN", "OTHER"]
 export const HELP_TYPE_OPTIONS = Object.keys(HELP_TYPE_LABELS);
 
 /**
