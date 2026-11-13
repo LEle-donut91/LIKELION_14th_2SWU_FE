@@ -640,10 +640,12 @@ export const RECEIVED_INFO_TITLE_RULE_BY_TYPE = {
 // 항목 우측 표시 문구
 export const RECEIVED_INFO_BADGE_TEXT = {
   ADDED: "추가됨", // added = true
-  UPDATED: "갱신", // updated = true -> "9/20 갱신"
+  UPDATED: "갱신됨", // updated = true
+  UPDATED_DATE_SUFFIX: "갱신", // 둘 다 false -> "9/20 갱신"
 };
 
 // 접근 종료 화면 문구 (unavailableReason별)
+// 와이어프레임 문구 외의 사유는 임의로 작성 (TODO: 기획/디자인 확정 시 수정)
 export const RECEIVED_INFO_UNAVAILABLE_MESSAGE = {
   [UNAVAILABLE_REASON.NOT_ACCEPTED]: "수락한 이후 확인할 수 있어요.",
   [UNAVAILABLE_REASON.REQUEST_COMPLETED]: "요청을 완료하여 접근이 종료됐어요.",
