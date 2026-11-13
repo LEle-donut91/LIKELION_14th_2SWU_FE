@@ -72,3 +72,45 @@ export const CARD_HEALTH_MOCK = {
     },
   ],
 };
+
+// C-03 연락 순서 목업 데이터
+// TODO: API 연동 후 contactApi.js의 USE_MOCK을 false로 바꾸면 사용하지 않음
+// - 비상연락망 조회 API(GET /api/emergency-contacts) 응답의 data와 같은 형태
+// - name: 연락 대상이 가입 시 등록한 이름 (아바타 첫 글자에 사용)
+// - personalLabel: 사용자가 지정한 표시명 / 없으면 null (카드 이름 칸에 우선 표시)
+// - priority: 전체 연락 순서 / guardianPriority: 보호자끼리의 순서 (보호자가 아니면 null)
+
+const GUARDIAN_LIST = [
+  { userId: 1, name: "서연", relationshipType: "GUARDIAN", personalLabel: null, priority: 1, guardianPriority: 1 },
+  { userId: 2, name: "지우", relationshipType: "GUARDIAN", personalLabel: null, priority: 2, guardianPriority: 2 },
+];
+
+const MY_PERSON_LIST = [
+  { userId: 11, name: "민재", relationshipType: "MY_PERSON", personalLabel: null, guardianPriority: null },
+  { userId: 12, name: "하은", relationshipType: "MY_PERSON", personalLabel: null, guardianPriority: null },
+  { userId: 13, name: "하준", relationshipType: "MY_PERSON", personalLabel: "민재의 친구", guardianPriority: null },
+];
+
+// 전체 순서(priority)를 앞에서부터 다시 매김
+const withPriority = (items) =>
+  items.map((item, index) => ({ ...item, priority: index + 1 }));
+
+// 테스트 시나리오를 지정하는 URL 쿼리 키 (예: /card/contact?mock=empty)
+export const CONTACT_MOCK_QUERY_KEY = "mock";
+
+// 저장 실패를 흉내 내는 URL 쿼리 키 (예: /card/contact?mockFail=true)
+export const CONTACT_MOCK_FAIL_QUERY_KEY = "mockFail";
+
+export const DEFAULT_CONTACT_MOCK_SCENARIO = "default";
+
+// 시나리오 키 → 테스트 데이터
+export const CARD_CONTACT_MOCK = {
+  // 보호자 + 나의 사람 (C-03 연락 순서)
+  default: { items: withPriority([...GUARDIAN_LIST, ...MY_PERSON_LIST.slice(0, 2)]) },
+  // 보호자 없음 (C-03 연락 순서 - 보호자 없음)
+  noGuardian: { items: withPriority(MY_PERSON_LIST) },
+  // 보호자만 있음 (나의 사람 영역에 추가하기 버튼)
+  guardianOnly: { items: withPriority(GUARDIAN_LIST) },
+  // 아무도 없음 (C-03 연락 순서 - 빈 상태)
+  empty: { items: [] },
+};
