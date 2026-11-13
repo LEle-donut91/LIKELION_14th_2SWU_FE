@@ -3,12 +3,17 @@ import {
   getAssigneeFooterKey,
   getAssigneeSafetyInformation,
 } from "@/features/request/utils/requestUtils";
-import { formatCompactDateTimeRange } from "@/shared/utils/dateFormat";
+import {
+  formatCompactDateTimeRange,
+  formatShortDateTimeRange,
+} from "@/shared/utils/dateFormat";
+
 import { PROPOSAL_STATUS } from "@/features/request/constants/enumConstants";
 import { HELP_TYPE_LABELS } from "@/features/request/constants/requestConstants";
 
 import iconDate from "@/shared/assets/icons/iconDate.svg";
 import iconLocation from "@/shared/assets/icons/iconLocation.svg";
+import iconHealthy from "@/shared/assets/icons/iconHealthy.svg";
 
 /**
  * =====================================================================
@@ -49,5 +54,50 @@ export const getAssigneeService = (raw) => {
     flags,
     footerKey: getAssigneeFooterKey(flags),
     safetyInformation: getAssigneeSafetyInformation(requestState),
+  };
+};
+
+/**
+ * =====================================================================
+ * [N-05] 변경 내용 확인
+ * - 조회 후 데이터 가공
+ * =====================================================================
+ */
+
+// TODO: API 연동 로직 수정 필요
+// [N-05] 변경 내용 확인 - 데이터 조회 후 가공
+// 반환: { situationId, requestId, userName, requestType, beforeInfoList, afterInfoList }
+export const getAssigneeReconfirmService = (raw) => {
+  const before = raw?.latestProposal?.before;
+  const after = raw?.latestProposal?.after;
+
+  return {
+    situationId: raw?.situationId ?? "",
+    requestId: raw?.requestId ?? "",
+    proposalId: raw?.latestProposal?.proposalId ?? "",
+    userName: raw?.requester?.name ?? "",
+    requestType: HELP_TYPE_LABELS[raw?.helpType] ?? "",
+
+    // 변경 전 일정, 장소, 정보
+    beforeInfoList: [
+      {
+        icon: iconDate,
+        label: "일정",
+        value: formatShortDateTimeRange(before?.startsAt, before?.endsAt),
+      },
+      { icon: iconLocation, label: "장소", value: before?.place ?? "" },
+      { icon: iconHealthy, label: "정보", value: before?.information ?? "" },
+    ],
+
+    // 변경 후 일정, 장소, 정보
+    afterInfoList: [
+      {
+        icon: iconDate,
+        label: "일정",
+        value: formatShortDateTimeRange(after?.startsAt, after?.endsAt),
+      },
+      { icon: iconLocation, label: "장소", value: after?.place ?? "" },
+      { icon: iconHealthy, label: "정보", value: after?.information ?? "" },
+    ],
   };
 };

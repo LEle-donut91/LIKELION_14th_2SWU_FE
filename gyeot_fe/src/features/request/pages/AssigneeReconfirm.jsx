@@ -1,67 +1,72 @@
-// N-05
+/**
+ * =====================================================================
+ * [N-05] 변경 내용 확인
+ * - 페이지 컴포넌트
+ * =====================================================================
+ */
+
 import styles from "@/features/request/pages/AssigneeReconfirm.module.css";
-import reconfirmData from "@/features/request/api/reconfirmData";
-import iconDate from "@/shared/assets/icons/iconDate.svg";
-import iconLocation from "@/shared/assets/icons/iconLocation.svg";
-import iconHealthy from "@/shared/assets/icons/iconHealthy.svg";
+
+// 일반 라이브러리
+import { useMemo, useState } from "react";
+import { useParams } from "react-router-dom";
+
+// icons/images
 import iconToggle from "@/shared/assets/icons/iconToggle.svg";
-import RequestSummary from "@/features/request/components/Request/RequestSummary";
+
+// Custom Hooks
+import { useRequestNav } from "@/features/request/hooks/useRequestNav";
+
+// Constants
+import { REQUEST_ROUTES } from "@/features/request/constants/routerConstants";
+
+// API, Services
+import {
+  getAssigneeReconfirmApi,
+  postAssigneeReconfirmAcceptApi,
+  postAssigneeReconfirmRejectApi,
+} from "@/features/request/api/assigneeApi";
+import { getAssigneeReconfirmService } from "@/features/request/services/assigneeService";
+
+// 일반 Components
 import ExitHeader from "@/features/request/components/Header/ExitHeader";
 import SmallFooter from "@/features/request/components/Footer/SmallFooter";
+import RequestSummary from "@/features/request/components/Request/RequestSummary";
 import DefaultModal from "@/features/request/components/Modal/DefaultModal";
-import { useRequestNav } from "@/features/request/hooks/useRequestNav";
-import { useState } from "react";
 
 function AssigneeReconfirm() {
-  const [isModalOpen, setModalOpen] = useState(false); // 모달 열기/닫기 상태
+  const paramId = useParams().id; // path parameter (요청 ID)
   const { handleGoBack, handleGoNext } = useRequestNav();
 
-  // JSON 데이터 변수에 각각 저장
-  const { userName, requestType, beforeInfo, afterInfo } = reconfirmData;
-  const {
-    time: beforeTime,
-    location: beforeLocation,
-    message: beforeMessage,
-  } = beforeInfo;
-  const {
-    time: afterTime,
-    location: afterLocation,
-    message: afterMessage,
-  } = afterInfo;
+  const [isModalOpen, setModalOpen] = useState(false); // "변경 내용 거절" 모달
 
-  // RequestSummary에 넘겨줄 infoList 배열 구성
-  // 부모 컴포넌트에서 동적으로 아이콘, 라벨, 값을 묶어서 전달
-  const beforeInfoList = [
-    { icon: iconDate, label: "일정", value: beforeTime },
-    { icon: iconLocation, label: "장소", value: beforeLocation },
-    { icon: iconHealthy, label: "정보", value: beforeMessage },
-  ];
-  const afterInfoList = [
-    { icon: iconDate, label: "일정", value: afterTime },
-    { icon: iconLocation, label: "장소", value: afterLocation },
-    { icon: iconHealthy, label: "정보", value: afterMessage },
-  ];
+  // TODO: API 연동 시 useEffect로 교체 (지금은 mock 이라 렌더마다 호출돼도 문제 없음)
+  // [N-05] 변경 내용 확인 - 데이터 조회 (가공은 service에서 처리)
+  const { proposalId, userName, requestType, beforeInfoList, afterInfoList } =
+    useMemo(
+      () => getAssigneeReconfirmService(getAssigneeReconfirmApi(paramId)),
+      [paramId],
+    );
 
-  // Footer의 확인 버튼 클릭 이벤트 핸들러
+  // TODO: API 연동 시 응답의 isSuccess 확인 후 이동 처리
+  // [Footer의 확인 버튼] 클릭 이벤트 핸들러
   const handleConfirmBtnClick = () => {
-    console.log("Footer의 확인 버튼 클릭");
-    // API 호출 로직 추가 필요
-
-    handleGoNext("/request/assignee");
+    postAssigneeReconfirmAcceptApi(paramId, proposalId);
+    handleGoBack();
   };
 
-  // 모달의 Confirm(거절) 버튼 클릭 이벤트 핸들러
-  const handleModalConfirmClick = () => {
-    console.log("모달의 거절 버튼 클릭");
-    // API 호출 로직 추가 필요
-
-    handleGoNext("/home");
+  // [모달의 거절 버튼] 클릭 이벤트 핸들러
+  const handleRejectConfirm = () => {
+    postAssigneeReconfirmRejectApi(paramId, proposalId);
+    setModalOpen(false);
+    handleGoNext(REQUEST_ROUTES.home, true);
   };
 
   return (
     <div className={styles.page}>
       {/* 헤더 (닫기 버튼이 있는 컴포넌트) */}
-      <ExitHeader title="변경 내용 확인" onClick={handleGoBack} />
+      <ExitHeader title="변경 내용 확인" onClick={() => handleGoBack()} />
+
       {/* 메인 컨텐츠 */}
       <main className={styles.content}>
         {/* 요청자 정보 카드 */}
@@ -105,7 +110,7 @@ function AssigneeReconfirm() {
         leftType="tertiary"
         leftTitle="거절"
         rightTitle="확인"
-        leftOnClick={() => setModalOpen(!isModalOpen)}
+        leftOnClick={() => setModalOpen(true)}
         rightOnClick={handleConfirmBtnClick}
       />
 
@@ -123,7 +128,7 @@ function AssigneeReconfirm() {
         }
         cancelTxt="돌아가기"
         confirmTxt="거절"
-        onConfirmClick={handleModalConfirmClick}
+        onConfirmClick={handleRejectConfirm}
       />
     </div>
   );

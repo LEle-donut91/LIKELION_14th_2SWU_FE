@@ -2,6 +2,9 @@ import getAssigneeMock from "@/features/request/mock/RequestAssignee/getAssignee
 import postAssigneeStartMock from "@/features/request/mock/RequestAssignee/postAssigneeStartMock";
 import postAssigneeDoneMock from "@/features/request/mock/RequestAssignee/postAssigneeDoneMock";
 import postAssigneeWithdrawMock from "@/features/request/mock/RequestAssignee/postAssigneeWithdrawMock";
+import getAssigneeReconfirmMock from "@/features/request/mock/AssigneeReconfirm/getAssigneeReconfirmMock";
+import postAssigneeReconfirmAcceptMock from "@/features/request/mock/AssigneeReconfirm/postAssigneeReconfirmAcceptMock";
+import postAssigneeReconfirmRejectMock from "@/features/request/mock/AssigneeReconfirm/postAssigneeReconfirmRejectMock";
 
 /**
  * =====================================================================
@@ -39,4 +42,33 @@ export const postAssigneeDoneApi = (requestId) => {
 export const postAssigneeWithdrawApi = (requestId) => {
   console.log("수락 철회:", requestId);
   return postAssigneeWithdrawMock;
+};
+
+/**
+ * =====================================================================
+ * [N-05] 변경 내용 확인
+ * - 데이터 조회 & 변경 내용 확인(수락) / 거절
+ * =====================================================================
+ */
+
+// TODO: API 연동 로직 수정 필요
+// [N-05] 변경 내용 확인 - 데이터 조회
+// 응답: "도움 요청 상세 조회" API의 data (viewerRole = ASSIGNEE, latestProposal 포함)
+export const getAssigneeReconfirmApi = (requestId) => {
+  console.log("변경 내용 조회:", requestId);
+  return getAssigneeReconfirmMock;
+};
+
+// TODO: API 연동 로직 수정 필요
+// [N-05] 변경 내용 확인 - "확인" (수정안 수락)
+export const postAssigneeReconfirmAcceptApi = (requestId, proposalId) => {
+  console.log("변경 내용 확인:", requestId, proposalId);
+  return postAssigneeReconfirmAcceptMock;
+};
+
+// TODO: API 연동 로직 수정 필요
+// [N-05] 변경 내용 확인 - 모달의 "거절" (수정안 거절)
+export const postAssigneeReconfirmRejectApi = (requestId, proposalId) => {
+  console.log("변경 내용 거절:", requestId, proposalId);
+  return postAssigneeReconfirmRejectMock;
 };
