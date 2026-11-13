@@ -150,9 +150,6 @@ export const BASIC_INFO_DELETE_MODAL = {
 // 페이지(목록 화면) 헤더 제목
 export const HEALTH_INFO_PAGE_TITLE = "건강 정보";
 
-// 섹션 하단 추가 버튼 문구
-export const HEALTH_INFO_ADD_BTN_TEXT = "추가하기";
-
 // 민감 항목 태그 문구 (BasicInfoItem에서 isSensitive가 true일 때 표시)
 export const SENSITIVE_TAG_TEXT = "민감";
 
@@ -163,6 +160,9 @@ export const HEALTH_CATEGORY_KEY = {
   ALLERGY: "allergy",
   CAUTION: "caution",
 };
+
+// '추가하기' 텍스트 버튼 문구 (CardAddButton 기본값, C-02 / C-03 등)
+export const CARD_ADD_BTN_TEXT = "추가하기";
 
 // 건강 정보 카테고리 구성 (화면에 그릴 순서대로)
 // - title: 섹션 제목 / 편집 화면 헤더 제목
