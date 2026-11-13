@@ -12,6 +12,9 @@ export const REQUEST_ROUTES = {
   // 홈 (TODO: 추후 shared/로 이동)
   home: "/home",
 
+  // 지난 상황 상세 (TODO: 추후 shared/로 이동)
+  pastSituationDetail: "/situation/past/detail",
+
   // 상황 ID
   request: (id) => `/request/${id}`,
 

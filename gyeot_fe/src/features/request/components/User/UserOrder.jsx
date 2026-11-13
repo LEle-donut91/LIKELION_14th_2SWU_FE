@@ -1,8 +1,10 @@
 import styles from "@/features/request/components/User/UserOrder.module.css";
 import {
-  USER_ORDER_STATE,
   USER_ORDER_STATE_TEXT,
 } from "@/features/request/constants/requestConstants";
+import {
+  USER_ORDER_STATE,
+} from "@/features/request/constants/enumConstants";
 
 function UserOrder({ title, orderList }) {
   return (

@@ -1,0 +1,50 @@
+{
+  "situationId": 1,
+  "requestId": 21,
+  "requestType": "GENERAL",
+  "helpType": "HOSPITAL",
+  "description": "병원에 가야하는 일이 생겼는데, 혼자 가기에 부담스러워요. 같이 가면 큰 도움이 될 것 같아요!",
+  "place": "○○병원",
+  "startsAt": "2026-11-10T14:00:00",
+  "endsAt": "2026-11-10T17:00:00",
+  "status": "ACCEPTED",
+  "displayStatus": "ACCEPTED",
+  "cancelReason": null,
+  "viewerRole": "ASSIGNEE",
+  "requester": { "userId": 2, "name": "지우" },
+  "currentAssignment": {
+    "assignmentId": 34,
+    "target": { "userId": 7, "name": "민재" },
+    "responseStatus": "AVAILABLE",
+    "responseDeadline": "2026-11-09T14:00:00",
+    "acceptedAt": "2026-11-08T10:12:00"
+  },
+  "noAssigneeReason": null,
+  "assignments": null,
+  "myAssignment": {
+    "responseStatus": "AVAILABLE",
+    "responseDeadline": "2026-11-09T14:00:00",
+    "closed": false,
+    "closeReason": null
+  },
+  "latestProposal": {
+    "proposalId": 5,
+    "status": "PENDING",
+    "invalidationReason": null,
+    "changedFields": ["STARTS_AT", "ENDS_AT", "INFORMATION_IDS"],
+    "before": {
+      "startsAt": "2026-11-10T14:00:00",
+      "endsAt": "2026-11-10T17:00:00",
+      "place": "○○병원",
+      "information": "생년월일, 출입 방법 외 3건"
+    },
+    "after": {
+      "startsAt": "2026-11-10T15:00:00",
+      "endsAt": "2026-11-10T18:00:00",
+      "place": "○○병원",
+      "information": "생년월일, 복용약 외 1건"
+    },
+    "responseDeadline": "2026-11-09T10:30:00"
+  },
+  "actions": ["ACCEPT_PROPOSAL", "REJECT_PROPOSAL"]
+}

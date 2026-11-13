@@ -1,7 +1,7 @@
 {
   "situationId": "1",
   "requestId": "1",
-  "requestState": "CANCEL",
+  "requestState": "CANCELED",
   "cancelReason": "SELF",
   "noAssignedReason": "REJECTED",
   "changeState": "INVALID",
