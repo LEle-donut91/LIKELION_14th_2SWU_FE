@@ -1,0 +1,42 @@
+/* 건강 정보 섹션 (제목 ~ 목록 영역 사이 gap 8) */
+.healthInfoSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* 섹션 제목 (폰트: index.css의 typoTitleMedium 사용) */
+.title {
+  margin: 0;
+  padding-bottom: 20px;
+  color: var(--color-gray-900);
+}
+
+/* 항목 카드 목록 + 추가하기 버튼 묶음 */
+.containerList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* 항목 카드 목록 (카드 사이 gap 12, ul 기본 스타일 제거) */
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* 추가하기 */
+.addBtn {
+  align-self: center;
+
+  padding: 8px 16px;
+  border: none;
+  background: none;
+  color: var(--color-gray-900);
+  cursor: pointer;
+}

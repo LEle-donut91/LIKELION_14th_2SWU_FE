@@ -28,3 +28,47 @@ export const CARD_BASIC_MOCK = {
     updatedDate: "2026-09-20",
   },
 };
+
+// C-02 건강 정보 목업 데이터
+// ※ request/mock/InfoPreview/getInfoPreviewMock.json의 healthInfo를 복사해 C-02 화면 형태로 변경
+//   - 카테고리 키, 필드명, 값은 원본과 동일
+//     (disease.name / diagnosedYear, medicine.name / dosage, allergy.name / reaction, caution.name / instruction)
+//   - 카테고리마다 항목을 여러 개 등록할 수 있어 객체 → 배열로 변경하고, 항목 구분용 id 추가
+//   - updatedAt("9/20") → updatedDate("2026-09-20"): C-01과 같은 "YYYY-MM-DD" 형식으로 변경 (원본이 null이면 null 유지)
+//   - isSensitive: 카테고리 단위로 고정(HEALTH_CATEGORY_LIST)되어 있어 제외
+//   - isDefault: 공개 정보 미리보기(H-03-02-01)에서 쓰는 값이라 제외
+// TODO: API 스펙 확정 후 응답 형태에 맞춰 교체
+export const CARD_HEALTH_MOCK = {
+  disease: [
+    {
+      id: "disease-1",
+      name: "고혈압",
+      diagnosedYear: "2024년",
+      updatedDate: "2026-09-20",
+    },
+  ],
+  medicine: [
+    {
+      id: "medicine-1",
+      name: "혈압약",
+      dosage: "매일 1정",
+      updatedDate: "2026-09-20",
+    },
+  ],
+  allergy: [
+    {
+      id: "allergy-1",
+      name: "페니실린",
+      reaction: "두드러기 반응",
+      updatedDate: null,
+    },
+  ],
+  caution: [
+    {
+      id: "caution-1",
+      name: "어지러움",
+      instruction: "앉아서 휴식 필요",
+      updatedDate: null,
+    },
+  ],
+};

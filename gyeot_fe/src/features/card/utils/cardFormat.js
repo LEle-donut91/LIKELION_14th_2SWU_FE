@@ -90,3 +90,13 @@ export const getTodayDateString = () => {
 // - 둘 다 "YYYYMMDD" 8자리 숫자 문자열이라 문자열 비교로 날짜 순서 비교 가능
 export const isFutureDate = (input) =>
   input > toBirthDateInput(getTodayDateString());
+
+/**
+ * =====================================================================
+ * [C-02] 건강 정보
+ * =====================================================================
+ */
+
+// 목록 카드 설명: ("2024년", " 진단") → "2024년 진단" / 값이 없으면 "" (뒤 문구도 붙이지 않음)
+export const formatHealthDescription = (value, suffix = "") =>
+  value ? `${value}${suffix}` : "";

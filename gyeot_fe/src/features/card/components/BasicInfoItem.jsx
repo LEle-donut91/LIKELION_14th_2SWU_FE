@@ -1,21 +1,38 @@
 import styles from "@/features/card/components/BasicInfoItem.module.css";
 import MaskIcon from "@/shared/components/MaskIcon/MaskIcon";
 import iconPencil from "@/shared/assets/icons/iconPencil.svg";
-import { BASIC_INFO_EDIT_BTN_TEXT } from "@/features/card/constants/cardConstants";
+import {
+  BASIC_INFO_EDIT_BTN_TEXT,
+  SENSITIVE_TAG_TEXT,
+} from "@/features/card/constants/cardConstants";
 
 /**
- * [C-01] 기본 정보 목록 카드 1개 (제목 / 갱신일 뱃지 / 값 / 수정하기 버튼)
- * @param {string}   title           카드 제목 (예: "생년월일")
- * @param {string}   description     값 표시 문구 (값이 없으면 BASIC_INFO_EMPTY_TEXT)
+ * [C-01 · C-02] 정보 목록 카드 1개 (제목 / 민감 태그 / 갱신일 뱃지 / 값 / 수정하기 버튼)
+ * @param {string}   title           카드 제목 (예: "생년월일", "고혈압")
+ * @param {boolean}  isSensitive     제목 옆 '민감' 태그 노출 여부 (기본값: false)
+ * @param {string}   description     값 표시 문구 (C-01: 값이 없으면 BASIC_INFO_EMPTY_TEXT)
  * @param {string}   updatedDateText 갱신일 뱃지 문구 (예: "9/20") / 빈 값이면 뱃지 숨김
  * @param {Function} onEditClick     '수정하기' 클릭 시 동작
  */
-function BasicInfoItem({ title, description, updatedDateText, onEditClick }) {
+function BasicInfoItem({
+  title,
+  isSensitive = false,
+  description,
+  updatedDateText,
+  onEditClick,
+}) {
   return (
     <li className={styles.basicInfoItem}>
-      {/* 제목 + 갱신일 뱃지 */}
+      {/* 제목 + 민감 태그 / 갱신일 뱃지 */}
       <div className={styles.titleRow}>
-        <p className={`${styles.title} typoBodyStrong`}>{title}</p>
+        <div className={styles.titleGroup}>
+          <p className={`${styles.title} typoBodyStrong`}>{title}</p>
+          {isSensitive && (
+            <span className={`${styles.sensitiveTag} typoCaptionMedium`}>
+              {SENSITIVE_TAG_TEXT}
+            </span>
+          )}
+        </div>
         {updatedDateText && (
           <span className={`${styles.dateBadge} typoCaptionMedium`}>
             {updatedDateText}

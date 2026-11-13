@@ -21,10 +21,24 @@
   gap: 8px;
 }
 
+/* 제목 + 민감 태그 */
+.titleGroup {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0; /* 제목이 길어져도 갱신일 뱃지를 밀지 않도록 */
+}
+
 /* 카드 제목 (폰트: index.css의 typoBodyStrong 사용) */
 .title {
   margin: 0;
   color: var(--color-gray-900);
+}
+
+/* 민감 태그 (폰트: index.css의 typoCaptionMedium 사용) */
+.sensitiveTag {
+  flex-shrink: 0;
+  color: var(--color-red-500);
 }
 
 /* 갱신일 뱃지 (폰트: index.css의 typoCaptionMedium 사용) */

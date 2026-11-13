@@ -96,9 +96,11 @@ export const BASIC_INFO_EMPTY_TEXT = "등록된 정보가 없어요";
 export const BASIC_INFO_EDIT_BTN_TEXT = "수정하기";
 
 // 편집 화면 하단 버튼 문구
+// - ADD: C-02에서 '추가하기'로 들어온 상태일 때 오른쪽 버튼 문구
 export const BASIC_INFO_FOOTER_TEXT = {
   DELETE: "삭제",
   UPDATE: "수정",
+  ADD: "추가",
 };
 
 // 생년월일 입력 설정 (YYYYMMDD 8자리)
@@ -136,3 +138,131 @@ export const BASIC_INFO_DELETE_MODAL = {
   cancelText: "취소",
   confirmText: "삭제",
 };
+
+/**
+ * =====================================================================
+ * [C-02] 건강 정보
+ * - 목록 카드 '수정하기', 하단 [삭제][수정] 버튼, 삭제 확인 모달 문구는
+ *   C-01 상수를 함께 사용 (BASIC_INFO_EDIT_BTN_TEXT / BASIC_INFO_FOOTER_TEXT / BASIC_INFO_DELETE_MODAL)
+ * =====================================================================
+ */
+
+// 페이지(목록 화면) 헤더 제목
+export const HEALTH_INFO_PAGE_TITLE = "건강 정보";
+
+// 섹션 하단 추가 버튼 문구
+export const HEALTH_INFO_ADD_BTN_TEXT = "추가하기";
+
+// 민감 항목 태그 문구 (BasicInfoItem에서 isSensitive가 true일 때 표시)
+export const SENSITIVE_TAG_TEXT = "민감";
+
+// 건강 정보 카테고리 키 (mock/API 데이터의 카테고리 키와 동일)
+export const HEALTH_CATEGORY_KEY = {
+  DISEASE: "disease",
+  MEDICINE: "medicine",
+  ALLERGY: "allergy",
+  CAUTION: "caution",
+};
+
+// 건강 정보 카테고리 구성 (화면에 그릴 순서대로)
+// - title: 섹션 제목 / 편집 화면 헤더 제목
+// - isSensitive: 서비스에서 민감 항목으로 지정된 카테고리인지 (목록 카드에 '민감' 표시)
+// - titleKey: 목록 카드 제목으로 쓸 필드 키
+// - descriptionKey: 목록 카드 설명으로 쓸 필드 키
+// - descriptionSuffix: 설명 값 뒤에 붙일 문구 (예: "2024년" → "2024년 진단")
+// - fields: 편집 화면 입력 필드 (위에서부터 그리는 순서)
+//   - isRequired: true면 비어 있을 때 [수정] 클릭 시 requiredMessage 토스트
+export const HEALTH_CATEGORY_LIST = [
+  {
+    key: HEALTH_CATEGORY_KEY.DISEASE,
+    title: "질환",
+    isSensitive: true,
+    titleKey: "name",
+    descriptionKey: "diagnosedYear",
+    descriptionSuffix: " 진단",
+    fields: [
+      {
+        key: "name",
+        label: "질환",
+        placeholder: "질환명",
+        isRequired: true,
+        requiredMessage: "질환명을 입력해 주세요.",
+      },
+      {
+        key: "diagnosedYear",
+        label: "진단일",
+        placeholder: "예: 2025년",
+        isRequired: false,
+      },
+    ],
+  },
+  {
+    key: HEALTH_CATEGORY_KEY.MEDICINE,
+    title: "복용약",
+    isSensitive: true,
+    titleKey: "name",
+    descriptionKey: "dosage",
+    descriptionSuffix: "",
+    fields: [
+      {
+        key: "name",
+        label: "복용약",
+        placeholder: "약 이름",
+        isRequired: true,
+        requiredMessage: "약 이름을 입력해 주세요.",
+      },
+      {
+        key: "dosage",
+        label: "복용법",
+        placeholder: "예: 아침 1정",
+        isRequired: false,
+      },
+    ],
+  },
+  {
+    key: HEALTH_CATEGORY_KEY.ALLERGY,
+    title: "알러지",
+    isSensitive: true,
+    titleKey: "name",
+    descriptionKey: "reaction",
+    descriptionSuffix: "",
+    fields: [
+      {
+        key: "name",
+        label: "알러지",
+        placeholder: "알러지명",
+        isRequired: true,
+        requiredMessage: "알러지명을 입력해 주세요.",
+      },
+      {
+        key: "reaction",
+        label: "반응",
+        placeholder: "예: 두드러기",
+        isRequired: false,
+      },
+    ],
+  },
+  {
+    key: HEALTH_CATEGORY_KEY.CAUTION,
+    title: "주의사항",
+    isSensitive: false,
+    titleKey: "name",
+    descriptionKey: "instruction",
+    descriptionSuffix: "",
+    fields: [
+      {
+        key: "name",
+        label: "주의사항",
+        placeholder: "증상",
+        isRequired: true,
+        requiredMessage: "증상을 입력해 주세요.",
+      },
+      {
+        key: "instruction",
+        label: "대처법",
+        placeholder: "예: 앉아서 휴식 필요",
+        isRequired: false,
+      },
+    ],
+  },
+];
