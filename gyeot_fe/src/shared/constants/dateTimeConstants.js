@@ -1,6 +1,9 @@
 // 날짜/시간 입력(DateTimeOption) 공통 설정
 // features/request/constants/requestConstants.js의 날짜·시간 설정을 shared용으로 복사 (요청 쪽 원본은 그대로 유지)
 
+// "0000-00-00" 형태 (ISO-8601 날짜) 판별용
+export const ISO_DATE_ONLY = /^\d{4}-\d{2}-\d{2}$/;
+
 // 날짜 입력칸 설정
 const DATE_CONFIGS = [
   {

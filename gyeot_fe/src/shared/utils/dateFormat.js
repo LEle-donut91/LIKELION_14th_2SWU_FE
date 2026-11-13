@@ -14,6 +14,18 @@ const toDateOnly = (value) => {
 
 const padTwo = (number) => String(number).padStart(2, "0");
 
+// 2000년 03월 15일 (월/일 2자리 패딩)
+export const formatFullKoreanDate = (value) => {
+  const date = toDate(value);
+  return `${date.getFullYear()}년 ${padTwo(date.getMonth() + 1)}월 ${padTwo(date.getDate())}일`;
+};
+
+// 9/20 (요일·시각 제거)
+export const formatMonthDay = (value) => {
+  const date = toDate(value);
+  return `${date.getMonth() + 1}/${date.getDate()}`;
+};
+
 // 9/28(월)
 export const formatDate = (value) => {
   const date = toDate(value);
