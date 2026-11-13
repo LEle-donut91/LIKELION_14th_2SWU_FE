@@ -460,26 +460,30 @@ export const getAssigneeFlags = ({ requestState, isChanged }) => {
   const isAcceptState = requestState === REQUEST_STATE.ACCEPTED;
   const isProgressState = requestState === REQUEST_STATE.IN_PROGRESS;
   const isDoneState = requestState === REQUEST_STATE.COMPLETED;
+  const isCanceledState = requestState === REQUEST_STATE.CANCELED;
+  const isExpiredState = requestState === REQUEST_STATE.EXPIRED;
 
   return {
     isAcceptState,
     isProgressState,
     isDoneState,
+    isCanceledState,
+    isExpiredState,
     isChanged,
 
     // 화면 요소 노출 여부
     showWithdrawBtn: isAcceptState, // 헤더 우측 "철회" 버튼
-    showChangedNotice: isChanged, // "요청 수정" 알림
+    showChangedNotice: isChanged && isAcceptState, // "요청 수정" 알림
     showDoneNotice: isDoneState, // "완료된 요청은 다시 열 수 없어요"
   };
 };
 
 // 상태별 푸터 종류 결정 (없으면 null) - 수정안이 있으면 항상 "변경 내용 확인" 우선
 export const getAssigneeFooterKey = (flags) => {
-  if (flags.isChanged) return ASSIGNEE_FOOTER_KEY.CHECK_CHANGE;
+  if (flags.showChangedNotice) return ASSIGNEE_FOOTER_KEY.CHECK_CHANGE;
   if (flags.isAcceptState) return ASSIGNEE_FOOTER_KEY.START;
   if (flags.isProgressState) return ASSIGNEE_FOOTER_KEY.DONE;
-  if (flags.isDoneState) return ASSIGNEE_FOOTER_KEY.PAST_SITUATION;
+  if (flags.isDoneState || flags.isCanceledState || flags.isExpiredState) return ASSIGNEE_FOOTER_KEY.PAST_SITUATION;
   return null;
 };
 

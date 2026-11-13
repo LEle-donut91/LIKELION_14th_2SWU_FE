@@ -569,6 +569,8 @@ export const TARGET_FOOTER_CONFIG = {
 export const ASSIGNEE_SAFETY_INFORMATION = {
   [REQUEST_STATE.ACCEPTED]: "수락한 이후 확인할 수 있어요.",
   [REQUEST_STATE.COMPLETED]: "접근이 종료되었어요.",
+  [REQUEST_STATE.CANCELED]: "접근이 종료되었어요.",
+  [REQUEST_STATE.EXPIRED]: "접근이 종료되었어요.",
 };
 
 // 푸터 종류
