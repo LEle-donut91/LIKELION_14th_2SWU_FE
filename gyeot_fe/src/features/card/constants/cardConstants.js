@@ -10,6 +10,10 @@ export const CARD_NAVIGATION_PATH = {
   SHARE: "/card/share", // C-06 공유 관리
 };
 
+// 카드 공통
+// '추가하기' 텍스트 버튼 문구 (CardAddButton 기본값)
+export const CARD_ADD_BTN_TEXT = "추가하기";
+
 // C-00 메뉴 구성 (고정 텍스트)
 // - key: mock/API 데이터에서 해당 항목 값을 찾는 키
 // - description: 카드 설명 (공유 관리는 공유 건수로 동적 생성하므로 없음)
@@ -161,9 +165,6 @@ export const HEALTH_CATEGORY_KEY = {
   CAUTION: "caution",
 };
 
-// '추가하기' 텍스트 버튼 문구 (CardAddButton 기본값, C-02 / C-03 등)
-export const CARD_ADD_BTN_TEXT = "추가하기";
-
 // 건강 정보 카테고리 구성 (화면에 그릴 순서대로)
 // - title: 섹션 제목 / 편집 화면 헤더 제목
 // - isSensitive: 서비스에서 민감 항목으로 지정된 카테고리인지 (목록 카드에 '민감' 표시)
@@ -266,3 +267,62 @@ export const HEALTH_CATEGORY_LIST = [
     ],
   },
 ];
+
+/**
+ * =====================================================================
+ * [C-03] 연락 순서
+ * =====================================================================
+ */
+
+// 연락 대상 관계 유형 (비상연락망 조회 API의 relationshipType 값과 동일)
+export const CONTACT_RELATIONSHIP_TYPE = {
+  GUARDIAN: "GUARDIAN",
+  MY_PERSON: "MY_PERSON",
+};
+
+// 관계 유형별 표시 문구 (섹션 제목 / 카드 보조 텍스트에 공용 사용)
+export const CONTACT_RELATIONSHIP_LABELS = {
+  GUARDIAN: "서로의 보호자",
+  MY_PERSON: "나의 사람",
+};
+
+// 헤더 제목
+export const CONTACT_ORDER_TITLE = "연락 순서";
+
+// 순위 뱃지 뒤에 붙는 문구: 1 → "1순위"
+export const CONTACT_ORDER_RANK_SUFFIX = "순위";
+
+// C-03에서 이동하는 화면 경로 (App.jsx 라우트 기준, 주석은 화면 코드 / 기능 번호)
+export const CONTACT_ORDER_NAVIGATION_PATH = {
+  MY_PERSON_INVITE: "/relation/acquaintance-invite", // R-01 나의 사람 초대 (F-01)
+  GUARDIAN_REQUEST: "/relation/guardian-request", // N-02 보호자 요청 (F-26)
+};
+
+// 하단 안내 문구
+// - WITH_GUARDIAN: 줄 단위 배열, 한 줄 안의 항목은 점으로 구분해 표시
+// - WITHOUT_GUARDIAN: 문단 단위 배열, 문단 안의 항목은 줄바꿈으로 표시
+export const CONTACT_ORDER_NOTICE = {
+  WITH_GUARDIAN: [
+    ["보호자는 항상 맨 앞에 와요"], ["길게 눌러 끌면 순서를 바꿀 수 있어요."]
+  ],
+  WITHOUT_GUARDIAN: [
+    ["보호자를 등록하면 항상 맨 앞에 와요."],
+    ["다음 순서로 자동으로 넘어가지 않아요.", "요청자가 직접 정해요."],
+  ],
+};
+
+// 연락할 사람이 아무도 없을 때 빈 상태 화면 문구 (descriptionLines: 배열의 각 원소 = 한 줄)
+export const CONTACT_ORDER_EMPTY = {
+  title: "아직 연락할 사람이 없어요",
+  descriptionLines: [
+    "나의 사람이나 서로의 보호자를 맺으면",
+    "여기서 연락 순서를 정할 수 있어요",
+  ],
+  inviteBtnText: "나의 사람 초대하기",
+  guardianRequestBtnText: "보호자 요청하기",
+};
+
+// 토스트 문구
+export const CONTACT_ORDER_TOAST_MESSAGE = {
+  SAVE_SUCCESS: "순서를 바꿨어요",
+};

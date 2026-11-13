@@ -1,0 +1,77 @@
+/* 전체 페이지 (DefaultToast의 absolute 기준점) */
+.page {
+  position: relative;
+  width: 100%;
+  min-height: 100%;
+  box-sizing: border-box;
+
+  /* index.css의 CSS 변수 형태로 수정 필요 (CardBasic과 동일한 임시 값) */
+  background-color: #f8f8f8;
+
+  display: flex;
+  flex-direction: column;
+}
+
+/* 헤더 아래 영역 */
+.main {
+  flex: 1;
+}
+
+/* 목록 화면 본문 */
+.mainContent {
+  display: flex;
+  flex-direction: column;
+  padding: 24px 20px 40px;
+}
+
+/* 섹션 (제목 + 카드 목록) */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* 섹션 제목 줄 (제목 + 최대 인원) */
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* 섹션 제목 (폰트: typoTitleMedium) */
+.sectionTitle {
+  margin: 0;
+  color: var(--color-gray-900);
+}
+
+/* 최대 인원 (폰트: typoCaptionMedium) */
+.sectionLimit {
+  color: var(--color-gray-500);
+}
+
+/* 보호자 / 나의 사람 구분선 */
+.divider {
+  width: 100%;
+  margin: 20px 0;
+  border: none;
+  border-top: 1px solid var(--color-olive-200);
+}
+
+/* 하단 안내 */
+.notice {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+/* 안내 문구 (폰트: typoBodySmall) */
+.noticeText {
+  margin: 0;
+  color: var(--color-gray-600);
+}
+
+/* 문단 안에서 줄바꿈되는 한 줄 */
+.noticeLine {
+  display: block;
+}
