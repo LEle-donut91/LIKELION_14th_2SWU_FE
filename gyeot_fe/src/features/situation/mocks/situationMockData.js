@@ -107,33 +107,58 @@ export const SITUATION_DETAIL_MOCK = {
   requests: [
     {
       id: 101,
-      helpType: "HOSPITAL",
-      targetName: "민재",
-      startDateTime: "2026-11-14T10:00:00",
-      endDateTime: "2026-11-14T13:00:00",
+      helpType: "MEAL",
+      targetName: "서연",
+      startDateTime: "2026-11-17T18:00:00",
+      endDateTime: "2026-11-17T19:00:00",
       status: "REQUESTED",
     },
     {
       id: 102,
-      helpType: "SHOPPING",
+      helpType: "HOSPITAL",
       targetName: "민재",
-      startDateTime: "2026-11-16T15:00:00",
-      endDateTime: "2026-11-16T17:00:00",
-      status: "UNASSIGNED",
+      startDateTime: "2026-11-19T14:00:00",
+      endDateTime: "2026-11-19T18:00:00",
+      status: "WAITING",
     },
     {
       id: 103,
-      helpType: "MEAL",
+      helpType: "SHOPPING",
+      targetName: "민재",
+      startDateTime: "2026-11-21T11:00:00",
+      endDateTime: "2026-11-21T12:00:00",
+      status: "UNASSIGNED",
+    },
+    {
+      id: 104,
+      helpType: "PET_CARE",
       targetName: "하은",
-      startDateTime: "2026-11-18T12:00:00",
-      endDateTime: "2026-11-18T13:00:00",
+      startDateTime: "2026-11-22T09:00:00",
+      endDateTime: "2026-11-23T12:00:00",
       status: "ACCEPTED",
+    },
+    {
+      id: 105,
+      helpType: "CONTACT",
+      targetName: "하은",
+      startDateTime: "2026-11-10T20:00:00",
+      endDateTime: "2026-11-10T20:30:00",
+      status: "COMPLETED",
+    },
+    {
+      id: 106,
+      helpType: "SHOPPING",
+      targetName: "서연",
+      startDateTime: "2026-11-09T16:00:00",
+      endDateTime: "2026-11-09T17:00:00",
+      status: "CANCELLED",
     },
   ],
 };
 
 // H-03-02 상황 상세 - 참여자 시점 (지우님의 상황에 내가 참여)
-// requests: 나에게 온 요청 (myRole: TARGET 내가 대상 / ASSIGNEE 내가 담당)
+// - responseNeededRequests : 응답이 필요한 요청 (내가 대상, 응답 기한 있음)
+// - requests               : 수락한 요청 (내가 담당)
 export const JOINED_SITUATION_DETAIL_MOCK = {
   id: 21,
   title: "무릎 수술 회복",
@@ -145,15 +170,40 @@ export const JOINED_SITUATION_DETAIL_MOCK = {
     { id: 2, name: "민재", isGuardian: false },
     { id: 3, name: "하은", isGuardian: false },
   ],
-  requests: [
+  responseNeededRequests: [
     {
       id: 201,
-      helpType: "HOSPITAL",
-      targetName: "지우", // 참여자 시점: 카드 제목에 상황 주인 이름 (디자인팀 확인 중)
-      startDateTime: "2026-11-14T14:00:00",
-      endDateTime: "2026-11-14T16:00:00",
-      status: "REQUESTED",
+      helpType: "SHOPPING",
+      startDateTime: "2026-11-21T11:00:00",
+      responseDeadline: "2026-11-20T18:00:00",
+      status: "WAITING",
       myRole: "TARGET",
+    },
+  ],
+  requests: [
+    {
+      id: 202,
+      helpType: "MEAL",
+      startDateTime: "2026-11-15T18:00:00",
+      endDateTime: "2026-11-15T19:00:00",
+      status: "IN_PROGRESS",
+      myRole: "ASSIGNEE",
+    },
+    {
+      id: 203,
+      helpType: "HOSPITAL",
+      startDateTime: "2026-11-19T14:00:00",
+      endDateTime: "2026-11-19T18:00:00",
+      status: "ACCEPTED",
+      myRole: "ASSIGNEE",
+    },
+    {
+      id: 204,
+      helpType: "CONTACT",
+      startDateTime: "2026-11-10T20:00:00",
+      endDateTime: "2026-11-10T20:30:00",
+      status: "COMPLETED",
+      myRole: "ASSIGNEE",
     },
   ],
 };

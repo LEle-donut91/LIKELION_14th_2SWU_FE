@@ -6,11 +6,11 @@
   background-color: var(--color-gray-050);
 }
 
-/* 콘텐츠: 헤더 아래 20, 좌우 16, 아래 40, 간격 40 */
+/* 콘텐츠: 헤더 아래 20, 좌우 16, 아래 40, 간격 30 */
 .content {
   display: flex;
   flex-direction: column;
-  gap: 40px;
+  gap: 30px;
   padding: 20px 16px 40px;
 }
 
@@ -29,6 +29,13 @@
 
 .situationSection > article {
   align-self: stretch;
+}
+
+/* 요청 영역 여러 개(참여자: 응답이 필요한 요청 + 수락한 요청): 간격 20 */
+.requestSectionContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 /* 요청 제목 + 목록: 간격 10 */

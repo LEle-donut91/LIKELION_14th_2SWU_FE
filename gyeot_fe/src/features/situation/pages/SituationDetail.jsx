@@ -6,6 +6,7 @@ import LargeFooter from "@/shared/components/LargeFooter/LargeFooter";
 import SituationDetailCard from "@/features/situation/components/SituationDetailCard";
 import ParticipantTagList from "@/features/situation/components/ParticipantTagList";
 import SituationRequestList from "@/features/situation/components/SituationRequestList";
+import ResponseNeededRequestList from "@/features/situation/components/ResponseNeededRequestList";
 import RequestListEmpty from "@/features/situation/components/RequestListEmpty";
 import {
   MY_REQUEST_ROLE,
@@ -41,6 +42,9 @@ function SituationDetail() {
   const situation = isOwner ? SITUATION_DETAIL_MOCK : JOINED_SITUATION_DETAIL_MOCK;
   const participantList = situation.participants;
   const requestList = isEmptyPreview ? [] : situation.requests;
+  // 참여자: 응답이 필요한 요청 (정보 주인은 없음)
+  const responseNeededRequestList =
+    isEmptyPreview || isOwner ? [] : situation.responseNeededRequests;
   const sectionText = REQUEST_SECTION_TEXT[isOwner ? "owner" : "participant"];
 
   // 정보 주인은 요청자 상세, 참여자는 내 역할(대상/담당)에 맞는 상세로 이동
@@ -77,22 +81,37 @@ function SituationDetail() {
           <ParticipantTagList participants={participantList} />
         </section>
 
-        <section className={styles.requestSection}>
-          <h2 className={`${styles.sectionTitle} typoTitleMedium`}>
-            {sectionText.title}
-          </h2>
-          {requestList.length > 0 ? (
-            <SituationRequestList
-              requests={requestList}
-              onRequestClick={handleRequestClick}
-            />
-          ) : (
-            <RequestListEmpty
-              title={sectionText.emptyTitle}
-              message={sectionText.emptyMessage}
-            />
+        <div className={styles.requestSectionContainer}>
+          {/* 참여자: 응답이 필요한 요청 (있을 때만) */}
+          {responseNeededRequestList.length > 0 && (
+            <section className={styles.requestSection}>
+              <h2 className={`${styles.sectionTitle} typoTitleMedium`}>
+                응답이 필요한 요청
+              </h2>
+              <ResponseNeededRequestList
+                requests={responseNeededRequestList}
+                onRequestClick={handleRequestClick}
+              />
+            </section>
           )}
-        </section>
+
+          <section className={styles.requestSection}>
+            <h2 className={`${styles.sectionTitle} typoTitleMedium`}>
+              {sectionText.title}
+            </h2>
+            {requestList.length > 0 ? (
+              <SituationRequestList
+                requests={requestList}
+                onRequestClick={handleRequestClick}
+              />
+            ) : (
+              <RequestListEmpty
+                title={sectionText.emptyTitle}
+                message={sectionText.emptyMessage}
+              />
+            )}
+          </section>
+        </div>
       </main>
 
       {/* 요청 작성은 정보 주인만 (F-05: 요청자는 항상 정보 주인) */}

@@ -21,6 +21,29 @@ export const formatDateFieldText = (dateTimeValue, placeholder) => {
   return `${Number(month)}/${Number(day)}`;
 };
 
+// 14:00
+const formatTime = (value) => {
+  const date = toDate(value);
+  return `${String(date.getHours()).padStart(2, "0")}:${String(
+    date.getMinutes(),
+  ).padStart(2, "0")}`;
+};
+
+// 9/30(화) 18:00 (H-03-02 참여자뷰 요청 카드)
+export const formatDateWithTime = (value) =>
+  `${formatDate(value)} ${formatTime(value)}`;
+
+// 요청 일정 (H-03-01 정보주인뷰 요청 카드)
+// - 하루 안: 9/30(화) 18:00 - 19:00
+// - 여러 날: 10/5(일) 09:00 - 10/6(월) 12:00
+export const formatRequestSchedule = (startValue, endValue) => {
+  const isSameDay =
+    toDate(startValue).toDateString() === toDate(endValue).toDateString();
+  return isSameDay
+    ? `${formatDateWithTime(startValue)} - ${formatTime(endValue)}`
+    : `${formatDateWithTime(startValue)} - ${formatDateWithTime(endValue)}`;
+};
+
 // 요청 기간: 9/28(일) - 10/12(일), 하루 안에 끝나면 9/28(일)만 (H-03 요청 목록)
 export const formatRequestPeriod = (startValue, endValue) => {
   const isSameDay =
