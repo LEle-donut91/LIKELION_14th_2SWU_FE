@@ -81,3 +81,43 @@ export const JOINED_SITUATION_MOCK = {
 
 // H-03-05 상황 종료 시트 - 진행 중인 요청 수
 export const ACTIVE_REQUEST_COUNT_MOCK = 2;
+
+// H-03 상황 상세 - 정보 주인 시점
+// participants: 정보 주인을 뺀 참여자 / requests: 이 상황의 요청 목록
+export const SITUATION_DETAIL_MOCK = {
+  id: 21,
+  title: "무릎 수술 회복",
+  startDate: "2026-11-01",
+  endDate: "2026-11-24",
+  participants: [
+    { id: 1, name: "서연", isGuardian: true },
+    { id: 2, name: "민재", isGuardian: false },
+    { id: 3, name: "하은", isGuardian: false },
+  ],
+  requests: [
+    {
+      id: 101,
+      helpType: "HOSPITAL",
+      targetName: "민재",
+      startDateTime: "2026-11-14T10:00:00",
+      endDateTime: "2026-11-14T13:00:00",
+      status: "REQUESTED",
+    },
+    {
+      id: 102,
+      helpType: "SHOPPING",
+      targetName: "민재",
+      startDateTime: "2026-11-16T15:00:00",
+      endDateTime: "2026-11-16T17:00:00",
+      status: "UNASSIGNED",
+    },
+    {
+      id: 103,
+      helpType: "MEAL",
+      targetName: "하은",
+      startDateTime: "2026-11-18T12:00:00",
+      endDateTime: "2026-11-18T13:00:00",
+      status: "ACCEPTED",
+    },
+  ],
+};

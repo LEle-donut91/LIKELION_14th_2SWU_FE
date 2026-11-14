@@ -1,0 +1,41 @@
+/* 페이지 전체: gray-050 배경 (하단 버튼은 LargeFooter가 아래에 고정) */
+.page {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  background-color: var(--color-gray-050);
+}
+
+/* 콘텐츠: 헤더 아래 20, 좌우 16, 아래 128 (하단 버튼 영역), 간격 40 */
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  padding: 20px 16px 128px;
+}
+
+/* 상황 카드 + 참여자 태그: 간격 15, 가운데 정렬 */
+.situationSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.situationSection > article {
+  align-self: stretch;
+}
+
+/* 요청 제목 + 목록: 간격 10 */
+.requestSection {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* "요청" 제목: 시안 너비 368 → 좌우 1 */
+.sectionTitle {
+  margin: 0;
+  padding: 0 1px;
+  color: var(--color-gray-900);
+}

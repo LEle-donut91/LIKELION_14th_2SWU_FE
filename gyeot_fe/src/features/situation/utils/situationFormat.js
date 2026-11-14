@@ -1,4 +1,5 @@
 // 상황 화면 날짜 표시용 유틸리티
+import { formatDate, formatDateRange } from "@/shared/utils/dateFormat";
 
 const toDate = (value) => (value instanceof Date ? value : new Date(value));
 
@@ -18,4 +19,11 @@ export const formatDateFieldText = (dateTimeValue, placeholder) => {
   const { year, month, day } = dateTimeValue ?? {};
   if (!year || !month || !day) return placeholder;
   return `${Number(month)}/${Number(day)}`;
+};
+
+// 요청 기간: 9/28(일) - 10/12(일), 하루 안에 끝나면 9/28(일)만 (H-03 요청 목록)
+export const formatRequestPeriod = (startValue, endValue) => {
+  const isSameDay =
+    toDate(startValue).toDateString() === toDate(endValue).toDateString();
+  return isSameDay ? formatDate(startValue) : formatDateRange(startValue, endValue);
 };
