@@ -12,6 +12,10 @@ const formatMonthDay = (value) => {
 export const formatMonthDayRange = (startValue, endValue) =>
   `${formatMonthDay(startValue)} ~ ${formatMonthDay(endValue)}`;
 
+// 9/1 - 9/20 (H-04 지난 상황 카드)
+export const formatMonthDayDashRange = (startValue, endValue) =>
+  `${formatMonthDay(startValue)} - ${formatMonthDay(endValue)}`;
+
 // 날짜 선택 시트 값({ year, month, day, ... }) → 9/28 (H-01 시작/종료 칸)
 // 날짜가 다 입력되지 않았으면 placeholder 반환
 export const formatDateFieldText = (dateTimeValue, placeholder) => {
