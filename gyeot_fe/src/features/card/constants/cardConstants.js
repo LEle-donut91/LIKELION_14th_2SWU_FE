@@ -462,6 +462,7 @@ export const MESSAGE_CATEGORY_KEY = {
 // 미리 남기는 말 카테고리 구성 (화면에 그릴 순서대로)
 // - title: 섹션 제목 / 편집 화면 헤더 제목
 // - isSensitive: 서비스에서 민감 항목으로 지정된 카테고리인지 (두 카테고리 모두 일반)
+// - isSingleLine: 목록 카드 내용을 한 줄로 표시하고 넘치면 말줄임 (내용이 최대 1000자까지 길어질 수 있어 적용)
 // - titleKey: 목록 카드 제목으로 쓸 필드 키
 // - descriptionKey: 목록 카드 설명으로 쓸 필드 키
 // - descriptionSuffix: 설명 값 뒤에 붙일 문구 (없음)
@@ -475,20 +476,21 @@ export const MESSAGE_CATEGORY_LIST = [
     key: MESSAGE_CATEGORY_KEY.PREFERENCE,
     title: "선호 · 부탁",
     isSensitive: false,
+    isSingleLine: true,
     titleKey: "title",
     descriptionKey: "value",
     descriptionSuffix: "",
     fields: [
       {
         key: "title",
-        label: "선호 또는 부탁",
+        label: "선호 · 부탁",
         placeholder: "선호 또는 부탁을 입력해주세요.",
         isRequired: true,
         requiredMessage: "항목을 입력해 주세요.",
       },
       {
         key: "value",
-        label: "내용",
+        label: "남길 내용",
         placeholder: "남길 내용을 입력해주세요.",
         isRequired: true,
         requiredMessage: "내용을 입력해 주세요.",
@@ -501,6 +503,7 @@ export const MESSAGE_CATEGORY_LIST = [
     key: MESSAGE_CATEGORY_KEY.DOCUMENT,
     title: "준비 문서 보관 위치",
     isSensitive: false,
+    isSingleLine: true,
     titleKey: "title",
     descriptionKey: "value",
     descriptionSuffix: "",
@@ -508,15 +511,14 @@ export const MESSAGE_CATEGORY_LIST = [
       {
         key: "title",
         label: "준비 문서",
-        // TODO: 디자인 확정 후 문구 교체 (임시 문구)
-        placeholder: "보관할 문서를 입력해주세요.",
+        placeholder: "보관하는 문서를 입력해주세요.",
         isRequired: true,
         requiredMessage: "항목을 입력해 주세요.",
       },
       {
         key: "value",
-        label: "위치 상세",
-        placeholder: "남길 내용을 입력해주세요.",
+        label: "보관 위치",
+        placeholder: "서류 보관 위치를 입력해주세요.",
         isRequired: true,
         requiredMessage: "내용을 입력해 주세요.",
         isMultiline: true,

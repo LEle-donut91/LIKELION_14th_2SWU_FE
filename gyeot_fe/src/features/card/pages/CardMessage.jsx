@@ -267,6 +267,7 @@ function CardMessage() {
                       item[category.descriptionKey],
                       category.descriptionSuffix,
                     )}
+                    isSingleLine={category.isSingleLine}
                     updatedDateText={formatShortDate(item.updatedDate)}
                     onEditClick={() => handleEditOpen(category, item)}
                   />
