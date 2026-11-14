@@ -23,3 +23,13 @@
 .fieldInput::placeholder {
   color: var(--color-gray-500);
 }
+
+/* 여러 줄 입력란 (isMultiline)
+   - 높이는 CardTextField.jsx에서 내용에 맞춰 조절 (한 줄 → 최대 maxRows 줄, 넘으면 스크롤)
+   - 크기 조절 핸들 숨김, 한 줄일 때 스크롤바가 보이지 않도록 기본은 overflow 숨김 */
+.fieldTextarea {
+  display: block;
+  resize: none;
+  overflow-y: hidden;
+  font-family: inherit;
+}
