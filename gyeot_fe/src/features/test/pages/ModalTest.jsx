@@ -5,8 +5,8 @@ import requestModalData from "@/features/test/api/requestModalData";
 
 function ModalTest() {
   // 모달 전체의 오픈 여부 상태
-  // requestModalData가 있으면 useState(true), 없으면 useState(false)
-  const [isModalOpen, setModalOpen] = useState(Boolean(requestModalData));
+  // requestModalData에 항목이 있으면 true, 없거나 빈 배열이면 false
+  const [isModalOpen, setModalOpen] = useState(requestModalData?.length > 0);
 
   // 현재 몇 번째 모달을 보고 있는지 추적하는 인덱스 상태
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -37,10 +37,12 @@ function ModalTest() {
   return (
     <>
       {/* 데이터가 존재할 때만 RequestModal을 렌더링 */}
-      {requestModalData && currentModalItem && (
+      {currentModalItem && (
         <RequestModal
           modalOpen={isModalOpen}
           modalItem={currentModalItem}
+          currentNumber={currentIndex + 1}
+          totalCount={requestModalData.length}
           onCancelClick={handleCancelModal}
           onConfirmClick={handleConfirmModal}
         />
