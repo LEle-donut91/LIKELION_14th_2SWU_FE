@@ -13,7 +13,7 @@
   flex-direction: column;
   gap: 40px;
 
-  padding: 16px 16px 40px;
+  padding: 16px 16px 240px;
 }
 
 /* 편집 화면 본문 (입력 필드 사이 간격) */
@@ -23,7 +23,7 @@
   gap: 40px;
 
   /* 하단 SmallFooter(absolute)에 입력란이 가려지지 않도록 아래 여백 확보 */
-  padding: 24px 16px 130px;
+  padding: 16px 16px 240px;
 }
 
 /* 토스트 위치 조정용 래퍼 (SmallFooter 위에 뜨도록) */
