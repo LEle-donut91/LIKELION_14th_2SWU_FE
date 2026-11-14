@@ -45,13 +45,27 @@ function Situation() {
     navigate(SITUATION_NAVIGATION_PATH.PAST_SITUATION_DETAIL);
   };
 
+  const handleAlarmClick = () => {
+    // TODO: 알림 화면 연결 (알림은 1차 추가 기능, F-11)
+  };
+
+  const handleSettingClick = () => {
+    // TODO: 설정(프로필) 화면 연결
+  };
+
   return (
     <div
       className={`${styles.page} ${
         hasOngoingSituation ? "" : styles.pageEmpty
       }`}
     >
-      <MainHeader title="상황" />
+      <MainHeader
+        title="상황"
+        hasAlarmButton
+        hasSettingButton
+        onAlarmClick={handleAlarmClick}
+        onSettingClick={handleSettingClick}
+      />
 
       <main className={styles.content}>
         {/* 진행 중인 상황 (없으면 S-00-2 빈 상태) */}
