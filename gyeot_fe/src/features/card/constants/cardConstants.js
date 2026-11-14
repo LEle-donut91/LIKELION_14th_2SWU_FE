@@ -326,3 +326,113 @@ export const CONTACT_ORDER_EMPTY = {
 export const CONTACT_ORDER_TOAST_MESSAGE = {
   SAVE_SUCCESS: "순서를 바꿨어요",
 };
+
+/**
+ * =====================================================================
+ * [C-04] 생활 정보
+ * - 목록 카드 '수정하기', 하단 [삭제][수정/추가] 버튼, 삭제 확인 모달 문구,
+ *   값이 없을 때 문구는 C-01 상수를 함께 사용
+ *   (BASIC_INFO_EDIT_BTN_TEXT / BASIC_INFO_FOOTER_TEXT / BASIC_INFO_DELETE_MODAL / BASIC_INFO_EMPTY_TEXT)
+ * =====================================================================
+ */
+
+// 페이지(목록 화면) 헤더 제목
+export const LIFE_INFO_PAGE_TITLE = "생활 정보";
+
+// 생활 정보 항목 유형 키 (mock/API 데이터의 유형 키와 동일)
+// - API informationType: ADDRESS / ENTRY_METHOD / PET
+export const LIFE_TYPE_KEY = {
+  ADDRESS: "address",
+  ENTRANCE_METHOD: "entranceMethod",
+  PET: "pet",
+};
+
+// 생활 정보 섹션 구성 (화면에 그릴 순서대로)
+// - 섹션 안에 항목 유형(types)을 묶어서 표시 (집 정보 = 집 주소 + 출입 방법)
+// - types의 각 유형
+//   - title: 편집 화면 헤더 제목 / titleKey가 없으면 목록 카드 제목으로도 사용
+//   - isSensitive: 서비스에서 민감 항목으로 지정된 유형인지 (목록 카드에 '민감' 표시)
+//   - isMultiple: 여러 개 등록 가능 여부 (API의 multiple)
+//     - false: '추가하기' 없음, 항목이 없으면 빈 카드(BASIC_INFO_EMPTY_TEXT)를 그리고 '수정하기' 시 추가 모드
+//     - true: 섹션 아래 '추가하기' 표시
+//   - isSingleLine: 목록 카드 값을 한 줄로 표시하고 넘치면 말줄임
+//   - titleKey: 목록 카드 제목으로 쓸 필드 키 (없으면 title 사용)
+//   - descriptionKey: 목록 카드 설명으로 쓸 필드 키
+//   - fields: 편집 화면 입력 필드 (위에서부터 그리는 순서)
+//     - isRequired: true면 비어 있을 때 [수정/추가] 클릭 시 requiredMessage 토스트
+//     - API 기준 모든 필드가 필수 (title·informationValue 모두 필수 입력)
+export const LIFE_SECTION_LIST = [
+  {
+    key: "home",
+    title: "집 정보",
+    types: [
+      {
+        key: LIFE_TYPE_KEY.ADDRESS,
+        title: "집 주소",
+        isSensitive: true,
+        isMultiple: false,
+        isSingleLine: true,
+        descriptionKey: "value",
+        fields: [
+          {
+            key: "value",
+            label: "집 주소",
+            // TODO: 디자인 확정 후 문구 교체 (임시 문구)
+            placeholder: "예: 서울특별시 ○○로 00",
+            isRequired: true,
+            requiredMessage: "집 주소를 입력해 주세요.",
+          },
+        ],
+      },
+      {
+        key: LIFE_TYPE_KEY.ENTRANCE_METHOD,
+        title: "출입 방법",
+        isSensitive: true,
+        isMultiple: false,
+        isSingleLine: false,
+        descriptionKey: "value",
+        fields: [
+          {
+            key: "value",
+            label: "출입 방법",
+            // TODO: 디자인 확정 후 문구 교체 (임시 문구)
+            placeholder: "예: 공동현관 비밀번호 0000",
+            isRequired: true,
+            requiredMessage: "출입 방법을 입력해 주세요.",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    key: "pet",
+    title: "반려동물",
+    types: [
+      {
+        key: LIFE_TYPE_KEY.PET,
+        title: "반려동물",
+        isSensitive: false,
+        isMultiple: true,
+        isSingleLine: false,
+        titleKey: "name",
+        descriptionKey: "care",
+        fields: [
+          {
+            key: "name",
+            label: "반려동물",
+            placeholder: "이름",
+            isRequired: true,
+            requiredMessage: "반려동물 이름을 입력해 주세요.",
+          },
+          {
+            key: "care",
+            label: "돌봄방식",
+            placeholder: "예: 3번 끼니 제공",
+            isRequired: true,
+            requiredMessage: "돌봄방식을 입력해 주세요.",
+          },
+        ],
+      },
+    ],
+  },
+];

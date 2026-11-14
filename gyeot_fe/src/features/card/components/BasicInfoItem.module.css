@@ -56,6 +56,13 @@
   color: var(--color-gray-500);
 }
 
+/* 값 한 줄 말줄임 (isSingleLine일 때 / C-04 집 주소) */
+.singleLine {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
 /* 수정하기 버튼 (우측 하단) */
 .editBtn {
   align-self: flex-end;

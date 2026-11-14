@@ -1,0 +1,43 @@
+/* C-04 생활 정보 */
+
+/* 페이지 전체 (SmallFooter, 토스트가 absolute로 배치되는 기준) */
+.page {
+  position: relative;
+  min-height: 100%;
+  background-color: var(--color-gray-050);
+}
+
+/* 목록 화면 본문 (섹션 사이 간격) */
+.listContent {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+
+  padding: 16px 16px 40px;
+}
+
+/* 편집 화면 본문 (입력 필드 사이 간격) */
+.editContent {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+
+  /* 하단 SmallFooter(absolute)에 입력란이 가려지지 않도록 아래 여백 확보 */
+  padding: 24px 16px 130px;
+}
+
+/* 토스트 위치 조정용 래퍼 (SmallFooter 위에 뜨도록) */
+.toastArea {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 70px;
+}
+
+/* 토스트 너비를 글자 길이에 맞춤 (화면 절반으로 줄어드는 문제 방지)
+ * - max-width: 문구가 아주 길면 좌우 16px 여백을 남기고 줄바꿈 */
+.toastArea > * {
+  width: max-content;
+  max-width: calc(100% - 32px);
+  box-sizing: border-box;
+}
