@@ -149,3 +149,33 @@ export const CARD_LIFE_MOCK = {
     },
   ],
 };
+
+// C-05 미리 남기는 말 목업 데이터
+// ※ request/mock/InfoPreview/getInfoPreviewMock.json의 messageInfo를 복사해 C-05 화면 형태로 변경
+//   - 카테고리 키, 필드명은 원본과 동일 (preference.value, document.value)
+//   - 원본에 없는 title(항목 이름, API 필수값) 추가
+//   - 원본 값("내용 값")은 자리표시라 시안 값으로 교체
+//     (선호·부탁은 시안도 "항목 / 값(사용자 입력)" 자리표시라 같은 문구 사용)
+//   - 카테고리마다 항목을 여러 개 등록할 수 있어 객체 → 배열로 변경하고, 항목 구분용 id 추가
+//   - updatedAt("9/20") → updatedDate("2026-09-20"): C-01·C-02·C-04와 같은 "YYYY-MM-DD" 형식으로 변경
+//   - isSensitive: 카테고리 단위로 고정(MESSAGE_CATEGORY_LIST)되어 있어 제외
+//   - isDefault: 공개 정보 미리보기(H-03-02-01)에서 쓰는 값이라 제외
+// TODO: API 스펙 확정 후 응답 형태에 맞춰 교체
+export const CARD_MESSAGE_MOCK = {
+  preference: [
+    {
+      id: "preference-1",
+      title: "항목",
+      value: "값(사용자 입력)",
+      updatedDate: "2026-09-20",
+    },
+  ],
+  document: [
+    {
+      id: "document-1",
+      title: "보험 증빙 서류",
+      value: "장롱 3번째 서랍 안",
+      updatedDate: "2026-09-20",
+    },
+  ],
+};

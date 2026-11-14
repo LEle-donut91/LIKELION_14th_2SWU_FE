@@ -23,3 +23,10 @@
 .fieldInput::placeholder {
   color: var(--color-gray-500);
 }
+
+/* 여러 줄 입력란 (isMultiline): 긴 내용 입력용 높이 확보, 크기 조절 핸들 숨김 */
+.fieldTextarea {
+  min-height: 160px;
+  resize: none;
+  font-family: inherit;
+}
