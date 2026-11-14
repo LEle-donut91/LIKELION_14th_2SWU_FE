@@ -21,7 +21,7 @@
   display: flex;
   flex-direction: column;
   gap: 24px;
-  padding: 24px 20px 40px;
+  padding: 16px 20px 240px;
 }
 
 /* 목록 제목 (폰트: typoTitleMedium) */
