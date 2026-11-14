@@ -57,7 +57,7 @@
   cursor: pointer;
 }
 
-/* 아이콘 버튼 (MaskIcon은 currentColor로 색을 그림)
+/* 아이콘 버튼
  * - 터치 영역 44px 확보
  * - 음수 margin으로 늘어난 만큼 상쇄해 헤더 높이·아이콘 위치는 그대로 유지
  *   (44px - 아이콘 28px) / 2 = 8px */
@@ -68,7 +68,7 @@
   color: var(--color-gray-600);
 }
 
-/* '...' 버튼 (시안상 진한 색, 아이콘 프레임 48px)
+/* '...' 버튼
  * - 48px 아이콘이 레이아웃상 28px만 차지하도록 상쇄: (48px - 28px) / 2 = 10px */
 .moreBtn {
   width: 48px;

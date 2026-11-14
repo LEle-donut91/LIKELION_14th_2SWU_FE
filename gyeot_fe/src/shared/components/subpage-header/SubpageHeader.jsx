@@ -82,7 +82,7 @@ function SubpageHeader({
 
       {/* 오른쪽 영역 */}
       <div className={styles.rightArea}>
-        {/* 오른쪽 텍스트: 클릭 동작이 있으면 버튼, 없으면 텍스트(예: 단계 표시) */}
+        {/* 오른쪽 텍스트: 클릭 동작이 있으면 버튼, 없으면 텍스트(예: 단계 표시 1/2) */}
         {rightText &&
           (onRightTextClick ? (
             <button
