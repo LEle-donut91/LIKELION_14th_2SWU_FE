@@ -4,6 +4,8 @@ import {
   NO_ASSIGNEE_REASON,
   REQUEST_STATE,
   USER_ORDER_STATE,
+  INFORMATION_TYPE,
+  UNAVAILABLE_REASON,
 } from "./enumConstants";
 
 /**
@@ -605,3 +607,57 @@ export const ASSIGNEE_FOOTER_CONFIG = {
     action: "pastSituation",
   },
 };
+
+/**
+ * =====================================================================
+ * [H-03-01-01] 전달받은 정보
+ * =====================================================================
+ */
+
+// 항목 이름("페니실린 알러지", "반려동물 나롱이") 조합 규칙
+export const RECEIVED_INFO_TITLE_RULE = {
+  TITLE_FIRST: "TITLE_FIRST", // title + typeName
+  TYPE_FIRST: "TYPE_FIRST", // typeName + title
+  TITLE_ONLY: "TITLE_ONLY", // title만
+  TYPE_ONLY: "TYPE_ONLY", // typeName만 (title이 없는 유형)
+};
+
+// 항목 유형별 이름 조합 규칙 (기획/디자인 변경 시 여기만 수정, 미지정 유형은 TITLE_FIRST)
+export const RECEIVED_INFO_TITLE_RULE_BY_TYPE = {
+  [INFORMATION_TYPE.BIRTH_DATE]: RECEIVED_INFO_TITLE_RULE.TYPE_ONLY,
+  [INFORMATION_TYPE.BLOOD_TYPE]: RECEIVED_INFO_TITLE_RULE.TYPE_ONLY,
+  [INFORMATION_TYPE.DISEASE]: RECEIVED_INFO_TITLE_RULE.TITLE_ONLY,
+  [INFORMATION_TYPE.MEDICATION]: RECEIVED_INFO_TITLE_RULE.TITLE_ONLY,
+  [INFORMATION_TYPE.ALLERGY]: RECEIVED_INFO_TITLE_RULE.TITLE_FIRST,
+  [INFORMATION_TYPE.CAUTION]: RECEIVED_INFO_TITLE_RULE.TITLE_FIRST,
+  [INFORMATION_TYPE.ADDRESS]: RECEIVED_INFO_TITLE_RULE.TYPE_ONLY,
+  [INFORMATION_TYPE.ENTRY_METHOD]: RECEIVED_INFO_TITLE_RULE.TYPE_ONLY,
+  [INFORMATION_TYPE.PET]: RECEIVED_INFO_TITLE_RULE.TYPE_FIRST,
+  [INFORMATION_TYPE.PREFERENCE_REQUEST]: RECEIVED_INFO_TITLE_RULE.TITLE_ONLY,
+  [INFORMATION_TYPE.DOCUMENT_LOCATION]: RECEIVED_INFO_TITLE_RULE.TITLE_ONLY,
+};
+
+// 항목 우측 표시 문구
+export const RECEIVED_INFO_BADGE_TEXT = {
+  ADDED: "추가됨", // added = true
+  UPDATED: "갱신됨", // updated = true
+  UPDATED_DATE_SUFFIX: "갱신", // 둘 다 false -> "9/20 갱신"
+};
+
+// 접근 종료 화면 문구 (unavailableReason별)
+// 와이어프레임 문구 외의 사유는 임의로 작성 (TODO: 기획/디자인 확정 시 수정)
+export const RECEIVED_INFO_UNAVAILABLE_MESSAGE = {
+  [UNAVAILABLE_REASON.NOT_ACCEPTED]: "수락한 이후 확인할 수 있어요.",
+  [UNAVAILABLE_REASON.REQUEST_COMPLETED]: "요청을 완료하여 접근이 종료됐어요.",
+  [UNAVAILABLE_REASON.REQUEST_ENDED_BY_TIME]:
+    "요청 종료 시각이 지나 접근이 종료됐어요.",
+  [UNAVAILABLE_REASON.REQUEST_CANCELED]: "요청이 취소되어 접근이 종료됐어요.",
+  [UNAVAILABLE_REASON.REQUEST_EXPIRED]: "요청이 만료되어 접근이 종료됐어요.",
+  [UNAVAILABLE_REASON.ASSIGNMENT_CLOSED]:
+    "담당자 지정이 해제되어 접근이 종료됐어요.",
+  [UNAVAILABLE_REASON.OWNER_REVOKED]:
+    "정보 주인이 공유를 철회하여 접근이 종료됐어요.",
+};
+
+// 알 수 없는 사유일 때 기본 문구
+export const RECEIVED_INFO_DEFAULT_UNAVAILABLE_MESSAGE = "접근이 종료됐어요.";

@@ -27,10 +27,21 @@ import {
   TARGET_FOOTER_KEY,
   ASSIGNEE_FOOTER_KEY,
   ASSIGNEE_SAFETY_INFORMATION,
+  RECEIVED_INFO_TITLE_RULE,
+  RECEIVED_INFO_TITLE_RULE_BY_TYPE,
+  RECEIVED_INFO_BADGE_TEXT,
+  RECEIVED_INFO_UNAVAILABLE_MESSAGE,
+  RECEIVED_INFO_DEFAULT_UNAVAILABLE_MESSAGE,
 } from "../constants/requestConstants";
 
 import { CHANGE_STATE, REQUEST_STATE } from "../constants/enumConstants";
 
+import {
+  formatMonthDay,
+  formatFullKoreanDate,
+} from "@/shared/utils/dateFormat";
+
+import { ISO_DATE_ONLY } from "@/shared/constants/dateTimeConstants";
 /**
  * =====================================================================
  * [request/ 공통] 타이머용 시간 문자열 처리
@@ -490,3 +501,54 @@ export const getAssigneeFooterKey = (flags) => {
 // 전달받은 정보(SafetyCardGroup) 안내 문구 결정 (없으면 "")
 export const getAssigneeSafetyInformation = (requestState) =>
   ASSIGNEE_SAFETY_INFORMATION[requestState] ?? "";
+
+/**
+ * =====================================================================
+ * [H-03-01-01] 전달받은 정보
+ * - 항목 이름 / 내용 / 갱신·추가 표시 / 접근 종료 문구 결정
+ * =====================================================================
+ */
+
+// 항목 이름 결정: title / typeName을 유형별 규칙대로 조합 (title이 없으면 typeName만)
+export const getReceivedInfoCardTitle = ({
+  informationType,
+  typeName,
+  title,
+}) => {
+  const rule =
+    RECEIVED_INFO_TITLE_RULE_BY_TYPE[informationType] ??
+    RECEIVED_INFO_TITLE_RULE.TITLE_FIRST;
+
+  if (!title || rule === RECEIVED_INFO_TITLE_RULE.TYPE_ONLY)
+    return typeName ?? "";
+  if (rule === RECEIVED_INFO_TITLE_RULE.TITLE_ONLY) return title;
+  if (rule === RECEIVED_INFO_TITLE_RULE.TYPE_FIRST)
+    return `${typeName} ${title}`;
+  return `${title} ${typeName}`;
+};
+
+// 항목 내용 결정: "0000-00-00" 형태면 "0000년 00월 00일"로, 아니면 그대로
+export const getReceivedInfoValue = (informationValue) => {
+  if (!ISO_DATE_ONLY.test(informationValue)) return informationValue ?? "";
+
+  // 날짜만 있는 ISO 문자열은 UTC로 해석되므로, 로컬(KST) 자정으로 맞춰서 변환
+  const formatted = formatFullKoreanDate(`${informationValue}T00:00:00`);
+  return formatted.includes("NaN") ? informationValue : formatted;
+};
+
+// 항목 우측 표시 결정
+// 둘 다 true -> "추가됨·갱신됨" / added -> "추가됨" / updated -> "갱신됨"
+// 둘 다 false -> "9/20 갱신" (updatedAt 기준)
+export const getReceivedInfoBadgeText = ({ added, updated, updatedAt }) => {
+  if (added && updated) {
+    return `${RECEIVED_INFO_BADGE_TEXT.ADDED}·${RECEIVED_INFO_BADGE_TEXT.UPDATED}`;
+  }
+  if (added) return RECEIVED_INFO_BADGE_TEXT.ADDED;
+  if (updated) return RECEIVED_INFO_BADGE_TEXT.UPDATED;
+  return `${formatMonthDay(updatedAt)} ${RECEIVED_INFO_BADGE_TEXT.UPDATED_DATE_SUFFIX}`;
+};
+
+// 접근 종료 화면 문구 결정 (unavailableReason 기준)
+export const getReceivedInfoUnavailableMessage = (unavailableReason) =>
+  RECEIVED_INFO_UNAVAILABLE_MESSAGE[unavailableReason] ??
+  RECEIVED_INFO_DEFAULT_UNAVAILABLE_MESSAGE;

@@ -1,0 +1,153 @@
+{
+  "requestId": 31,
+  "accessible": true,
+  "accessUntil": "2026-10-02T17:00:00",
+  "unavailableReason": null,
+  "categories": [
+    {
+      "category": "BASIC",
+      "categoryName": "기본 정보",
+      "items": [
+        {
+          "informationId": 1,
+          "informationType": "BIRTH_DATE",
+          "typeName": "생년월일",
+          "title": null,
+          "informationValue": "2000-03-15",
+          "updatedAt": "2026-08-10T10:00:00",
+          "updated": false,
+          "added": false,
+          "sensitive": false
+        },
+        {
+          "informationId": 2,
+          "informationType": "BLOOD_TYPE",
+          "typeName": "혈액형",
+          "title": null,
+          "informationValue": "A형",
+          "updatedAt": "2026-08-10T10:00:00",
+          "updated": false,
+          "added": false,
+          "sensitive": false
+        }
+      ]
+    },
+    {
+      "category": "HEALTH",
+      "categoryName": "건강 정보",
+      "items": [
+        {
+          "informationId": 10,
+          "informationType": "DISEASE",
+          "typeName": "질환",
+          "title": "고혈압",
+          "informationValue": "2000-03-15",
+          "updatedAt": "2026-08-10T10:00:00",
+          "updated": false,
+          "added": false,
+          "sensitive": true
+        },
+        {
+          "informationId": 12,
+          "informationType": "MEDICATION",
+          "typeName": "복용약",
+          "title": "혈압약",
+          "informationValue": "아침 1정",
+          "updatedAt": "2026-09-20T09:30:00",
+          "updated": true,
+          "added": false,
+          "sensitive": true
+        },
+        {
+          "informationId": 13,
+          "informationType": "ALLERGY",
+          "typeName": "알러지",
+          "title": "페니실린",
+          "informationValue": "복용 시 두드러기 발생",
+          "updatedAt": "2026-09-20T11:00:00",
+          "updated": true,
+          "added": false,
+          "sensitive": true
+        },
+        {
+          "informationId": 14,
+          "informationType": "CAUTION",
+          "typeName": "주의사항",
+          "title": "어지러움",
+          "informationValue": "앉아서 휴식 필요",
+          "updatedAt": "2026-09-28T15:00:00",
+          "updated": false,
+          "added": true,
+          "sensitive": false
+        }
+      ]
+    },
+    {
+      "category": "LIFE",
+      "categoryName": "생활 정보",
+      "items": [
+        {
+          "informationId": 21,
+          "informationType": "ADDRESS",
+          "typeName": "주소",
+          "title": null,
+          "informationValue": "서울특별시 성북구 ○○로 00",
+          "updatedAt": "2026-08-10T10:00:00",
+          "updated": true,
+          "added": true,
+          "sensitive": true
+        },
+        {
+          "informationId": 22,
+          "informationType": "ENTRY_METHOD",
+          "typeName": "출입 방법",
+          "title": null,
+          "informationValue": "경비실에 말하고 들어가기",
+          "updatedAt": "2026-09-25T18:00:00",
+          "updated": false,
+          "added": true,
+          "sensitive": true
+        },
+        {
+          "informationId": 23,
+          "informationType": "PET",
+          "typeName": "반려동물",
+          "title": "나롱이",
+          "informationValue": "하루에 3번 끼니 제공",
+          "updatedAt": "2026-09-20T13:00:00",
+          "updated": true,
+          "added": false,
+          "sensitive": false
+        }
+      ]
+    },
+    {
+      "category": "ADVANCE_MESSAGE",
+      "categoryName": "미리 남기는 말",
+      "items": [
+        {
+          "informationId": 31,
+          "informationType": "PREFERENCE_REQUEST",
+          "typeName": "선호·부탁",
+          "title": "식사 선호",
+          "informationValue": "죽이나 부드러운 음식을 선호해요",
+          "updatedAt": "2026-09-20T14:00:00",
+          "updated": true,
+          "added": false,
+          "sensitive": false
+        },
+        {
+          "informationId": 32,
+          "informationType": "DOCUMENT_LOCATION",
+          "typeName": "준비 문서 보관 위치",
+          "title": "건강보험증",
+          "informationValue": "안방 서랍장 첫째 칸",
+          "updatedAt": "2026-08-10T10:00:00",
+          "updated": false,
+          "added": false,
+          "sensitive": false
+        }
+      ]
+    }
+  ]
+}
