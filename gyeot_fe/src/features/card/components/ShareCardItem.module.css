@@ -1,0 +1,104 @@
+/* 공유 카드 1장 (시안 기준 추정 수치, Figma 확인 필요) */
+.shareCardItem {
+  display: flex;
+  flex-direction: column;
+  padding: 20px 0;
+  list-style: none;
+}
+
+/* 카드 사이 구분선 */
+.shareCardItem + .shareCardItem {
+  border-top: 1px solid var(--color-gray-100);
+}
+
+/* 제목 + 철회됨 뱃지 */
+.titleRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+/* 제목 (폰트: typoBodyStrong) */
+.title {
+  flex: 1;
+  min-width: 0;
+  color: var(--color-gray-900);
+}
+
+/* 보조 문구 */
+.sub {
+  margin: 0;
+  color: var(--color-gray-700);
+}
+
+/* 태그 + 버튼 줄 */
+.bottomRow {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+/* 태그 목록 */
+.tagList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* 태그 (폰트: typoCaptionMedium, 시안이 굵은 글씨라 굵기만 덮어씀) */
+.tag {
+  padding: 2px 8px;
+  border-radius: 4px;
+  background-color: var(--color-olive-200);
+  color: var(--color-olive-700);
+  font-weight: 700;
+}
+
+/* 버튼 공통: 공용 Button(width 100%)을 글자 길이에 맞춤
+   (.shareCardItem을 앞에 붙여 Button.module.css보다 우선 적용) */
+.shareCardItem .revokeBtn,
+.shareCardItem .reallowBtn {
+  border-radius: 8px;
+  flex-shrink: 0;
+  width: auto;
+  font-weight: 700;
+}
+
+
+.shareCardItem .reallowBtn {
+  color: var(--color-olive-600);
+}
+
+/* [직접 철회]: 흰 배경 / 회색 테두리 / 빨간 글씨 (비활성일 때는 공용 Button 회색 유지) */
+.shareCardItem .revokeBtn:not(:disabled) {
+  border-color: var(--color-gray-200);
+  color: var(--color-red-700);
+}
+
+/* ===== 철회됨 상태 ===== */
+.revoked .title,
+.revoked .sub {
+  color: var(--color-gray-300);
+}
+
+/* 철회됨 뱃지 (폰트: typoCaptionMedium, 굵기만 덮어씀) */
+.revokedBadge {
+  flex-shrink: 0;
+  padding: 4px 12px;
+  border: 1px solid var(--color-gray-300);
+  border-radius: 4px;
+  background-color: var(--color-gray-200);
+  color: var(--color-gray-500);
+  font-weight: 700;
+}
+
+.revoked .tag {
+  background-color: var(--color-gray-100);
+  color: var(--color-gray-400);
+}

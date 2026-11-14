@@ -2,6 +2,8 @@
 import {
   BIRTH_DATE_INPUT_LENGTH,
   BLOOD_TYPE_LABELS,
+  SHARE_AUTO_REVOKE_TEXT,
+  SHARE_HELP_TYPE_LABELS,
 } from "@/features/card/constants/cardConstants";
 
 // 갱신일 표시: "2026-09-20" → "갱신 9/20"
@@ -100,3 +102,40 @@ export const isFutureDate = (input) =>
 // 목록 카드 설명: ("2024년", " 진단") → "2024년 진단" / 값이 없으면 "" (뒤 문구도 붙이지 않음)
 export const formatHealthDescription = (value, suffix = "") =>
   value ? `${value}${suffix}` : "";
+
+/**
+ * =====================================================================
+ * [C-06] 공유 관리
+ * - 시각 문자열("YYYY-MM-DDTHH:mm:ss")은 시간대 표기가 없어 new Date()가 로컬 시간으로 해석함
+ *   (C-01 날짜 문자열 "YYYY-MM-DD"처럼 UTC로 밀리지 않음)
+ * - shared/utils/dateFormat.js의 formatDateTime은 "10/2(목) 14:00"처럼 요일이 붙어 시안과 달라 별도 작성
+ * =====================================================================
+ */
+
+// 공유 카드 시각 표시: "2026-10-02T14:00:00" → "10/2 14:00"
+export const formatShareDateTime = (value) => {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return `${date.getMonth() + 1}/${date.getDate()} ${padTwo(date.getHours())}:${padTwo(date.getMinutes())}`;
+};
+
+// 자동 회수 문구: "2026-10-02T18:00:00" → "~ 10/2 18:00 자동 회수"
+export const formatAutoRevokeText = (value) => {
+  const dateTime = formatShareDateTime(value);
+  return dateTime ? `~ ${dateTime} ${SHARE_AUTO_REVOKE_TEXT}` : "";
+};
+
+// 도움 종류 표시: "HOSPITAL" → "병원 동행"
+export const formatHelpType = (value) => SHARE_HELP_TYPE_LABELS[value] ?? "";
+
+// 공유 항목 태그 목록: 같은 항목 유형(informationType)은 한 번만 표시
+// 예: [복용약(혈압약), 복용약(당뇨약), 알레르기] → [복용약, 알레르기]
+export const getUniqueSharedItems = (sharedItems = []) => {
+  const seenTypes = new Set();
+  return sharedItems.filter(({ informationType }) => {
+    if (seenTypes.has(informationType)) return false;
+    seenTypes.add(informationType);
+    return true;
+  });
+};
