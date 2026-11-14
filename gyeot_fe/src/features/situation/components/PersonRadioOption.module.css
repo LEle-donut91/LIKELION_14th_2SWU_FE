@@ -1,0 +1,63 @@
+/* 사람 목록: 간격 12, 확인 버튼과 간격 48 */
+.personList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 48px;
+}
+
+/* 사람 카드(BtnPerson): 테두리 gray-100, 그림자, 라디우스 16, 패딩 12 16 */
+.personItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 64px;
+  padding: 12px 16px;
+  border-radius: 16px;
+  border: 1px solid var(--color-gray-100);
+  background-color: var(--color-base-000);
+  box-shadow: 0 0 4px var(--color-box-shadow);
+  box-sizing: border-box;
+  cursor: pointer;
+}
+
+/* 프로필 · 이름 · 보호자 태그 (간격 8) */
+.personLeft {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+/* 프로필: 40px 원형, user-profile 배경 */
+.profile {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  background-color: var(--color-user-profile);
+}
+
+.name {
+  color: var(--color-gray-900);
+  white-space: nowrap;
+}
+
+/* 보호자 태그: beige-500, 흰 글자, 알약형 */
+.guardianTag {
+  flex-shrink: 0;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background-color: var(--color-beige-500);
+  color: var(--color-base-000);
+}
+
+/* 라디오 28px: 선택 전 gray-600, 선택 olive-600 */
+.radioOff {
+  color: var(--color-gray-600);
+}
+
+.radioOn {
+  color: var(--color-olive-600);
+}

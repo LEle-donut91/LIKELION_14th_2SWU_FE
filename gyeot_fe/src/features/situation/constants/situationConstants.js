@@ -15,6 +15,18 @@ export const SITUATION_NAVIGATION_PATH = {
   REQUEST_ASSIGNEE_DETAIL: "/request/assignee", // H-03-01 요청 상세 - 담당자 (뒤에 /요청 ID)
 };
 
+// H-04 지난 상황 - 상단 탭 (전체 / 도와준 / 도움받은, F-22)
+// - HELPED   : 내가 참여자로 도와준 상황
+// - RECEIVED : 내가 정보 주인으로 도움받은 상황
+export const PAST_SITUATION_FILTER_TABS = [
+  { key: "ALL", label: "전체" },
+  { key: "HELPED", label: "도와준" },
+  { key: "RECEIVED", label: "도움받은" },
+];
+
+// H-04 사람 별 보기 - 아무도 선택하지 않았을 때 문구
+export const PAST_SITUATION_ALL_PERSON_TEXT = "전체";
+
 // H-01 상황 종류 (종류 선택 시트)
 // key: 서버 요청에 쓸 값 (API 명세 확정 후 맞춰서 수정)
 export const SITUATION_TYPE_OPTIONS = [

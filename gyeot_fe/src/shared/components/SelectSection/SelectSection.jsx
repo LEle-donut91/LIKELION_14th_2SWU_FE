@@ -1,10 +1,13 @@
 import styles from "@/shared/components/SelectSection/SelectSection.module.css";
 import iconDown from "@/shared/assets/icons/iconDown.svg";
 
-function SelectSection({ title, isRequired, text, width, onClick }) {
+// isSelected: 선택 상태를 직접 지정할 때 사용 (미전달 시 기존처럼 text로 판단)
+//   예) H-04 사람 별 보기는 기본 문구가 "전체"라 text만으로는 선택 여부를 알 수 없음
+function SelectSection({ title, isRequired, text, width, onClick, isSelected: isSelectedProp }) {
   // 텍스트가 존재하고 "한 명 선택/선택"이 아닐 때만 active 스타일 적용
   const isSelected =
-    text && text !== "선택" && text !== "한 명 선택" && text.trim() !== "";
+    isSelectedProp ??
+    (text && text !== "선택" && text !== "한 명 선택" && text.trim() !== "");
   const borderStyle = isSelected ? styles.borderActive : styles.borderDefault;
   const txtStyle = isSelected ? styles.txtActive : styles.txtDefault;
 
