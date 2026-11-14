@@ -27,6 +27,17 @@ export const PAST_SITUATION_FILTER_TABS = [
 // H-04 사람 별 보기 - 아무도 선택하지 않았을 때 문구
 export const PAST_SITUATION_ALL_PERSON_TEXT = "전체";
 
+// N-04 지난 상황 상세 - 요청 기록 상태 태그 (완료 / 취소 / 만료, F-22)
+// 만료는 시안에 없어 취소와 같은 모양으로 임시 지정
+export const PAST_REQUEST_STATUS_TAG = {
+  COMPLETED: { label: "완료", variant: "completed" },
+  CANCELLED: { label: "취소", variant: "cancelled" },
+  EXPIRED: { label: "만료", variant: "cancelled" },
+};
+
+// N-04 담당자가 탈퇴했을 때 표시 이름 (F-32)
+export const WITHDRAWN_USER_NAME = "탈퇴한 사용자";
+
 // H-01 상황 종류 (종류 선택 시트)
 // key: 서버 요청에 쓸 값 (API 명세 확정 후 맞춰서 수정)
 export const SITUATION_TYPE_OPTIONS = [

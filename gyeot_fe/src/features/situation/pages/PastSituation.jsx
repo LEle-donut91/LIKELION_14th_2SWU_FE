@@ -77,11 +77,12 @@ function PastSituation() {
         {filteredSituationList.length > 0 ? (
           <ul className={styles.situationList}>
             {filteredSituationList.map((situation) => (
-              <PastSituationCard
-                key={situation.id}
-                situation={situation}
-                onClick={handleSituationClick}
-              />
+              <li key={situation.id}>
+                <PastSituationCard
+                  situation={situation}
+                  onClick={handleSituationClick}
+                />
+              </li>
             ))}
           </ul>
         ) : (
