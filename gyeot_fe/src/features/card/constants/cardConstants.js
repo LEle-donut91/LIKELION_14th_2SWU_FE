@@ -436,3 +436,154 @@ export const LIFE_SECTION_LIST = [
     ],
   },
 ];
+
+/**
+ * =====================================================================
+ * [C-05] 미리 남기는 말
+ * - 목록 카드 '수정하기', 하단 [삭제][수정/추가] 버튼, 삭제 확인 모달 문구는
+ *   C-01 상수를 함께 사용 (BASIC_INFO_EDIT_BTN_TEXT / BASIC_INFO_FOOTER_TEXT / BASIC_INFO_DELETE_MODAL)
+ * - 섹션 1개 = 항목 유형 1개라 C-02(HEALTH_CATEGORY_LIST)와 같은 구조 사용
+ * =====================================================================
+ */
+
+// 페이지(목록 화면) 헤더 제목
+export const MESSAGE_INFO_PAGE_TITLE = "미리 남기는 말";
+
+// 내용 입력란 최대 글자 수 (API informationValue 최대 1000자)
+export const MESSAGE_VALUE_MAX_LENGTH = 1000;
+
+// 미리 남기는 말 카테고리 키 (mock/API 데이터의 카테고리 키와 동일)
+// - API informationType: PREFERENCE_REQUEST / DOCUMENT_LOCATION
+export const MESSAGE_CATEGORY_KEY = {
+  PREFERENCE: "preference",
+  DOCUMENT: "document",
+};
+
+// 미리 남기는 말 카테고리 구성 (화면에 그릴 순서대로)
+// - title: 섹션 제목 / 편집 화면 헤더 제목
+// - isSensitive: 서비스에서 민감 항목으로 지정된 카테고리인지 (두 카테고리 모두 일반)
+// - isSingleLine: 목록 카드 내용을 한 줄로 표시하고 넘치면 말줄임 (내용이 최대 1000자까지 길어질 수 있어 적용)
+// - titleKey: 목록 카드 제목으로 쓸 필드 키
+// - descriptionKey: 목록 카드 설명으로 쓸 필드 키
+// - descriptionSuffix: 설명 값 뒤에 붙일 문구 (없음)
+// - fields: 편집 화면 입력 필드 (위에서부터 그리는 순서)
+//   - isRequired: true면 비어 있을 때 [수정/추가] 클릭 시 requiredMessage 토스트
+//   - API 기준 모든 필드가 필수 (title·informationValue 모두 필수 입력)
+//   - isMultiline: 여러 줄 입력란(textarea)으로 그림
+//   - maxLength: 입력 가능한 최대 글자 수
+export const MESSAGE_CATEGORY_LIST = [
+  {
+    key: MESSAGE_CATEGORY_KEY.PREFERENCE,
+    title: "선호 · 부탁",
+    isSensitive: false,
+    isSingleLine: true,
+    titleKey: "title",
+    descriptionKey: "value",
+    descriptionSuffix: "",
+    fields: [
+      {
+        key: "title",
+        label: "선호 · 부탁",
+        placeholder: "선호 또는 부탁을 입력해주세요.",
+        isRequired: true,
+        requiredMessage: "항목을 입력해 주세요.",
+      },
+      {
+        key: "value",
+        label: "남길 내용",
+        placeholder: "남길 내용을 입력해주세요.",
+        isRequired: true,
+        requiredMessage: "내용을 입력해 주세요.",
+        isMultiline: true,
+        maxLength: MESSAGE_VALUE_MAX_LENGTH,
+      },
+    ],
+  },
+  {
+    key: MESSAGE_CATEGORY_KEY.DOCUMENT,
+    title: "준비 문서 보관 위치",
+    isSensitive: false,
+    isSingleLine: true,
+    titleKey: "title",
+    descriptionKey: "value",
+    descriptionSuffix: "",
+    fields: [
+      {
+        key: "title",
+        label: "준비 문서",
+        placeholder: "보관하는 문서를 입력해주세요.",
+        isRequired: true,
+        requiredMessage: "항목을 입력해 주세요.",
+      },
+      {
+        key: "value",
+        label: "보관 위치",
+        placeholder: "서류 보관 위치를 입력해주세요.",
+        isRequired: true,
+        requiredMessage: "내용을 입력해 주세요.",
+        isMultiline: true,
+        maxLength: MESSAGE_VALUE_MAX_LENGTH,
+      },
+    ],
+  },
+];
+
+/**
+ * =====================================================================
+ * [C-06] 공유 관리
+ * =====================================================================
+ */
+
+// 헤더 제목
+export const SHARE_PAGE_TITLE = "공유 관리";
+
+// 목록 위 제목 (공유 카드가 있을 때만 표시)
+export const SHARE_LIST_TITLE = "내 정보를 볼 수 있어요";
+
+// 공유 카드 상태 (공유 중 목록 조회 API의 status 값과 동일)
+export const SHARING_STATUS = {
+  SHARING: "SHARING", // 공유 중
+  REVOKED: "REVOKED", // 철회됨
+};
+
+// 도움 종류: 서버 응답에 쓰는 값(key), 한글 매핑(value)
+// - API(공유 중 목록 조회 helpType) 기준 값
+//   (request의 HELP_TYPE_LABELS와 key가 달라 C-06에서는 별도로 둠)
+export const SHARE_HELP_TYPE_LABELS = {
+  HOSPITAL: "병원 동행",
+  MEAL: "식사",
+  GROCERY: "장보기",
+  PET_CARE: "반려동물",
+  CHECK_IN: "연락/안부",
+  OTHER: "기타",
+};
+
+// 카드 버튼 문구
+export const SHARE_BTN_TEXT = {
+  REVOKE: "직접 철회",
+  REALLOW: "다시 허용",
+};
+
+// 철회됨 카드 뱃지 문구
+export const SHARE_REVOKED_BADGE_TEXT = "철회됨";
+
+// 공유 중 카드 보조 문구: 자동 회수 시각 뒤에 붙는 문구 ("~ 10/2 18:00 자동 회수")
+export const SHARE_AUTO_REVOKE_TEXT = "자동 회수";
+
+// 철회됨 카드 보조 문구: 시작 시각 뒤에 붙는 문구 ("10/2 14:00 · 내가 대상")
+export const SHARE_REVOKED_SUB_TEXT = "내가 대상";
+
+// 공유 중인 카드가 없을 때 빈 상태 화면 문구
+export const SHARE_EMPTY = {
+  message: "현재 공유 중인 상황이 없어요.",
+  guide: "도움 요청을 수락받으면 여기에 표시돼요",
+};
+
+// 토스트 문구
+// - 철회 / 다시 허용 성공·실패 시 서버 응답의 message를 우선 사용하고, 없을 때만 아래 문구 사용
+// TODO: 디자인에서 토스트 문구가 정해지면 교체
+export const SHARE_TOAST_MESSAGE = {
+  REVOKE_SUCCESS: "공유를 철회했습니다.",
+  REALLOW_SUCCESS: "다시 허용했습니다.",
+  ERROR: "요청을 처리하지 못했어요. 다시 시도해 주세요.",
+};

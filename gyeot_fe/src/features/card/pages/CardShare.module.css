@@ -1,0 +1,39 @@
+/* 전체 페이지 (DefaultToast의 absolute 기준점) */
+.page {
+  position: relative;
+  width: 100%;
+  min-height: 100%;
+  box-sizing: border-box;
+
+  background-color: var(--color-gray-050);
+
+  display: flex;
+  flex-direction: column;
+}
+
+/* 헤더 아래 영역 */
+.main {
+  flex: 1;
+}
+
+/* 목록 화면 본문 (시안 기준 추정 수치, Figma 확인 필요) */
+.mainContent {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 24px 20px 40px;
+}
+
+/* 목록 제목 (폰트: typoTitleMedium) */
+.listTitle {
+  margin: 0;
+  color: var(--color-gray-900);
+}
+
+/* 토스트 너비를 글자 길이에 맞춤 (화면 절반으로 줄어드는 문제 방지)
+ * - max-width: 문구가 아주 길면 좌우 16px 여백을 남기고 줄바꿈 */
+.toastArea > * {
+  width: max-content;
+  max-width: calc(100% - 32px);
+  box-sizing: border-box;
+}
