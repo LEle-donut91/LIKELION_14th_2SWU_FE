@@ -8,6 +8,7 @@ import ManageParticipantList from "@/features/situation/components/ManagePartici
 import JoinedSituationCard from "@/features/situation/components/JoinedSituationCard";
 import InviteParticipantOption from "@/features/situation/components/InviteParticipantOption";
 import SituationEndSheet from "@/features/situation/components/SituationEndSheet";
+import SituationLeaveSheet from "@/features/situation/components/SituationLeaveSheet";
 import SituationConfirmModal from "@/features/situation/components/SituationConfirmModal";
 import { SITUATION_NAVIGATION_PATH } from "@/features/situation/constants/situationConstants";
 import {
@@ -15,6 +16,7 @@ import {
   INVITE_CANDIDATE_LIST_MOCK,
   JOINED_SITUATION_MOCK,
   MANAGE_PARTICIPANT_LIST_MOCK,
+  MY_ASSIGNED_REQUEST_LIST_MOCK,
 } from "@/features/situation/mocks/situationMockData";
 
 function SituationManage() {
@@ -32,8 +34,9 @@ function SituationManage() {
   const inviteCandidateList = INVITE_CANDIDATE_LIST_MOCK;
   const joinedSituation = JOINED_SITUATION_MOCK;
   const activeRequestCount = ACTIVE_REQUEST_COUNT_MOCK;
+  const myAssignedRequestList = MY_ASSIGNED_REQUEST_LIST_MOCK;
 
-  // 열려 있는 시트/모달 ("invite" | "end" | null), 제외할 참여자 id
+  // 열려 있는 시트/모달 ("invite" | "end" | "leave" | null), 제외할 참여자 id
   const [openSheet, setOpenSheet] = useState(null);
   const [excludeTargetId, setExcludeTargetId] = useState(null);
 
@@ -74,8 +77,11 @@ function SituationManage() {
     navigate(SITUATION_NAVIGATION_PATH.SITUATION_LIST);
   };
 
-  const handleSituationLeaveClick = () => {
-    navigate(SITUATION_NAVIGATION_PATH.SITUATION_LEAVE);
+  // 상황 나가기(N-09): 확인 시트에서 '나가기'를 누르면 상황 목록으로
+  const handleSituationLeaveConfirm = () => {
+    // TODO: 상황 나가기 API 연동 후 결과에 따라 이동
+    setOpenSheet(null);
+    navigate(SITUATION_NAVIGATION_PATH.SITUATION_LIST);
   };
 
   return (
@@ -131,7 +137,7 @@ function SituationManage() {
             <button
               type="button"
               className={styles.dangerTextBtn}
-              onClick={handleSituationLeaveClick}
+              onClick={() => setOpenSheet("leave")}
             >
               상황 나가기
             </button>
@@ -168,6 +174,14 @@ function SituationManage() {
         onClose={handleSheetClose}
         activeRequestCount={activeRequestCount}
         onConfirm={handleSituationEndConfirm}
+      />
+
+      {/* 상황 나가기 확인 (N-09) */}
+      <SituationLeaveSheet
+        isOpen={openSheet === "leave"}
+        onClose={handleSheetClose}
+        assignedRequests={myAssignedRequestList}
+        onConfirm={handleSituationLeaveConfirm}
       />
 
       {/* 참여자 제외 확인 */}

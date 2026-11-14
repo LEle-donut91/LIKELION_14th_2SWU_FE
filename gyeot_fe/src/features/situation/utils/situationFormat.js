@@ -50,3 +50,11 @@ export const formatRequestPeriod = (startValue, endValue) => {
     toDate(startValue).toDateString() === toDate(endValue).toDateString();
   return isSameDay ? formatDate(startValue) : formatDateRange(startValue, endValue);
 };
+
+// 요일 없는 짧은 일시: 10/2 14:00 (N-09 상황 나가기 시트)
+export const formatMonthDayTime = (value) => {
+  const date = toDate(value);
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  return `${date.getMonth() + 1}/${date.getDate()} ${hours}:${minutes}`;
+};
