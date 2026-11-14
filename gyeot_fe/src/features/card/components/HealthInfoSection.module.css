@@ -2,7 +2,6 @@
 .healthInfoSection {
   display: flex;
   flex-direction: column;
-  gap: 8px;
 }
 
 /* 섹션 제목 (폰트: index.css의 typoTitleMedium 사용) */

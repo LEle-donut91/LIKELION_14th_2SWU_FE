@@ -30,7 +30,7 @@
 
 /* 편집 화면 컨텐츠 (하단 SmallFooter 높이만큼 여백 확보) */
 .editContent {
-  padding: 16px 16px 140px;
+  padding: 16px 16px 240px;
 }
 
 /* 토스트 위치 조정 영역
