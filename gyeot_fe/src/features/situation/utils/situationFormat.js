@@ -3,8 +3,8 @@ import { formatDate, formatDateRange } from "@/shared/utils/dateFormat";
 
 const toDate = (value) => (value instanceof Date ? value : new Date(value));
 
-// 8/10
-const formatMonthDay = (value) => {
+// 8/10 (N-04 지난 상황 상세 요청 날짜 등)
+export const formatMonthDay = (value) => {
   const date = toDate(value);
   return `${date.getMonth() + 1}/${date.getDate()}`;
 };

@@ -1,0 +1,14 @@
+/* 페이지 전체: gray-050 배경 */
+.page {
+  width: 100%;
+  min-height: 100vh;
+  background-color: var(--color-gray-050);
+}
+
+/* 콘텐츠: 위 16 좌우 16 아래 40, 간격 48 */
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+  padding: 16px 16px 40px;
+}
