@@ -21,7 +21,7 @@
 .mainContent {
   display: flex;
   flex-direction: column;
-  padding: 24px 20px 40px;
+  padding: 16px 16px 240px;
 }
 
 /* 섹션 (제목 + 카드 목록) */
