@@ -82,6 +82,16 @@ export const JOINED_SITUATION_MOCK = {
 // H-03-05 상황 종료 시트 - 진행 중인 요청 수
 export const ACTIVE_REQUEST_COUNT_MOCK = 2;
 
+// N-09 상황 나가기 시트 - 이 상황에서 내가 담당 중인 요청
+export const MY_ASSIGNED_REQUEST_LIST_MOCK = [
+  {
+    id: 301,
+    helpType: "HOSPITAL",
+    startDateTime: "2026-11-20T14:00:00",
+    status: "ACCEPTED",
+  },
+];
+
 // H-03 상황 상세 - 정보 주인 시점
 // participants: 정보 주인을 뺀 참여자 / requests: 이 상황의 요청 목록
 export const SITUATION_DETAIL_MOCK = {

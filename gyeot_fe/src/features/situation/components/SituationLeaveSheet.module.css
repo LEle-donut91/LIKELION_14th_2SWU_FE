@@ -1,0 +1,159 @@
+/* 시트 컨테이너: 상황 종료 시트와 같은 크기, 라디우스 24 */
+.sheetContainer {
+  max-width: 402px !important;
+  height: auto !important;
+  margin: 0 auto !important;
+  left: 0 !important;
+  right: 0 !important;
+  border-top-left-radius: 24px !important;
+  border-top-right-radius: 24px !important;
+}
+
+/* 내용(SectionContent): 위 16 좌우 16 아래 64, 간격 20 */
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 16px 16px 64px;
+}
+
+/* 제목 + 안내 박스: 간격 11 */
+.txtContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+
+.title {
+  margin: 0;
+  color: var(--color-gray-900);
+}
+
+/* 안내 박스: beige-100 배경, 테두리 beige-200, 라디우스 24, 패딩 16, 문단 간격 8, beige-800 */
+.notice {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  border-radius: 24px;
+  border: 1px solid var(--color-beige-200);
+  background-color: var(--color-beige-100);
+  color: var(--color-beige-800);
+}
+
+.notice p {
+  margin: 0;
+}
+
+.notice strong {
+  font-weight: 700;
+}
+
+/* 담당 요청 목록: 간격 12 */
+.requestList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* 요청 카드: 높이 80, 테두리 olive-200, 라디우스 16, 패딩 16, 간격 12 */
+.requestItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 80px;
+  padding: 16px;
+  border-radius: 16px;
+  border: 1px solid var(--color-olive-200);
+  background-color: var(--color-base-000);
+  box-sizing: border-box;
+}
+
+/* 아이콘 원: 44px, olive-100 */
+.iconCircle {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  background-color: var(--color-olive-100);
+}
+
+.requestTxt {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* 요청 제목: Gothic Bold 17 / 24 */
+.requestTitle {
+  font-family: var(--font-gothic);
+  font-weight: 700;
+  font-size: 17px;
+  line-height: 24px;
+  letter-spacing: -0.2px;
+  color: var(--color-gray-900);
+}
+
+.requestStatus {
+  color: var(--color-gray-600);
+}
+
+/* 처리 결과 태그: beige-100 배경, beige-600 글자, 높이 20, 라디우스 4 (Gothic Bold 12) */
+.resultTag {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  height: 20px;
+  padding: 0 8px;
+  border-radius: 4px;
+  background-color: var(--color-beige-100);
+  color: var(--color-beige-600);
+  white-space: nowrap;
+
+  font-family: var(--font-gothic);
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 16px;
+}
+
+/* 버튼 영역: 2칸, 간격 12 */
+.btnContainer {
+  display: flex;
+  gap: 12px;
+}
+
+/* 버튼: 높이 56, 라디우스 16 (Gothic Bold 17) */
+.sheetBtn {
+  flex: 1;
+  height: 56px;
+  padding: 0;
+  border-radius: 16px;
+  cursor: pointer;
+
+  font-family: var(--font-gothic);
+  font-weight: 700;
+  font-size: 17px;
+  line-height: 1.29;
+  letter-spacing: -0.2px;
+}
+
+/* 취소: olive-200 배경, 테두리 olive-300, olive-800 글자 */
+.cancelBtn {
+  border: 1px solid var(--color-olive-300);
+  background-color: var(--color-olive-200);
+  color: var(--color-olive-800);
+}
+
+/* 나가기: red-700 배경, 흰 글자 */
+.leaveBtn {
+  border: none;
+  background-color: var(--color-red-700);
+  color: var(--color-base-000);
+}
