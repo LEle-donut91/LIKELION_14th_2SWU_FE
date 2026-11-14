@@ -62,8 +62,16 @@
   font-weight: 700;
 }
 
-/* 요청됨: gray-200 배경, gray-500 글자 */
-.requested {
+/* 요청됨 · 진행 중: olive-700 배경, 흰 글자 */
+.requested,
+.inProgress {
+  background-color: var(--color-olive-700);
+  color: var(--color-base-000);
+}
+
+/* 응답 대기 · 취소: gray-200 배경, gray-500 글자 */
+.waiting,
+.cancelled {
   background-color: var(--color-gray-200);
   color: var(--color-gray-500);
 }
@@ -80,13 +88,17 @@
   color: var(--color-base-000);
 }
 
-/* 진행 중 · 완료: 시안 확정 전 임시 색 */
-.inProgress {
-  background-color: var(--color-olive-700);
+/* 완료: beige-200 배경, 흰 글자 */
+.completed {
+  background-color: var(--color-beige-200);
   color: var(--color-base-000);
 }
 
-.completed {
-  background-color: var(--color-beige-500);
-  color: var(--color-base-000);
+/* 끝난 요청(완료·취소·만료): 제목 gray-200, 일정 gray-300 */
+.endedItem .title {
+  color: var(--color-gray-200);
+}
+
+.endedItem .meta {
+  color: var(--color-gray-300);
 }
