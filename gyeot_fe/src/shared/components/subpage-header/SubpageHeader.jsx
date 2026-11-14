@@ -114,7 +114,7 @@ function SubpageHeader({
             onClick={handleMoreClick}
             aria-label="더보기"
           >
-            <MaskIcon src={iconEtc} size={28} />
+            <MaskIcon src={iconEtc} size={48} />
           </button>
         )}
       </div>

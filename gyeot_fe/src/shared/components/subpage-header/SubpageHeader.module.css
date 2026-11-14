@@ -9,7 +9,7 @@
   padding: 16px;
   box-sizing: border-box;
 
-  background-color: var(--color-gray-050);
+  background-color: transparent; /* 페이지 배경색을 따라감 */
 }
 
 /* 왼쪽 버튼 영역 */
@@ -57,13 +57,23 @@
   cursor: pointer;
 }
 
-/* 아이콘 버튼 (MaskIcon은 currentColor로 색을 그림) */
+/* 아이콘 버튼 (MaskIcon은 currentColor로 색을 그림)
+ * - 터치 영역 44px 확보
+ * - 음수 margin으로 늘어난 만큼 상쇄해 헤더 높이·아이콘 위치는 그대로 유지
+ *   (44px - 아이콘 28px) / 2 = 8px */
 .iconBtn {
+  width: 44px;
+  height: 44px;
+  margin: -8px;
   color: var(--color-gray-600);
 }
 
-/* '...' 버튼 (시안상 진한 색) */
+/* '...' 버튼 (시안상 진한 색, 아이콘 프레임 48px)
+ * - 48px 아이콘이 레이아웃상 28px만 차지하도록 상쇄: (48px - 28px) / 2 = 10px */
 .moreBtn {
+  width: 48px;
+  height: 48px;
+  margin: -10px;
   color: var(--color-gray-900);
 }
 
@@ -72,4 +82,13 @@
 .rightText {
   white-space: nowrap; /* 텍스트 줄바꿈 방지 */
   color: var(--color-gray-600);
+}
+
+/* 오른쪽 텍스트 버튼 터치 영역 48px 확보
+ * - 세로: (48px - 줄 높이 26px) / 2 = 11px
+ * - 가로: 좌우 8px씩 추가 ('취소' 등 두 글자 기준 약 48px 이상)
+ * - 같은 크기의 음수 margin으로 상쇄해 헤더 높이·텍스트 위치는 그대로 유지 */
+.textBtn {
+  padding: 11px 8px;
+  margin: -11px -8px;
 }
