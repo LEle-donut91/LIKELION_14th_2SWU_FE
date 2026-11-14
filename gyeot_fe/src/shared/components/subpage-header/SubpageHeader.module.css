@@ -1,32 +1,33 @@
 /* 서브페이지 헤더 전체 영역 */
 .header {
-  /* 좌측 / 중앙 / 우측 3분할 */
+  /* 좌측 / 중앙 / 우측 3분할 (한쪽 버튼이 없어도 타이틀 중앙 유지) */
   display: grid;
   grid-template-columns: minmax(48px, 1fr) minmax(0, max-content) minmax(48px, 1fr);
   align-items: center;
-  column-gap: 8px;
+  column-gap: 16px;
 
-  height: 56px; /* 시안 수치 확정 후 조정 */
-  padding: 0 16px; /* 시안 수치 확정 후 조정 */
+  padding: 16px;
   box-sizing: border-box;
 
-  background-color: var(--color-base-000);
+  background-color: transparent; /* 페이지 배경색을 따라감 */
 }
 
 /* 왼쪽 버튼 영역 */
 .leftArea {
   display: flex;
+  align-items: center;
   justify-self: start;
 }
 
 /* 오른쪽 버튼 영역 */
 .rightArea {
   display: flex;
+  align-items: center;
   justify-self: end;
   gap: 8px;
 }
 
-/* 중앙 타이틀 */
+/* 중앙 타이틀 (폰트: index.css의 typoDisplaySmall 사용) */
 .title {
   margin: 0;
   color: var(--color-gray-900);
@@ -38,21 +39,56 @@
   text-overflow: ellipsis;
 }
 
-/* 헤더 버튼 공통 (아이콘 전달 전 회색 박스 형태로 임시 구성) */
-.headerBtn {
+/* 버튼 기본 스타일 초기화 (아이콘 버튼 / 텍스트 버튼 공통) */
+.iconBtn,
+.textBtn {
   flex-shrink: 0; /* 영역이 좁아져도 버튼 크기 유지 */
-  white-space: nowrap; /* 버튼 텍스트 줄바꿈 방지 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-  padding: 8px 12px;
+  padding: 0;
+  margin: 0;
   border: none;
-  border-radius: 4px;
-
-  background-color: var(--color-gray-100);
-  color: var(--color-gray-600);
-
-  font-family: var(--font-gothic);
-  font-size: 12px;
-  line-height: 16px;
+  background: none;
+  appearance: none;
+  -webkit-appearance: none;
 
   cursor: pointer;
+}
+
+/* 아이콘 버튼
+ * - 터치 영역 44px 확보
+ * - 음수 margin으로 늘어난 만큼 상쇄해 헤더 높이·아이콘 위치는 그대로 유지
+ *   (44px - 아이콘 28px) / 2 = 8px */
+.iconBtn {
+  width: 44px;
+  height: 44px;
+  margin: -8px;
+  color: var(--color-gray-600);
+}
+
+/* '...' 버튼
+ * - 48px 아이콘이 레이아웃상 28px만 차지하도록 상쇄: (48px - 28px) / 2 = 10px */
+.moreBtn {
+  width: 48px;
+  height: 48px;
+  margin: -10px;
+  color: var(--color-gray-900);
+}
+
+/* 오른쪽 텍스트 버튼 / 텍스트 (폰트: index.css의 typoBodyMedium 사용) */
+.textBtn,
+.rightText {
+  white-space: nowrap; /* 텍스트 줄바꿈 방지 */
+  color: var(--color-gray-600);
+}
+
+/* 오른쪽 텍스트 버튼 터치 영역 48px 확보
+ * - 세로: (48px - 줄 높이 26px) / 2 = 11px
+ * - 가로: 좌우 8px씩 추가 ('취소' 등 두 글자 기준 약 48px 이상)
+ * - 같은 크기의 음수 margin으로 상쇄해 헤더 높이·텍스트 위치는 그대로 유지 */
+.textBtn {
+  padding: 11px 8px;
+  margin: -11px -8px;
 }
