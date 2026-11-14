@@ -114,3 +114,38 @@ export const CARD_CONTACT_MOCK = {
   // 아무도 없음 (C-03 연락 순서 - 빈 상태)
   empty: { items: [] },
 };
+
+// C-04 생활 정보 목업 데이터
+// ※ request/mock/InfoPreview/getInfoPreviewMock.json의 lifeInfo를 복사해 C-04 화면 형태로 변경
+//   - 유형 키, 필드명, 값은 원본과 동일
+//     (address.value, entranceMethod.value, pet.name / care)
+//   - API(분류별 항목 조회)가 유형마다 items 배열로 내려주므로 모든 유형을 배열로 변경하고, 항목 구분용 id 추가
+//     (집 주소·출입 방법은 1개만 등록 가능 → 배열이 비어 있으면 '등록된 정보가 없어요' 카드 표시)
+//   - updatedAt("9/20") → updatedDate("2026-09-20"): C-01·C-02와 같은 "YYYY-MM-DD" 형식으로 변경
+//   - isSensitive: 유형 단위로 고정(LIFE_SECTION_LIST)되어 있어 제외
+//   - isDefault: 공개 정보 미리보기(H-03-02-01)에서 쓰는 값이라 제외
+// TODO: API 스펙 확정 후 응답 형태에 맞춰 교체
+export const CARD_LIFE_MOCK = {
+  address: [
+    {
+      id: "address-1",
+      value: "서울특별시 화랑로 621 서울여자대학교 조형예술관 000호",
+      updatedDate: "2026-09-20",
+    },
+  ],
+  entranceMethod: [
+    {
+      id: "entranceMethod-1",
+      value: "공동현관문 비밀번호 0000*",
+      updatedDate: "2026-09-20",
+    },
+  ],
+  pet: [
+    {
+      id: "pet-1",
+      name: "나롱이",
+      care: "하루에 3번 끼니 제공",
+      updatedDate: "2026-09-20",
+    },
+  ],
+};
