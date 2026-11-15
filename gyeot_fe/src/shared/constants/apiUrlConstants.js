@@ -19,5 +19,5 @@ export const REQUEST_API_URLS = {
 
 // D. 안심카드·정보 공유
 export const INFO_SHARE_API_URLS = {
-  // 여기에 안심카드·정보 공유 관련 API URL 상수를 정의합니다.
+  sharingOptions: "/api/safety-information/sharing-options", // 공개 항목 선택지 조회
 }

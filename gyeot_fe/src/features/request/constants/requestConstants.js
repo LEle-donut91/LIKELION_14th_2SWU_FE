@@ -38,6 +38,7 @@ export const INITIAL_FORM = {
   endDateTime: null,
   location: null,
   content: null,
+  informationIds: [],
   dueDate: { days: "1" },
 };
 
