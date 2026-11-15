@@ -2,13 +2,16 @@ import { create } from "zustand";
 import { INITIAL_FORM } from "@/features/request/constants/requestConstants";
 
 export const useRequestFormStore = create((set) => ({
-// 상태 변수
+  // 상태 변수
   entryId: null, // 이 폼이 어떤 상황 ID(URL :id)로 열렸는지
-  form: INITIAL_FORM,
+  form: INITIAL_FORM, // 사용자 입력값과 공개할 항목 ID 목록
 
   // 진입 시 초기화
   initForm: (entryId, initialValues = {}) =>
-    set({ entryId, form: { ...INITIAL_FORM, ...initialValues } }),
+    set({
+      entryId,
+      form: { ...INITIAL_FORM, ...initialValues },
+    }),
 
   // 상황 변경 (URL :id 교체와 짝). 이전 요청 대상은 해제
   changeSituation: (situationId) =>
@@ -24,5 +27,6 @@ export const useRequestFormStore = create((set) => ({
     })),
 
   // 요청 완료 / 작성 취소 시 비우기
-  resetForm: () => set({ entryId: null, form: INITIAL_FORM }),
+  resetForm: () =>
+    set({ entryId: null, form: INITIAL_FORM }),
 }));
