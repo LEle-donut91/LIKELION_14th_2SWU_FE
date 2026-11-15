@@ -1,5 +1,4 @@
 import {
-  SENSITIVE_KEYS,
   DATE_TIME_KEYS,
   DUE_DATE_KEYS,
   DATE_TIME_MAX_LIMITS,
@@ -209,33 +208,69 @@ export const toMinutes = (d) =>
 /**
  * =====================================================================
  * [H-03-02-01] 공개 정보 미리보기
+ * =====================================================================
+ */
+// 사용자가 선택한 요청 대상의 이름과 역할(보호자 여부)을 반환
+export const getSelectedUserInfo = (users, userId) => {
+  const selectedUser = users?.find((user) => user.id === userId);
+  return {
+    userName: selectedUser?.userName ?? "",
+    userPart: selectedUser?.isGuardian ? "보호자" : "",
+  };
+};
+
+/**
+ * =====================================================================
+ * [H-03-02-01] 공개 정보 미리보기
  * [H-03-01-02] 요청 수정 · 취소
  * - 사용자 입력값(체크한 항목) 기반 텍스트 UI 가공
  * =====================================================================
  */
+
+// 전체 선택 목록에서 해당 분류에 속한 ID만 추출
+// selectedIds: 사용자가 체크한 ID 목록 -> [12, 34, 56]
+// items: 해당 분류의 항목 목록 -> (기본 정보, 건강 정보, 생활 정보, 미리 남기는 말)
+export const getCategoryDescription = (items) => {
+  const names = [...new Set(items.map((item) => item.typeName))].join(", ");
+  if (!names) return "";
+
+  // 한글 음절은 28개 종성 단위로 반복되며, 나머지가 0이면 받침이 없다.
+  const hasFinalConsonant =
+    (names.charCodeAt(names.length - 1) - "가".charCodeAt(0)) % 28 !== 0;
+  return `${names}${hasFinalConsonant ? "이" : "가"} 포함되어 있어요.`;
+};
+
+export const getCategoryInformationIds = (selectedIds, items) =>
+  selectedIds.filter((id) => items.some((item) => item.id === id));
+
+// 다른 분류의 선택은 유지하고 해당 분류의 선택만 교체
+// 예: 12번 체크 해제 후 14번 체크 -> 기존 선택 12, 34, 56 -> 14, 34, 56
+export const replaceCategoryInformationIds = (selectedIds, items, nextIds) => {
+  const categoryIds = items.map((item) => item.id);
+  return [...selectedIds.filter((id) => !categoryIds.includes(id)), ...nextIds];
+};
+
+// 선택한 공개 항목의 민감정보 포함 여부와 기본값 일치 여부
+export const getInformationSelectionFlags = (informationOptions, selectedIds) => {
+  const { defaultIds = [], sensitiveIds = [] } = informationOptions ?? {};
+  return {
+    isSensitiveIncluded: sensitiveIds.some((id) => selectedIds.includes(id)),
+    isDefaultChecked: Boolean(informationOptions)
+      && selectedIds.length === defaultIds.length
+      && defaultIds.every((id) => selectedIds.includes(id)),
+  };
+};
 
 // 선택된 ID 목록(checkedList)과 원본 데이터 목록(dataList)을 받아서,
 // 선택된 항목들의 title을 쉼표(,)로 연결하여 반환
 export const getSelectedTitles = (checkedList, dataList) => {
   if (!checkedList || checkedList.length === 0) return "해당 없음";
 
-  return dataList
-    .filter((item) => checkedList.includes(item.id))
-    .map((item) => item.label)
+  // new Set(...)은 중복된 값을 하나씩만 남기는 문법
+  return [...new Set(dataList
+    .filter((item) => checkedList.includes(item.id)) // 1. 선택된 항목만 남김
+    .map((item) => item.label))] // 2. 표시할 이름만 추출
     .join(", ");
-};
-
-// TODO : API 명세서 확인 후 삭제 여부 검토
-// 사용자가 체크한 항목 중 민감정보가 포함되어 있으면 true 반환 (아니라면 false)
-export const checkSensitiveIncluded = (healthList = [], lifeList = []) => {
-  const isHealthSensitiveSelected = healthList.some((id) =>
-    SENSITIVE_KEYS.includes(id),
-  );
-  const isLifeSensitiveSelected = lifeList.some((id) =>
-    SENSITIVE_KEYS.includes(id),
-  );
-
-  return isHealthSensitiveSelected || isLifeSensitiveSelected;
 };
 
 /**

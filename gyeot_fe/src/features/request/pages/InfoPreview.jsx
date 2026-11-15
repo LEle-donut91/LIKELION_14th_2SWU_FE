@@ -9,29 +9,37 @@
 import styles from "@/features/request/pages/InfoPreview.module.css";
 
 // 일반 라이브러리
-import { Fragment, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 
 // Custom Hooks
 import { useRequestNav } from "@/features/request/hooks/useRequestNav";
-import { useCheckForm } from "@/features/request/hooks/useCheckForm";
+import { useRequestFormStore } from "@/features/request/stores/useRequestFormStore";
+import { useToast } from "@/features/request/hooks/useToast";
 
 // Constants
 import { REQUEST_ROUTES } from "@/features/request/constants/routerConstants";
-import { INFO_PREVIEW_SECTIONS } from "@/features/request/constants/requestConstants";
+import { REQUEST_QUERY_KEYS } from "@/features/request/constants/requestQueryKeys";
 
 // Utils
-import { getSelectedTitles } from "@/features/request/utils/requestUtils";
+import {
+  getSelectedTitles,
+  getSelectedUserInfo,
+  getCategoryInformationIds,
+  replaceCategoryInformationIds,
+} from "@/features/request/utils/requestUtils";
 
 // API, Services
 import {
-  getInfoPreviewApi,
-  postInfoPreviewApi,
-} from "@/features/request/api/createApi";
+  getRequestTargetsApi,
+  getInformationOptionsApi,
+} from "@/features/request/api/getApi";
 import {
-  getInfoPreviewService,
-  postInfoPreviewService,
-} from "@/features/request/services/createService";
+  getRequestTargetsService,
+  getInformationOptionsService,
+} from "@/features/request/services/getService";
+import { postInfoPreviewApi } from "@/features/request/api/createApi";
 
 // 일반 Components
 import StepHeader from "@/features/request/components/Header/StepHeader";
@@ -42,25 +50,72 @@ import DefaultSheet from "@/features/request/components/Sheet/DefaultSheet";
 import CheckOption from "@/features/request/components/Option/CheckOption";
 import LargeFooter from "@/features/request/components/Footer/LargeFooter";
 import DefaultModal from "@/features/request/components/Modal/DefaultModal";
+import DefaultToast from "@/features/request/components/Toast/DefaultToast";
 
 // 페이지 컴포넌트
 function InfoPreview() {
-  // useNavigation 커스텀 훅의 함수
-  const { handleGoNext, handleGoBack } = useRequestNav();
+  const { handleGoNext, handleGoBack } = useRequestNav(); // useNavigation 커스텀 훅의 함수
+  const paramId = useParams().id; // path parameter (situationId)
+  const { toast, showToast, hideToast } = useToast(); // 토스트 메시지
+  const { form: requestForm, setForm } = useRequestFormStore((state) => state); // 요청 작성 폼 상태 관리
 
-  // path parameter (tempId)
-  const paramId = useParams().id;
+  // 요청 대상 후보 조회 (요청 작성 시 선택한 대상)
+  const {
+    data: users = [],
+    isPending: isTargetsPending,
+    error: targetsError,
+  } = useQuery({
+    queryKey: REQUEST_QUERY_KEYS.targets(requestForm.situationId),
+    queryFn: () =>
+      getRequestTargetsApi({ situationId: Number(requestForm.situationId) }),
+    select: getRequestTargetsService,
+    enabled: Boolean(requestForm.situationId),
+  });
 
-  // TODO: API 연동 시 useEffect로 교체 (지금은 mock 이라 렌더마다 호출돼도 문제 없음)
-  // [H-03-02-01] 공개 정보 미리보기 - 데이터 조회
-  const { userName, userPart, dueDate, sections } = useMemo(
-    () => getInfoPreviewService(getInfoPreviewApi(paramId)),
-    [paramId],
+  // API 호출 에러 처리
+  useEffect(() => {
+    if (!targetsError) return;
+    showToast(targetsError.response?.data?.message);
+  }, [targetsError, showToast]);
+
+  // 공개 항목 선택지 조회 (새 요청이므로 requestId는 전달하지 않음)
+  const {
+    data: informationOptions,
+    isPending: isInformationPending,
+    error: informationError,
+  } = useQuery({
+    queryKey: REQUEST_QUERY_KEYS.informationOptions(requestForm.helpType),
+    queryFn: () => getInformationOptionsApi({ helpType: requestForm.helpType }),
+    enabled: Boolean(requestForm.helpType),
+  });
+  const {
+    categories,
+    selectedIds,
+    isSensitiveIncluded,
+    isDefaultChecked,
+    dueDate,
+  } = useMemo(
+    () => getInformationOptionsService(informationOptions, requestForm),
+    [informationOptions, requestForm],
   );
 
-  // 체크된 항목은 form 하나로 관리 (isDefault 항목이 초기 체크 상태)
-  const { form, setField, isSensitiveIncluded, isDefaultChecked } =
-    useCheckForm(sections);
+  // API 호출 에러 처리
+  useEffect(() => {
+    if (informationError) showToast(informationError.response?.data?.message);
+  }, [informationError, showToast]);
+
+  // 공개 항목 선택지 조회 후, 기본값이 있는 경우 requestForm에 반영
+  useEffect(() => {
+    if (!informationOptions) return;
+    setForm((prev) => ({
+      ...prev,
+      informationIds: getInformationOptionsService(informationOptions, prev)
+        .defaultIds,
+    }));
+  }, [informationOptions, setForm]);
+
+  // 선택한 대상의 이름과 보호자 여부를 가져오는 함수
+  const { userName, userPart } = getSelectedUserInfo(users, requestForm.userId);
 
   // 열려 있는 시트 (한 번에 하나만 열림) - 값은 CHECK_FORM_FIELD_KEY 중 하나
   const [openSheet, setOpenSheet] = useState(null);
@@ -69,10 +124,22 @@ function InfoPreview() {
   // 민감정보 확인 모달의 열림/닫힘 상태
   const [isModalOpen, setModalOpen] = useState(false);
 
+  // 선택한 공개 항목을 카테고리별로 교체하는 함수
+  const setCategorySelection = (categoryItems, ids) => {
+    setForm((prev) => ({
+      ...prev,
+      informationIds: replaceCategoryInformationIds(
+        prev.informationIds,
+        categoryItems,
+        ids,
+      ),
+    }));
+  };
+
   // TODO: API 연동 로직 수정 필요
   // [H-03-02-01] 공개 정보 제출 후 [요청 완료] 페이지로 이동
   const handleGoSend = () => {
-    const reqRefinedData = postInfoPreviewService(paramId, form);
+    const reqRefinedData = { ...requestForm, informationIds: selectedIds };
     postInfoPreviewApi(reqRefinedData);
 
     handleGoNext(REQUEST_ROUTES.send(paramId), true);
@@ -80,6 +147,8 @@ function InfoPreview() {
 
   // 요청 보내기 버튼 클릭 핸들러 (민감정보가 있으면 확인 모달을 먼저 띄움)
   const handleSendBtnClick = () => {
+    if (isTargetsPending || isInformationPending || informationError) return;
+
     if (isSensitiveIncluded) {
       setModalOpen(true);
       return;
@@ -97,8 +166,8 @@ function InfoPreview() {
         <UserInfo
           isAgain={false}
           state="받는 사람"
-          userName={userName}
-          part={userPart}
+          userName={isTargetsPending ? "..." : userName}
+          part={isTargetsPending ? "..." : userPart}
         />
 
         <DueDateState
@@ -112,32 +181,38 @@ function InfoPreview() {
             공유 정보
           </span>
           {/* 기본 정보 / 건강 정보 / 생활 정보 / 미리 남기는 말 */}
-          {INFO_PREVIEW_SECTIONS.map(({ key, title, description }) => (
-            <Fragment key={key}>
-              <SafetyCardGroup
-                title={title}
-                information={getSelectedTitles(form[key], sections[key])}
-                onClick={() => setOpenSheet(key)}
-              />
+          {isInformationPending && <div role="status">로딩중</div>}
+          {categories
+            .filter(({ items }) => items.length > 0)
+            .map(({ key, title, description, items }) => (
+              <Fragment key={key}>
+                <SafetyCardGroup
+                  title={title}
+                  information={getSelectedTitles(
+                    getCategoryInformationIds(selectedIds, items),
+                    items,
+                  )}
+                  onClick={() => setOpenSheet(key)}
+                />
 
-              <DefaultSheet
-                isOpen={openSheet === key}
-                onClose={closeSheet}
-                title={title}
-                description={description}
-                value={form[key]}
-                onConfirm={(v) => setField(key, v)}
-              >
-                {(temp, setTemp) => (
-                  <CheckOption
-                    data={sections[key]}
-                    checkedValue={temp}
-                    onChecked={setTemp}
-                  />
-                )}
-              </DefaultSheet>
-            </Fragment>
-          ))}
+                <DefaultSheet
+                  isOpen={openSheet === key}
+                  onClose={closeSheet}
+                  title={title}
+                  description={description}
+                  value={getCategoryInformationIds(selectedIds, items)}
+                  onConfirm={(v) => setCategorySelection(items, v)}
+                >
+                  {(temp, setTemp) => (
+                    <CheckOption
+                      data={items}
+                      checkedValue={temp}
+                      onChecked={setTemp}
+                    />
+                  )}
+                </DefaultSheet>
+              </Fragment>
+            ))}
         </div>
 
         <span className={`${styles.defaultTxt} typoBodySmall`}>
@@ -170,6 +245,13 @@ function InfoPreview() {
         confirmTxt="공유"
         onConfirmClick={handleGoSend}
       />
+      {toast && (
+        <DefaultToast
+          key={toast.id}
+          message={toast.message}
+          onHide={hideToast}
+        />
+      )}
     </div>
   );
 }
