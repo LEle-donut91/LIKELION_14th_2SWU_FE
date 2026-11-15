@@ -17,8 +17,6 @@ export const REQUEST_ROUTES = {
 
   // 상황 ID
   request: (id) => `/request/${id}`,
-
-  // 임시 ID
   infoPreview: (id) => `/request/info-preview/${id}`,
 
   // 요청 ID
