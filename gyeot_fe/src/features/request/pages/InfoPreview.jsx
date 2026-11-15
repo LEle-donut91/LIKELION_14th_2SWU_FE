@@ -21,7 +21,6 @@ import { useToast } from "@/features/request/hooks/useToast";
 // Constants
 import { REQUEST_ROUTES } from "@/features/request/constants/routerConstants";
 import { REQUEST_QUERY_KEYS } from "@/features/request/constants/requestQueryKeys";
-import { INFO_PREVIEW_SECTIONS } from "@/features/request/constants/requestConstants";
 
 // Utils
 import {
@@ -181,10 +180,8 @@ function InfoPreview() {
             공유 정보
           </span>
           {/* 기본 정보 / 건강 정보 / 생활 정보 / 미리 남기는 말 */}
-          {isInformationPending && INFO_PREVIEW_SECTIONS.map(({ key }) => (
-            <SafetyCardGroup key={key} title="..." information="..." />
-          ))}
-          {categories.map(({ key, title, description, items }) => (
+          {isInformationPending && <div role="status">로딩중</div>}
+          {categories.filter(({ items }) => items.length > 0).map(({ key, title, description, items }) => (
             <Fragment key={key}>
               <SafetyCardGroup
                 title={title}

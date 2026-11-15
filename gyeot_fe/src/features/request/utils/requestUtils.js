@@ -230,6 +230,16 @@ export const getSelectedUserInfo = (users, userId) => {
 // 전체 선택 목록에서 해당 분류에 속한 ID만 추출
 // selectedIds: 사용자가 체크한 ID 목록 -> [12, 34, 56]
 // items: 해당 분류의 항목 목록 -> (기본 정보, 건강 정보, 생활 정보, 미리 남기는 말)
+export const getCategoryDescription = (items) => {
+  const names = [...new Set(items.map((item) => item.typeName))].join(", ");
+  if (!names) return "";
+
+  // 한글 음절은 28개 종성 단위로 반복되며, 나머지가 0이면 받침이 없다.
+  const hasFinalConsonant =
+    (names.charCodeAt(names.length - 1) - "가".charCodeAt(0)) % 28 !== 0;
+  return `${names}${hasFinalConsonant ? "이" : "가"} 포함되어 있어요.`;
+};
+
 export const getCategoryInformationIds = (selectedIds, items) =>
   selectedIds.filter((id) => items.some((item) => item.id === id));
 
@@ -256,9 +266,10 @@ export const getInformationSelectionFlags = (informationOptions, selectedIds) =>
 export const getSelectedTitles = (checkedList, dataList) => {
   if (!checkedList || checkedList.length === 0) return "해당 없음";
 
-  return dataList
-    .filter((item) => checkedList.includes(item.id))
-    .map((item) => item.label)
+  // new Set(...)은 중복된 값을 하나씩만 남기는 문법
+  return [...new Set(dataList
+    .filter((item) => checkedList.includes(item.id)) // 1. 선택된 항목만 남김
+    .map((item) => item.label))] // 2. 표시할 이름만 추출
     .join(", ");
 };
 

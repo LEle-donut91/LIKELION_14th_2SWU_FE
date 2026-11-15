@@ -1,11 +1,12 @@
 import {
-  INFO_PREVIEW_SECTIONS,
   MS_PER_MINUTE,
 } from "@/features/request/constants/requestConstants";
 import { formatMonthDay, formatShortDateTime } from "@/shared/utils/dateFormat";
 import {
   toMinutes,
   getInformationSelectionFlags,
+  getReceivedInfoCardTitle,
+  getCategoryDescription,
 } from "@/features/request/utils/requestUtils";
 
 // 대상 후보 조회 API 관련
@@ -21,10 +22,10 @@ export const getInformationOptionsService = (
   raw,
   requestForm,
 ) => {
-  const categories = (raw?.data?.categories ?? []).map((category, index) => ({
+  const categories = (raw?.data?.categories ?? []).map((category) => ({
     key: category.category,
     title: category.categoryName,
-    description: INFO_PREVIEW_SECTIONS[index]?.description,
+    description: getCategoryDescription(category.items),
     items: category.items.map((item) => {
       const updatedText =
         item.updated && item.updatedAt
@@ -33,7 +34,7 @@ export const getInformationOptionsService = (
       return {
         id: item.informationId,
         label: item.typeName,
-        title: item.title || item.typeName,
+        title: getReceivedInfoCardTitle(item),
         description: `${item.informationValue}${updatedText}`,
         isSensitive: item.sensitive,
         isDefault: item.selected,
