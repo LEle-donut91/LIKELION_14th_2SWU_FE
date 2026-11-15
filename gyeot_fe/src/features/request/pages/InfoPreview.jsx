@@ -31,11 +31,15 @@ import {
 } from "@/features/request/utils/requestUtils";
 
 // API, Services
-import { getRequestTargetsApi, getInformationOptionsApi } from "@/features/request/api/getApi";
-import { getRequestTargetsService, getInformationOptionsService } from "@/features/request/services/getService";
 import {
-  postInfoPreviewApi,
-} from "@/features/request/api/createApi";
+  getRequestTargetsApi,
+  getInformationOptionsApi,
+} from "@/features/request/api/getApi";
+import {
+  getRequestTargetsService,
+  getInformationOptionsService,
+} from "@/features/request/services/getService";
+import { postInfoPreviewApi } from "@/features/request/api/createApi";
 
 // 일반 Components
 import StepHeader from "@/features/request/components/Header/StepHeader";
@@ -50,22 +54,30 @@ import DefaultToast from "@/features/request/components/Toast/DefaultToast";
 
 // 페이지 컴포넌트
 function InfoPreview() {
-  // useNavigation 커스텀 훅의 함수
-  const { handleGoNext, handleGoBack } = useRequestNav();
-
-  // path parameter (situationId)
-  const paramId = useParams().id;
-
-  // 토스트 메시지
-  const { toast, showToast, hideToast } = useToast();
+  const { handleGoNext, handleGoBack } = useRequestNav(); // useNavigation 커스텀 훅의 함수
+  const paramId = useParams().id; // path parameter (situationId)
+  const { toast, showToast, hideToast } = useToast(); // 토스트 메시지
+  const { form: requestForm, setForm } = useRequestFormStore((state) => state); // 요청 작성 폼 상태 관리
 
   // 요청 대상 후보 조회 (요청 작성 시 선택한 대상)
   const {
-    form: requestForm,
-    setForm,
-  } = useRequestFormStore((state) => state);
-  
-  
+    data: users = [],
+    isPending: isTargetsPending,
+    error: targetsError,
+  } = useQuery({
+    queryKey: REQUEST_QUERY_KEYS.targets(requestForm.situationId),
+    queryFn: () =>
+      getRequestTargetsApi({ situationId: Number(requestForm.situationId) }),
+    select: getRequestTargetsService,
+    enabled: Boolean(requestForm.situationId),
+  });
+
+  // API 호출 에러 처리
+  useEffect(() => {
+    if (!targetsError) return;
+    showToast(targetsError.response?.data?.message);
+  }, [targetsError, showToast]);
+
   // 공개 항목 선택지 조회 (새 요청이므로 requestId는 전달하지 않음)
   const {
     data: informationOptions,
@@ -87,45 +99,22 @@ function InfoPreview() {
     [informationOptions, requestForm],
   );
 
-  // 공개 항목 선택지 조회 후, 기본값이 있는 경우 requestForm에 반영
-  useEffect(() => {
-    if (!informationOptions) return;
-    setForm((prev) => ({
-      ...prev,
-      informationIds: getInformationOptionsService(informationOptions, prev).defaultIds,
-    }));
-  }, [informationOptions, setForm]);
-
   // API 호출 에러 처리
   useEffect(() => {
     if (informationError) showToast(informationError.response?.data?.message);
   }, [informationError, showToast]);
 
-  // 선택한 공개 항목을 카테고리별로 교체하는 함수
-  const setCategorySelection = (categoryItems, ids) => {
+  // 공개 항목 선택지 조회 후, 기본값이 있는 경우 requestForm에 반영
+  useEffect(() => {
+    if (!informationOptions) return;
     setForm((prev) => ({
       ...prev,
-      informationIds: replaceCategoryInformationIds(prev.informationIds, categoryItems, ids),
+      informationIds: getInformationOptionsService(informationOptions, prev)
+        .defaultIds,
     }));
-  };
-  const {
-    data: users = [],
-    isPending: isTargetsPending,
-    error: targetsError,
-  } = useQuery({
-    queryKey: REQUEST_QUERY_KEYS.targets(requestForm.situationId),
-    queryFn: () =>
-      getRequestTargetsApi({ situationId: Number(requestForm.situationId) }),
-    select: getRequestTargetsService,
-    enabled: Boolean(requestForm.situationId),
-  });
+  }, [informationOptions, setForm]);
 
-  // API 호출 에러 처리
-  useEffect(() => {
-    if (!targetsError) return;
-    showToast(targetsError.response?.data?.message);
-  }, [targetsError, showToast]);
-
+  // 선택한 대상의 이름과 보호자 여부를 가져오는 함수
   const { userName, userPart } = getSelectedUserInfo(users, requestForm.userId);
 
   // 열려 있는 시트 (한 번에 하나만 열림) - 값은 CHECK_FORM_FIELD_KEY 중 하나
@@ -134,6 +123,18 @@ function InfoPreview() {
 
   // 민감정보 확인 모달의 열림/닫힘 상태
   const [isModalOpen, setModalOpen] = useState(false);
+
+  // 선택한 공개 항목을 카테고리별로 교체하는 함수
+  const setCategorySelection = (categoryItems, ids) => {
+    setForm((prev) => ({
+      ...prev,
+      informationIds: replaceCategoryInformationIds(
+        prev.informationIds,
+        categoryItems,
+        ids,
+      ),
+    }));
+  };
 
   // TODO: API 연동 로직 수정 필요
   // [H-03-02-01] 공개 정보 제출 후 [요청 완료] 페이지로 이동
@@ -181,32 +182,37 @@ function InfoPreview() {
           </span>
           {/* 기본 정보 / 건강 정보 / 생활 정보 / 미리 남기는 말 */}
           {isInformationPending && <div role="status">로딩중</div>}
-          {categories.filter(({ items }) => items.length > 0).map(({ key, title, description, items }) => (
-            <Fragment key={key}>
-              <SafetyCardGroup
-                title={title}
-                information={getSelectedTitles(getCategoryInformationIds(selectedIds, items), items)}
-                onClick={() => setOpenSheet(key)}
-              />
+          {categories
+            .filter(({ items }) => items.length > 0)
+            .map(({ key, title, description, items }) => (
+              <Fragment key={key}>
+                <SafetyCardGroup
+                  title={title}
+                  information={getSelectedTitles(
+                    getCategoryInformationIds(selectedIds, items),
+                    items,
+                  )}
+                  onClick={() => setOpenSheet(key)}
+                />
 
-              <DefaultSheet
-                isOpen={openSheet === key}
-                onClose={closeSheet}
-                title={title}
-                description={description}
-                value={getCategoryInformationIds(selectedIds, items)}
-                onConfirm={(v) => setCategorySelection(items, v)}
-              >
-                {(temp, setTemp) => (
-                  <CheckOption
-                    data={items}
-                    checkedValue={temp}
-                    onChecked={setTemp}
-                  />
-                )}
-              </DefaultSheet>
-            </Fragment>
-          ))}
+                <DefaultSheet
+                  isOpen={openSheet === key}
+                  onClose={closeSheet}
+                  title={title}
+                  description={description}
+                  value={getCategoryInformationIds(selectedIds, items)}
+                  onConfirm={(v) => setCategorySelection(items, v)}
+                >
+                  {(temp, setTemp) => (
+                    <CheckOption
+                      data={items}
+                      checkedValue={temp}
+                      onChecked={setTemp}
+                    />
+                  )}
+                </DefaultSheet>
+              </Fragment>
+            ))}
         </div>
 
         <span className={`${styles.defaultTxt} typoBodySmall`}>
