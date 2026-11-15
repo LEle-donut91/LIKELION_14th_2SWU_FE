@@ -9,13 +9,17 @@
 import styles from "@/features/request/pages/Request.module.css";
 
 // 일반 라이브러리
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 
 // Custom Hooks
 import { useRequestNav } from "@/features/request/hooks/useRequestNav";
 import { useRequestForm } from "@/features/request/hooks/useRequestForm";
 import { useToast } from "@/features/request/hooks/useToast";
+
+// Zustand Store
+import { useRequestCreateStore } from "../stores/useRequestCreateStore";
 
 // Constants
 import { REQUEST_ROUTES } from "@/features/request/constants/routerConstants";
@@ -25,6 +29,7 @@ import {
   DATE_TIME_SECTIONS,
   DUE_DATE_SECTIONS,
 } from "@/features/request/constants/requestConstants";
+import { REQUEST_QUERY_KEYS } from "@/features/request/constants/requestQueryKeys";
 
 // Utils
 import {
@@ -37,15 +42,10 @@ import {
 } from "@/features/request/utils/requestUtils";
 
 // API, Services
-import {
-  getReqFormApi,
-  postReqFormApi,
-} from "@/features/request/api/createApi";
-import {
-  getReqFormService,
-  postReqFormIdService,
-  postReqFormService,
-} from "@/features/request/services/createService";
+import { getReqFormApi } from "@/features/request/api/createApi";
+import { getReqFormService } from "@/features/request/services/createService";
+import { getRequestTargetsApi } from "@/features/request/api/getApi";
+import { getRequestTargetsService } from "@/features/request/services/getService";
 
 // 일반 Components
 import StepHeader from "@/features/request/components/Header/StepHeader";
@@ -74,12 +74,22 @@ function Request() {
   const passedUserId = state[REQUEST_FORM_FIELD_KEY.USER_ID];
   const passedDueDate = state[REQUEST_FORM_FIELD_KEY.DUE_DATE];
 
-  // 입력값 전체는 form 하나 (초기값 전달)
-  const { form, setField, validate } = useRequestForm({
-    situationId: paramId,
-    ...(passedUserId && { userId: passedUserId }),
-    ...(passedDueDate && { dueDate: passedDueDate }),
+  // 입력값 전체는 Zustand store의 form 하나
+  // - 같은 진입(paramId)으로 돌아온 경우(예: 미리보기에서 뒤로가기) 입력값 유지
+  // - 다른 진입이면 새로 초기화 (초기값 전달)
+  const { entryId, initForm, changeSituation, resetForm } = useRequestCreateStore((state) => state);
+
+  useState(() => {
+    if (entryId !== paramId) {
+      initForm(paramId, {
+        situationId: paramId,
+        ...(passedUserId && { userId: passedUserId }),
+        ...(passedDueDate && { dueDate: passedDueDate }),
+      });
+    }
   });
+
+  const { form, setField, validate } = useRequestForm();
 
   // 토스트 메시지
   const { toast, showToast, hideToast } = useToast();
@@ -94,12 +104,44 @@ function Request() {
     if (isPrerequisiteEnsured(form, showToast)) setOpenSheet(sheet);
   };
 
-  // TODO: API 연동 시 useEffect로 교체 (지금은 mock 이라 렌더마다 호출돼도 문제 없음)
-  // [H-03-02] 요청 작성 - 데이터 조회
-  const { situation, user } = useMemo(
-    () => getReqFormService(getReqFormApi()),
-    [],
-  );
+  // TODO: 상황 목록 조회 API 연동 시 교체 (지금은 mock 이라 렌더마다 호출돼도 문제 없음)
+  // [H-03-02] 요청 작성 - 상황 목록 조회
+  const { situation } = useMemo(() => getReqFormService(getReqFormApi()), []);
+
+  // 대상 후보 조회 (TanStack Query, 상황 선택 후 호출)
+  // - 상황이 바뀌면 queryKey가 달라져 자동으로 다시 조회
+  const {
+    data: user = [],
+    isPending: isTargetsPending,
+    error: targetsError,
+  } = useQuery({
+    queryKey: REQUEST_QUERY_KEYS.targets(form.situationId),
+    queryFn: () =>
+      getRequestTargetsApi({ situationId: Number(form.situationId) }),
+    select: getRequestTargetsService,
+    enabled: Boolean(form.situationId),
+  });
+
+  // API 호출 에러 처리
+  useEffect(() => {
+    if (!targetsError) return;
+    showToast(targetsError.response?.data?.message);
+  }, [targetsError, showToast]);
+
+  // 상황 선택 확정 핸들러
+  // - store: 상황 변경 + 요청 대상 해제
+  // - URL: :id도 새 상황 ID로 교체 (replace: 히스토리에 쌓지 않음)
+  const handleSituationConfirm = (situationId) => {
+    if (situationId === form.situationId) return;
+    changeSituation(situationId);
+    handleGoNext(REQUEST_ROUTES.request(situationId), true);
+  };
+
+  // 뒤로가기: 작성 중이던 입력값 비우고 이전 페이지로
+  const handleHeaderBackClick = () => {
+    resetForm();
+    handleGoBack();
+  };
 
   // Footer 버튼 눌렀을 때 실행될 핸들러
   const handleFooterBtnClick = () => {
@@ -110,21 +152,14 @@ function Request() {
       showToast(firstError);
       return;
     }
-
-    // TODO: API 연동 로직 수정 필요
-    // [H-03-02] 요청 작성 - 폼 제출
-    const reqRefinedData = postReqFormService(form);
-    const resRawData = postReqFormApi(reqRefinedData);
-    const { reqId } = postReqFormIdService(resRawData);
-
     // [공개 정보 미리보기] 페이지로 이동
-    handleGoNext(REQUEST_ROUTES.infoPreview(reqId));
+    handleGoNext(REQUEST_ROUTES.infoPreview(form.situationId));
   };
 
   return (
     <div className={styles.page}>
       {/* 헤더 */}
-      <StepHeader title="요청 작성" step="1" onClick={handleGoBack} />
+      <StepHeader title="요청 작성" step="1" onClick={handleHeaderBackClick} />
 
       {/* 메인 컨텐츠 */}
       <main className={styles.content}>
@@ -141,7 +176,7 @@ function Request() {
           title="상황"
           description="상황에 참여한 사람들에게만 요청을 보낼 수 있어요."
           value={form.situationId}
-          onConfirm={(v) => setField(REQUEST_FORM_FIELD_KEY.SITUATION_ID, v)}
+          onConfirm={(v) => handleSituationConfirm(v)}
         >
           {(temp, setTemp) => (
             <SituationOption
@@ -245,9 +280,13 @@ function Request() {
           value={form.userId}
           onConfirm={(v) => setField(REQUEST_FORM_FIELD_KEY.USER_ID, v)}
         >
-          {(temp, setTemp) => (
-            <UserOption data={user} selectedValue={temp} onSelect={setTemp} />
-          )}
+          {(temp, setTemp) =>
+            isTargetsPending ? (
+              <div>Loading...</div>
+            ) : (
+              <UserOption data={user} selectedValue={temp} onSelect={setTemp} />
+            )
+          }
         </DefaultSheet>
 
         {/* 응답 기한 */}
