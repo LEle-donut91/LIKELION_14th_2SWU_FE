@@ -1,5 +1,4 @@
 import {
-  SENSITIVE_KEYS,
   DATE_TIME_KEYS,
   DUE_DATE_KEYS,
   DATE_TIME_MAX_LIMITS,
@@ -228,6 +227,30 @@ export const getSelectedUserInfo = (users, userId) => {
  * =====================================================================
  */
 
+// 전체 선택 목록에서 해당 분류에 속한 ID만 추출
+// selectedIds: 사용자가 체크한 ID 목록 -> [12, 34, 56]
+// items: 해당 분류의 항목 목록 -> (기본 정보, 건강 정보, 생활 정보, 미리 남기는 말)
+export const getCategoryInformationIds = (selectedIds, items) =>
+  selectedIds.filter((id) => items.some((item) => item.id === id));
+
+// 다른 분류의 선택은 유지하고 해당 분류의 선택만 교체
+// 예: 12번 체크 해제 후 14번 체크 -> 기존 선택 12, 34, 56 -> 14, 34, 56
+export const replaceCategoryInformationIds = (selectedIds, items, nextIds) => {
+  const categoryIds = items.map((item) => item.id);
+  return [...selectedIds.filter((id) => !categoryIds.includes(id)), ...nextIds];
+};
+
+// 선택한 공개 항목의 민감정보 포함 여부와 기본값 일치 여부
+export const getInformationSelectionFlags = (informationOptions, selectedIds) => {
+  const { defaultIds = [], sensitiveIds = [] } = informationOptions ?? {};
+  return {
+    isSensitiveIncluded: sensitiveIds.some((id) => selectedIds.includes(id)),
+    isDefaultChecked: Boolean(informationOptions)
+      && selectedIds.length === defaultIds.length
+      && defaultIds.every((id) => selectedIds.includes(id)),
+  };
+};
+
 // 선택된 ID 목록(checkedList)과 원본 데이터 목록(dataList)을 받아서,
 // 선택된 항목들의 title을 쉼표(,)로 연결하여 반환
 export const getSelectedTitles = (checkedList, dataList) => {
@@ -237,19 +260,6 @@ export const getSelectedTitles = (checkedList, dataList) => {
     .filter((item) => checkedList.includes(item.id))
     .map((item) => item.label)
     .join(", ");
-};
-
-// TODO : API 명세서 확인 후 삭제 여부 검토
-// 사용자가 체크한 항목 중 민감정보가 포함되어 있으면 true 반환 (아니라면 false)
-export const checkSensitiveIncluded = (healthList = [], lifeList = []) => {
-  const isHealthSensitiveSelected = healthList.some((id) =>
-    SENSITIVE_KEYS.includes(id),
-  );
-  const isLifeSensitiveSelected = lifeList.some((id) =>
-    SENSITIVE_KEYS.includes(id),
-  );
-
-  return isHealthSensitiveSelected || isLifeSensitiveSelected;
 };
 
 /**
