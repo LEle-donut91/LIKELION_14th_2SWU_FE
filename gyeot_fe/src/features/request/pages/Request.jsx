@@ -15,11 +15,10 @@ import { useQuery } from "@tanstack/react-query";
 
 // Custom Hooks
 import { useRequestNav } from "@/features/request/hooks/useRequestNav";
-import { useRequestForm } from "@/features/request/hooks/useRequestForm";
 import { useToast } from "@/features/request/hooks/useToast";
 
 // Zustand Store
-import { useRequestCreateStore } from "../stores/useRequestCreateStore";
+import { useRequestFormStore } from "@/features/request/stores/useRequestFormStore";
 
 // Constants
 import { REQUEST_ROUTES } from "@/features/request/constants/routerConstants";
@@ -40,6 +39,7 @@ import {
   isReadOnly,
   isPrerequisiteEnsured,
 } from "@/features/request/utils/requestUtils";
+import { validateInput } from "@/features/request/utils/validateInput";
 
 // API, Services
 import { getReqFormApi } from "@/features/request/api/createApi";
@@ -77,7 +77,8 @@ function Request() {
   // 입력값 전체는 Zustand store의 form 하나
   // - 같은 진입(paramId)으로 돌아온 경우(예: 미리보기에서 뒤로가기) 입력값 유지
   // - 다른 진입이면 새로 초기화 (초기값 전달)
-  const { entryId, initForm, changeSituation, resetForm } = useRequestCreateStore((state) => state);
+  const { entryId, form, initForm, changeSituation, setForm, resetForm } =
+    useRequestFormStore((state) => state);
 
   useState(() => {
     if (entryId !== paramId) {
@@ -88,8 +89,6 @@ function Request() {
       });
     }
   });
-
-  const { form, setField, validate } = useRequestForm();
 
   // 토스트 메시지
   const { toast, showToast, hideToast } = useToast();
@@ -146,7 +145,7 @@ function Request() {
   // Footer 버튼 눌렀을 때 실행될 핸들러
   const handleFooterBtnClick = () => {
     // 입력값 유효성 검사 (첫 번째 에러 문구 하나만 토스트로)
-    const errors = validate();
+    const errors = validateInput(form, new Date());
     const [firstError] = Object.values(errors);
     if (firstError) {
       showToast(firstError);
@@ -190,7 +189,7 @@ function Request() {
         {/* 도움 종류 */}
         <RadioSection
           value={form.helpType}
-          onChange={(v) => setField(REQUEST_FORM_FIELD_KEY.HELP_TYPE, v)}
+          onChange={(v) => setForm({ ...form, helpType: v })}
         />
 
         {/* 시작 - 종료 */}
@@ -212,7 +211,7 @@ function Request() {
           isOpen={openSheet === REQUEST_SHEET.START}
           onClose={closeSheet}
           value={form.startDateTime}
-          onConfirm={(v) => setField(REQUEST_FORM_FIELD_KEY.START_DATE_TIME, v)}
+          onConfirm={(v) => setForm({ ...form, startDateTime: v })}
         >
           {(temp, setTemp) => (
             <DateTimeOption
@@ -226,7 +225,7 @@ function Request() {
           isOpen={openSheet === REQUEST_SHEET.END}
           onClose={closeSheet}
           value={form.endDateTime}
-          onConfirm={(v) => setField(REQUEST_FORM_FIELD_KEY.END_DATE_TIME, v)}
+          onConfirm={(v) => setForm({ ...form, endDateTime: v })}
         >
           {(temp, setTemp) => (
             <DateTimeOption
@@ -247,7 +246,7 @@ function Request() {
           readOnly={isReadOnly(form)}
           onFocus={() => isPrerequisiteEnsured(form, showToast)}
           onChange={(e) =>
-            setField(REQUEST_FORM_FIELD_KEY.LOCATION, e.target.value || null)
+            setForm({ ...form, location: e.target.value || null })
           }
         />
 
@@ -261,7 +260,7 @@ function Request() {
           readOnly={isReadOnly(form)}
           onFocus={() => isPrerequisiteEnsured(form, showToast)}
           onChange={(e) =>
-            setField(REQUEST_FORM_FIELD_KEY.CONTENT, e.target.value || null)
+            setForm({ ...form, content: e.target.value || null })
           }
         />
 
@@ -278,7 +277,7 @@ function Request() {
           title="요청 대상"
           description="상황에 참여한 사람들에게만 요청을 보낼 수 있어요."
           value={form.userId}
-          onConfirm={(v) => setField(REQUEST_FORM_FIELD_KEY.USER_ID, v)}
+          onConfirm={(v) => setForm({ ...form, userId: v })}
         >
           {(temp, setTemp) =>
             isTargetsPending ? (
@@ -300,7 +299,7 @@ function Request() {
           isOpen={openSheet === REQUEST_SHEET.DUE_DATE}
           onClose={closeSheet}
           value={form.dueDate}
-          onConfirm={(v) => setField(REQUEST_FORM_FIELD_KEY.DUE_DATE, v)}
+          onConfirm={(v) => setForm({ ...form, dueDate: v })}
         >
           {(temp, setTemp) => (
             <DateTimeOption

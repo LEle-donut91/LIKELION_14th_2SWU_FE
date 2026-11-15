@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { INITIAL_FORM } from "@/features/request/constants/requestConstants";
 
-export const useRequestCreateStore = create((set) => ({
+export const useRequestFormStore = create((set) => ({
 // 상태 변수
   entryId: null, // 이 폼이 어떤 상황 ID(URL :id)로 열렸는지
   form: INITIAL_FORM,
