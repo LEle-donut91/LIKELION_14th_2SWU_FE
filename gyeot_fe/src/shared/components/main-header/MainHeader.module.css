@@ -1,52 +1,48 @@
-/* 메인 헤더 전체 영역 */
+/* 메인 헤더 전체 영역 (시안: 패딩 16, 간격 16, 위쪽 정렬) */
 .header {
-  /* 좌측 타이틀 / 우측 버튼 2분할 */
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
+  align-items: flex-start;
+  gap: 16px;
 
-  height: 56px;
-  padding: 0 16px;
+  padding: 16px;
   box-sizing: border-box;
+
+  background-color: transparent; /* 페이지 배경색을 따라감 */
 }
 
-/* 왼쪽 타이틀 (시안: Gothic Bold 18 / 22.5) */
+/* 왼쪽 타이틀 (폰트: index.css의 typoDisplayMedium - 명조 Bold 24 / 34) */
 .title {
+  flex: 1;
+  min-width: 0;
   margin: 0;
-
-  font-family: var(--font-gothic);
-  font-weight: 700;
-  font-size: 18px;
-  line-height: 22.5px;
-  letter-spacing: -0.16px;
   color: var(--color-gray-900);
+  white-space: pre-line; /* 타이틀 안의 \n 줄바꿈 표시 */
 }
 
-/* 오른쪽 버튼 영역 */
+/* 오른쪽 아이콘 영역: 간격 12, 타이틀 첫 줄(34px) 높이에 맞춰 세로 가운데 */
 .rightArea {
   display: flex;
   flex-shrink: 0; /* 영역이 좁아져도 버튼 크기 유지 */
-  gap: 6px;
+  align-items: center;
+  gap: 12px;
+  height: 34px;
 }
 
-/* 헤더 버튼 공통 */
-.headerBtn {
+/* 아이콘 버튼
+ * - 아이콘 28px, 터치 영역 44px 확보
+ * - 음수 margin으로 늘어난 만큼 상쇄해 헤더 높이·아이콘 위치는 그대로 유지
+ *   (44px - 28px) / 2 = 8px */
+.iconBtn {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
   width: 44px;
-  height: 36px;
+  height: 44px;
+  margin: -8px;
   padding: 0;
   border: none;
-  border-radius: 2px;
-
-  background-color: var(--color-gray-100);
+  background: none;
   color: var(--color-gray-600);
-
-  font-family: var(--font-gothic);
-  font-weight: 400;
-  font-size: 12px;
-  line-height: 12px;
-  letter-spacing: -0.16px;
-  white-space: nowrap;
-
   cursor: pointer;
 }
