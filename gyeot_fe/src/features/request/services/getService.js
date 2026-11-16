@@ -1,13 +1,57 @@
 import {
   MS_PER_MINUTE,
+  HELP_TYPE_LABELS,
+  DUE_DATE_DEFAULT_MINUTES,
+  REQUESTER_FOOTER_CONFIG,
+  REQUESTER_FOOTER_KEY,
+  ASSIGNEE_FOOTER_CONFIG,
+  ASSIGNEE_FOOTER_KEY,
+  TARGET_FOOTER_CONFIG,
+  TARGET_FOOTER_KEY,
+  TARGET_STATE,
+  TARGET_NOTICE_CONFIG,
+  TARGET_GUIDE_LINES,
+  TARGET_GUIDE_KEY,
+  CANCEL_NOTICE_CONFIG,
+  NO_ASSIGNEE_NOTICE_CONFIG,
+  EDIT_INVALID_NOTICE_CONFIG,
+  REQUESTER_ORDER_TITLE,
+  REQUESTER_USER_STATE_TEXT,
+  ASSIGNEE_SAFETY_INFORMATION,
 } from "@/features/request/constants/requestConstants";
-import { formatMonthDay, formatShortDateTime } from "@/shared/utils/dateFormat";
+import {
+  formatMonthDay,
+  formatShortDateTime,
+  formatCompactDateTimeRange,
+  formatShortDateTimeRange,
+  formatPaddedShortDateTime,
+} from "@/shared/utils/dateFormat";
 import {
   toMinutes,
   getInformationSelectionFlags,
   getReceivedInfoCardTitle,
   getCategoryDescription,
+  getReceivedInfoValue,
+  getReceivedInfoBadgeText,
+  getReceivedInfoUnavailableMessage,
 } from "@/features/request/utils/requestUtils";
+import {
+  REQUEST_STATE,
+  DISPLAY_STATUS,
+  PROPOSAL_STATUS,
+  RESPONSE_STATUS,
+  VIEWER_ROLE,
+  REQUEST_ACTION,
+  ASSIGNMENT_CLOSE_REASON,
+  NO_ASSIGNEE_REASON,
+  USER_ORDER_STATE,
+} from "@/features/request/constants/enumConstants";
+import {
+  getInfoPreviewService,
+} from "@/features/request/services/createService";
+import iconDate from "@/shared/assets/icons/iconDate.svg";
+import iconLocation from "@/shared/assets/icons/iconLocation.svg";
+import iconHealthy from "@/shared/assets/icons/iconHealthy.svg";
 
 // 대상 후보 조회 API 관련
 export const getRequestTargetsService = (raw) =>
@@ -63,5 +107,344 @@ export const getInformationOptionsService = (
     dueDate: formatShortDateTime(
       new Date(Date.now() + toMinutes(requestForm.dueDate) * MS_PER_MINUTE),
     ),
+  };
+};
+
+const FOOTER_ACTIONS = {
+  edit: REQUEST_ACTION.EDIT,
+  askAgain: REQUEST_ACTION.REASSIGN,
+  withdraw: REQUEST_ACTION.WITHDRAW_PROPOSAL,
+  done: REQUEST_ACTION.COMPLETE,
+  sameRequest: REQUEST_ACTION.DUPLICATE,
+  checkChange: REQUEST_ACTION.ACCEPT_PROPOSAL,
+  start: REQUEST_ACTION.START,
+  pastSituation: REQUEST_ACTION.VIEW_PAST_SITUATION,
+};
+
+// API에서 허용한 버튼만 남긴다. 두 버튼 중 하나만 허용되면 단일 푸터로 표시한다.
+const getAllowedFooter = (config, actions) => {
+  if (!config) return null;
+  if (config.size !== "small") {
+    return actions.includes(FOOTER_ACTIONS[config.action]) ? config : null;
+  }
+  const buttons = ["left", "right"]
+    .map((side) => ({
+      title: config[`${side}Title`],
+      type: config[`${side}Type`],
+      action: config[`${side}Action`],
+    }))
+    .filter((button) => actions.includes(FOOTER_ACTIONS[button.action]));
+  if (buttons.length === 2) return config;
+  return buttons[0] ? { size: "large", ...buttons[0] } : null;
+};
+
+const getRequesterFooter = (actions) => {
+  let key = REQUESTER_FOOTER_KEY.EDIT;
+  if (actions.includes(REQUEST_ACTION.WITHDRAW_PROPOSAL)) {
+    key = REQUESTER_FOOTER_KEY.EDIT_WITHDRAW;
+  } else if (actions.includes(REQUEST_ACTION.REASSIGN)) {
+    key = REQUESTER_FOOTER_KEY.EDIT_ASK_AGAIN;
+  } else if (actions.includes(REQUEST_ACTION.COMPLETE)) {
+    key = REQUESTER_FOOTER_KEY.DONE;
+  } else if (actions.includes(REQUEST_ACTION.DUPLICATE)) {
+    key = REQUESTER_FOOTER_KEY.SAME_REQUEST;
+  }
+  return getAllowedFooter(REQUESTER_FOOTER_CONFIG[key], actions);
+};
+
+const getAssigneeFooter = (actions) => {
+  const key = [
+    ASSIGNEE_FOOTER_KEY.CHECK_CHANGE,
+    ASSIGNEE_FOOTER_KEY.START,
+    ASSIGNEE_FOOTER_KEY.DONE,
+    ASSIGNEE_FOOTER_KEY.PAST_SITUATION,
+  ].find((key) => actions.includes(FOOTER_ACTIONS[ASSIGNEE_FOOTER_CONFIG[key].action]));
+  return ASSIGNEE_FOOTER_CONFIG[key] ?? null;
+};
+
+const getTargetState = ({ status, myAssignment }) => {
+  if (myAssignment?.closed && myAssignment.closeReason === ASSIGNMENT_CLOSE_REASON.TARGET_CHANGED) {
+    return TARGET_STATE.PASS;
+  }
+  if (status === REQUEST_STATE.CANCELED) return TARGET_STATE.CANCEL;
+  if (status === REQUEST_STATE.EXPIRED) return TARGET_STATE.EXPIRED;
+  if (myAssignment?.closed) return null;
+  if (myAssignment?.responseStatus === RESPONSE_STATUS.CHECK_LATER) return TARGET_STATE.HOLD;
+  if (myAssignment?.responseStatus === RESPONSE_STATUS.UNAVAILABLE) return TARGET_STATE.REFUSED;
+  return TARGET_STATE.BEFORE;
+};
+
+// 명세의 우선순위대로 부탁 순서 배지를 계산한다.
+const getOrderState = (assignment, raw, index, length) => {
+  const { responseStatus, closeReason } = assignment;
+  if (responseStatus === RESPONSE_STATUS.UNAVAILABLE) return USER_ORDER_STATE.DIFFICULTY;
+  if (closeReason === ASSIGNMENT_CLOSE_REASON.ACCEPTANCE_WITHDRAWN
+    || (closeReason === ASSIGNMENT_CLOSE_REASON.REQUEST_ENDED && raw.status === REQUEST_STATE.CANCELED)) {
+    return USER_ORDER_STATE.CANCEL;
+  }
+  if (closeReason === ASSIGNMENT_CLOSE_REASON.TARGET_CHANGED
+    || closeReason === ASSIGNMENT_CLOSE_REASON.RESPONSE_DEADLINE_PASSED
+    || (closeReason === ASSIGNMENT_CLOSE_REASON.REQUEST_ENDED && raw.status === REQUEST_STATE.EXPIRED)
+    || (index === length - 1 && raw.noAssigneeReason === NO_ASSIGNEE_REASON.DEADLINE_PASSED)) {
+    return USER_ORDER_STATE.EXPIRED;
+  }
+  if (closeReason == null && (responseStatus == null || responseStatus === RESPONSE_STATUS.CHECK_LATER)) {
+    return USER_ORDER_STATE.WAITING;
+  }
+  return null;
+};
+
+const getRequesterNotices = (raw, flags) => {
+  const notices = [];
+  if (raw.status === REQUEST_STATE.CANCELED && CANCEL_NOTICE_CONFIG[raw.cancelReason]) {
+    notices.push({ key: "cancel", ...CANCEL_NOTICE_CONFIG[raw.cancelReason] });
+  }
+  if (raw.status === REQUEST_STATE.EXPIRED) {
+    notices.push({ key: "expired", title: "만료됨", information: "담당자가 없어 요청이 만료됐어요." });
+  }
+  if (flags.isAssignedNoti && NO_ASSIGNEE_NOTICE_CONFIG[raw.noAssigneeReason]) {
+    notices.push({ key: "noAssignee", ...NO_ASSIGNEE_NOTICE_CONFIG[raw.noAssigneeReason] });
+  }
+  if (flags.isEditInvalid) notices.push({ key: "editInvalid", ...EDIT_INVALID_NOTICE_CONFIG });
+  return notices;
+};
+
+export const getRequestDetailService = (response = {}) => {
+  const raw = response?.data ?? response ?? {};
+  const actions = raw.actions ?? [];
+  const role = raw.viewerRole?.toLowerCase();
+  const isRequester = raw.viewerRole === VIEWER_ROLE.REQUESTER;
+  const isAssignee = raw.viewerRole === VIEWER_ROLE.ASSIGNEE;
+  const isTarget = raw.viewerRole === VIEWER_ROLE.TARGET;
+  const isDoneState = raw.status === REQUEST_STATE.COMPLETED;
+  const isProgressState = raw.status === REQUEST_STATE.IN_PROGRESS;
+  const isAssignedNoti = raw.displayStatus === DISPLAY_STATUS.NO_ASSIGNEE;
+  const isEditPending = raw.latestProposal?.status === PROPOSAL_STATUS.PENDING;
+  const targetState = getTargetState(raw);
+  const canRespond = isTarget && actions.includes(REQUEST_ACTION.RESPOND)
+    && !raw.myAssignment?.closed
+    && raw.status !== REQUEST_STATE.CANCELED && raw.status !== REQUEST_STATE.EXPIRED;
+  const flags = {
+    isAssignedNoti,
+    isEditPending,
+    isEditInvalid: raw.latestProposal?.status === PROPOSAL_STATUS.INVALIDATED,
+    isCancelable: isRequester && actions.includes(REQUEST_ACTION.CANCEL),
+    showWithdrawBtn: isAssignee && actions.includes(REQUEST_ACTION.WITHDRAW),
+    showChangedNotice: isAssignee && isEditPending,
+    showDoneNotice: isAssignee && isDoneState,
+    showUserState: isRequester && (isEditPending || isDoneState),
+    showUserOrder: isRequester && [DISPLAY_STATUS.WAITING, DISPLAY_STATUS.NO_ASSIGNEE,
+      DISPLAY_STATUS.CANCELED, DISPLAY_STATUS.EXPIRED].includes(raw.displayStatus),
+    showProgress: isRequester && isProgressState,
+    showMessage: !isRequester || !isProgressState,
+    showDueDate: isRequester ? raw.displayStatus === DISPLAY_STATUS.WAITING : canRespond,
+    showHoldBtn: canRespond && targetState === TARGET_STATE.BEFORE,
+  };
+  const targetFooterKey = {
+    [TARGET_STATE.BEFORE]: TARGET_FOOTER_KEY.RESPOND,
+    [TARGET_STATE.HOLD]: TARGET_FOOTER_KEY.CHANGE,
+    [TARGET_STATE.REFUSED]: TARGET_FOOTER_KEY.CHANGE_TO_ACCEPT,
+  }[targetState];
+  const notice = isTarget ? TARGET_NOTICE_CONFIG[targetState] ?? null : null;
+  let guideLines = [];
+  if (isTarget && (notice || raw.myAssignment?.closed)) {
+    guideLines = TARGET_GUIDE_LINES[TARGET_GUIDE_KEY.CLOSED];
+  } else if (isTarget && [TARGET_STATE.HOLD, TARGET_STATE.REFUSED].includes(targetState)) {
+    guideLines = TARGET_GUIDE_LINES[TARGET_GUIDE_KEY.HOLD];
+  }
+  const assignments = [...(raw.assignments ?? [])].sort((a, b) => a.order - b.order);
+  const deadlineHours = raw.responseDeadlineHours ?? DUE_DATE_DEFAULT_MINUTES / 60;
+  const initialDueDate = {
+    days: String(Math.floor(deadlineHours / 24)),
+    hours: String(deadlineHours % 24),
+    minutes: "0",
+  };
+  const footerConfig = isRequester ? getRequesterFooter(actions)
+    : isAssignee ? getAssigneeFooter(actions)
+      : canRespond ? TARGET_FOOTER_CONFIG[targetFooterKey] : null;
+
+  return {
+    role,
+    situation: raw.situation,
+    situationId: raw.situation?.situationId ?? "",
+    requestId: raw.requestId ?? "",
+    requestState: raw.status ?? "",
+    displayStatus: raw.displayStatus ?? "",
+    stepState: [DISPLAY_STATUS.WAITING, DISPLAY_STATUS.NO_ASSIGNEE].includes(raw.displayStatus)
+      ? REQUEST_STATE.REQUESTED : raw.displayStatus ?? raw.status ?? "",
+    requestType: HELP_TYPE_LABELS[raw.helpType] ?? "",
+    userName: (isRequester ? raw.currentAssignment?.target?.name : raw.requester?.name) ?? "",
+    userId: raw.currentAssignment?.target?.userId ?? "",
+    message: raw.description ?? "",
+    dueDate: (isRequester ? raw.currentAssignment?.responseDeadline : raw.myAssignment?.responseDeadline) ?? "",
+    initialDueDate,
+    infoList: [
+      { icon: iconDate, label: "시간", value: raw.startsAt && raw.endsAt
+        ? formatCompactDateTimeRange(raw.startsAt, raw.endsAt) : "" },
+      { icon: iconLocation, label: "장소", value: raw.place ?? "" },
+    ],
+    userList: assignments.map((assignment, index) => ({
+      order: assignment.order,
+      userName: assignment.target?.name ?? "",
+      state: getOrderState(assignment, raw, index, assignments.length),
+    })),
+    flags,
+    notices: isRequester ? getRequesterNotices(raw, flags) : [],
+    notice,
+    footerConfig,
+    orderTitle: isAssignedNoti || [REQUEST_STATE.CANCELED, REQUEST_STATE.EXPIRED].includes(raw.status)
+      ? REQUESTER_ORDER_TITLE.ASK_OTHER : REQUESTER_ORDER_TITLE.DEFAULT,
+    userStateText: isDoneState ? REQUESTER_USER_STATE_TEXT.DONE : REQUESTER_USER_STATE_TEXT.EDIT_PENDING,
+    safetyInformation: ASSIGNEE_SAFETY_INFORMATION[raw.status] ?? "",
+    guideLines,
+  };
+};
+
+export const getAssigneeReconfirmService = (raw) => {
+  const before = raw?.latestProposal?.before;
+  const after = raw?.latestProposal?.after;
+
+  return {
+    situationId: raw?.situation?.situationId ?? raw?.situationId ?? "",
+    requestId: raw?.requestId ?? "",
+    proposalId: raw?.latestProposal?.proposalId ?? "",
+    userName: raw?.requester?.name ?? "",
+    requestType: HELP_TYPE_LABELS[raw?.helpType] ?? "",
+
+    // 변경 전 일정, 장소, 정보
+    beforeInfoList: [
+      {
+        icon: iconDate,
+        label: "일정",
+        value: formatShortDateTimeRange(before?.startsAt, before?.endsAt),
+      },
+      { icon: iconLocation, label: "장소", value: before?.place ?? "" },
+      { icon: iconHealthy, label: "정보", value: before?.informations?.map((item) => item.name).join(", ") ?? before?.information ?? "" },
+    ],
+
+    // 변경 후 일정, 장소, 정보
+    afterInfoList: [
+      {
+        icon: iconDate,
+        label: "일정",
+        value: formatShortDateTimeRange(after?.startsAt, after?.endsAt),
+      },
+      { icon: iconLocation, label: "장소", value: after?.place ?? "" },
+      { icon: iconHealthy, label: "정보", value: after?.informations?.map((item) => item.name).join(", ") ?? after?.information ?? "" },
+    ],
+  };
+};
+
+export const getReceivedInfoService = (raw) => {
+  const isAccessible = Boolean(raw?.accessible);
+
+  return {
+    requestId: raw?.requestId ?? "",
+    isAccessible,
+
+    // 접근 기한 (볼 수 없을 때도 접근 종료 화면에 표시)
+    dueDate: raw?.accessUntil
+      ? `~ ${formatPaddedShortDateTime(raw.accessUntil)} (종료 시점)`
+      : "",
+
+    // 접근 종료 화면 문구 (볼 수 있으면 "")
+    unavailableMessage: isAccessible
+      ? ""
+      : getReceivedInfoUnavailableMessage(raw?.unavailableReason),
+
+    // 분류별 항목 -> SafetyCardDetail props
+    safetyCardDetails: (raw?.categories ?? []).map((category) => ({
+      title: category.categoryName,
+      cardList: (category.items ?? []).map((item) => ({
+        id: item.informationId,
+        cardTitle: getReceivedInfoCardTitle(item),
+        isSensitive: Boolean(item.sensitive),
+        firstInfo: getReceivedInfoValue(item.informationValue),
+        secondInfo: getReceivedInfoBadgeText(item),
+      })),
+    })),
+  };
+};
+
+export const getEditFormService = (raw) => {
+  const isEditing = raw?.isEditing ?? false;
+  const draft = raw?.draft;
+
+  return {
+    situationId: raw?.situationId ?? "",
+    requestId: raw?.requestId ?? "",
+    isEditing,
+    userName: raw?.userName ?? "",
+    dueDate: raw?.dueDate ?? "",
+    sections: getInfoPreviewService(draft?.sharedInfo).sections,
+    initialRequestForm:
+      isEditing && draft
+        ? {
+            startDateTime: draft.startAt,
+            endDateTime: draft.endAt,
+            location: draft.location,
+          }
+        : {},
+  };
+};
+
+export const getEditCheckService = (raw) => ({
+  situationId: raw?.situationId ?? "",
+  requestId: raw?.requestId ?? "",
+  isConfirmRequired: raw?.isAccepted ?? false,
+  userName: raw?.userName ?? "",
+  userPart: raw?.userPart ?? "",
+  beforeInfoList: [
+    { icon: iconDate, label: "일정", value: raw?.beforeInfo?.time ?? "" },
+    {
+      icon: iconLocation,
+      label: "장소",
+      value: raw?.beforeInfo?.location ?? "",
+    },
+    { icon: iconHealthy, label: "정보", value: raw?.beforeInfo?.message ?? "" },
+  ],
+  afterInfoList: [
+    { icon: iconDate, label: "일정", value: raw?.afterInfo?.time ?? "" },
+    {
+      icon: iconLocation,
+      label: "장소",
+      value: raw?.afterInfo?.location ?? "",
+    },
+    { icon: iconHealthy, label: "정보", value: raw?.afterInfo?.message ?? "" },
+  ],
+});
+
+export const getAskAgainService = (raw) => {
+  const summary = raw?.lastReqSummary;
+
+  return {
+    situationId: raw?.situationId ?? "",
+    requestId: raw?.requestId ?? "",
+    reqType: summary?.type ?? "",
+    reqMsg: summary?.message ?? "",
+    startAt: summary?.startAt ?? null,
+
+    // [이전 요청 내용]의 시간/장소/정보
+    infoList: [
+      { icon: iconDate, label: "일정", value: summary?.time ?? "" },
+      { icon: iconLocation, label: "장소", value: summary?.location ?? "" },
+      { icon: iconHealthy, label: "정보", value: summary?.info ?? "" },
+    ],
+
+    // [대상 이력] 목록 매핑
+    userRecord:
+      raw?.userRecord?.map((user) => ({
+        name: user.name,
+        part: user.part,
+        state: user.state,
+      })) || [],
+
+    // [새 요청 대상] 목록 매핑
+    userLst:
+      raw?.userLst?.map((user) => ({
+        id: user.id,
+        userName: user.userName,
+        isGuardian: user.isGuardian,
+      })) || [],
   };
 };

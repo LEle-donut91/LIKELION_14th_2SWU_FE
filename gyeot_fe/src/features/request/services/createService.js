@@ -6,7 +6,7 @@ import { CHECK_ITEM_ID } from "@/features/request/constants/requestConstants";
  * - post/get/patch/delete + 요청 내용 + Api
  * - 조회 후 데이터 가공
  * - 폼 제출 전 데이터 가공
- * - getInfoPreviewService는 requesterService.js의 getEditFormService에서 재사용 ([H-03-01-02] 요청 수정 · 취소)
+ * - getInfoPreviewService는 getService.js의 getEditFormService에서 재사용 ([H-03-01-02] 요청 수정 · 취소)
  * =======================================================================================================================
  */
 
@@ -35,26 +35,6 @@ export const getReqFormService = (raw) => {
       })) || [],
   };
 };
-
-// TODO: API 연동 로직 수정 필요
-// [H-03-02] 요청 작성 - 폼 제출 전 데이터 가공
-export const postReqFormService = (raw) => ({
-  situationId: raw.situationId,
-  targetUserId: raw.userId,
-  helpType: raw.helpType,
-  startAt: raw.startDateTime,
-  endAt: raw.endDateTime,
-  location: raw.location,
-  content: raw.content,
-  responseDue: raw.dueDate,
-});
-
-// TODO: API 연동 로직 수정 필요
-// [H-03-02] 요청 작성 - 폼 제출 후 데이터 가공
-export const postReqFormIdService = (raw) => ({
-  reqId: raw.requestId,
-  msg: raw.message,
-});
 
 /**
  * =====================================================================
@@ -204,16 +184,3 @@ export const getInfoPreviewService = (raw) => {
     },
   };
 };
-
-// TODO: API 연동 로직 수정 필요
-// [H-03-02-01] 공개 정보 미리보기 - 제출 전 데이터 가공
-// form: { basicInfo: [...ids], healthInfo: [...], lifeInfo: [...], messageInfo: [...] }
-export const postInfoPreviewService = (tempId, form) => ({
-  tempId,
-  sharedInfo: {
-    basicInfo: form.basicInfo,
-    healthInfo: form.healthInfo,
-    lifeInfo: form.lifeInfo,
-    messageInfo: form.messageInfo,
-  },
-});
