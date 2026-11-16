@@ -45,7 +45,7 @@ import {
   formatFullKoreanDate,
 } from "@/shared/utils/dateFormat";
 
-import { formatLocalDateTime, toDateFromInput } from "@/features/request/utils/dateFormat";
+import { toDateFromInput } from "@/features/request/utils/dateFormat";
 
 import { ISO_DATE_ONLY } from "@/shared/constants/dateTimeConstants";
 /**
@@ -56,18 +56,6 @@ import { ISO_DATE_ONLY } from "@/shared/constants/dateTimeConstants";
 
 // 1자리 숫자 앞에 0 붙이기 (예: 1 -> "01")
 export const padTimeUnit = (num) => String(num).padStart(2, "0");
-
-// 선택한 상황과 이전 화면의 전달값으로 요청 폼 초기값을 구성한다.
-export const getRequestInitialValues = (situations, situationId, userId, dueDate) => {
-  const selectedSituation = getSelectedSituation(situations, situationId);
-  return {
-    situationId,
-    situationStartDate: selectedSituation?.startDate ?? null,
-    situationEndDate: selectedSituation?.endDate ?? null,
-    ...(userId && { userId }),
-    ...(dueDate && { dueDate }),
-  };
-};
 
 // "HH:MM:SS" -> 초 단위 총합 (비어있거나 숫자가 아니면 0 취급)
 export const parseTimeToSeconds = (timeStr = "") => {
@@ -615,9 +603,3 @@ export const normalizeResponseDeadline = (form, now = new Date()) => {
   }
   return { form, message: null };
 };
-
-export const toLocalDateTime = (value) => {
-  const date = toDateFromInput(value);
-  return date ? formatLocalDateTime(date) : null;
-};
-

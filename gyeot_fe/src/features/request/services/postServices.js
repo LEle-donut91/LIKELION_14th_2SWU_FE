@@ -1,13 +1,16 @@
-import { normalizeResponseDeadline, toLocalDateTime, toMinutes } from "@/features/request/utils/requestUtils";
+import { normalizeResponseDeadline, toMinutes } from "@/features/request/utils/requestUtils";
+import { formatLocalDateTime, toDateFromInput } from "@/features/request/utils/dateFormat";
 
 // 도움 요청 생성 API 관련
 export const postCareRequestService = (requestForm, now = new Date()) => {
   const { form } = normalizeResponseDeadline(requestForm, now);
+  const start = toDateFromInput(form.startDateTime);
+  const end = toDateFromInput(form.endDateTime);
   return {
     situationId: Number(form.situationId),
     helpType: form.helpType,
-    startsAt: toLocalDateTime(form.startDateTime),
-    endsAt: toLocalDateTime(form.endDateTime),
+    startsAt: start ? formatLocalDateTime(start) : null,
+    endsAt: end ? formatLocalDateTime(end) : null,
     place: form.location,
     description: form.content ?? "",
     targetUserId: Number(form.userId),

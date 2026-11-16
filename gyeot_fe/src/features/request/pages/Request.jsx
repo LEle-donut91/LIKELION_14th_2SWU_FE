@@ -32,7 +32,6 @@ import { REQUEST_QUERY_KEYS } from "@/features/request/constants/requestQueryKey
 
 // Utils
 import {
-  getRequestInitialValues,
   getSelectedSituationText,
   getSelectedUserText,
   getDateTimeText,
@@ -91,10 +90,14 @@ function Request() {
 
   useState(() => {
     if (entryId !== paramId) {
-      initForm(
-        paramId,
-        getRequestInitialValues(situation, paramId, passedUserId, passedDueDate),
-      );
+      const selectedSituation = getSelectedSituation(situation, paramId);
+      initForm(paramId, {
+        situationId: paramId,
+        situationStartDate: selectedSituation?.startDate ?? null,
+        situationEndDate: selectedSituation?.endDate ?? null,
+        ...(passedUserId && { userId: passedUserId }),
+        ...(passedDueDate && { dueDate: passedDueDate }),
+      });
     }
   });
 
