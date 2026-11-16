@@ -3,7 +3,8 @@ import { REQUEST_ACTION } from "@/features/request/constants/enumConstants";
 export const FOOTER_ACTIONS = {
   edit: REQUEST_ACTION.EDIT,
   askAgain: REQUEST_ACTION.REASSIGN,
-  withdraw: REQUEST_ACTION.WITHDRAW_PROPOSAL,
+  withdraw: REQUEST_ACTION.WITHDRAW,
+  withdrawProposal: REQUEST_ACTION.WITHDRAW_PROPOSAL,
   done: REQUEST_ACTION.COMPLETE,
   sameRequest: REQUEST_ACTION.DUPLICATE,
   checkChange: REQUEST_ACTION.ACCEPT_PROPOSAL,
@@ -43,7 +44,7 @@ export const REQUESTER_FOOTER_CONFIG = {
     rightType: "secondary",
     leftTitle: "수정 철회",
     rightTitle: "수정",
-    leftAction: "withdraw",
+    leftAction: "withdrawProposal",
     rightAction: "edit",
   },
   [REQUESTER_FOOTER_KEY.DONE]: {

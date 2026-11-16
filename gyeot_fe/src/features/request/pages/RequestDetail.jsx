@@ -19,6 +19,7 @@ import {
   postStartApi,
   postDoneApi,
   postAcceptWithdrawApi,
+  postEditWithdrawApi,
   postResponseApi,
 } from "@/features/request/api/postApi";
 
@@ -80,6 +81,14 @@ function RequestDetail() {
     },
   });
 
+  const { mutate: withdrawProposal, isPending: isWithdrawingProposal } = useMutation({
+    mutationFn: postEditWithdrawApi,
+    onSuccess: () => refetch(),
+    onError: (error) => {
+      showToast(getErrorMessage(error));
+    },
+  });
+
   const { mutate: startCare, isPending: isStarting } = useMutation({
     mutationFn: postStartApi,
     onSuccess: () => refetch(),
@@ -105,7 +114,7 @@ function RequestDetail() {
   });
 
   const {
-    situationId, stepState, userName, userId, requestType, message,
+    situationId, proposalId, stepState, userName, userId, requestType, message,
     dueDate, initialDueDate, infoList, userList, flags = {}, notices = [],
     notice, footerConfig, role, orderTitle, userStateText, safetyInformation,
     guideLines = [],
@@ -123,6 +132,10 @@ function RequestDetail() {
     edit: () => handleGoNext(REQUEST_ROUTES.editForm(paramId)),
     askAgain: () => handleGoNext(REQUEST_ROUTES.askAgain(paramId)),
     withdraw: () => setWithdrawModalOpen(true),
+    withdrawProposal: () => {
+      if (isWithdrawingProposal || !proposalId) return;
+      withdrawProposal({ requestId: paramId, proposalId });
+    },
     done: () => {
       if (isStarting || isCompleting) return;
       completeCare(paramId);

@@ -44,6 +44,14 @@ export const postCancelApi = async (requestId) => {
   return response.data;
 };
 
+// 수정안 철회 API (요청자 뷰)
+export const postEditWithdrawApi = async ({ requestId, proposalId }) => {
+  const response = await axiosInstance.post(
+    REQUEST_API_URLS.editWithdraw(requestId, proposalId),
+  );
+  return response.data;
+};
+
 // TODO: API 연동 로직 수정 필요
 // [N-05] 변경 내용 확인 - "확인" (수정안 수락)
 export const postAssigneeReconfirmAcceptApi = (requestId, proposalId) => {

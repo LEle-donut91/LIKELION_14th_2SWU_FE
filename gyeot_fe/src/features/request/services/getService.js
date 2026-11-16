@@ -157,6 +157,7 @@ export const getRequestDetailService = (response = {}) => {
     situation: raw.situation,
     situationId: raw.situation?.situationId ?? "",
     requestId: raw.requestId ?? "",
+    proposalId: raw.latestProposal?.proposalId ?? "",
     requestState: raw.status ?? "",
     displayStatus: raw.displayStatus ?? "",
     stepState: [DISPLAY_STATUS.WAITING, DISPLAY_STATUS.NO_ASSIGNEE].includes(raw.displayStatus)
