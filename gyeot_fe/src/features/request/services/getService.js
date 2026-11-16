@@ -190,7 +190,8 @@ export const getRequestDetailService = (response = {}) => {
   };
 };
 
-export const getAssigneeReconfirmService = (raw) => {
+export const getAssigneeReconfirmService = (response = {}) => {
+  const raw = response?.data ?? response ?? {};
   const before = raw?.latestProposal?.before;
   const after = raw?.latestProposal?.after;
 
@@ -206,7 +207,8 @@ export const getAssigneeReconfirmService = (raw) => {
       {
         icon: iconDate,
         label: "일정",
-        value: formatShortDateTimeRange(before?.startsAt, before?.endsAt),
+        value: before?.startsAt && before?.endsAt
+          ? formatShortDateTimeRange(before.startsAt, before.endsAt) : "",
       },
       { icon: iconLocation, label: "장소", value: before?.place ?? "" },
       { icon: iconHealthy, label: "정보", value: before?.informations?.map((item) => item.name).join(", ") ?? before?.information ?? "" },
@@ -217,7 +219,8 @@ export const getAssigneeReconfirmService = (raw) => {
       {
         icon: iconDate,
         label: "일정",
-        value: formatShortDateTimeRange(after?.startsAt, after?.endsAt),
+        value: after?.startsAt && after?.endsAt
+          ? formatShortDateTimeRange(after.startsAt, after.endsAt) : "",
       },
       { icon: iconLocation, label: "장소", value: after?.place ?? "" },
       { icon: iconHealthy, label: "정보", value: after?.informations?.map((item) => item.name).join(", ") ?? after?.information ?? "" },

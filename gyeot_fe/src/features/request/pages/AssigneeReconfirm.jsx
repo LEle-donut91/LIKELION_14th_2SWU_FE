@@ -8,7 +8,8 @@
 import styles from "@/features/request/pages/AssigneeReconfirm.module.css";
 
 // 일반 라이브러리
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 
 // icons/images
@@ -16,13 +17,16 @@ import iconToggle from "@/shared/assets/icons/iconToggle.svg";
 
 // Custom Hooks
 import { useRequestNav } from "@/features/request/hooks/useRequestNav";
+import { useToast } from "@/features/request/hooks/useToast";
+import { getErrorMessage } from "@/shared/utils/apiError";
 
 // Constants
 import { REQUEST_ROUTES } from "@/features/request/constants/routerConstants";
+import { REQUEST_QUERY_KEYS } from "@/features/request/constants/requestQueryKeys";
 
 // API, Services
 import {
-  getAssigneeReconfirmApi,
+  getRequestDetailApi,
 } from "@/features/request/api/getApi";
 import {
   postAssigneeReconfirmAcceptApi,
@@ -35,6 +39,7 @@ import SubpageHeader from "@/shared/components/subpage-header/SubpageHeader";
 import SmallFooter from "@/shared/components/SmallFooter/SmallFooter";
 import RequestSummary from "@/features/request/components/Request/RequestSummary";
 import DefaultModal from "@/shared/components/DefaultModal/DefaultModal";
+import DefaultToast from "@/shared/components/Toast/DefaultToast";
 
 function AssigneeReconfirm() {
   const paramId = useParams().id; // path parameter (요청 ID)
@@ -42,23 +47,33 @@ function AssigneeReconfirm() {
 
   const [isModalOpen, setModalOpen] = useState(false); // "변경 내용 거절" 모달
 
-  // TODO: API 연동 시 useEffect로 교체 (지금은 mock 이라 렌더마다 호출돼도 문제 없음)
-  // [N-05] 변경 내용 확인 - 데이터 조회 (가공은 service에서 처리)
+  const { toast, showToast, hideToast } = useToast();
+  const { data: detail, isPending, error } = useQuery({
+    queryKey: REQUEST_QUERY_KEYS.detail(paramId),
+    queryFn: () => getRequestDetailApi(paramId),
+    select: getAssigneeReconfirmService,
+    enabled: Boolean(paramId),
+  });
+
+  useEffect(() => {
+    if (!error) return;
+    showToast(getErrorMessage(error));
+  }, [error, showToast]);
+
   const { proposalId, userName, requestType, beforeInfoList, afterInfoList } =
-    useMemo(
-      () => getAssigneeReconfirmService(getAssigneeReconfirmApi(paramId)),
-      [paramId],
-    );
+    detail ?? {};
 
   // TODO: API 연동 시 응답의 isSuccess 확인 후 이동 처리
   // [Footer의 확인 버튼] 클릭 이벤트 핸들러
   const handleConfirmBtnClick = () => {
+    if (!proposalId) return;
     postAssigneeReconfirmAcceptApi(paramId, proposalId);
     handleGoBack();
   };
 
   // [모달의 거절 버튼] 클릭 이벤트 핸들러
   const handleRejectConfirm = () => {
+    if (!proposalId) return;
     postAssigneeReconfirmRejectApi(paramId, proposalId);
     setModalOpen(false);
     handleGoNext(REQUEST_ROUTES.home, true);
@@ -69,6 +84,13 @@ function AssigneeReconfirm() {
       {/* 헤더 (닫기 버튼이 있는 컴포넌트) */}
       <SubpageHeader hasBackButton={false} hasCloseButton title="변경 내용 확인" onCloseClick={() => handleGoBack()} />
 
+      {isPending && (
+        <div className={styles.content}>
+          <p role="status">요청 정보를 불러오는 중이에요.</p>
+        </div>
+      )}
+      {detail && (
+        <>
       {/* 메인 컨텐츠 */}
       <main className={styles.content}>
         {/* 요청자 정보 카드 */}
@@ -108,13 +130,13 @@ function AssigneeReconfirm() {
       </main>
 
       {/* 하단 Footer */}
-      <SmallFooter
+      {proposalId && <SmallFooter
         leftType="tertiary"
         leftTitle="거절"
         rightTitle="확인"
         leftOnClick={() => setModalOpen(true)}
         rightOnClick={handleConfirmBtnClick}
-      />
+      />}
 
       {/* 변경 내용 거절 */}
       <DefaultModal
@@ -132,6 +154,15 @@ function AssigneeReconfirm() {
         confirmTxt="거절"
         onConfirmClick={handleRejectConfirm}
       />
+        </>
+      )}
+      {toast && (
+        <DefaultToast
+          key={toast.id}
+          message={toast.message}
+          onHide={hideToast}
+        />
+      )}
     </div>
   );
 }
