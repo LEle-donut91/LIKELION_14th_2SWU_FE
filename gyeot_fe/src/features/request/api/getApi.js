@@ -1,11 +1,9 @@
-import getAssigneeMock from "@/features/request/mock/RequestDetail/getAssigneeMock";
 import getAssigneeReconfirmMock from "@/features/request/mock/AssigneeReconfirm/getAssigneeReconfirmMock";
 import getReceivedInfoMock from "@/features/request/mock/ReceivedInfo/getReceivedInfoMock";
 import getEditFormMock from "@/features/request/mock/RequestEdit/getEditFormMock";
 import getEditCheckMock from "@/features/request/mock/RequestEdit/getEditCheckMock";
 import getAskAgainMock from "@/features/request/mock/AskAgain/getAskAgainMock";
 import getRequesterMock from "@/features/request/mock/RequestDetail/getRequesterMock";
-import getTargetMock from "@/features/request/mock/RequestDetail/getTargetMock";
 import { REQUEST_API_URLS, INFO_SHARE_API_URLS } from "@/shared/constants/apiUrlConstants";
 import { axiosInstance } from "@/shared/api/axiosInstance";
 
@@ -26,12 +24,11 @@ export const getInformationOptionsApi = async ({ helpType, requestId }) => {
 };
 
 // TODO: API 연동 로직 수정 필요
-// [H-03-01] 요청 상세(담당자 뷰) - 데이터 조회
-// 응답: "도움 요청 상세 조회" API의 data (viewerRole = ASSIGNEE)
-// - 실제 연동 시 envelope({ status, code, message, data })에서 data만 반환할 것
-export const getAssigneeApi = (requestId) => {
-  console.log("담당자 데이터 조회:", requestId);
-  return getAssigneeMock;
+// 요청 상세 조회. 응답의 viewerRole로 화면을 결정한다.
+// 현재는 요청자 mock을 사용하며, 실제 연동 시 서버의 상세 응답을 반환한다.
+export const getRequestDetailApi = (requestId) => {
+  console.log("요청 상세 조회:", requestId);
+  return getRequesterMock;
 };
 
 // TODO: API 연동 로직 수정 필요
@@ -72,19 +69,4 @@ export const getEditCheckApi = (requestId) => {
 export const getAskAgainApi = (requestId) => {
   console.log(requestId);
   return getAskAgainMock;
-};
-
-// TODO: API 연동 로직 수정 필요
-// [H-03-01] 요청 상세(요청자 뷰) - 데이터 조회
-// Returns the shared request detail data (viewerRole = REQUESTER).
-export const getRequesterApi = (requestId) => {
-  console.log("요청자 데이터 조회:", requestId);
-  return getRequesterMock;
-};
-
-// TODO: API 연동 로직 수정 필요
-// 요청 상세(대상자 뷰) - 데이터 조회
-export const getTargetApi = (requestId) => {
-  console.log("대상자 데이터 조회:", requestId);
-  return getTargetMock;
 };

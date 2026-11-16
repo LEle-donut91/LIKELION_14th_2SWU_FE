@@ -21,9 +21,7 @@ export const REQUEST_ROUTES = {
 
   // 요청 ID
   send: (id) => `/request/send/${id}`,
-  assignee: (id) => `/request/assignee/${id}`,
-  requester: (id) => `/request/requester/${id}`,
-  target: (id) => `/request/target/${id}`,
+  detail: (id) => `/request/detail/${id}`,
   receivedInfo: (id) => `/request/received-info/${id}`,
   editForm: (id) => `/request/edit-form/${id}`,
   editCheck: (id) => `/request/edit-check/${id}`,

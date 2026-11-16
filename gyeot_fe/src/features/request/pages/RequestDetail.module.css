@@ -22,7 +22,7 @@
   margin-bottom: 16px;
 }
 
-.dueDateContainer {
+.requester .dueDateContainer {
   margin-top: 16px;
 }
 
@@ -66,4 +66,29 @@
   position: relative;
   width: 240px;
   height: 192px;
+}
+
+.assignee .content,
+.target .content {
+  gap: 16px;
+}
+
+.assignee .content {
+  flex: 1;
+}
+
+.assignee .stepContainer {
+  margin-bottom: 32px;
+}
+
+.doneNotice {
+  margin-top: 48px;
+  text-align: center;
+  color: var(--color-gray-700);
+}
+
+.guideTxt {
+  color: var(--color-gray-700);
+  text-align: center;
+  margin-top: 32px;
 }
