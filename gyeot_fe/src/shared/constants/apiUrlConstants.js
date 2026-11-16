@@ -30,4 +30,5 @@ export const REQUEST_API_URLS = {
 // D. 안심카드·정보 공유
 export const INFO_SHARE_API_URLS = {
   sharingOptions: "/api/safety-information/sharing-options", // 공개 항목 선택지 조회
+  sharedInformation: (requestId) => `/api/care-requests/${requestId}/shared-information`, // 전달받은 정보 조회
 }

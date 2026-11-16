@@ -1,5 +1,3 @@
-import getAssigneeReconfirmMock from "@/features/request/mock/AssigneeReconfirm/getAssigneeReconfirmMock";
-import getReceivedInfoMock from "@/features/request/mock/ReceivedInfo/getReceivedInfoMock";
 import getEditFormMock from "@/features/request/mock/RequestEdit/getEditFormMock";
 import getEditCheckMock from "@/features/request/mock/RequestEdit/getEditCheckMock";
 import getAskAgainMock from "@/features/request/mock/AskAgain/getAskAgainMock";
@@ -28,21 +26,10 @@ export const getRequestDetailApi = async (requestId) => {
   return response.data;
 };
 
-// TODO: API 연동 로직 수정 필요
-// [N-05] 변경 내용 확인 - 데이터 조회
-// 응답: "도움 요청 상세 조회" API의 data (viewerRole = ASSIGNEE, latestProposal 포함)
-export const getAssigneeReconfirmApi = (requestId) => {
-  console.log("변경 내용 조회:", requestId);
-  return getAssigneeReconfirmMock;
-};
-
-// TODO: API 연동 로직 수정 필요
-// [H-03-01-01] 전달받은 정보 - 데이터 조회
-// - 실제 연동 시 envelope({ status, code, message, data })에서 data만 반환할 것
-// - 404 SHARED_INFO_NOT_FOUND: 오류 문구를 띄우고 이전 화면으로 돌아갈 것
-export const getReceivedInfoApi = (requestId) => {
-  console.log("전달받은 정보 조회:", requestId);
-  return getReceivedInfoMock;
+// 전달받은 정보 조회 API
+export const getReceivedInfoApi = async (requestId) => {
+  const response = await axiosInstance.get(INFO_SHARE_API_URLS.sharedInformation(requestId));
+  return response.data;
 };
 
 // TODO: API 연동 로직 수정 필요

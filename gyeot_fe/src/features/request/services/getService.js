@@ -229,7 +229,8 @@ export const getAssigneeReconfirmService = (response = {}) => {
   };
 };
 
-export const getReceivedInfoService = (raw) => {
+export const getReceivedInfoService = (response = {}) => {
+  const raw = response?.data ?? response ?? {};
   const isAccessible = Boolean(raw?.accessible);
 
   return {

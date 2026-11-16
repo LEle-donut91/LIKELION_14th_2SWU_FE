@@ -509,18 +509,17 @@ export const RECEIVED_INFO_BADGE_TEXT = {
 };
 
 // 접근 종료 화면 문구 (unavailableReason별)
-// 와이어프레임 문구 외의 사유는 임의로 작성 (TODO: 기획/디자인 확정 시 수정)
 export const RECEIVED_INFO_UNAVAILABLE_MESSAGE = {
-  [UNAVAILABLE_REASON.NOT_ACCEPTED]: "수락한 이후 확인할 수 있어요.",
+  [UNAVAILABLE_REASON.NOT_ACCEPTED]: "요청을 수락해야 확인할 수 있어요.",
   [UNAVAILABLE_REASON.REQUEST_COMPLETED]: "요청을 완료하여 접근이 종료됐어요.",
   [UNAVAILABLE_REASON.REQUEST_ENDED_BY_TIME]:
-    "요청 종료 시각이 지나 접근이 종료됐어요.",
+    "요청을 완료하여 접근이 종료됐어요.",
   [UNAVAILABLE_REASON.REQUEST_CANCELED]: "요청이 취소되어 접근이 종료됐어요.",
-  [UNAVAILABLE_REASON.REQUEST_EXPIRED]: "요청이 만료되어 접근이 종료됐어요.",
+  [UNAVAILABLE_REASON.REQUEST_EXPIRED]: "요청에 대한 접근이 불가능해요.",
   [UNAVAILABLE_REASON.ASSIGNMENT_CLOSED]:
-    "담당자 지정이 해제되어 접근이 종료됐어요.",
+    "요청에 대한 접근이 불가능해요.",
   [UNAVAILABLE_REASON.OWNER_REVOKED]:
-    "정보 주인이 공유를 철회하여 접근이 종료됐어요.",
+    "요청에 대한 접근이 불가능해요.",
 };
 
 // 알 수 없는 사유일 때 기본 문구

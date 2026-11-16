@@ -13,4 +13,7 @@ export const REQUEST_QUERY_KEYS = {
 
   // 도움 요청 상세 조회 (GET)
   detail: (requestId) => ["requestDetail", String(requestId)],
+
+  // 전달받은 정보 조회 (GET)
+  receivedInfo: (requestId) => ["requestReceivedInfo", String(requestId)],
 };
