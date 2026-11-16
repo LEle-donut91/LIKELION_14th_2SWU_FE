@@ -109,8 +109,8 @@ function AskAgain() {
 
   useEffect(() => {
     if (!initialForm || entryId === formEntryId) return;
-    initForm(formEntryId, initialForm);
-  }, [initialForm, entryId, formEntryId, initForm]);
+    initForm(formEntryId, { ...initialForm, reassignRequestId: Number(paramId) });
+  }, [initialForm, entryId, formEntryId, initForm, paramId]);
 
 
   // 열려 있는 시트 (한 번에 하나만 열림)

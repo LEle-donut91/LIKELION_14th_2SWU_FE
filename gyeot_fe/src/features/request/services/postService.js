@@ -35,11 +35,19 @@ export const postEditFormService = (requestId, requestForm, checkForm) => ({
   },
 });
 
-export const postAskAgainService = (requestId, form) => ({
-  requestId,
-  targetUserId: form.userId,
-  responseDue: form.dueDate ?? null,
-});
+export const postAskAgainService = (requestForm, now = new Date()) => {
+  const { form } = normalizeResponseDeadline(requestForm, now);
+  return {
+    requestId: form.reassignRequestId,
+    payload: {
+      targetUserId: Number(form.userId),
+      ...(form.dueDate !== null && {
+        responseDeadlineHours: toMinutes(form.dueDate) / 60,
+      }),
+      informationIds: [...new Set((form.informationIds ?? []).map(Number))],
+    },
+  };
+};
 
 export const postAskAgainIdService = (raw) => ({
   tempId: raw.tempId,

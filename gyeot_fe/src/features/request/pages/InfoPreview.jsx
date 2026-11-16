@@ -39,8 +39,8 @@ import {
   getRequestTargetsService,
   getInformationOptionsService,
 } from "@/features/request/services/getService";
-import { postCareRequestApi } from "@/features/request/api/postApi";
-import { postCareRequestService, postCareRequestResultService } from "@/features/request/services/postService";
+import { postCareRequestApi, postAskAgainApi } from "@/features/request/api/postApi";
+import { postCareRequestService, postCareRequestResultService, postAskAgainService } from "@/features/request/services/postService";
 
 // 일반 Components
 import SubpageHeader from "@/shared/components/subpage-header/SubpageHeader";
@@ -58,6 +58,7 @@ function InfoPreview() {
   const { handleGoNext, handleGoBack } = useRequestNav(); // useNavigation 커스텀 훅의 함수
   const { toast, showToast, hideToast } = useToast(); // 토스트 메시지
   const { form: requestForm, setForm, resetForm } = useRequestFormStore((state) => state); // 요청 작성 폼 상태 관리
+  const { reassignRequestId } = requestForm;
 
   // 요청 대상 후보 조회 (요청 작성 시 선택한 대상)
   const {
@@ -78,14 +79,17 @@ function InfoPreview() {
     showToast(getErrorMessage(targetsError));
   }, [targetsError, showToast]);
 
-  // 공개 항목 선택지 조회 (새 요청이므로 requestId는 전달하지 않음)
+  // 도움 종류로 조회하고, 다시 부탁하기에서는 기존 요청 ID도 전달
   const {
     data: informationOptions,
     isPending: isInformationPending,
     error: informationError,
   } = useQuery({
-    queryKey: REQUEST_QUERY_KEYS.informationOptions(requestForm.helpType),
-    queryFn: () => getInformationOptionsApi({ helpType: requestForm.helpType }),
+    queryKey: REQUEST_QUERY_KEYS.informationOptions(requestForm.helpType, reassignRequestId),
+    queryFn: () => getInformationOptionsApi({
+      helpType: requestForm.helpType,
+      ...(reassignRequestId && { requestId: reassignRequestId }),
+    }),
     enabled: Boolean(requestForm.helpType),
   });
   const {
@@ -138,7 +142,9 @@ function InfoPreview() {
 
   // [H-03-02-01] 공개 정보 제출 후 [요청 완료] 페이지로 이동
   const { mutate: sendRequest, isPending: isSending } = useMutation({
-    mutationFn: (form) => postCareRequestApi(postCareRequestService(form)),
+    mutationFn: (form) => form.reassignRequestId
+      ? postAskAgainApi(postAskAgainService(form))
+      : postCareRequestApi(postCareRequestService(form)),
     onSuccess: (data) => {
       const { requestId } = postCareRequestResultService(data);
       resetForm();

@@ -3,6 +3,7 @@
  * 입력 Form 초기값 설정
  */
 export const INITIAL_FORM = {
+  reassignRequestId: null,
   situationId: null,
   situationStartDate: null,
   situationEndDate: null,

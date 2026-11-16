@@ -1,6 +1,5 @@
 import postEditFormMock from "@/features/request/mock/RequestEdit/postEditFormMock";
 import postEditReconfirmMock from "@/features/request/mock/RequestEdit/postEditReconfirmMock";
-import postAskAgainMock from "@/features/request/mock/AskAgain/postAskAgainMock";
 import { axiosInstance } from "@/shared/api/axiosInstance";
 import { REQUEST_API_URLS } from "@/shared/constants/apiUrlConstants";
 
@@ -80,9 +79,8 @@ export const postEditReconfirmApi = (payload) => {
   return postEditReconfirmMock;
 };
 
-// TODO: API 연동 로직 수정 필요
-// [N-06] 다시 부탁하기 - 폼 제출
-export const postAskAgainApi = (payload) => {
-  console.log("전송한 Payload:", payload);
-  return postAskAgainMock;
+// 다시 부탁하기 - 새 대상 지정
+export const postAskAgainApi = async ({ requestId, payload }) => {
+  const response = await axiosInstance.post(REQUEST_API_URLS.assignments(requestId), payload);
+  return response.data;
 };
