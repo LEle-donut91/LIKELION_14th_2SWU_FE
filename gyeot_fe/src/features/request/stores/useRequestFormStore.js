@@ -14,10 +14,16 @@ export const useRequestFormStore = create((set) => ({
     }),
 
   // 상황 변경 (URL :id 교체와 짝). 이전 요청 대상은 해제
-  changeSituation: (situationId) =>
+  changeSituation: ({ id, startDate, endDate }) =>
     set((state) => ({
-      entryId: situationId,
-      form: { ...state.form, situationId, userId: null },
+      entryId: id,
+      form: {
+        ...state.form,
+        situationId: id,
+        situationStartDate: startDate,
+        situationEndDate: endDate,
+        userId: null,
+      },
     })),
 
   // useState의 setForm처럼 값 또는 updater 함수를 받음

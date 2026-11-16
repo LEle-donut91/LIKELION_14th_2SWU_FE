@@ -1,3 +1,4 @@
+import { toDateFromInput } from "@/features/request/utils/dateFormat";
 import { useEffect, useState } from "react";
 import {
   MS_PER_MINUTE,
@@ -10,7 +11,6 @@ import {
 import {
   isDateTimeComplete,
   isDueDateEntered,
-  toDate,
   toMinutes,
   getInitialDueDate,
   getMsUntilStartLeadTooShort,
@@ -147,7 +147,7 @@ export const validateRequestForm = (form, now, fields = null) => {
 
   // 3. 시작 일시
   if (targetFields.includes(START_DATE_TIME)) {
-    const start = toDate(form.startDateTime);
+    const start = toDateFromInput(form.startDateTime);
     if (!start) {
       errors.startDateTime = "시작 일시를 모두 입력해 주세요.";
     } else {
@@ -164,8 +164,8 @@ export const validateRequestForm = (form, now, fields = null) => {
 
   // 4. 종료 일시
   if (targetFields.includes(END_DATE_TIME)) {
-    // const start = toDate(form.startDateTime);
-    // const end = toDate(form.endDateTime);
+    // const start = toDateFromInput(form.startDateTime);
+    // const end = toDateFromInput(form.endDateTime);
     if (!isDateTimeComplete(form.endDateTime)) {
       errors.endDateTime = "종료 일시를 모두 입력해 주세요.";
     }
@@ -190,7 +190,7 @@ export const validateRequestForm = (form, now, fields = null) => {
       errors.dueDate = "응답 기한을 입력해 주세요.";
     } else {
       const dueMinutes = toMinutes(form.dueDate);
-      const start = toDate(form.startDateTime);
+      const start = toDateFromInput(form.startDateTime);
 
       if (dueMinutes < DUE_DATE_MIN_MINUTES) {
         errors.dueDate = "응답 기한은 최소 1시간 이상이어야 해요.";

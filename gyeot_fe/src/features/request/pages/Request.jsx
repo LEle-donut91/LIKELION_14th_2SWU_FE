@@ -32,10 +32,12 @@ import { REQUEST_QUERY_KEYS } from "@/features/request/constants/requestQueryKey
 
 // Utils
 import {
+  getRequestInitialValues,
   getSelectedSituationText,
   getSelectedUserText,
   getDateTimeText,
   getDueDateText,
+  normalizeResponseDeadline,
   isReadOnly,
   isPrerequisiteEnsured,
 } from "@/features/request/utils/requestUtils";
@@ -74,6 +76,9 @@ function Request() {
   const passedUserId = state[REQUEST_FORM_FIELD_KEY.USER_ID];
   const passedDueDate = state[REQUEST_FORM_FIELD_KEY.DUE_DATE];
 
+  // TODO: 상황 목록 조회 API 연동 시 교체
+  const { situation } = useMemo(() => getReqFormService(getReqFormApi()), []);
+
   // 입력값 전체는 Zustand store의 form 하나
   // - 같은 진입(paramId)으로 돌아온 경우(예: 미리보기에서 뒤로가기) 입력값 유지
   // - 다른 진입이면 새로 초기화 (초기값 전달)
@@ -82,11 +87,10 @@ function Request() {
 
   useState(() => {
     if (entryId !== paramId) {
-      initForm(paramId, {
-        situationId: paramId,
-        ...(passedUserId && { userId: passedUserId }),
-        ...(passedDueDate && { dueDate: passedDueDate }),
-      });
+      initForm(
+        paramId,
+        getRequestInitialValues(situation, paramId, passedUserId, passedDueDate),
+      );
     }
   });
 
@@ -102,10 +106,6 @@ function Request() {
     // 선행 조건(상황/도움 종류를 모두 선택)을 만족했을 때만 시트 열기
     if (isPrerequisiteEnsured(form, showToast)) setOpenSheet(sheet);
   };
-
-  // TODO: 상황 목록 조회 API 연동 시 교체 (지금은 mock 이라 렌더마다 호출돼도 문제 없음)
-  // [H-03-02] 요청 작성 - 상황 목록 조회
-  const { situation } = useMemo(() => getReqFormService(getReqFormApi()), []);
 
   // 대상 후보 조회 (TanStack Query, 상황 선택 후 호출)
   // - 상황이 바뀌면 queryKey가 달라져 자동으로 다시 조회
@@ -132,7 +132,11 @@ function Request() {
   // - URL: :id도 새 상황 ID로 교체 (replace: 히스토리에 쌓지 않음)
   const handleSituationConfirm = (situationId) => {
     if (situationId === form.situationId) return;
-    changeSituation(situationId);
+    const selectedSituation = situation.find(
+      (item) => String(item.id) === String(situationId),
+    );
+    if (!selectedSituation) return;
+    changeSituation({ ...selectedSituation, id: situationId });
     handleGoNext(REQUEST_ROUTES.request(situationId), true);
   };
 
@@ -145,13 +149,16 @@ function Request() {
   // Footer 버튼 눌렀을 때 실행될 핸들러
   const handleFooterBtnClick = () => {
     // 입력값 유효성 검사 (첫 번째 에러 문구 하나만 토스트로)
-    const errors = validateInput(form, new Date());
+    const now = new Date();
+    const errors = validateInput(form, now);
     const [firstError] = Object.values(errors);
     if (firstError) {
       showToast(firstError);
       return;
     }
     // [공개 정보 미리보기] 페이지로 이동
+    const normalized = normalizeResponseDeadline(form, now);
+    setForm(normalized.form);
     handleGoNext(REQUEST_ROUTES.infoPreview(form.situationId));
   };
 

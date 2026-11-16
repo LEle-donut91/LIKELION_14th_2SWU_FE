@@ -10,8 +10,7 @@ import styles from "@/features/request/pages/InfoPreview.module.css";
 
 // 일반 라이브러리
 import { Fragment, useEffect, useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 // Custom Hooks
 import { useRequestNav } from "@/features/request/hooks/useRequestNav";
@@ -39,7 +38,8 @@ import {
   getRequestTargetsService,
   getInformationOptionsService,
 } from "@/features/request/services/getService";
-import { postInfoPreviewApi } from "@/features/request/api/createApi";
+import { postCareRequestApi } from "@/features/request/api/postApi";
+import { postCareRequestService, postCareRequestResultService } from "@/features/request/services/postServices";
 
 // 일반 Components
 import StepHeader from "@/features/request/components/Header/StepHeader";
@@ -55,9 +55,8 @@ import DefaultToast from "@/features/request/components/Toast/DefaultToast";
 // 페이지 컴포넌트
 function InfoPreview() {
   const { handleGoNext, handleGoBack } = useRequestNav(); // useNavigation 커스텀 훅의 함수
-  const paramId = useParams().id; // path parameter (situationId)
   const { toast, showToast, hideToast } = useToast(); // 토스트 메시지
-  const { form: requestForm, setForm } = useRequestFormStore((state) => state); // 요청 작성 폼 상태 관리
+  const { form: requestForm, setForm, resetForm } = useRequestFormStore((state) => state); // 요청 작성 폼 상태 관리
 
   // 요청 대상 후보 조회 (요청 작성 시 선택한 대상)
   const {
@@ -136,18 +135,28 @@ function InfoPreview() {
     }));
   };
 
-  // TODO: API 연동 로직 수정 필요
   // [H-03-02-01] 공개 정보 제출 후 [요청 완료] 페이지로 이동
-  const handleGoSend = () => {
-    const reqRefinedData = { ...requestForm, informationIds: selectedIds };
-    postInfoPreviewApi(reqRefinedData);
+  const { mutate: sendRequest, isPending: isSending } = useMutation({
+    mutationFn: (form) => postCareRequestApi(postCareRequestService(form)),
+    onSuccess: (data) => {
+      const { requestId } = postCareRequestResultService(data);
+      resetForm();
+      handleGoNext(REQUEST_ROUTES.send(requestId), true);
+    },
+    onError: (error) => {
+      showToast(error.response?.data?.message);
+    },
+  });
 
-    handleGoNext(REQUEST_ROUTES.send(paramId), true);
+  const handleGoSend = () => {
+    if (isSending) return;
+    setModalOpen(false);
+    sendRequest({ ...requestForm, informationIds: selectedIds });
   };
 
   // 요청 보내기 버튼 클릭 핸들러 (민감정보가 있으면 확인 모달을 먼저 띄움)
   const handleSendBtnClick = () => {
-    if (isTargetsPending || isInformationPending || informationError) return;
+    if (isSending || isTargetsPending || targetsError || isInformationPending || informationError) return;
 
     if (isSensitiveIncluded) {
       setModalOpen(true);
