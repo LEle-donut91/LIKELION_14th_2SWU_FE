@@ -28,6 +28,17 @@ export const useRequestFormStore = create((set) => ({
       },
     })),
 
+  // 요청 대상 변경
+  changeUser: ({ id, userName = null, isGuardian = null }) =>
+    set((state) => ({
+      form: {
+        ...state.form,
+        userId: id,
+        userName,
+        isGuardian,
+      },
+    })),
+
   // useState의 setForm처럼 값 또는 updater 함수를 받음
   setForm: (updater) =>
     set((state) => ({

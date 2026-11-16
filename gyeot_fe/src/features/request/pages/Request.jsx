@@ -85,7 +85,7 @@ function Request() {
   // 입력값 전체는 Zustand store의 form 하나
   // - 같은 진입(paramId)으로 돌아온 경우(예: 미리보기에서 뒤로가기) 입력값 유지
   // - 다른 진입이면 새로 초기화 (초기값 전달)
-  const { entryId, form, initForm, changeSituation, setForm, resetForm } =
+  const { entryId, form, initForm, changeSituation, changeUser, setForm, resetForm } =
     useRequestFormStore((state) => state);
 
   useState(() => {
@@ -291,12 +291,7 @@ function Request() {
           value={form.userId}
           onConfirm={(v) => {
             const selectedUser = getSelectedUser(user, v);
-            setForm((prev) => ({
-              ...prev,
-              userId: v,
-              userName: selectedUser?.userName ?? null,
-              isGuardian: selectedUser?.isGuardian ?? null,
-            }));
+            changeUser({ ...selectedUser, id: v });
           }}
         >
           {(temp, setTemp) =>
