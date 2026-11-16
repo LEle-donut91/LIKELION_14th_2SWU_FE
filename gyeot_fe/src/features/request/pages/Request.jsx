@@ -42,6 +42,10 @@ import {
   isPrerequisiteEnsured,
 } from "@/features/request/utils/requestUtils";
 import { validateInput } from "@/features/request/utils/validateInput";
+import {
+  getSelectedUser,
+  getSelectedSituation,
+} from "@/features/request/utils/getSelectedItem";
 
 // API, Services
 import { getReqFormApi } from "@/features/request/api/createApi";
@@ -132,9 +136,7 @@ function Request() {
   // - URL: :id도 새 상황 ID로 교체 (replace: 히스토리에 쌓지 않음)
   const handleSituationConfirm = (situationId) => {
     if (situationId === form.situationId) return;
-    const selectedSituation = situation.find(
-      (item) => String(item.id) === String(situationId),
-    );
+    const selectedSituation = getSelectedSituation(situation, situationId);
     if (!selectedSituation) return;
     changeSituation({ ...selectedSituation, id: situationId });
     handleGoNext(REQUEST_ROUTES.request(situationId), true);
@@ -284,7 +286,15 @@ function Request() {
           title="요청 대상"
           description="상황에 참여한 사람들에게만 요청을 보낼 수 있어요."
           value={form.userId}
-          onConfirm={(v) => setForm({ ...form, userId: v })}
+          onConfirm={(v) => {
+            const selectedUser = getSelectedUser(user, v);
+            setForm((prev) => ({
+              ...prev,
+              userId: v,
+              userName: selectedUser?.userName ?? null,
+              isGuardian: selectedUser?.isGuardian ?? null,
+            }));
+          }}
         >
           {(temp, setTemp) =>
             isTargetsPending ? (

@@ -30,24 +30,6 @@ export const MAX_TIMEOUT_MS = 2 ** 31 - 1;
  * =====================================================================
  */
 
-/**
- * @type {RequestForm}
- * 입력 Form 초기값 설정
- */
-export const INITIAL_FORM = {
-  situationId: null,
-  situationStartDate: null,
-  situationEndDate: null,
-  userId: null,
-  helpType: null,
-  startDateTime: null,
-  endDateTime: null,
-  location: null,
-  content: null,
-  informationIds: [],
-  dueDate: { days: "1" },
-};
-
 // 요청 폼 입력 시 - 선행 조건 관련 토스트 메시지
 export const REQUEST_PREREQUISITE_TOAST_MESSAGE = {
   SITUATION_REQUIRED: "상황을 먼저 선택해 주세요.",

@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { INITIAL_FORM } from "@/features/request/constants/requestConstants";
+import { INITIAL_FORM } from "@/features/request/constants/initialFormConstants";
 
 export const useRequestFormStore = create((set) => ({
   // 상태 변수
@@ -23,6 +23,8 @@ export const useRequestFormStore = create((set) => ({
         situationStartDate: startDate,
         situationEndDate: endDate,
         userId: null,
+        userName: null,
+        isGuardian: null,
       },
     })),
 

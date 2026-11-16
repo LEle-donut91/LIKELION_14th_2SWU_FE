@@ -38,6 +38,7 @@ import {
 } from "../constants/requestConstants";
 
 import { CHANGE_STATE, REQUEST_STATE } from "../constants/enumConstants";
+import { getSelectedUser, getSelectedSituation } from "./getSelectedItem";
 
 import {
   formatMonthDay,
@@ -58,9 +59,7 @@ export const padTimeUnit = (num) => String(num).padStart(2, "0");
 
 // 선택한 상황과 이전 화면의 전달값으로 요청 폼 초기값을 구성한다.
 export const getRequestInitialValues = (situations, situationId, userId, dueDate) => {
-  const selectedSituation = situations.find(
-    (item) => String(item.id) === String(situationId),
-  );
+  const selectedSituation = getSelectedSituation(situations, situationId);
   return {
     situationId,
     situationStartDate: selectedSituation?.startDate ?? null,
@@ -118,7 +117,7 @@ export const isPrerequisiteEnsured = (form, showToast) => {
 
 // 선택된 상황을 화면 표시용 문자열로 가공
 export const getSelectedSituationText = (situation, situationId) => {
-  const selectedSituation = situation?.find((item) => item.id === situationId);
+  const selectedSituation = getSelectedSituation(situation, situationId);
   return selectedSituation?.title || "선택"; // 없으면 "선택" 출력
 };
 
@@ -171,7 +170,7 @@ export const getDateTimeText = (dateTimeObj) => {
 
 // 선택된 요청 대상을 화면 표시용 문자열로 가공
 export const getSelectedUserText = (user, userId) => {
-  const selectedUser = user?.find((item) => item.id === userId);
+  const selectedUser = getSelectedUser(user, userId);
   return selectedUser?.userName || "한 명 선택"; // 없으면 "한 명 선택" 출력
 };
 
@@ -226,7 +225,7 @@ export const toMinutes = (d) =>
  */
 // 사용자가 선택한 요청 대상의 이름과 역할(보호자 여부)을 반환
 export const getSelectedUserInfo = (users, userId) => {
-  const selectedUser = users?.find((user) => user.id === userId);
+  const selectedUser = getSelectedUser(users, userId);
   return {
     userName: selectedUser?.userName ?? "",
     userPart: selectedUser?.isGuardian ? "보호자" : "나의 사람",
