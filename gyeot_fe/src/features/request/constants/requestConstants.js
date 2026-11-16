@@ -3,7 +3,7 @@ import {
   CANCEL_REASON,
   NO_ASSIGNEE_REASON,
   REQUEST_STATE,
-  USER_ORDER_STATE,
+  ASSIGNMENT_CLOSE_REASON,
   INFORMATION_TYPE,
   UNAVAILABLE_REASON,
 } from "./enumConstants";
@@ -279,16 +279,6 @@ export const CHECK_ITEM_ID = {
   DOCUMENT: "document",
 };
 
-// TODO : API 명세서 확인 후 삭제 여부 검토
-// 민감정보 항목의 ID 목록 정의
-export const SENSITIVE_KEYS = [
-  CHECK_ITEM_ID.DISEASE,
-  CHECK_ITEM_ID.MEDICINE,
-  CHECK_ITEM_ID.ALLERGY,
-  CHECK_ITEM_ID.ADDRESS,
-  CHECK_ITEM_ID.ENTRANCE_METHOD,
-];
-
 /**
  * =====================================================================
  * [H-03-01-02] 요청 수정 · 취소
@@ -353,6 +343,14 @@ export const REQUEST_ENDED_STATES = [
   REQUEST_STATE.EXPIRED,
 ];
 
+// 서버 응답으로부터 계산한 부탁 순서 배지의 UI 상태
+export const USER_ORDER_STATE = {
+  EXPIRED: "EXPIRED",
+  WAITING: "WAITING",
+  DIFFICULTY: "DIFFICULTY",
+  CANCEL: "CANCEL",
+};
+
 export const USER_ORDER_STATE_TEXT = {
   [USER_ORDER_STATE.EXPIRED]: "기한 경과",
   [USER_ORDER_STATE.WAITING]: "응답 대기",
@@ -374,13 +372,6 @@ export const REQUESTER_USER_STATE_TEXT = {
 
 // 헤더 우측 버튼 문구
 export const REQUESTER_CANCEL_BTN_TITLE = "취소";
-
-// 알림(RequestState) 종류 - React key 및 노출 규칙 구분용
-export const REQUESTER_NOTICE_KEY = {
-  CANCEL: "cancel",
-  NO_ASSIGNEE: "noAssignee",
-  EDIT_INVALID: "editInvalid",
-};
 
 // 알림(RequestState) 문구 설정
 // [담당자 없음] 사유별 제목/본문
@@ -433,34 +424,17 @@ export const EDIT_INVALID_NOTICE_CONFIG = {
  * =====================================================================
  */
 
-// 대상자 뷰의 요청 상태 (서버 값)
-export const TARGET_STATE = {
-  BEFORE: "BEFORE", // 응답 전
-  HOLD: "HOLD", // 보류
-  REFUSED: "REFUSED", // 거절
-  CANCEL: "CANCEL", // 요청자가 취소
-  EXPIRED: "EXPIRED", // 요청 만료
-  PASS: "PASS", // 다른 사용자에게 넘어감
-};
-
-// 더 이상 응답할 수 없는 상태 목록
-export const TARGET_CLOSED_STATES = [
-  TARGET_STATE.CANCEL,
-  TARGET_STATE.EXPIRED,
-  TARGET_STATE.PASS,
-];
-
 // 알림(RequestState) 문구 설정 - 기획/디자인 변경 시 여기 문구만 수정
 export const TARGET_NOTICE_CONFIG = {
-  [TARGET_STATE.CANCEL]: {
+  [REQUEST_STATE.CANCELED]: {
     title: "요청 취소",
     information: "요청자가 취소했어요.",
   },
-  [TARGET_STATE.EXPIRED]: {
+  [REQUEST_STATE.EXPIRED]: {
     title: "요청 만료",
     information: "요청이 만료됐어요.",
   },
-  [TARGET_STATE.PASS]: {
+  [ASSIGNMENT_CLOSE_REASON.TARGET_CHANGED]: {
     title: "요청 취소",
     information: "다른 사용자에게 요청이 넘어갔어요.",
   },

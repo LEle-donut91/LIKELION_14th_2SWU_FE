@@ -62,7 +62,6 @@ export const ASSIGNMENT_CLOSE_REASON = {
   RELATIONSHIP_ENDED: "RELATIONSHIP_ENDED",
   USER_WITHDRAWN: "USER_WITHDRAWN",
   REQUEST_ENDED: "REQUEST_ENDED",
-  RESPONSE_DEADLINE_PASSED: "RESPONSE_DEADLINE_PASSED",
 };
 
 export const REQUEST_ACTION = {
@@ -78,14 +77,6 @@ export const REQUEST_ACTION = {
   WITHDRAW_PROPOSAL: "WITHDRAW_PROPOSAL",
   DUPLICATE: "DUPLICATE",
   VIEW_PAST_SITUATION: "VIEW_PAST_SITUATION",
-};
-
-// 부탁 순서 마감 사유
-export const USER_ORDER_STATE = {
-  EXPIRED: "EXPIRED",
-  WAITING: "WAITING",
-  DIFFICULTY: "DIFFICULTY",
-  CANCEL: "CANCEL",
 };
 
 // 화면 상태 (displayStatus)
@@ -107,14 +98,6 @@ export const HELP_TYPE = {
   PET_CARE: "PET_CARE",
   CHECK_IN: "CHECK_IN",
   OTHER: "OTHER",
-};
-
-// 전달받은 정보 - 분류 (categories[].category)
-export const INFORMATION_CATEGORY = {
-  BASIC: "BASIC", // 기본 정보
-  HEALTH: "HEALTH", // 건강 정보
-  LIFE: "LIFE", // 생활 정보
-  ADVANCE_MESSAGE: "ADVANCE_MESSAGE", // 미리 남기는 말
 };
 
 // 전달받은 정보 - 항목 유형 (items[].informationType)

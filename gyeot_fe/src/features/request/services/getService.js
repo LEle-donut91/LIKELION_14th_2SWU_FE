@@ -3,13 +3,8 @@ import {
   MS_PER_MINUTE,
   HELP_TYPE_LABELS,
   DUE_DATE_DEFAULT_MINUTES,
-  TARGET_STATE,
-  TARGET_NOTICE_CONFIG,
   TARGET_GUIDE_LINES,
   TARGET_GUIDE_KEY,
-  CANCEL_NOTICE_CONFIG,
-  NO_ASSIGNEE_NOTICE_CONFIG,
-  EDIT_INVALID_NOTICE_CONFIG,
   REQUESTER_ORDER_TITLE,
   REQUESTER_USER_STATE_TEXT,
   ASSIGNEE_SAFETY_INFORMATION,
@@ -37,9 +32,6 @@ import {
   RESPONSE_STATUS,
   VIEWER_ROLE,
   REQUEST_ACTION,
-  ASSIGNMENT_CLOSE_REASON,
-  NO_ASSIGNEE_REASON,
-  USER_ORDER_STATE,
 } from "@/features/request/constants/enumConstants";
 import {
   getInfoPreviewService,
@@ -48,6 +40,7 @@ import iconDate from "@/shared/assets/icons/iconDate.svg";
 import iconLocation from "@/shared/assets/icons/iconLocation.svg";
 import iconHealthy from "@/shared/assets/icons/iconHealthy.svg";
 import { getRequesterFooter, getAssigneeFooter } from "@/features/request/utils/getFooter";
+import { getTargetNotice, getOrderState, getRequesterNotices } from "@/features/request/utils/getRequestDetail";
 
 // 대상 후보 조회 API 관련
 export const getRequestTargetsService = (raw) =>
@@ -106,53 +99,6 @@ export const getInformationOptionsService = (
   };
 };
 
-const getTargetState = ({ status, myAssignment }) => {
-  if (myAssignment?.closed && myAssignment.closeReason === ASSIGNMENT_CLOSE_REASON.TARGET_CHANGED) {
-    return TARGET_STATE.PASS;
-  }
-  if (status === REQUEST_STATE.CANCELED) return TARGET_STATE.CANCEL;
-  if (status === REQUEST_STATE.EXPIRED) return TARGET_STATE.EXPIRED;
-  if (myAssignment?.closed) return null;
-  if (myAssignment?.responseStatus === RESPONSE_STATUS.CHECK_LATER) return TARGET_STATE.HOLD;
-  if (myAssignment?.responseStatus === RESPONSE_STATUS.UNAVAILABLE) return TARGET_STATE.REFUSED;
-  return TARGET_STATE.BEFORE;
-};
-
-// 명세의 우선순위대로 부탁 순서 배지를 계산한다.
-const getOrderState = (assignment, raw, index, length) => {
-  const { responseStatus, closeReason } = assignment;
-  if (responseStatus === RESPONSE_STATUS.UNAVAILABLE) return USER_ORDER_STATE.DIFFICULTY;
-  if (closeReason === ASSIGNMENT_CLOSE_REASON.ACCEPTANCE_WITHDRAWN
-    || (closeReason === ASSIGNMENT_CLOSE_REASON.REQUEST_ENDED && raw.status === REQUEST_STATE.CANCELED)) {
-    return USER_ORDER_STATE.CANCEL;
-  }
-  if (closeReason === ASSIGNMENT_CLOSE_REASON.TARGET_CHANGED
-    || closeReason === ASSIGNMENT_CLOSE_REASON.RESPONSE_DEADLINE_PASSED
-    || (closeReason === ASSIGNMENT_CLOSE_REASON.REQUEST_ENDED && raw.status === REQUEST_STATE.EXPIRED)
-    || (index === length - 1 && raw.noAssigneeReason === NO_ASSIGNEE_REASON.DEADLINE_PASSED)) {
-    return USER_ORDER_STATE.EXPIRED;
-  }
-  if (closeReason == null && (responseStatus == null || responseStatus === RESPONSE_STATUS.CHECK_LATER)) {
-    return USER_ORDER_STATE.WAITING;
-  }
-  return null;
-};
-
-const getRequesterNotices = (raw, flags) => {
-  const notices = [];
-  if (raw.status === REQUEST_STATE.CANCELED && CANCEL_NOTICE_CONFIG[raw.cancelReason]) {
-    notices.push({ key: "cancel", ...CANCEL_NOTICE_CONFIG[raw.cancelReason] });
-  }
-  if (raw.status === REQUEST_STATE.EXPIRED) {
-    notices.push({ key: "expired", title: "만료됨", information: "담당자가 없어 요청이 만료됐어요." });
-  }
-  if (flags.isAssignedNoti && NO_ASSIGNEE_NOTICE_CONFIG[raw.noAssigneeReason]) {
-    notices.push({ key: "noAssignee", ...NO_ASSIGNEE_NOTICE_CONFIG[raw.noAssigneeReason] });
-  }
-  if (flags.isEditInvalid) notices.push({ key: "editInvalid", ...EDIT_INVALID_NOTICE_CONFIG });
-  return notices;
-};
-
 export const getRequestDetailService = (response = {}) => {
   const raw = response?.data ?? response ?? {};
   const actions = raw.actions ?? [];
@@ -164,7 +110,7 @@ export const getRequestDetailService = (response = {}) => {
   const isProgressState = raw.status === REQUEST_STATE.IN_PROGRESS;
   const isAssignedNoti = raw.displayStatus === DISPLAY_STATUS.NO_ASSIGNEE;
   const isEditPending = raw.latestProposal?.status === PROPOSAL_STATUS.PENDING;
-  const targetState = getTargetState(raw);
+  const responseStatus = raw.myAssignment?.responseStatus;
   const canRespond = isTarget && actions.includes(REQUEST_ACTION.RESPOND)
     && !raw.myAssignment?.closed
     && raw.status !== REQUEST_STATE.CANCELED && raw.status !== REQUEST_STATE.EXPIRED;
@@ -182,18 +128,17 @@ export const getRequestDetailService = (response = {}) => {
     showProgress: isRequester && isProgressState,
     showMessage: !isRequester || !isProgressState,
     showDueDate: isRequester ? raw.displayStatus === DISPLAY_STATUS.WAITING : canRespond,
-    showHoldBtn: canRespond && targetState === TARGET_STATE.BEFORE,
+    showHoldBtn: canRespond && responseStatus == null,
   };
   const targetFooterKey = {
-    [TARGET_STATE.BEFORE]: TARGET_FOOTER_KEY.RESPOND,
-    [TARGET_STATE.HOLD]: TARGET_FOOTER_KEY.CHANGE,
-    [TARGET_STATE.REFUSED]: TARGET_FOOTER_KEY.CHANGE_TO_ACCEPT,
-  }[targetState];
-  const notice = isTarget ? TARGET_NOTICE_CONFIG[targetState] ?? null : null;
+    [RESPONSE_STATUS.CHECK_LATER]: TARGET_FOOTER_KEY.CHANGE,
+    [RESPONSE_STATUS.UNAVAILABLE]: TARGET_FOOTER_KEY.CHANGE_TO_ACCEPT,
+  }[responseStatus] ?? TARGET_FOOTER_KEY.RESPOND;
+  const notice = isTarget ? getTargetNotice(raw) : null;
   let guideLines = [];
   if (isTarget && (notice || raw.myAssignment?.closed)) {
     guideLines = TARGET_GUIDE_LINES[TARGET_GUIDE_KEY.CLOSED];
-  } else if (isTarget && [TARGET_STATE.HOLD, TARGET_STATE.REFUSED].includes(targetState)) {
+  } else if (isTarget && [RESPONSE_STATUS.CHECK_LATER, RESPONSE_STATUS.UNAVAILABLE].includes(responseStatus)) {
     guideLines = TARGET_GUIDE_LINES[TARGET_GUIDE_KEY.HOLD];
   }
   const assignments = [...(raw.assignments ?? [])].sort((a, b) => a.order - b.order);
