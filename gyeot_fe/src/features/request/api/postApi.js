@@ -1,5 +1,3 @@
-import postAssigneeReconfirmAcceptMock from "@/features/request/mock/AssigneeReconfirm/postAssigneeReconfirmAcceptMock";
-import postAssigneeReconfirmRejectMock from "@/features/request/mock/AssigneeReconfirm/postAssigneeReconfirmRejectMock";
 import postEditFormMock from "@/features/request/mock/RequestEdit/postEditFormMock";
 import postEditReconfirmMock from "@/features/request/mock/RequestEdit/postEditReconfirmMock";
 import postAskAgainMock from "@/features/request/mock/AskAgain/postAskAgainMock";
@@ -52,18 +50,20 @@ export const postEditWithdrawApi = async ({ requestId, proposalId }) => {
   return response.data;
 };
 
-// TODO: API 연동 로직 수정 필요
 // [N-05] 변경 내용 확인 - "확인" (수정안 수락)
-export const postAssigneeReconfirmAcceptApi = (requestId, proposalId) => {
-  console.log("변경 내용 확인:", requestId, proposalId);
-  return postAssigneeReconfirmAcceptMock;
+export const postReconfirmAcceptApi = async ({ requestId, proposalId }) => {
+  const response = await axiosInstance.post(
+    REQUEST_API_URLS.reconfirmAccept(requestId, proposalId),
+  );
+  return response.data;
 };
 
-// TODO: API 연동 로직 수정 필요
 // [N-05] 변경 내용 확인 - 모달의 "거절" (수정안 거절)
-export const postAssigneeReconfirmRejectApi = (requestId, proposalId) => {
-  console.log("변경 내용 거절:", requestId, proposalId);
-  return postAssigneeReconfirmRejectMock;
+export const postReconfirmRejectApi = async ({ requestId, proposalId }) => {
+  const response = await axiosInstance.post(
+    REQUEST_API_URLS.reconfirmReject(requestId, proposalId),
+  );
+  return response.data;
 };
 
 // TODO: API 연동 로직 수정 필요

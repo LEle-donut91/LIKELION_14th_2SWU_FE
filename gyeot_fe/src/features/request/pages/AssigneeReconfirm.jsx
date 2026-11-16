@@ -9,7 +9,7 @@ import styles from "@/features/request/pages/AssigneeReconfirm.module.css";
 
 // 일반 라이브러리
 import { useEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 
 // icons/images
@@ -29,8 +29,8 @@ import {
   getRequestDetailApi,
 } from "@/features/request/api/getApi";
 import {
-  postAssigneeReconfirmAcceptApi,
-  postAssigneeReconfirmRejectApi,
+  postReconfirmAcceptApi,
+  postReconfirmRejectApi,
 } from "@/features/request/api/postApi";
 import { getAssigneeReconfirmService } from "@/features/request/services/getService";
 
@@ -63,20 +63,35 @@ function AssigneeReconfirm() {
   const { proposalId, userName, requestType, beforeInfoList, afterInfoList } =
     detail ?? {};
 
-  // TODO: API 연동 시 응답의 isSuccess 확인 후 이동 처리
+  const { mutate: acceptReconfirmation, isPending: isAccepting } = useMutation({
+    mutationFn: postReconfirmAcceptApi,
+    onSuccess: () => handleGoBack(),
+    onError: (error) => {
+      showToast(getErrorMessage(error));
+    },
+  });
+
+  const { mutate: rejectReconfirmation, isPending: isRejecting } = useMutation({
+    mutationFn: postReconfirmRejectApi,
+    onSuccess: () => {
+      setModalOpen(false);
+      handleGoNext(REQUEST_ROUTES.home, true);
+    },
+    onError: (error) => {
+      showToast(getErrorMessage(error));
+    },
+  });
+
   // [Footer의 확인 버튼] 클릭 이벤트 핸들러
   const handleConfirmBtnClick = () => {
-    if (!proposalId) return;
-    postAssigneeReconfirmAcceptApi(paramId, proposalId);
-    handleGoBack();
+    if (!proposalId || isAccepting || isRejecting) return;
+    acceptReconfirmation({ requestId: paramId, proposalId });
   };
 
   // [모달의 거절 버튼] 클릭 이벤트 핸들러
   const handleRejectConfirm = () => {
-    if (!proposalId) return;
-    postAssigneeReconfirmRejectApi(paramId, proposalId);
-    setModalOpen(false);
-    handleGoNext(REQUEST_ROUTES.home, true);
+    if (!proposalId || isAccepting || isRejecting) return;
+    rejectReconfirmation({ requestId: paramId, proposalId });
   };
 
   return (
