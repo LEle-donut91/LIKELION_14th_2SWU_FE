@@ -109,8 +109,8 @@ function AskAgain() {
 
   useEffect(() => {
     if (!initialForm || entryId === formEntryId) return;
-    initForm(formEntryId, { ...initialForm, reassignRequestId: Number(paramId) });
-  }, [initialForm, entryId, formEntryId, initForm, paramId]);
+    initForm(formEntryId, initialForm);
+  }, [initialForm, entryId, formEntryId, initForm]);
 
 
   // 열려 있는 시트 (한 번에 하나만 열림)
@@ -148,7 +148,8 @@ function AskAgain() {
     setForm(normalized.form);
 
     // [공개 정보 미리보기] 페이지로 이동
-    handleGoNext(REQUEST_ROUTES.infoPreview(normalized.form.situationId));
+    const searchParams = new URLSearchParams({ askAgain: paramId });
+    handleGoNext(`${REQUEST_ROUTES.infoPreview(normalized.form.situationId)}?${searchParams}`);
   };
 
   return (

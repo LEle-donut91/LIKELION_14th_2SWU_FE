@@ -11,6 +11,7 @@ import styles from "@/features/request/pages/InfoPreview.module.css";
 // 일반 라이브러리
 import { Fragment, useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { useSearchParams } from "react-router-dom";
 
 // Custom Hooks
 import { useRequestNav } from "@/features/request/hooks/useRequestNav";
@@ -58,7 +59,8 @@ function InfoPreview() {
   const { handleGoNext, handleGoBack } = useRequestNav(); // useNavigation 커스텀 훅의 함수
   const { toast, showToast, hideToast } = useToast(); // 토스트 메시지
   const { form: requestForm, setForm, resetForm } = useRequestFormStore((state) => state); // 요청 작성 폼 상태 관리
-  const { reassignRequestId } = requestForm;
+  const [searchParams] = useSearchParams();
+  const reassignRequestId = searchParams.get("askAgain");
 
   // 요청 대상 후보 조회 (요청 작성 시 선택한 대상)
   const {
@@ -142,8 +144,8 @@ function InfoPreview() {
 
   // [H-03-02-01] 공개 정보 제출 후 [요청 완료] 페이지로 이동
   const { mutate: sendRequest, isPending: isSending } = useMutation({
-    mutationFn: (form) => form.reassignRequestId
-      ? postAskAgainApi(postAskAgainService(form))
+    mutationFn: (form) => reassignRequestId
+      ? postAskAgainApi(postAskAgainService(Number(reassignRequestId), form))
       : postCareRequestApi(postCareRequestService(form)),
     onSuccess: (data) => {
       const { requestId } = postCareRequestResultService(data);

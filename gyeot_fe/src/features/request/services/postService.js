@@ -35,10 +35,10 @@ export const postEditFormService = (requestId, requestForm, checkForm) => ({
   },
 });
 
-export const postAskAgainService = (requestForm, now = new Date()) => {
+export const postAskAgainService = (requestId, requestForm, now = new Date()) => {
   const { form } = normalizeResponseDeadline(requestForm, now);
   return {
-    requestId: form.reassignRequestId,
+    requestId,
     payload: {
       targetUserId: Number(form.userId),
       ...(form.dueDate !== null && {
