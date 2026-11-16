@@ -3,7 +3,6 @@ import getReceivedInfoMock from "@/features/request/mock/ReceivedInfo/getReceive
 import getEditFormMock from "@/features/request/mock/RequestEdit/getEditFormMock";
 import getEditCheckMock from "@/features/request/mock/RequestEdit/getEditCheckMock";
 import getAskAgainMock from "@/features/request/mock/AskAgain/getAskAgainMock";
-import getRequesterMock from "@/features/request/mock/RequestDetail/getRequesterMock";
 import { REQUEST_API_URLS, INFO_SHARE_API_URLS } from "@/shared/constants/apiUrlConstants";
 import { axiosInstance } from "@/shared/api/axiosInstance";
 
@@ -23,12 +22,10 @@ export const getInformationOptionsApi = async ({ helpType, requestId }) => {
   return response.data;
 };
 
-// TODO: API 연동 로직 수정 필요
-// 요청 상세 조회. 응답의 viewerRole로 화면을 결정한다.
-// 현재는 요청자 mock을 사용하며, 실제 연동 시 서버의 상세 응답을 반환한다.
-export const getRequestDetailApi = (requestId) => {
-  console.log("요청 상세 조회:", requestId);
-  return getRequesterMock;
+// 요청 상세 조회 API (응답의 viewerRole로 화면을 결정)
+export const getRequestDetailApi = async (requestId) => {
+  const response = await axiosInstance.get(REQUEST_API_URLS.detail(requestId));
+  return response.data;
 };
 
 // TODO: API 연동 로직 수정 필요

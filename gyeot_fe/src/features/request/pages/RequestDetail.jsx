@@ -1,16 +1,17 @@
 import { getRequestDetailService } from "@/features/request/services/getService";
-import { Fragment, useMemo, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 import styles from "./RequestDetail.module.css";
 import { useRequestNav } from "@/features/request/hooks/useRequestNav";
+import { useToast } from "@/features/request/hooks/useToast";
 import { REQUEST_ROUTES } from "@/features/request/constants/routerConstants";
+import { REQUEST_QUERY_KEYS } from "@/features/request/constants/requestQueryKeys";
 import {
   REQUESTER_CANCEL_BTN_TITLE,
   REQUEST_FORM_FIELD_KEY,
 } from "@/features/request/constants/requestConstants";
-import {
-  getRequestDetailApi,
-} from "@/features/request/api/getApi";
+import { getRequestDetailApi } from "@/features/request/api/getApi";
 import {
   patchEditWithdrawApi,
   patchRequestDoneApi,
@@ -31,6 +32,7 @@ import SubpageHeader from "@/shared/components/subpage-header/SubpageHeader";
 import SmallFooter from "@/shared/components/SmallFooter/SmallFooter";
 import LargeFooter from "@/shared/components/LargeFooter/LargeFooter";
 import DefaultModal from "@/shared/components/DefaultModal/DefaultModal";
+import DefaultToast from "@/shared/components/Toast/DefaultToast";
 import RequestStep from "@/features/request/components/Request/RequestStep";
 import RequestSummary from "@/features/request/components/Request/RequestSummary";
 import DueDateState from "@/features/request/components/State/DueDateState";
@@ -47,18 +49,32 @@ function RequestDetail() {
   const [isCancelModalOpen, setCancelModalOpen] = useState(false);
   const [isSameModalOpen, setSameModalOpen] = useState(false);
   const [isWithdrawModalOpen, setWithdrawModalOpen] = useState(false);
+  const { toast, showToast, hideToast } = useToast();
 
-  // TODO: 실제 API 연동 시 비동기 조회 및 변경 후 재조회 처리
-  const detail = useMemo(
-    () => getRequestDetailService(getRequestDetailApi(paramId)),
-    [paramId],
-  );
+  const {
+    data: detail,
+    isPending,
+    error,
+  } = useQuery({
+    queryKey: REQUEST_QUERY_KEYS.detail(paramId),
+    queryFn: () => getRequestDetailApi(paramId),
+    select: getRequestDetailService,
+    enabled: Boolean(paramId),
+  });
+
+  useEffect(() => {
+    if (!error) return;
+    showToast(
+      error.response?.data?.message,
+    );
+  }, [error, showToast]);
+
   const {
     situationId, stepState, userName, userId, requestType, message,
     dueDate, initialDueDate, infoList, userList, flags, notices = [],
     notice, footerConfig, role, orderTitle, userStateText, safetyInformation,
     guideLines = [],
-  } = detail;
+  } = detail ?? {};
   const isRequester = role === "requester";
   const isAssignee = role === "assignee";
   const isTarget = role === "target";
@@ -117,7 +133,7 @@ function RequestDetail() {
       onClick: flags.showHoldBtn ? footerActions.hold : undefined,
     },
   };
-  const headerAction = headerActions[role];
+  const headerAction = headerActions[role] ?? {};
 
   return (
     <div className={`${styles.page} ${styles[role]}`}>
@@ -127,6 +143,13 @@ function RequestDetail() {
         onBackClick={() => handleGoBack()}
         onRightTextClick={headerAction.onClick}
       />
+      {isPending && (
+        <div className={styles.content}>
+          <p role="status">요청 정보를 불러오는 중이에요.</p>
+        </div>
+      )}
+      {detail && (
+        <>
       <div className={styles.content}>
         {!isTarget && (
           <div className={styles.stepContainer}>
@@ -278,6 +301,15 @@ function RequestDetail() {
           cancelTxt="취소"
           confirmTxt="철회"
           onConfirmClick={handleWithdrawConfirm}
+        />
+      )}
+        </>
+      )}
+      {toast && (
+        <DefaultToast
+          key={toast.id}
+          message={toast.message}
+          onHide={hideToast}
         />
       )}
     </div>
