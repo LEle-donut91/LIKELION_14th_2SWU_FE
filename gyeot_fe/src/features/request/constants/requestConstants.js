@@ -502,10 +502,10 @@ export const RECEIVED_INFO_TITLE_RULE_BY_TYPE = {
 };
 
 // 항목 우측 표시 문구
+// updated 우선 -> "9/20 갱신" / added만 true -> "추가됨" / 둘 다 false -> 표시 없음
 export const RECEIVED_INFO_BADGE_TEXT = {
-  ADDED: "추가됨", // added = true
-  UPDATED: "갱신됨", // updated = true
-  UPDATED_DATE_SUFFIX: "갱신", // 둘 다 false -> "9/20 갱신"
+  UPDATED_DATE_SUFFIX: "갱신", // updated = true이면 무조건 표기 (예: '9/20 갱신')
+  ADDED: "추가됨", // added = true, updated = false
 };
 
 // 접근 종료 화면 문구 (unavailableReason별)

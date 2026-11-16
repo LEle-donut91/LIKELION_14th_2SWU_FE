@@ -349,15 +349,13 @@ export const getReceivedInfoValue = (informationValue) => {
 };
 
 // 항목 우측 표시 결정
-// 둘 다 true -> "추가됨·갱신됨" / added -> "추가됨" / updated -> "갱신됨"
-// 둘 다 false -> "9/20 갱신" (updatedAt 기준)
+// updated 우선 -> "9/20 갱신" / added만 true -> "추가됨" / 둘 다 false -> 표시 없음
 export const getReceivedInfoBadgeText = ({ added, updated, updatedAt }) => {
-  if (added && updated) {
-    return `${RECEIVED_INFO_BADGE_TEXT.ADDED}·${RECEIVED_INFO_BADGE_TEXT.UPDATED}`;
+  if (updated) {
+    return `${formatMonthDay(updatedAt)} ${RECEIVED_INFO_BADGE_TEXT.UPDATED_DATE_SUFFIX}`;
   }
   if (added) return RECEIVED_INFO_BADGE_TEXT.ADDED;
-  if (updated) return RECEIVED_INFO_BADGE_TEXT.UPDATED;
-  return `${formatMonthDay(updatedAt)} ${RECEIVED_INFO_BADGE_TEXT.UPDATED_DATE_SUFFIX}`;
+  return "";
 };
 
 // 접근 종료 화면 문구 결정 (unavailableReason 기준)
