@@ -30,6 +30,14 @@ export const postDoneApi = async (requestId) => {
   return response.data;
 };
 
+// 요청 응답 API (대상자 뷰) - 보류, 거절, 수락
+export const postResponseApi = async ({ requestId, response }) => {
+  const result = await axiosInstance.post(REQUEST_API_URLS.respond(requestId), {
+    response,
+  });
+  return result.data;
+};
+
 // TODO: API 연동 로직 수정 필요
 // [N-05] 변경 내용 확인 - "확인" (수정안 수락)
 export const postAssigneeReconfirmAcceptApi = (requestId, proposalId) => {

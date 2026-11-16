@@ -7,6 +7,7 @@ import { useRequestNav } from "@/features/request/hooks/useRequestNav";
 import { useToast } from "@/features/request/hooks/useToast";
 import { REQUEST_ROUTES } from "@/features/request/constants/routerConstants";
 import { REQUEST_QUERY_KEYS } from "@/features/request/constants/requestQueryKeys";
+import { RESPONSE_STATUS } from "@/features/request/constants/enumConstants";
 import {
   REQUESTER_CANCEL_BTN_TITLE,
   REQUEST_FORM_FIELD_KEY,
@@ -14,16 +15,12 @@ import {
 import { getRequestDetailApi } from "@/features/request/api/getApi";
 import {
   patchRequestCancelApi,
-  patchTargetHoldApi,
-  patchTargetRefuseApi,
-  patchTargetAcceptApi,
-  patchTargetChangeRefuseApi,
-  patchTargetChangeAcceptApi,
 } from "@/features/request/api/patchApi";
 import {
   postStartApi,
   postDoneApi,
   postAcceptWithdrawApi,
+  postResponseApi,
 } from "@/features/request/api/postApi";
 
 import SubpageHeader from "@/shared/components/subpage-header/SubpageHeader";
@@ -86,6 +83,20 @@ function RequestDetail() {
     },
   });
 
+  const { mutate: respondToRequest, isPending: isResponding } = useMutation({
+    mutationFn: postResponseApi,
+    onSuccess: (_, { response }) => {
+      if (response === RESPONSE_STATUS.AVAILABLE) {
+        handleGoNext(REQUEST_ROUTES.detail(paramId), true);
+        return;
+      }
+      return refetch();
+    },
+    onError: (error) => {
+      showToast(error.response?.data?.message);
+    },
+  });
+
   const { mutate: completeCare, isPending: isCompleting } = useMutation({
     mutationFn: postDoneApi,
     onSuccess: () => refetch(),
@@ -104,10 +115,11 @@ function RequestDetail() {
   const isAssignee = role === "assignee";
   const isTarget = role === "target";
 
-  const acceptRequest = (api) => {
-    api(paramId);
-    handleGoNext(REQUEST_ROUTES.detail(paramId), true);
+  const handleResponse = (response) => {
+    if (isResponding) return;
+    respondToRequest({ requestId: paramId, response });
   };
+
   const footerActions = {
     edit: () => handleGoNext(REQUEST_ROUTES.editForm(paramId)),
     askAgain: () => handleGoNext(REQUEST_ROUTES.askAgain(paramId)),
@@ -125,11 +137,11 @@ function RequestDetail() {
     pastSituation: () => handleGoNextWithState(
       REQUEST_ROUTES.pastSituationDetail, { situationId }, true,
     ),
-    hold: () => patchTargetHoldApi(paramId),
-    refuse: () => patchTargetRefuseApi(paramId),
-    accept: () => acceptRequest(patchTargetAcceptApi),
-    changeToRefuse: () => patchTargetChangeRefuseApi(paramId),
-    changeToAccept: () => acceptRequest(patchTargetChangeAcceptApi),
+    hold: () => handleResponse(RESPONSE_STATUS.CHECK_LATER),
+    refuse: () => handleResponse(RESPONSE_STATUS.UNAVAILABLE),
+    accept: () => handleResponse(RESPONSE_STATUS.AVAILABLE),
+    changeToRefuse: () => handleResponse(RESPONSE_STATUS.UNAVAILABLE),
+    changeToAccept: () => handleResponse(RESPONSE_STATUS.AVAILABLE),
   };
 
   const handleCancelConfirm = () => {
