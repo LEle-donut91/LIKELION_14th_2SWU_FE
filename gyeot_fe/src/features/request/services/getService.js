@@ -39,6 +39,7 @@ import {
 import iconDate from "@/shared/assets/icons/iconDate.svg";
 import iconLocation from "@/shared/assets/icons/iconLocation.svg";
 import iconHealthy from "@/shared/assets/icons/iconHealthy.svg";
+import { getInformationSummary } from "@/features/request/utils/requestUtils";
 import { getRequesterFooter, getAssigneeFooter } from "@/features/request/utils/getFooter";
 import { getTargetNotice, getOrderState, getRequesterNotices } from "@/features/request/utils/getRequestDetail";
 
@@ -211,7 +212,7 @@ export const getAssigneeReconfirmService = (response = {}) => {
           ? formatShortDateTimeRange(before.startsAt, before.endsAt) : "",
       },
       { icon: iconLocation, label: "장소", value: before?.place ?? "" },
-      { icon: iconHealthy, label: "정보", value: before?.informations?.map((item) => item.name).join(", ") ?? before?.information ?? "" },
+      { icon: iconHealthy, label: "정보", value: getInformationSummary(before?.informations) },
     ],
 
     // 변경 후 일정, 장소, 정보
@@ -223,7 +224,7 @@ export const getAssigneeReconfirmService = (response = {}) => {
           ? formatShortDateTimeRange(after.startsAt, after.endsAt) : "",
       },
       { icon: iconLocation, label: "장소", value: after?.place ?? "" },
-      { icon: iconHealthy, label: "정보", value: after?.informations?.map((item) => item.name).join(", ") ?? after?.information ?? "" },
+      { icon: iconHealthy, label: "정보", value: getInformationSummary(after?.informations) },
     ],
   };
 };

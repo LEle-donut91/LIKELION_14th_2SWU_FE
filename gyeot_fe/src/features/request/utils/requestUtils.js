@@ -379,3 +379,17 @@ export const normalizeResponseDeadline = (form, now = new Date()) => {
   }
   return { form, message: null };
 };
+
+/**
+ * [N-05] 변경 내용 확인
+ */
+// 이름은 중복 없이 최대 2개 표시하고, 나머지 건수에는 중복 항목도 포함한다.
+export const getInformationSummary = (informations = []) => {
+  const items = informations ?? [];
+  const names = [...new Set(items.map((item) => item.name))].slice(0, 2);
+  const summary = names.join(", ");
+
+  return items.length > 2
+    ? `${summary} 외 ${items.length - names.length}건`
+    : summary;
+};
