@@ -9,8 +9,10 @@ import { useParams } from "react-router-dom";
 import { useRequestNav } from "@/features/request/hooks/useRequestNav";
 
 // API, Services
-import { getReceivedInfoApi } from "@/features/request/api/assigneeApi";
-import { getReceivedInfoService } from "@/features/request/services/assigneeService";
+import {
+  getReceivedInfoApi,
+} from "@/features/request/api/getApi";
+import { getReceivedInfoService } from "@/features/request/services/getService";
 
 // 일반 Components
 import SubpageHeader from "@/shared/components/subpage-header/SubpageHeader";

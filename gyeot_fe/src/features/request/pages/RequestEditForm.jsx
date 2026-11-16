@@ -37,13 +37,15 @@ import {
 // API, Services
 import {
   getEditFormApi,
-  postEditFormApi,
-  patchRequestCancelApi,
-} from "@/features/request/api/requesterApi";
+} from "@/features/request/api/getApi";
 import {
-  getEditFormService,
-  postEditFormService,
-} from "@/features/request/services/requesterService";
+  postEditFormApi,
+} from "@/features/request/api/postApi";
+import {
+  patchRequestCancelApi,
+} from "@/features/request/api/patchApi";
+import { getEditFormService } from "@/features/request/services/getService";
+import { postEditFormService } from "@/features/request/services/postService";
 
 // 일반 Components
 import SubpageHeader from "@/shared/components/subpage-header/SubpageHeader";

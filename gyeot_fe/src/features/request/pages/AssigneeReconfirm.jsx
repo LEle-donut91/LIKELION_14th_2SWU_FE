@@ -23,10 +23,12 @@ import { REQUEST_ROUTES } from "@/features/request/constants/routerConstants";
 // API, Services
 import {
   getAssigneeReconfirmApi,
+} from "@/features/request/api/getApi";
+import {
   postAssigneeReconfirmAcceptApi,
   postAssigneeReconfirmRejectApi,
-} from "@/features/request/api/assigneeApi";
-import { getAssigneeReconfirmService } from "@/features/request/services/assigneeService";
+} from "@/features/request/api/postApi";
+import { getAssigneeReconfirmService } from "@/features/request/services/getService";
 
 // 일반 Components
 import SubpageHeader from "@/shared/components/subpage-header/SubpageHeader";

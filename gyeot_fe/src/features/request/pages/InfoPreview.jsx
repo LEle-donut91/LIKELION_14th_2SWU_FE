@@ -39,7 +39,7 @@ import {
   getInformationOptionsService,
 } from "@/features/request/services/getService";
 import { postCareRequestApi } from "@/features/request/api/postApi";
-import { postCareRequestService, postCareRequestResultService } from "@/features/request/services/postServices";
+import { postCareRequestService, postCareRequestResultService } from "@/features/request/services/postService";
 
 // 일반 Components
 import SubpageHeader from "@/shared/components/subpage-header/SubpageHeader";

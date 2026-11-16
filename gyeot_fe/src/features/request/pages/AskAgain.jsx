@@ -39,13 +39,12 @@ import {
 // API, Services
 import {
   getAskAgainApi,
-  postAskAgainApi,
-} from "@/features/request/api/requesterApi";
+} from "@/features/request/api/getApi";
 import {
-  getAskAgainService,
-  postAskAgainService,
-  postAskAgainIdService,
-} from "@/features/request/services/requesterService";
+  postAskAgainApi,
+} from "@/features/request/api/postApi";
+import { getAskAgainService } from "@/features/request/services/getService";
+import { postAskAgainService, postAskAgainIdService } from "@/features/request/services/postService";
 
 // 일반 Components
 import SubpageHeader from "@/shared/components/subpage-header/SubpageHeader";

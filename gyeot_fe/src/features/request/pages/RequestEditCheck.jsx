@@ -21,9 +21,11 @@ import { useRequestNav } from "@/features/request/hooks/useRequestNav";
 // API, Services
 import {
   getEditCheckApi,
+} from "@/features/request/api/getApi";
+import {
   postEditReconfirmApi,
-} from "@/features/request/api/requesterApi";
-import { getEditCheckService } from "@/features/request/services/requesterService";
+} from "@/features/request/api/postApi";
+import { getEditCheckService } from "@/features/request/services/getService";
 
 // 일반 Components
 import SubpageHeader from "@/shared/components/subpage-header/SubpageHeader";
