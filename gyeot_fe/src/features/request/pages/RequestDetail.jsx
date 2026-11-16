@@ -84,13 +84,7 @@ function RequestDetail() {
 
   const { mutate: respondToRequest, isPending: isResponding } = useMutation({
     mutationFn: postResponseApi,
-    onSuccess: (_, { response }) => {
-      if (response === RESPONSE_STATUS.AVAILABLE) {
-        handleGoNext(REQUEST_ROUTES.detail(paramId), true);
-        return;
-      }
-      return refetch();
-    },
+    onSuccess: () => refetch(),
     onError: (error) => {
       showToast(getErrorMessage(error));
     },
