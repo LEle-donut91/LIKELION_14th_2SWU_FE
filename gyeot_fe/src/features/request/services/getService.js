@@ -8,6 +8,7 @@ import {
   REQUESTER_ORDER_TITLE,
   REQUESTER_USER_STATE_TEXT,
   ASSIGNEE_SAFETY_INFORMATION,
+  USER_ORDER_STATE_TEXT,
 } from "@/features/request/constants/requestConstants";
 import {
   formatMonthDay,
@@ -42,6 +43,7 @@ import iconHealthy from "@/shared/assets/icons/iconHealthy.svg";
 import { getInformationSummary } from "@/features/request/utils/requestUtils";
 import { getRequesterFooter, getAssigneeFooter } from "@/features/request/utils/getFooter";
 import { getTargetNotice, getOrderState, getRequesterNotices } from "@/features/request/utils/getRequestDetail";
+import { toDateTimeInput } from "@/features/request/utils/dateFormat";
 
 // 대상 후보 조회 API 관련
 export const getRequestTargetsService = (raw) =>
@@ -309,37 +311,42 @@ export const getEditCheckService = (raw) => ({
   ],
 });
 
-export const getAskAgainService = (raw) => {
-  const summary = raw?.lastReqSummary;
-
+export const getAskAgainInformationService = (response) => {
+  const items = (response?.data?.categories ?? [])
+    .flatMap((category) => category.items ?? [])
+    .filter((item) => item.selected);
   return {
-    situationId: raw?.situationId ?? "",
-    requestId: raw?.requestId ?? "",
-    reqType: summary?.type ?? "",
-    reqMsg: summary?.message ?? "",
-    startAt: summary?.startAt ?? null,
+    icon: iconHealthy,
+    label: "정보",
+    value: getInformationSummary(items.map((item) => ({ name: item.typeName }))),
+  };
+};
 
-    // [이전 요청 내용]의 시간/장소/정보
+export const getAskAgainDetailService = (response) => {
+  const raw = response?.data ?? {};
+  const assignments = raw.assignments ?? [];
+  return {
+    reqType: HELP_TYPE_LABELS[raw.helpType] ?? "",
+    reqMsg: raw.description ?? "",
+    initialForm: {
+      situationId: raw.situation?.situationId != null ? String(raw.situation.situationId) : null,
+      situationStartDate: raw.situation?.startDate ?? null,
+      situationEndDate: raw.situation?.endDate ?? null,
+      helpType: raw.helpType ?? null,
+      startDateTime: toDateTimeInput(raw.startsAt),
+      endDateTime: toDateTimeInput(raw.endsAt),
+      location: raw.place ?? null,
+      content: raw.description ?? null,
+    },
     infoList: [
-      { icon: iconDate, label: "일정", value: summary?.time ?? "" },
-      { icon: iconLocation, label: "장소", value: summary?.location ?? "" },
-      { icon: iconHealthy, label: "정보", value: summary?.info ?? "" },
+      { icon: iconDate, label: "일정", value: raw.startsAt && raw.endsAt
+        ? formatShortDateTimeRange(raw.startsAt, raw.endsAt) : "" },
+      { icon: iconLocation, label: "장소", value: raw.place ?? "" },
     ],
-
-    // [대상 이력] 목록 매핑
-    userRecord:
-      raw?.userRecord?.map((user) => ({
-        name: user.name,
-        part: user.part,
-        state: user.state,
-      })) || [],
-
-    // [새 요청 대상] 목록 매핑
-    userLst:
-      raw?.userLst?.map((user) => ({
-        id: user.id,
-        userName: user.userName,
-        isGuardian: user.isGuardian,
-      })) || [],
+    userRecord: assignments.map((assignment, index) => ({
+      name: assignment.target?.name ?? "",
+      part: assignment.target?.isGuardian ? "보호자" : "나의 사람",
+      state: USER_ORDER_STATE_TEXT[getOrderState(assignment, raw, index, assignments.length)] ?? "",
+    })),
   };
 };

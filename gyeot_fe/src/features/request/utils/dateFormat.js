@@ -1,6 +1,19 @@
 const toDate = (value) => (value instanceof Date ? value : new Date(value));
 const padTwo = (number) => String(number).padStart(2, "0");
 
+// 일시를 로컬 날짜/시간 입력 객체로 변환
+export const toDateTimeInput = (value) => {
+  if (!value) return null;
+  const date = toDate(value);
+  return {
+    year: String(date.getFullYear()),
+    month: String(date.getMonth() + 1),
+    day: String(date.getDate()),
+    hour: String(date.getHours()),
+    minute: String(date.getMinutes()),
+  };
+};
+
 // 날짜/시간 입력 객체를 로컬 Date로 변환. 미완성 입력은 null을 반환
 export const toDateFromInput = (value) => {
   const keys = ["year", "month", "day", "hour", "minute"];
