@@ -1,4 +1,8 @@
 import {
+  DEADLINE_NOTICE,
+  DUE_DATE_DEFAULT_MINUTES,
+  DUE_DATE_MIN_MINUTES,
+  DUE_DATE_MAX_MINUTES,
   DATE_TIME_KEYS,
   DUE_DATE_KEYS,
   DATE_TIME_MAX_LIMITS,
@@ -40,6 +44,8 @@ import {
   formatFullKoreanDate,
 } from "@/shared/utils/dateFormat";
 
+import { formatLocalDateTime, toDateFromInput } from "@/features/request/utils/dateFormat";
+
 import { ISO_DATE_ONLY } from "@/shared/constants/dateTimeConstants";
 /**
  * =====================================================================
@@ -49,6 +55,20 @@ import { ISO_DATE_ONLY } from "@/shared/constants/dateTimeConstants";
 
 // 1자리 숫자 앞에 0 붙이기 (예: 1 -> "01")
 export const padTimeUnit = (num) => String(num).padStart(2, "0");
+
+// 선택한 상황과 이전 화면의 전달값으로 요청 폼 초기값을 구성한다.
+export const getRequestInitialValues = (situations, situationId, userId, dueDate) => {
+  const selectedSituation = situations.find(
+    (item) => String(item.id) === String(situationId),
+  );
+  return {
+    situationId,
+    situationStartDate: selectedSituation?.startDate ?? null,
+    situationEndDate: selectedSituation?.endDate ?? null,
+    ...(userId && { userId }),
+    ...(dueDate && { dueDate }),
+  };
+};
 
 // "HH:MM:SS" -> 초 단위 총합 (비어있거나 숫자가 아니면 0 취급)
 export const parseTimeToSeconds = (timeStr = "") => {
@@ -158,7 +178,7 @@ export const getSelectedUserText = (user, userId) => {
 // 입력된 응답 기한 객체를 화면 표시용 문자열 (N일 N시간 N분)으로 가공
 export const getDueDateText = (dueDate, isFixed = false) => {
   // 응답 기한이 고정된 경우 "시작 시간까지" 출력
-  if (isFixed) return "시작 시간까지";
+  if (isFixed || dueDate === null) return "시작 시간까지";
 
   // 없으면 "선택" 출력
   if (!dueDate) return "선택";
@@ -193,12 +213,6 @@ export const isDateTimeComplete = (v) =>
 export const isDueDateEntered = (d) =>
   DUE_DATE_KEYS.some((k) => d?.[k] != null && d?.[k] !== "");
 
-// 시간/날짜 입력값 객체 (DateTimeValue)를 Date 타입으로 변환
-export const toDate = (v) =>
-  isDateTimeComplete(v)
-    ? new Date(+v.year, +v.month - 1, +v.day, +v.hour, +v.minute)
-    : null;
-
 // 응답 기한 입력값 객체 (DueDateValue)를 분 단위 총합으로 환산 (없는 키/null은 0으로 취급)
 export const toMinutes = (d) =>
   (parseInt(d?.days, 10) || 0) * 24 * 60 +
@@ -215,7 +229,7 @@ export const getSelectedUserInfo = (users, userId) => {
   const selectedUser = users?.find((user) => user.id === userId);
   return {
     userName: selectedUser?.userName ?? "",
-    userPart: selectedUser?.isGuardian ? "보호자" : "",
+    userPart: selectedUser?.isGuardian ? "보호자" : "나의 사람",
   };
 };
 
@@ -286,7 +300,7 @@ export const getMsUntilStartLeadTooShort = (
   startDateTime,
   now = new Date(),
 ) => {
-  const start = toDate(startDateTime);
+  const start = toDateFromInput(startDateTime);
   return start ? start - now - START_MIN_LEAD_MINUTES * MS_PER_MINUTE : null;
 };
 
@@ -321,7 +335,7 @@ export const isStartTimeEnsured = (
   showToast,
   now = new Date(),
 ) => {
-  const start = toDate(startDateTime);
+  const start = toDateFromInput(startDateTime);
   if (start && start <= now) {
     showToast(START_PASSED_TOAST_MESSAGE);
     return false;
@@ -587,3 +601,24 @@ export const getReceivedInfoBadgeText = ({ added, updated, updatedAt }) => {
 export const getReceivedInfoUnavailableMessage = (unavailableReason) =>
   RECEIVED_INFO_UNAVAILABLE_MESSAGE[unavailableReason] ??
   RECEIVED_INFO_DEFAULT_UNAVAILABLE_MESSAGE;
+
+// 다음 버튼을 누른 시점에 미입력 및 시작 시간을 넘는 응답 기한을 보정한다.
+export const normalizeResponseDeadline = (form, now = new Date()) => {
+  if (form.dueDate === null) return { form, message: null };
+  if (!isDueDateEntered(form.dueDate)) return {
+    form: { ...form, dueDate: { days: String(DUE_DATE_DEFAULT_MINUTES / (24 * 60)) } },
+    message: DEADLINE_NOTICE.DEFAULT,
+  };
+  const start = toDateFromInput(form.startDateTime);
+  const minutes = toMinutes(form.dueDate);
+  if (start && minutes >= DUE_DATE_MIN_MINUTES && minutes <= DUE_DATE_MAX_MINUTES && minutes % 60 === 0 && now.getTime() + minutes * MS_PER_MINUTE > start.getTime()) {
+    return { form: { ...form, dueDate: null }, message: DEADLINE_NOTICE.FIXED };
+  }
+  return { form, message: null };
+};
+
+export const toLocalDateTime = (value) => {
+  const date = toDateFromInput(value);
+  return date ? formatLocalDateTime(date) : null;
+};
+

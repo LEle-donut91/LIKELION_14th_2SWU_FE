@@ -16,6 +16,10 @@ import {
 
 // 토스트 노출 시간(ms)
 export const TOAST_DURATION = 3000;
+export const DEADLINE_NOTICE = {
+  DEFAULT: "기본값은 24시간입니다.",
+  FIXED: "응답 기한은 시작 시간까지로 고정됩니다",
+};
 
 // setTimeout이 지원하는 최대 지연 시간 (약 24.8일, 초과하면 즉시 실행됨)
 export const MAX_TIMEOUT_MS = 2 ** 31 - 1;
@@ -32,6 +36,8 @@ export const MAX_TIMEOUT_MS = 2 ** 31 - 1;
  */
 export const INITIAL_FORM = {
   situationId: null,
+  situationStartDate: null,
+  situationEndDate: null,
   userId: null,
   helpType: null,
   startDateTime: null,

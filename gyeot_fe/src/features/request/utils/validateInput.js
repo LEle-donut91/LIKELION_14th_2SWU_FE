@@ -6,11 +6,11 @@ import {
   REQUEST_FORM_FIELD_KEY,
 } from "@/features/request/constants/requestConstants";
 import {
-  isDateTimeComplete,
   isDueDateEntered,
-  toDate,
   toMinutes,
 } from "@/features/request/utils/requestUtils";
+
+import { formatDateToLocalDayBoundary, toDateFromInput } from "@/features/request/utils/dateFormat";
 
 export const validateInput = (form, now, fields = null) => {
   // REQUEST_FORM_FIELD_KEY 구조분해 할당 (유효성 검사 후보 필드만 가져옴)
@@ -21,6 +21,7 @@ export const validateInput = (form, now, fields = null) => {
     END_DATE_TIME,
     LOCATION,
     USER_ID,
+    CONTENT,
     DUE_DATE,
   } = REQUEST_FORM_FIELD_KEY;
 
@@ -33,6 +34,7 @@ export const validateInput = (form, now, fields = null) => {
     END_DATE_TIME,
     LOCATION,
     USER_ID,
+    CONTENT,
     DUE_DATE,
   ];
 
@@ -49,7 +51,7 @@ export const validateInput = (form, now, fields = null) => {
 
   // 3. 시작 일시
   if (targetFields.includes(START_DATE_TIME)) {
-    const start = toDate(form.startDateTime);
+    const start = toDateFromInput(form.startDateTime);
     if (!start) {
       errors.startDateTime = "시작 일시를 모두 입력해 주세요.";
     } else {
@@ -66,9 +68,9 @@ export const validateInput = (form, now, fields = null) => {
 
   // 4. 종료 일시
   if (targetFields.includes(END_DATE_TIME)) {
-    const start = toDate(form.startDateTime);
-    const end = toDate(form.endDateTime);
-    if (!isDateTimeComplete(form.endDateTime)) {
+    const start = toDateFromInput(form.startDateTime);
+    const end = toDateFromInput(form.endDateTime);
+    if (!end) {
       errors.endDateTime = "종료 일시를 모두 입력해 주세요.";
     }
     else if (start && end <= start) {
@@ -88,22 +90,20 @@ export const validateInput = (form, now, fields = null) => {
 
   // 7. 응답 기한
   if (targetFields.includes(DUE_DATE)) {
-    if (!isDueDateEntered(form.dueDate)) {
-      errors.dueDate = "응답 기한을 입력해 주세요.";
-    } else {
-      const dueMinutes = toMinutes(form.dueDate);
-      const start = toDate(form.startDateTime);
-
-      if (dueMinutes < DUE_DATE_MIN_MINUTES) {
-        errors.dueDate = "응답 기한은 최소 1시간 이상이어야 해요.";
-      } else if (dueMinutes > DUE_DATE_MAX_MINUTES) {
-        errors.dueDate = "응답 기한은 최대 3일까지 설정할 수 있어요.";
-      } else if (start) {
-        const deadline = new Date(now.getTime() + dueMinutes * MS_PER_MINUTE);
-        if (deadline > start) {
-          errors.dueDate = "응답 기한은 시작 시간을 넘을 수 없어요.";
-        }
+    if (form.dueDate !== null && isDueDateEntered(form.dueDate)) {
+      const minutes = toMinutes(form.dueDate);
+      if (minutes < DUE_DATE_MIN_MINUTES || minutes > DUE_DATE_MAX_MINUTES) {
+        errors.dueDate = "응답 기한은 1시간~3일 범위로 입력해 주세요.";
       }
+    }
+  }
+  // 상황 기간은 ISO 날짜(YYYY-MM-DD)이며, 종료일 전체를 포함한다.
+  const situationStart = formatDateToLocalDayBoundary(form.situationStartDate);
+  const situationEnd = formatDateToLocalDayBoundary(form.situationEndDate, true);
+  for (const field of [START_DATE_TIME, END_DATE_TIME]) {
+    const date = toDateFromInput(form[field]);
+    if (targetFields.includes(field) && date && ((situationStart && date < situationStart) || (situationEnd && date > situationEnd))) {
+      errors[field] = "시작·종료 일시는 상황 기간 안에 있어야 해요.";
     }
   }
 

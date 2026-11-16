@@ -14,6 +14,7 @@ export const SITUATION_API_URLS = {
 
 // C. 도움 요청
 export const REQUEST_API_URLS = {
+  create: "/api/care-requests", // 도움 요청 생성
   targetCandidates: "/api/care-requests/target-candidates", // 대상 후보 조회
 };
 
