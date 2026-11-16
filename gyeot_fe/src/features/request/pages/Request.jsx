@@ -16,6 +16,7 @@ import { useQuery } from "@tanstack/react-query";
 // Custom Hooks
 import { useRequestNav } from "@/features/request/hooks/useRequestNav";
 import { useToast } from "@/features/request/hooks/useToast";
+import { getErrorMessage } from "@/shared/utils/apiError";
 
 // Zustand Store
 import { useRequestFormStore } from "@/features/request/stores/useRequestFormStore";
@@ -131,7 +132,7 @@ function Request() {
   // API 호출 에러 처리
   useEffect(() => {
     if (!targetsError) return;
-    showToast(targetsError.response?.data?.message);
+    showToast(getErrorMessage(targetsError));
   }, [targetsError, showToast]);
 
   // 상황 선택 확정 핸들러

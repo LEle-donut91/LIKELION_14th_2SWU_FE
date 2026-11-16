@@ -5,6 +5,7 @@ import { useParams } from "react-router-dom";
 import styles from "./RequestDetail.module.css";
 import { useRequestNav } from "@/features/request/hooks/useRequestNav";
 import { useToast } from "@/features/request/hooks/useToast";
+import { getErrorMessage } from "@/shared/utils/apiError";
 import { REQUEST_ROUTES } from "@/features/request/constants/routerConstants";
 import { REQUEST_QUERY_KEYS } from "@/features/request/constants/requestQueryKeys";
 import { RESPONSE_STATUS } from "@/features/request/constants/enumConstants";
@@ -60,9 +61,7 @@ function RequestDetail() {
 
   useEffect(() => {
     if (!error) return;
-    showToast(
-      error.response?.data?.message,
-    );
+    showToast(getErrorMessage(error));
   }, [error, showToast]);
 
   const { mutate: withdrawAcceptance, isPending: isWithdrawing } = useMutation({
@@ -71,7 +70,7 @@ function RequestDetail() {
       handleGoNext(REQUEST_ROUTES.home, true);
     },
     onError: (error) => {
-      showToast(error.response?.data?.message);
+      showToast(getErrorMessage(error));
     },
   });
 
@@ -79,7 +78,7 @@ function RequestDetail() {
     mutationFn: postStartApi,
     onSuccess: () => refetch(),
     onError: (error) => {
-      showToast(error.response?.data?.message);
+      showToast(getErrorMessage(error));
     },
   });
 
@@ -93,7 +92,7 @@ function RequestDetail() {
       return refetch();
     },
     onError: (error) => {
-      showToast(error.response?.data?.message);
+      showToast(getErrorMessage(error));
     },
   });
 
@@ -101,7 +100,7 @@ function RequestDetail() {
     mutationFn: postDoneApi,
     onSuccess: () => refetch(),
     onError: (error) => {
-      showToast(error.response?.data?.message);
+      showToast(getErrorMessage(error));
     },
   });
 

@@ -16,6 +16,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { useRequestNav } from "@/features/request/hooks/useRequestNav";
 import { useRequestFormStore } from "@/features/request/stores/useRequestFormStore";
 import { useToast } from "@/features/request/hooks/useToast";
+import { getErrorMessage } from "@/shared/utils/apiError";
 
 // Constants
 import { REQUEST_ROUTES } from "@/features/request/constants/routerConstants";
@@ -74,7 +75,7 @@ function InfoPreview() {
   // API 호출 에러 처리
   useEffect(() => {
     if (!targetsError) return;
-    showToast(targetsError.response?.data?.message);
+    showToast(getErrorMessage(targetsError));
   }, [targetsError, showToast]);
 
   // 공개 항목 선택지 조회 (새 요청이므로 requestId는 전달하지 않음)
@@ -100,7 +101,7 @@ function InfoPreview() {
 
   // API 호출 에러 처리
   useEffect(() => {
-    if (informationError) showToast(informationError.response?.data?.message);
+    if (informationError) showToast(getErrorMessage(informationError));
   }, [informationError, showToast]);
 
   // 공개 항목 선택지 조회 후, 기본값이 있는 경우 requestForm에 반영
@@ -144,7 +145,7 @@ function InfoPreview() {
       handleGoNext(REQUEST_ROUTES.send(requestId), true);
     },
     onError: (error) => {
-      showToast(error.response?.data?.message);
+      showToast(getErrorMessage(error));
     },
   });
 
