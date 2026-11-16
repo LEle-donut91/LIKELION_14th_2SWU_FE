@@ -1,13 +1,8 @@
+import { TARGET_FOOTER_CONFIG, TARGET_FOOTER_KEY } from "@/features/request/constants/footerConstants";
 import {
   MS_PER_MINUTE,
   HELP_TYPE_LABELS,
   DUE_DATE_DEFAULT_MINUTES,
-  REQUESTER_FOOTER_CONFIG,
-  REQUESTER_FOOTER_KEY,
-  ASSIGNEE_FOOTER_CONFIG,
-  ASSIGNEE_FOOTER_KEY,
-  TARGET_FOOTER_CONFIG,
-  TARGET_FOOTER_KEY,
   TARGET_STATE,
   TARGET_NOTICE_CONFIG,
   TARGET_GUIDE_LINES,
@@ -52,6 +47,7 @@ import {
 import iconDate from "@/shared/assets/icons/iconDate.svg";
 import iconLocation from "@/shared/assets/icons/iconLocation.svg";
 import iconHealthy from "@/shared/assets/icons/iconHealthy.svg";
+import { getRequesterFooter, getAssigneeFooter } from "@/features/request/utils/getFooter";
 
 // 대상 후보 조회 API 관련
 export const getRequestTargetsService = (raw) =>
@@ -108,58 +104,6 @@ export const getInformationOptionsService = (
       new Date(Date.now() + toMinutes(requestForm.dueDate) * MS_PER_MINUTE),
     ),
   };
-};
-
-const FOOTER_ACTIONS = {
-  edit: REQUEST_ACTION.EDIT,
-  askAgain: REQUEST_ACTION.REASSIGN,
-  withdraw: REQUEST_ACTION.WITHDRAW_PROPOSAL,
-  done: REQUEST_ACTION.COMPLETE,
-  sameRequest: REQUEST_ACTION.DUPLICATE,
-  checkChange: REQUEST_ACTION.ACCEPT_PROPOSAL,
-  start: REQUEST_ACTION.START,
-  pastSituation: REQUEST_ACTION.VIEW_PAST_SITUATION,
-};
-
-// API에서 허용한 버튼만 남긴다. 두 버튼 중 하나만 허용되면 단일 푸터로 표시한다.
-const getAllowedFooter = (config, actions) => {
-  if (!config) return null;
-  if (config.size !== "small") {
-    return actions.includes(FOOTER_ACTIONS[config.action]) ? config : null;
-  }
-  const buttons = ["left", "right"]
-    .map((side) => ({
-      title: config[`${side}Title`],
-      type: config[`${side}Type`],
-      action: config[`${side}Action`],
-    }))
-    .filter((button) => actions.includes(FOOTER_ACTIONS[button.action]));
-  if (buttons.length === 2) return config;
-  return buttons[0] ? { size: "large", ...buttons[0] } : null;
-};
-
-const getRequesterFooter = (actions) => {
-  let key = REQUESTER_FOOTER_KEY.EDIT;
-  if (actions.includes(REQUEST_ACTION.WITHDRAW_PROPOSAL)) {
-    key = REQUESTER_FOOTER_KEY.EDIT_WITHDRAW;
-  } else if (actions.includes(REQUEST_ACTION.REASSIGN)) {
-    key = REQUESTER_FOOTER_KEY.EDIT_ASK_AGAIN;
-  } else if (actions.includes(REQUEST_ACTION.COMPLETE)) {
-    key = REQUESTER_FOOTER_KEY.DONE;
-  } else if (actions.includes(REQUEST_ACTION.DUPLICATE)) {
-    key = REQUESTER_FOOTER_KEY.SAME_REQUEST;
-  }
-  return getAllowedFooter(REQUESTER_FOOTER_CONFIG[key], actions);
-};
-
-const getAssigneeFooter = (actions) => {
-  const key = [
-    ASSIGNEE_FOOTER_KEY.CHECK_CHANGE,
-    ASSIGNEE_FOOTER_KEY.START,
-    ASSIGNEE_FOOTER_KEY.DONE,
-    ASSIGNEE_FOOTER_KEY.PAST_SITUATION,
-  ].find((key) => actions.includes(FOOTER_ACTIONS[ASSIGNEE_FOOTER_CONFIG[key].action]));
-  return ASSIGNEE_FOOTER_CONFIG[key] ?? null;
 };
 
 const getTargetState = ({ status, myAssignment }) => {
