@@ -1,5 +1,4 @@
 {
-  "situationId": 1,
   "requestId": 21,
   "requestType": "GENERAL",
   "helpType": "HOSPITAL",
@@ -11,14 +10,11 @@
   "displayStatus": "ACCEPTED",
   "cancelReason": null,
   "viewerRole": "ASSIGNEE",
-  "requester": { "userId": 2, "name": "지우" },
-  "currentAssignment": {
-    "assignmentId": 34,
-    "target": { "userId": 7, "name": "민재" },
-    "responseStatus": "AVAILABLE",
-    "responseDeadline": "2026-11-09T14:00:00",
-    "acceptedAt": "2026-11-08T10:12:00"
+  "requester": {
+    "userId": 2,
+    "name": "지우"
   },
+  "currentAssignment": null,
   "noAssigneeReason": null,
   "assignments": null,
   "myAssignment": {
@@ -31,20 +27,52 @@
     "proposalId": 5,
     "status": "PENDING",
     "invalidationReason": null,
-    "changedFields": ["STARTS_AT", "ENDS_AT", "INFORMATION_IDS"],
+    "changedFields": [
+      "STARTS_AT",
+      "ENDS_AT",
+      "INFORMATION_IDS"
+    ],
     "before": {
       "startsAt": "2026-11-10T14:00:00",
       "endsAt": "2026-11-10T17:00:00",
       "place": "○○병원",
-      "information": "생년월일, 출입 방법 외 3건"
+      "informations": [
+        {
+          "informationId": 12,
+          "name": "생년월일"
+        },
+        {
+          "informationId": 15,
+          "name": "출입 방법"
+        }
+      ]
     },
     "after": {
       "startsAt": "2026-11-10T15:00:00",
       "endsAt": "2026-11-10T18:00:00",
       "place": "○○병원",
-      "information": "생년월일, 복용약 외 1건"
+      "informations": [
+        {
+          "informationId": 12,
+          "name": "생년월일"
+        },
+        {
+          "informationId": 20,
+          "name": "복용약"
+        }
+      ]
     },
     "responseDeadline": "2026-11-09T10:30:00"
   },
-  "actions": ["ACCEPT_PROPOSAL", "REJECT_PROPOSAL"]
+  "actions": [
+    "ACCEPT_PROPOSAL",
+    "REJECT_PROPOSAL"
+  ],
+  "situation": {
+    "situationId": 1,
+    "startDate": "2026-11-08",
+    "endDate": "2026-11-15",
+    "status": "ACTIVE"
+  },
+  "responseDeadlineHours": null
 }
