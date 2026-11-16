@@ -385,23 +385,23 @@ export const REQUESTER_NOTICE_KEY = {
 // 알림(RequestState) 문구 설정
 // [담당자 없음] 사유별 제목/본문
 export const NO_ASSIGNEE_NOTICE_CONFIG = {
-  [NO_ASSIGNEE_REASON.REJECTED]: {
+  [NO_ASSIGNEE_REASON.UNAVAILABLE]: {
     title: "요청 거절",
     information: "진행이 어렵다고 응답했어요.",
   },
-  [NO_ASSIGNEE_REASON.EXPIRED]: {
+  [NO_ASSIGNEE_REASON.DEADLINE_PASSED]: {
     title: "기한 지남",
     information: "상대방이 응답하지 않았어요.",
   },
-  [NO_ASSIGNEE_REASON.ACCEPT_WITHDRAWN]: {
+  [NO_ASSIGNEE_REASON.ACCEPTANCE_WITHDRAWN]: {
     title: "수락 철회",
     information: "상대방이 수락을 취소했어요.",
   },
-  [NO_ASSIGNEE_REASON.LEFT_SITUATION]: {
+  [NO_ASSIGNEE_REASON.PARTICIPANT_LEFT]: {
     title: "상황 나가기",
     information: "상대방이 상황에서 나갔어요.",
   },
-  [NO_ASSIGNEE_REASON.RELATION_RELEASED]: {
+  [NO_ASSIGNEE_REASON.RELATIONSHIP_ENDED]: {
     title: "관계 해제",
     information: "상대방과 관계가 해제됐어요.",
   },
@@ -409,15 +409,11 @@ export const NO_ASSIGNEE_NOTICE_CONFIG = {
 
 // [요청 취소] 사유별 제목/본문
 export const CANCEL_NOTICE_CONFIG = {
-  [CANCEL_REASON.SELF]: {
+  [CANCEL_REASON.REQUESTER_CANCELED]: {
     title: "요청 취소",
     information: "직접 취소했어요.",
   },
-  [CANCEL_REASON.EXPIRED]: {
-    title: "만료됨",
-    information: "담당자가 없어 요청이 만료됐어요.",
-  },
-  [CANCEL_REASON.REJECTED]: {
+  [CANCEL_REASON.RECONFIRMATION_REJECTED]: {
     title: "거절함",
     information: "담당자가 거절해 취소됐어요.",
   },
@@ -429,54 +425,7 @@ export const EDIT_INVALID_NOTICE_CONFIG = {
   information: "수정이 반영되지 않았어요",
 };
 
-// 푸터 종류
-export const REQUESTER_FOOTER_KEY = {
-  EDIT: "edit",
-  EDIT_ASK_AGAIN: "editAskAgain",
-  EDIT_WITHDRAW: "editWithdraw",
-  DONE: "done",
-  SAME_REQUEST: "sameRequest",
-};
 
-// 푸터 설정 - action 값은 페이지의 footerActions 키와 연결
-export const REQUESTER_FOOTER_CONFIG = {
-  [REQUESTER_FOOTER_KEY.EDIT]: {
-    size: "large",
-    title: "수정",
-    type: "secondary",
-    action: "edit",
-  },
-  [REQUESTER_FOOTER_KEY.EDIT_ASK_AGAIN]: {
-    size: "small",
-    leftType: "secondary",
-    rightType: "primary",
-    leftTitle: "수정",
-    rightTitle: "다른사람 요청",
-    leftAction: "edit",
-    rightAction: "askAgain",
-  },
-  [REQUESTER_FOOTER_KEY.EDIT_WITHDRAW]: {
-    size: "small",
-    leftType: "tertiary",
-    rightType: "secondary",
-    leftTitle: "수정 철회",
-    rightTitle: "수정",
-    leftAction: "withdraw",
-    rightAction: "edit",
-  },
-  [REQUESTER_FOOTER_KEY.DONE]: {
-    size: "large",
-    title: "완료",
-    type: "primary",
-    action: "done",
-  },
-  [REQUESTER_FOOTER_KEY.SAME_REQUEST]: {
-    size: "large",
-    title: "같은 내용 요청",
-    type: "secondary",
-    action: "sameRequest",
-  },
-};
 
 /**
  * =====================================================================
@@ -531,38 +480,7 @@ export const TARGET_GUIDE_LINES = {
   [TARGET_GUIDE_KEY.CLOSED]: ["더 이상 응답할 수 없어요."],
 };
 
-// 푸터 종류
-export const TARGET_FOOTER_KEY = {
-  RESPOND: "RESPOND", // 응답 전: [거절, 수락]
-  CHANGE: "CHANGE", // 보류: [거절로 변경, 수락으로 변경]
-  CHANGE_TO_ACCEPT: "CHANGE_TO_ACCEPT", // 거절: [수락으로 변경]
-};
 
-// 푸터 설정 - action 값은 페이지의 targetActions 키와 연결
-export const TARGET_FOOTER_CONFIG = {
-  [TARGET_FOOTER_KEY.RESPOND]: {
-    size: "small",
-    leftType: "secondary",
-    leftTitle: "거절",
-    rightTitle: "수락",
-    leftAction: "refuse",
-    rightAction: "accept",
-  },
-  [TARGET_FOOTER_KEY.CHANGE]: {
-    size: "small",
-    leftType: "secondary",
-    leftTitle: "거절로 변경",
-    rightTitle: "수락으로 변경",
-    leftAction: "changeToRefuse",
-    rightAction: "changeToAccept",
-  },
-  [TARGET_FOOTER_KEY.CHANGE_TO_ACCEPT]: {
-    size: "large",
-    title: "수락으로 변경",
-    type: "primary",
-    action: "changeToAccept",
-  },
-};
 
 /**
  * =====================================================================
@@ -578,37 +496,7 @@ export const ASSIGNEE_SAFETY_INFORMATION = {
   [REQUEST_STATE.EXPIRED]: "접근이 종료되었어요.",
 };
 
-// 푸터 종류
-export const ASSIGNEE_FOOTER_KEY = {
-  CHECK_CHANGE: "checkChange",
-  START: "start",
-  DONE: "done",
-  PAST_SITUATION: "pastSituation",
-};
 
-// 푸터 설정 - action 값은 페이지의 footerActions 키와 연결
-export const ASSIGNEE_FOOTER_CONFIG = {
-  [ASSIGNEE_FOOTER_KEY.CHECK_CHANGE]: {
-    title: "변경 내용 확인",
-    type: "primary",
-    action: "checkChange",
-  },
-  [ASSIGNEE_FOOTER_KEY.START]: {
-    title: "시작",
-    type: "primary",
-    action: "start",
-  },
-  [ASSIGNEE_FOOTER_KEY.DONE]: {
-    title: "완료",
-    type: "primary",
-    action: "done",
-  },
-  [ASSIGNEE_FOOTER_KEY.PAST_SITUATION]: {
-    title: "지난 상황에서 보기",
-    type: "primary",
-    action: "pastSituation",
-  },
-};
 
 /**
  * =====================================================================
