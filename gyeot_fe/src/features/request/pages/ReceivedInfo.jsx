@@ -13,7 +13,7 @@ import { getReceivedInfoApi } from "@/features/request/api/assigneeApi";
 import { getReceivedInfoService } from "@/features/request/services/assigneeService";
 
 // 일반 Components
-import ExitHeader from "@/features/request/components/Header/ExitHeader";
+import SubpageHeader from "@/shared/components/subpage-header/SubpageHeader";
 import SafetyCardDetail from "@/features/request/components/SafetyCard/SafetyCardDetail";
 import DueDateState from "@/features/request/components/State/DueDateState";
 
@@ -34,7 +34,7 @@ function ReceivedInfo() {
 
   return (
     <div className={styles.page}>
-      <ExitHeader title="전달받은 정보" onClick={handleGoBack} />
+      <SubpageHeader hasBackButton={false} hasCloseButton title="전달받은 정보" onCloseClick={handleGoBack} />
 
       <main className={styles.content}>
         <DueDateState isResponse={false} title="접근 기한" dueDate={dueDate} />

@@ -46,17 +46,17 @@ import {
 } from "@/features/request/services/requesterService";
 
 // 일반 Components
-import StepHeader from "@/features/request/components/Header/StepHeader";
-import SelectSection from "@/features/request/components/Section/SelectSection";
-import InputSection from "@/features/request/components/Section/InputSection";
-import TimeSheet from "@/features/request/components/Sheet/TimeSheet";
+import SubpageHeader from "@/shared/components/subpage-header/SubpageHeader";
+import SelectSection from "@/shared/components/SelectSection/SelectSection";
+import InputSection from "@/shared/components/InputSection/InputSection";
+import TimeSheet from "@/shared/components/TimeSheet/TimeSheet";
 import DateTimeOption from "@/features/request/components/Option/DateTimeOption";
-import DefaultSheet from "@/features/request/components/Sheet/DefaultSheet";
+import DefaultSheet from "@/shared/components/DefaultSheet/DefaultSheet";
 import CheckOption from "@/features/request/components/Option/CheckOption";
 import SafetyCardGroup from "@/features/request/components/SafetyCard/SafetyCardGroup";
-import SmallFooter from "@/features/request/components/Footer/SmallFooter";
-import DefaultModal from "@/features/request/components/Modal/DefaultModal";
-import DefaultToast from "@/features/request/components/Toast/DefaultToast";
+import SmallFooter from "@/shared/components/SmallFooter/SmallFooter";
+import DefaultModal from "@/shared/components/DefaultModal/DefaultModal";
+import DefaultToast from "@/shared/components/Toast/DefaultToast";
 
 // 페이지 컴포넌트
 function RequestEditForm() {
@@ -144,7 +144,7 @@ function RequestEditForm() {
   return (
     <div className={styles.page}>
       {/* 헤더 */}
-      <StepHeader title="요청 수정" step="1" onClick={handleGoBack} />
+      <SubpageHeader title="요청 수정" rightText="1 / 2" onBackClick={handleGoBack} />
 
       {/* 메인 컨텐츠 */}
       <main className={styles.content}>

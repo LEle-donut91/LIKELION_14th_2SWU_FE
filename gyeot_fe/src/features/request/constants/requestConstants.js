@@ -14,8 +14,6 @@ import {
  * =====================================================================
  */
 
-// 토스트 노출 시간(ms)
-export const TOAST_DURATION = 3000;
 export const DEADLINE_NOTICE = {
   DEFAULT: "기본값은 24시간입니다.",
   FIXED: "응답 기한은 시작 시간까지로 고정됩니다",

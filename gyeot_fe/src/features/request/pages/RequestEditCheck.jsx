@@ -26,10 +26,10 @@ import {
 import { getEditCheckService } from "@/features/request/services/requesterService";
 
 // 일반 Components
-import StepHeader from "@/features/request/components/Header/StepHeader";
+import SubpageHeader from "@/shared/components/subpage-header/SubpageHeader";
 import RequestSummary from "@/features/request/components/Request/RequestSummary";
 import UserInfo from "@/features/request/components/User/UserInfo";
-import LargeFooter from "@/features/request/components/Footer/LargeFooter";
+import LargeFooter from "@/shared/components/LargeFooter/LargeFooter";
 
 // 페이지 컴포넌트
 function RequestEditCheck() {
@@ -60,7 +60,7 @@ function RequestEditCheck() {
 
   return (
     <div className={styles.page}>
-      <StepHeader title="요청 수정" step="2" onClick={handleGoBack} />
+      <SubpageHeader title="요청 수정" rightText="2 / 2" onBackClick={handleGoBack} />
 
       {/* 실제 컨텐츠가 들어갈 자리 */}
       <main className={styles.content}>

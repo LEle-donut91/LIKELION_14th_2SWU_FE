@@ -36,16 +36,16 @@ import {
 import { getRequesterService } from "@/features/request/services/requesterService";
 
 // 일반 Components
-import DefaultHeader from "@/features/request/components/Header/DefaultHeader";
-import SmallFooter from "@/features/request/components/Footer/SmallFooter";
-import LargeFooter from "@/features/request/components/Footer/LargeFooter";
+import SubpageHeader from "@/shared/components/subpage-header/SubpageHeader";
+import SmallFooter from "@/shared/components/SmallFooter/SmallFooter";
+import LargeFooter from "@/shared/components/LargeFooter/LargeFooter";
 import RequestStep from "@/features/request/components/Request/RequestStep";
 import RequestSummary from "@/features/request/components/Request/RequestSummary";
 import DueDateState from "@/features/request/components/State/DueDateState";
 import RequestState from "@/features/request/components/State/RequestState";
 import UserOrder from "@/features/request/components/User/UserOrder";
 import UserState from "@/features/request/components/User/UserState";
-import DefaultModal from "@/features/request/components/Modal/DefaultModal";
+import DefaultModal from "@/shared/components/DefaultModal/DefaultModal";
 
 function RequestRequester() {
   const paramId = useParams().id; // path parameter (요청 ID)
@@ -139,13 +139,13 @@ function RequestRequester() {
 
   return (
     <div className={styles.page}>
-      <DefaultHeader
+      <SubpageHeader
         title="요청 상세"
-        subBtnTitle={
+        rightText={
           flags.isCancelable ? REQUESTER_CANCEL_BTN_TITLE : undefined
         }
-        onClick={() => handleGoBack()}
-        onSubBtnClick={() => setCancelModalOpen(true)}
+        onBackClick={() => handleGoBack()}
+        onRightTextClick={() => setCancelModalOpen(true)}
       />
 
       <div className={styles.content}>

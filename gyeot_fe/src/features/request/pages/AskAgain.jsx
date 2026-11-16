@@ -48,16 +48,16 @@ import {
 } from "@/features/request/services/requesterService";
 
 // 일반 Components
-import DefaultHeader from "@/features/request/components/Header/DefaultHeader";
+import SubpageHeader from "@/shared/components/subpage-header/SubpageHeader";
 import RequestSummary from "@/features/request/components/Request/RequestSummary";
 import UserInfo from "@/features/request/components/User/UserInfo";
-import SelectSection from "@/features/request/components/Section/SelectSection";
-import DefaultSheet from "@/features/request/components/Sheet/DefaultSheet";
-import TimeSheet from "@/features/request/components/Sheet/TimeSheet";
+import SelectSection from "@/shared/components/SelectSection/SelectSection";
+import DefaultSheet from "@/shared/components/DefaultSheet/DefaultSheet";
+import TimeSheet from "@/shared/components/TimeSheet/TimeSheet";
 import UserOption from "@/features/request/components/Option/UserOption";
 import DateTimeOption from "@/features/request/components/Option/DateTimeOption";
-import LargeFooter from "@/features/request/components/Footer/LargeFooter";
-import DefaultToast from "@/features/request/components/Toast/DefaultToast";
+import LargeFooter from "@/shared/components/LargeFooter/LargeFooter";
+import DefaultToast from "@/shared/components/Toast/DefaultToast";
 
 // 페이지 컴포넌트
 function AskAgain() {
@@ -125,7 +125,7 @@ function AskAgain() {
   return (
     <div className={styles.page}>
       {/* 기본 헤더 */}
-      <DefaultHeader title="다시 부탁하기" onClick={handleGoBack} />
+      <SubpageHeader title="다시 부탁하기" onBackClick={handleGoBack} />
 
       <div className={styles.content}>
         {/* 요청 요약 카드 */}

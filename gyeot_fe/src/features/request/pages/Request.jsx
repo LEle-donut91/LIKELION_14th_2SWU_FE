@@ -53,17 +53,17 @@ import { getRequestTargetsApi } from "@/features/request/api/getApi";
 import { getRequestTargetsService } from "@/features/request/services/getService";
 
 // 일반 Components
-import StepHeader from "@/features/request/components/Header/StepHeader";
-import LargeFooter from "@/features/request/components/Footer/LargeFooter";
+import SubpageHeader from "@/shared/components/subpage-header/SubpageHeader";
+import LargeFooter from "@/shared/components/LargeFooter/LargeFooter";
 import RadioSection from "@/features/request/components/Section/RadioSection";
-import SelectSection from "@/features/request/components/Section/SelectSection";
-import InputSection from "@/features/request/components/Section/InputSection";
-import DefaultSheet from "@/features/request/components/Sheet/DefaultSheet";
-import TimeSheet from "@/features/request/components/Sheet/TimeSheet";
+import SelectSection from "@/shared/components/SelectSection/SelectSection";
+import InputSection from "@/shared/components/InputSection/InputSection";
+import DefaultSheet from "@/shared/components/DefaultSheet/DefaultSheet";
+import TimeSheet from "@/shared/components/TimeSheet/TimeSheet";
 import SituationOption from "@/features/request/components/Option/SituationOption";
 import UserOption from "@/features/request/components/Option/UserOption";
 import DateTimeOption from "@/features/request/components/Option/DateTimeOption";
-import DefaultToast from "@/features/request/components/Toast/DefaultToast";
+import DefaultToast from "@/shared/components/Toast/DefaultToast";
 
 // 페이지 컴포넌트
 function Request() {
@@ -170,7 +170,7 @@ function Request() {
   return (
     <div className={styles.page}>
       {/* 헤더 */}
-      <StepHeader title="요청 작성" step="1" onClick={handleHeaderBackClick} />
+      <SubpageHeader title="요청 작성" rightText="1 / 2" onBackClick={handleHeaderBackClick} />
 
       {/* 메인 컨텐츠 */}
       <main className={styles.content}>

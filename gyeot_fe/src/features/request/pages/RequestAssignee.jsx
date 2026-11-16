@@ -28,13 +28,13 @@ import {
 import { getAssigneeService } from "@/features/request/services/assigneeService";
 
 // 일반 Components
-import DefaultHeader from "@/features/request/components/Header/DefaultHeader";
-import LargeFooter from "@/features/request/components/Footer/LargeFooter";
+import SubpageHeader from "@/shared/components/subpage-header/SubpageHeader";
+import LargeFooter from "@/shared/components/LargeFooter/LargeFooter";
 import RequestStep from "@/features/request/components/Request/RequestStep";
 import RequestState from "@/features/request/components/State/RequestState";
 import RequestSummary from "@/features/request/components/Request/RequestSummary";
 import SafetyCardGroup from "@/features/request/components/SafetyCard/SafetyCardGroup";
-import DefaultModal from "@/features/request/components/Modal/DefaultModal";
+import DefaultModal from "@/shared/components/DefaultModal/DefaultModal";
 
 function RequestAssignee() {
   const paramId = useParams().id; // path parameter (요청 ID)
@@ -98,11 +98,11 @@ function RequestAssignee() {
 
   return (
     <div className={styles.page}>
-      <DefaultHeader
+      <SubpageHeader
         title="요청 상세"
-        subBtnTitle={flags.showWithdrawBtn ? "철회" : undefined}
-        onClick={() => handleGoBack()}
-        onSubBtnClick={
+        rightText={flags.showWithdrawBtn ? "철회" : undefined}
+        onBackClick={() => handleGoBack()}
+        onRightTextClick={
           flags.showWithdrawBtn ? () => setModalOpen(true) : undefined
         }
       />

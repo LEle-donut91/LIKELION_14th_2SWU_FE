@@ -30,9 +30,9 @@ import {
 import { getTargetService } from "@/features/request/services/targetService";
 
 // 일반 Components
-import DefaultHeader from "@/features/request/components/Header/DefaultHeader";
-import SmallFooter from "@/features/request/components/Footer/SmallFooter";
-import LargeFooter from "@/features/request/components/Footer/LargeFooter";
+import SubpageHeader from "@/shared/components/subpage-header/SubpageHeader";
+import SmallFooter from "@/shared/components/SmallFooter/SmallFooter";
+import LargeFooter from "@/shared/components/LargeFooter/LargeFooter";
 import RequestSummary from "@/features/request/components/Request/RequestSummary";
 import DueDateState from "@/features/request/components/State/DueDateState";
 import RequestState from "@/features/request/components/State/RequestState";
@@ -116,11 +116,11 @@ function RequestTarget() {
   return (
     <div className={styles.page}>
       {/* 상단 헤더 */}
-      <DefaultHeader
+      <SubpageHeader
         title="받은 요청"
-        subBtnTitle={flags.showHoldBtn ? "보류" : undefined}
-        onClick={() => handleGoBack()}
-        onSubBtnClick={flags.showHoldBtn ? targetActions.hold : undefined}
+        rightText={flags.showHoldBtn ? "보류" : undefined}
+        onBackClick={() => handleGoBack()}
+        onRightTextClick={flags.showHoldBtn ? targetActions.hold : undefined}
       />
 
       {/* 실제 메인 컨텐츠 */}

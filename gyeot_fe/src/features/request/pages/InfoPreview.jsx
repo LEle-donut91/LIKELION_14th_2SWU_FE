@@ -42,15 +42,15 @@ import { postCareRequestApi } from "@/features/request/api/postApi";
 import { postCareRequestService, postCareRequestResultService } from "@/features/request/services/postServices";
 
 // 일반 Components
-import StepHeader from "@/features/request/components/Header/StepHeader";
+import SubpageHeader from "@/shared/components/subpage-header/SubpageHeader";
 import UserInfo from "@/features/request/components/User/UserInfo";
 import DueDateState from "@/features/request/components/State/DueDateState";
 import SafetyCardGroup from "@/features/request/components/SafetyCard/SafetyCardGroup";
-import DefaultSheet from "@/features/request/components/Sheet/DefaultSheet";
+import DefaultSheet from "@/shared/components/DefaultSheet/DefaultSheet";
 import CheckOption from "@/features/request/components/Option/CheckOption";
-import LargeFooter from "@/features/request/components/Footer/LargeFooter";
-import DefaultModal from "@/features/request/components/Modal/DefaultModal";
-import DefaultToast from "@/features/request/components/Toast/DefaultToast";
+import LargeFooter from "@/shared/components/LargeFooter/LargeFooter";
+import DefaultModal from "@/shared/components/DefaultModal/DefaultModal";
+import DefaultToast from "@/shared/components/Toast/DefaultToast";
 
 // 페이지 컴포넌트
 function InfoPreview() {
@@ -168,7 +168,7 @@ function InfoPreview() {
   return (
     <div className={styles.page}>
       {/* 헤더 */}
-      <StepHeader title="요청 작성" step="2" onClick={handleGoBack} />
+      <SubpageHeader title="요청 작성" rightText="2 / 2" onBackClick={handleGoBack} />
 
       {/* 메인 컨텐츠 */}
       <main className={styles.content}>

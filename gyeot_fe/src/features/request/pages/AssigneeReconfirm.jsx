@@ -29,10 +29,10 @@ import {
 import { getAssigneeReconfirmService } from "@/features/request/services/assigneeService";
 
 // 일반 Components
-import ExitHeader from "@/features/request/components/Header/ExitHeader";
-import SmallFooter from "@/features/request/components/Footer/SmallFooter";
+import SubpageHeader from "@/shared/components/subpage-header/SubpageHeader";
+import SmallFooter from "@/shared/components/SmallFooter/SmallFooter";
 import RequestSummary from "@/features/request/components/Request/RequestSummary";
-import DefaultModal from "@/features/request/components/Modal/DefaultModal";
+import DefaultModal from "@/shared/components/DefaultModal/DefaultModal";
 
 function AssigneeReconfirm() {
   const paramId = useParams().id; // path parameter (요청 ID)
@@ -65,7 +65,7 @@ function AssigneeReconfirm() {
   return (
     <div className={styles.page}>
       {/* 헤더 (닫기 버튼이 있는 컴포넌트) */}
-      <ExitHeader title="변경 내용 확인" onClick={() => handleGoBack()} />
+      <SubpageHeader hasBackButton={false} hasCloseButton title="변경 내용 확인" onCloseClick={() => handleGoBack()} />
 
       {/* 메인 컨텐츠 */}
       <main className={styles.content}>
