@@ -1,5 +1,3 @@
-import postAssigneeStartMock from "@/features/request/mock/RequestDetail/postAssigneeStartMock";
-import postAssigneeDoneMock from "@/features/request/mock/RequestDetail/postAssigneeDoneMock";
 import postAssigneeReconfirmAcceptMock from "@/features/request/mock/AssigneeReconfirm/postAssigneeReconfirmAcceptMock";
 import postAssigneeReconfirmRejectMock from "@/features/request/mock/AssigneeReconfirm/postAssigneeReconfirmRejectMock";
 import postEditFormMock from "@/features/request/mock/RequestEdit/postEditFormMock";
@@ -20,18 +18,16 @@ export const postAcceptWithdrawApi = async (requestId) => {
   return response.data;
 };
 
-// TODO: API 연동 로직 수정 필요
-// [H-03-01] 요청 상세(담당자 뷰) - 시작
-export const postAssigneeStartApi = (requestId) => {
-  console.log("시작:", requestId);
-  return postAssigneeStartMock;
+// 돌봄 시작 API
+export const postStartApi = async (requestId) => {
+  const response = await axiosInstance.post(REQUEST_API_URLS.start(requestId));
+  return response.data;
 };
 
-// TODO: API 연동 로직 수정 필요
-// [H-03-01] 요청 상세(담당자 뷰) - 완료
-export const postAssigneeDoneApi = (requestId) => {
-  console.log("완료:", requestId);
-  return postAssigneeDoneMock;
+// 돌봄 완료 API (담당자·요청자 공통)
+export const postDoneApi = async (requestId) => {
+  const response = await axiosInstance.post(REQUEST_API_URLS.complete(requestId));
+  return response.data;
 };
 
 // TODO: API 연동 로직 수정 필요

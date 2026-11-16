@@ -13,7 +13,6 @@ import {
 } from "@/features/request/constants/requestConstants";
 import { getRequestDetailApi } from "@/features/request/api/getApi";
 import {
-  patchRequestDoneApi,
   patchRequestCancelApi,
   patchTargetHoldApi,
   patchTargetRefuseApi,
@@ -22,8 +21,8 @@ import {
   patchTargetChangeAcceptApi,
 } from "@/features/request/api/patchApi";
 import {
-  postAssigneeStartApi,
-  postAssigneeDoneApi,
+  postStartApi,
+  postDoneApi,
   postAcceptWithdrawApi,
 } from "@/features/request/api/postApi";
 
@@ -54,6 +53,7 @@ function RequestDetail() {
     data: detail,
     isPending,
     error,
+    refetch,
   } = useQuery({
     queryKey: REQUEST_QUERY_KEYS.detail(paramId),
     queryFn: () => getRequestDetailApi(paramId),
@@ -78,6 +78,22 @@ function RequestDetail() {
     },
   });
 
+  const { mutate: startCare, isPending: isStarting } = useMutation({
+    mutationFn: postStartApi,
+    onSuccess: () => refetch(),
+    onError: (error) => {
+      showToast(error.response?.data?.message);
+    },
+  });
+
+  const { mutate: completeCare, isPending: isCompleting } = useMutation({
+    mutationFn: postDoneApi,
+    onSuccess: () => refetch(),
+    onError: (error) => {
+      showToast(error.response?.data?.message);
+    },
+  });
+
   const {
     situationId, stepState, userName, userId, requestType, message,
     dueDate, initialDueDate, infoList, userList, flags = {}, notices = [],
@@ -96,12 +112,16 @@ function RequestDetail() {
     edit: () => handleGoNext(REQUEST_ROUTES.editForm(paramId)),
     askAgain: () => handleGoNext(REQUEST_ROUTES.askAgain(paramId)),
     withdraw: () => setWithdrawModalOpen(true),
-    done: () => isRequester
-      ? patchRequestDoneApi(paramId)
-      : postAssigneeDoneApi(paramId),
+    done: () => {
+      if (isStarting || isCompleting) return;
+      completeCare(paramId);
+    },
     sameRequest: () => setSameModalOpen(true),
     checkChange: () => handleGoNext(REQUEST_ROUTES.assigneeReconfirm(paramId)),
-    start: () => postAssigneeStartApi(paramId),
+    start: () => {
+      if (isStarting || isCompleting) return;
+      startCare(paramId);
+    },
     pastSituation: () => handleGoNextWithState(
       REQUEST_ROUTES.pastSituationDetail, { situationId }, true,
     ),
