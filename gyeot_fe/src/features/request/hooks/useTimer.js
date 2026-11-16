@@ -12,13 +12,20 @@ import { formatSecondsToTime } from "@/features/request/utils/requestUtils";
  *   const { hour, minute, second } = useTimer(parseTimeToSeconds("12:00:00"));
  * =====================================================================
  */
-export function useTimer(initialSeconds = 0, enabled = true) {
+export function useTimer(initialSeconds = 0, enabled = true, deadline = null) {
   const [remaining, setRemaining] = useState(initialSeconds);
+  const [now, setNow] = useState(Date.now);
 
   useEffect(() => {
     if (!enabled) return;
 
     const interval = setInterval(() => {
+      if (deadline) {
+        const currentTime = Date.now();
+        setNow(currentTime);
+        if (currentTime >= Date.parse(deadline)) clearInterval(interval);
+        return;
+      }
       setRemaining((prev) => {
         if (prev <= 1) clearInterval(interval); // 0초가 되면 타이머 삭제
         return Math.max(prev - 1, 0);
@@ -27,7 +34,10 @@ export function useTimer(initialSeconds = 0, enabled = true) {
 
     // 언마운트 시 타이머 삭제
     return () => clearInterval(interval);
-  }, [enabled]);
+  }, [enabled, deadline]);
 
-  return formatSecondsToTime(remaining);
+  const deadlineSeconds = Math.floor((Date.parse(deadline) - now) / 1000);
+  return formatSecondsToTime(deadline
+    ? Math.max(Number.isFinite(deadlineSeconds) ? deadlineSeconds : 0, 0)
+    : remaining);
 }

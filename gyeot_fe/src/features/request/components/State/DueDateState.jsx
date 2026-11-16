@@ -2,11 +2,11 @@ import styles from "@/features/request/components/State/DueDateState.module.css"
 import { useTimer } from "@/features/request/hooks/useTimer";
 import { parseTimeToSeconds } from "@/features/request/utils/requestUtils";
 
-function DueDateState({ isResponse, title, dueDate }) {
-  // "HH:MM:SS" -> 초 변환 후 카운트다운 (응답 기한 모드일 때만 동작)
+function DueDateState({ isResponse, isDeadline = false, title, dueDate }) {
   const { hour, minute, second } = useTimer(
-    parseTimeToSeconds(dueDate),
+    isDeadline ? 0 : parseTimeToSeconds(dueDate),
     isResponse,
+    isDeadline ? dueDate : null,
   );
 
   return (
