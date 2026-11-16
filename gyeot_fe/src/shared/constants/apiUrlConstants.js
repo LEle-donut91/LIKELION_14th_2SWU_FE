@@ -17,6 +17,7 @@ export const REQUEST_API_URLS = {
   create: "/api/care-requests", // 도움 요청 생성
   targetCandidates: "/api/care-requests/target-candidates", // 대상 후보 조회
   detail: (requestId) => `/api/care-requests/${requestId}`, // 도움 요청 상세 조회
+  withdraw: (requestId) => `/api/care-requests/${requestId}/withdraw`, // 수락 철회
 };
 
 // D. 안심카드·정보 공유

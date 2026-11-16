@@ -1,6 +1,6 @@
 import { getRequestDetailService } from "@/features/request/services/getService";
 import { Fragment, useEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 import styles from "./RequestDetail.module.css";
 import { useRequestNav } from "@/features/request/hooks/useRequestNav";
@@ -13,7 +13,6 @@ import {
 } from "@/features/request/constants/requestConstants";
 import { getRequestDetailApi } from "@/features/request/api/getApi";
 import {
-  patchEditWithdrawApi,
   patchRequestDoneApi,
   patchRequestCancelApi,
   patchTargetHoldApi,
@@ -25,7 +24,7 @@ import {
 import {
   postAssigneeStartApi,
   postAssigneeDoneApi,
-  postAssigneeWithdrawApi,
+  postAcceptWithdrawApi,
 } from "@/features/request/api/postApi";
 
 import SubpageHeader from "@/shared/components/subpage-header/SubpageHeader";
@@ -69,9 +68,19 @@ function RequestDetail() {
     );
   }, [error, showToast]);
 
+  const { mutate: withdrawAcceptance, isPending: isWithdrawing } = useMutation({
+    mutationFn: postAcceptWithdrawApi,
+    onSuccess: () => {
+      handleGoNext(REQUEST_ROUTES.home, true);
+    },
+    onError: (error) => {
+      showToast(error.response?.data?.message);
+    },
+  });
+
   const {
     situationId, stepState, userName, userId, requestType, message,
-    dueDate, initialDueDate, infoList, userList, flags, notices = [],
+    dueDate, initialDueDate, infoList, userList, flags = {}, notices = [],
     notice, footerConfig, role, orderTitle, userStateText, safetyInformation,
     guideLines = [],
   } = detail ?? {};
@@ -86,7 +95,7 @@ function RequestDetail() {
   const footerActions = {
     edit: () => handleGoNext(REQUEST_ROUTES.editForm(paramId)),
     askAgain: () => handleGoNext(REQUEST_ROUTES.askAgain(paramId)),
-    withdraw: () => patchEditWithdrawApi(paramId),
+    withdraw: () => setWithdrawModalOpen(true),
     done: () => isRequester
       ? patchRequestDoneApi(paramId)
       : postAssigneeDoneApi(paramId),
@@ -115,9 +124,9 @@ function RequestDetail() {
     });
   };
   const handleWithdrawConfirm = () => {
-    postAssigneeWithdrawApi(paramId);
+    if (isWithdrawing) return;
     setWithdrawModalOpen(false);
-    handleGoNext(REQUEST_ROUTES.home, true);
+    withdrawAcceptance(paramId);
   };
   const headerActions = {
     requester: {

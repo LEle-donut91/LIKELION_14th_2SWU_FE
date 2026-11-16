@@ -1,6 +1,5 @@
 import postAssigneeStartMock from "@/features/request/mock/RequestDetail/postAssigneeStartMock";
 import postAssigneeDoneMock from "@/features/request/mock/RequestDetail/postAssigneeDoneMock";
-import postAssigneeWithdrawMock from "@/features/request/mock/RequestDetail/postAssigneeWithdrawMock";
 import postAssigneeReconfirmAcceptMock from "@/features/request/mock/AssigneeReconfirm/postAssigneeReconfirmAcceptMock";
 import postAssigneeReconfirmRejectMock from "@/features/request/mock/AssigneeReconfirm/postAssigneeReconfirmRejectMock";
 import postEditFormMock from "@/features/request/mock/RequestEdit/postEditFormMock";
@@ -12,6 +11,12 @@ import { REQUEST_API_URLS } from "@/shared/constants/apiUrlConstants";
 // 도움 요청 생성 API
 export const postCareRequestApi = async (payload) => {
   const response = await axiosInstance.post(REQUEST_API_URLS.create, payload);
+  return response.data;
+};
+
+// 수락 철회 API
+export const postAcceptWithdrawApi = async (requestId) => {
+  const response = await axiosInstance.post(REQUEST_API_URLS.withdraw(requestId));
   return response.data;
 };
 
@@ -27,13 +32,6 @@ export const postAssigneeStartApi = (requestId) => {
 export const postAssigneeDoneApi = (requestId) => {
   console.log("완료:", requestId);
   return postAssigneeDoneMock;
-};
-
-// TODO: API 연동 로직 수정 필요
-// [H-03-01] 요청 상세(담당자 뷰) - 수락 철회
-export const postAssigneeWithdrawApi = (requestId) => {
-  console.log("수락 철회:", requestId);
-  return postAssigneeWithdrawMock;
 };
 
 // TODO: API 연동 로직 수정 필요
