@@ -15,9 +15,7 @@ import {
 } from "@/features/request/constants/requestConstants";
 import { getRequestDetailApi } from "@/features/request/api/getApi";
 import {
-  patchRequestCancelApi,
-} from "@/features/request/api/patchApi";
-import {
+  postCancelApi,
   postStartApi,
   postDoneApi,
   postAcceptWithdrawApi,
@@ -63,6 +61,14 @@ function RequestDetail() {
     if (!error) return;
     showToast(getErrorMessage(error));
   }, [error, showToast]);
+
+  const { mutate: cancelRequest, isPending: isCanceling } = useMutation({
+    mutationFn: postCancelApi,
+    onSuccess: () => refetch(),
+    onError: (error) => {
+      showToast(getErrorMessage(error));
+    },
+  });
 
   const { mutate: withdrawAcceptance, isPending: isWithdrawing } = useMutation({
     mutationFn: postAcceptWithdrawApi,
@@ -138,9 +144,11 @@ function RequestDetail() {
   };
 
   const handleCancelConfirm = () => {
-    patchRequestCancelApi(paramId);
+    if (isCanceling) return;
     setCancelModalOpen(false);
+    cancelRequest(paramId);
   };
+
   const handleSameConfirm = () => {
     setSameModalOpen(false);
     handleGoNextWithState(REQUEST_ROUTES.request(situationId), {

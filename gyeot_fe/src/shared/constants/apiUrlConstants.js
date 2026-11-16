@@ -18,6 +18,7 @@ export const REQUEST_API_URLS = {
   targetCandidates: "/api/care-requests/target-candidates", // 대상 후보 조회
   detail: (requestId) => `/api/care-requests/${requestId}`, // 도움 요청 상세 조회
   withdraw: (requestId) => `/api/care-requests/${requestId}/withdraw`, // 수락 철회
+  cancel: (requestId) => `/api/care-requests/${requestId}/cancel`, // 요청 취소
   respond: (requestId) => `/api/care-requests/${requestId}/respond`, // 요청 응답
   start: (requestId) => `/api/care-requests/${requestId}/start`, // 돌봄 시작
   complete: (requestId) => `/api/care-requests/${requestId}/complete`, // 돌봄 완료
