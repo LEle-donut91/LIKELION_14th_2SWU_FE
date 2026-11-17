@@ -55,9 +55,8 @@ export const SAFETY_INFO_MOCK_MESSAGE = {
 };
 
 // 실패 응답 (명세 'D 에러 코드' 표 기준)
-// - INVALID_INPUT은 명세에 문구가 없어 목업용 임시 문구 사용
 export const SAFETY_INFO_MOCK_ERROR = {
-  INVALID_INPUT: { status: 400, code: "INVALID_INPUT", message: "입력값을 확인해 주세요." },
+  INVALID_INPUT: { status: 400, code: "INVALID_INPUT", message: "입력값이 올바르지 않습니다." },
   SAFETY_INFO_NOT_FOUND: { status: 404, code: "SAFETY_INFO_NOT_FOUND", message: "존재하지 않는 안심카드 항목입니다." },
   SAFETY_INFO_ALREADY_EXISTS: { status: 409, code: "SAFETY_INFO_ALREADY_EXISTS", message: "이미 등록된 항목입니다. 기존 항목을 수정해 주세요." },
 };
