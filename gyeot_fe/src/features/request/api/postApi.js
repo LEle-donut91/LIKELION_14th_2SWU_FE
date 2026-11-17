@@ -47,7 +47,7 @@ export const postEditWithdrawApi = async ({ requestId, proposalId }) => {
   return response.data;
 };
 
-// [N-05] 변경 내용 확인 - "확인" (수정안 수락)
+// 재확인 수락 API
 export const postReconfirmAcceptApi = async ({ requestId, proposalId }) => {
   const response = await axiosInstance.post(
     REQUEST_API_URLS.reconfirmAccept(requestId, proposalId),
@@ -55,7 +55,7 @@ export const postReconfirmAcceptApi = async ({ requestId, proposalId }) => {
   return response.data;
 };
 
-// [N-05] 변경 내용 확인 - 모달의 "거절" (수정안 거절)
+// 재확인 거절 API
 export const postReconfirmRejectApi = async ({ requestId, proposalId }) => {
   const response = await axiosInstance.post(
     REQUEST_API_URLS.reconfirmReject(requestId, proposalId),
@@ -63,7 +63,7 @@ export const postReconfirmRejectApi = async ({ requestId, proposalId }) => {
   return response.data;
 };
 
-// 다시 부탁하기 - 새 대상 지정
+// 다시 부탁하기 API
 export const postAskAgainApi = async ({ requestId, payload }) => {
   const response = await axiosInstance.post(REQUEST_API_URLS.assignments(requestId), payload);
   return response.data;

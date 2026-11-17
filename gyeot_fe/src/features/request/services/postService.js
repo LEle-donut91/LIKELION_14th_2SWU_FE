@@ -44,8 +44,3 @@ export const postAskAgainService = (requestId, requestForm, now = new Date()) =>
   };
 };
 
-export const postAskAgainIdService = (raw) => ({
-  tempId: raw.tempId,
-  msg: raw.message,
-});
-

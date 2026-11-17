@@ -1,6 +1,3 @@
-import getEditFormMock from "@/features/request/mock/RequestEdit/getEditFormMock";
-import getEditCheckMock from "@/features/request/mock/RequestEdit/getEditCheckMock";
-import getAskAgainMock from "@/features/request/mock/AskAgain/getAskAgainMock";
 import { REQUEST_API_URLS, INFO_SHARE_API_URLS } from "@/shared/constants/apiUrlConstants";
 import { axiosInstance } from "@/shared/api/axiosInstance";
 
@@ -30,27 +27,4 @@ export const getRequestDetailApi = async (requestId) => {
 export const getReceivedInfoApi = async (requestId) => {
   const response = await axiosInstance.get(INFO_SHARE_API_URLS.sharedInformation(requestId));
   return response.data;
-};
-
-// TODO: API 연동 로직 수정 필요
-// [H-03-01-02] 요청 수정 - 폼 데이터 조회 (GET 1회)
-export const getEditFormApi = (requestId) => {
-  console.log(requestId);
-  return getEditFormMock;
-};
-
-// TODO: API 연동 로직 수정 필요
-// [H-03-01-02] 요청 수정 내용 확인 - 변경 전/후 조회
-export const getEditCheckApi = (requestId) => {
-  console.log(requestId);
-  return getEditCheckMock;
-};
-
-// TODO: API 연동 로직 수정 필요
-// [N-06] 다시 부탁하기 - 이전 요청 내용, 대상 이력, 새 요청 대상 조회
-// 응답: { situationId, requestId, lastReqSummary: { type, time, startAt, location, info, message }, userRecord, userLst }
-// - startAt: 시작 일시 (DateTimeValue). 시작까지 1시간 미만이면 응답 기한이 시작 시간까지로 고정됨
-export const getAskAgainApi = (requestId) => {
-  console.log(requestId);
-  return getAskAgainMock;
 };

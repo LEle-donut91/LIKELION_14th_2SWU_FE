@@ -4,7 +4,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 import styles from "./RequestDetail.module.css";
 import { useRequestNav } from "@/features/request/hooks/useRequestNav";
-import { useToast } from "@/features/request/hooks/useToast";
+import { useToast } from "@/shared/hooks/useToast";
 import { getErrorMessage } from "@/shared/utils/apiError";
 import { REQUEST_ROUTES } from "@/features/request/constants/routerConstants";
 import { REQUEST_QUERY_KEYS } from "@/features/request/constants/requestQueryKeys";
