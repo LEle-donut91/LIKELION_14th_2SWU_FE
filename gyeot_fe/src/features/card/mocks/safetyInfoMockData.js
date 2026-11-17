@@ -58,5 +58,9 @@ export const SAFETY_INFO_MOCK_MESSAGE = {
 export const SAFETY_INFO_MOCK_ERROR = {
   INVALID_INPUT: { status: 400, code: "INVALID_INPUT", message: "입력값이 올바르지 않습니다." },
   SAFETY_INFO_NOT_FOUND: { status: 404, code: "SAFETY_INFO_NOT_FOUND", message: "존재하지 않는 안심카드 항목입니다." },
-  SAFETY_INFO_ALREADY_EXISTS: { status: 409, code: "SAFETY_INFO_ALREADY_EXISTS", message: "이미 등록된 항목입니다. 기존 항목을 수정해 주세요." },
+  SAFETY_INFO_ALREADY_EXISTS: { status: 409, code: "SAFETY_INFO_ALREADY_EXISTS", message: "이미 등록된 항목입니다.\n기존 항목을 수정해 주세요." },
 };
+
+// 실패 응답을 흉내 내는 URL 쿼리 키 (예: /card/basic?mockFail=true)
+// - 작성: 409 SAFETY_INFO_ALREADY_EXISTS / 수정·삭제: 404 SAFETY_INFO_NOT_FOUND
+export const SAFETY_INFO_MOCK_FAIL_QUERY_KEY = "mockFail";

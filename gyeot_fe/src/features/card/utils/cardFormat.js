@@ -21,6 +21,9 @@ export const formatSharingCount = (count) => {
   return `지금 공유 중 ${count}건`;
 };
 
+// 토스트 문구: 문장마다 줄바꿈 ("A입니다. B해 주세요." → "A입니다.\nB해 주세요.")
+export const formatToastMessage = (message = "") => message.replace(/\.\s+/g, ".\n");
+
 /**
  * =====================================================================
  * [C-01] 기본 정보
@@ -29,10 +32,11 @@ export const formatSharingCount = (count) => {
  * =====================================================================
  */
 
-// "YYYY-MM-DD" → { year, month, day } (숫자) / 형식이 다르면 null
+// "YYYY-MM-DD" 또는 "YYYY-MM-DDTHH:mm:ss" → { year, month, day } (숫자) / 형식이 다르면 null
+// - 날짜·시간 문자열도 받을 수 있도록 앞 10자리(날짜)만 사용
 const parseDateString = (value) => {
   if (!value) return null;
-  const [year, month, day] = value.split("-").map(Number);
+  const [year, month, day] = value.slice(0, 10).split("-").map(Number);
   if (!year || !month || !day) return null;
   return { year, month, day };
 };

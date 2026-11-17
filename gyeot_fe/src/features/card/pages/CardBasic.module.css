@@ -50,4 +50,6 @@
   width: max-content;
   max-width: calc(100% - 32px);
   box-sizing: border-box;
+  white-space: pre-line; /* \n을 줄바꿈으로 표시 */
+  word-break: keep-all;
 }

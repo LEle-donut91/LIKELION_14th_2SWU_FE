@@ -22,6 +22,21 @@ export const SAFETY_INFO_CATEGORY = {
   ADVANCE_MESSAGE: "ADVANCE_MESSAGE",
 };
 
+// 안심카드 항목 유형 (API informationType 값, 명세 'D 공통 값' 항목 유형 표)
+export const SAFETY_INFO_TYPE = {
+  BIRTH_DATE: "BIRTH_DATE",
+  BLOOD_TYPE: "BLOOD_TYPE",
+  DISEASE: "DISEASE",
+  MEDICATION: "MEDICATION",
+  ALLERGY: "ALLERGY",
+  CAUTION: "CAUTION",
+  ADDRESS: "ADDRESS",
+  ENTRY_METHOD: "ENTRY_METHOD",
+  PET: "PET",
+  PREFERENCE_REQUEST: "PREFERENCE_REQUEST",
+  DOCUMENT_LOCATION: "DOCUMENT_LOCATION",
+};
+
 // 분류 → C-00 메뉴 key 매핑 (CARD_MENU_SECTION_LIST의 item.key)
 export const CARD_MENU_KEY_BY_CATEGORY = {
   [SAFETY_INFO_CATEGORY.BASIC]: "basic",
@@ -108,9 +123,10 @@ export const BASIC_INFO_KEY = {
 
 // 기본 정보 목록 구성 (화면에 그릴 순서대로)
 // - title: 목록 카드 제목 / 편집 화면 헤더 제목 / 입력 영역 라벨에 공용 사용
+// - informationType: API 항목 유형 (작성 요청·조회 응답 매핑에 사용)
 export const BASIC_INFO_ITEM_LIST = [
-  { key: BASIC_INFO_KEY.BIRTH_DATE, title: "생년월일" },
-  { key: BASIC_INFO_KEY.BLOOD_TYPE, title: "혈액형" },
+  { key: BASIC_INFO_KEY.BIRTH_DATE, title: "생년월일", informationType: SAFETY_INFO_TYPE.BIRTH_DATE },
+  { key: BASIC_INFO_KEY.BLOOD_TYPE, title: "혈액형", informationType: SAFETY_INFO_TYPE.BLOOD_TYPE },
 ];
 
 // 값이 없을 때 목록 카드 설명 칸에 보여줄 문구
