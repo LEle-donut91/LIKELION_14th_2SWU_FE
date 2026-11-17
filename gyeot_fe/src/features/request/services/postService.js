@@ -22,17 +22,12 @@ export const postCareRequestService = (requestForm, now = new Date()) => {
 // 도움 요청 생성 응답에서 생성된 요청 정보를 추출한다.
 export const postCareRequestResultService = (raw) => raw.data;
 
-export const postEditFormService = (requestId, requestForm, checkForm) => ({
+export const postEditFormService = (requestId, requestForm) => ({
   requestId,
   startAt: requestForm.startDateTime,
   endAt: requestForm.endDateTime,
   location: requestForm.location,
-  sharedInfo: {
-    basicInfo: checkForm.basicInfo,
-    healthInfo: checkForm.healthInfo,
-    lifeInfo: checkForm.lifeInfo,
-    messageInfo: checkForm.messageInfo,
-  },
+  informationIds: requestForm.informationIds,
 });
 
 export const postAskAgainService = (requestId, requestForm, now = new Date()) => {

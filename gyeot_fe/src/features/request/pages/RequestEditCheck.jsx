@@ -12,26 +12,34 @@ import styles from "@/features/request/pages/RequestEditCheck.module.css";
 import iconToggle from "@/shared/assets/icons/iconToggle.svg";
 
 // 일반 라이브러리
-import { useMemo } from "react";
+import { useEffect } from "react";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 
 // Custom Hooks
 import { useRequestNav } from "@/features/request/hooks/useRequestNav";
+import { useRequestFormStore } from "@/features/request/stores/useRequestFormStore";
+import { useToast } from "@/features/request/hooks/useToast";
+import { REQUEST_QUERY_KEYS } from "@/features/request/constants/requestQueryKeys";
+import { getErrorMessage } from "@/shared/utils/apiError";
 
 // API, Services
 import {
-  getEditCheckApi,
+  getRequestDetailApi,
+  getInformationOptionsApi,
 } from "@/features/request/api/getApi";
 import {
-  postEditReconfirmApi,
-} from "@/features/request/api/postApi";
+  patchEditApi,
+} from "@/features/request/api/patchApi";
 import { getEditCheckService } from "@/features/request/services/getService";
+import { patchEditService } from "@/features/request/services/patchService";
 
 // 일반 Components
 import SubpageHeader from "@/shared/components/subpage-header/SubpageHeader";
 import RequestSummary from "@/features/request/components/Request/RequestSummary";
 import UserInfo from "@/features/request/components/User/UserInfo";
 import LargeFooter from "@/shared/components/LargeFooter/LargeFooter";
+import DefaultToast from "@/shared/components/Toast/DefaultToast";
 
 // 페이지 컴포넌트
 function RequestEditCheck() {
@@ -41,23 +49,55 @@ function RequestEditCheck() {
   // path parameter (요청 ID)
   const paramId = useParams().id;
 
-  // TODO: API 연동 시 useEffect로 교체 (지금은 mock 이라 렌더마다 호출돼도 문제 없음)
-  // [H-03-01-02] 요청 수정 내용 확인 - 데이터 조회
+  const requestForm = useRequestFormStore((state) => state.form);
+  const { toast, showToast, hideToast } = useToast();
+  // 선택한 정보 ID를 표시 이름으로 변환하기 위한 선택지 조회
+  const { data: informationOptions, isPending: isInformationPending, error: informationError } = useQuery({
+    queryKey: REQUEST_QUERY_KEYS.informationOptions(requestForm.helpType, paramId),
+    queryFn: () => getInformationOptionsApi({ helpType: requestForm.helpType, requestId: paramId }),
+    enabled: Boolean(requestForm.helpType && paramId),
+  });
+  const { data: requestDetail, isPending: isDetailPending, error: detailError } = useQuery({
+    queryKey: REQUEST_QUERY_KEYS.detail(paramId),
+    queryFn: () => getRequestDetailApi(paramId),
+    enabled: Boolean(paramId),
+  });
+
+  useEffect(() => {
+    if (detailError) showToast(getErrorMessage(detailError));
+  }, [detailError, showToast]);
+
+  useEffect(() => {
+    if (informationError) showToast(getErrorMessage(informationError));
+  }, [informationError, showToast]);
+
   const {
     userName,
     isConfirmRequired,
     userPart,
     beforeInfoList,
     afterInfoList,
-  } = useMemo(() => getEditCheckService(getEditCheckApi(paramId)), [paramId]);
+  } = getEditCheckService(requestDetail, requestForm, informationOptions);
 
-  // TODO: API 연동 로직 수정 필요
+  const { mutate: editRequest, isPending: isEditing } = useMutation({
+    mutationFn: (form) => patchEditApi(patchEditService(paramId, form, requestDetail, informationOptions)),
+    onSuccess: () => {
+      handleGoBackTwice();
+    },
+    onError: (error) => {
+      showToast(getErrorMessage(error));
+    },
+  });
+
   // [H-03-01-02] 재확인 요청 후 [요청 상세 · 요청자 뷰]로 이동
   const handleReconfirmBtnClick = () => {
-    postEditReconfirmApi(paramId);
-
-    // [요청 상세 · 요청자 뷰]로 이동
-    handleGoBackTwice();
+    if (isEditing || isDetailPending || isInformationPending || detailError || informationError) return;
+    const { payload } = patchEditService(paramId, requestForm, requestDetail, informationOptions);
+    if (Object.keys(payload).length === 0) {
+      showToast("변경된 내용이 없어요.");
+      return;
+    }
+    editRequest(requestForm);
   };
 
   return (
@@ -66,6 +106,8 @@ function RequestEditCheck() {
 
       {/* 실제 컨텐츠가 들어갈 자리 */}
       <main className={styles.content}>
+        {isDetailPending || isInformationPending ? <div role="status">로딩중</div> : (
+          <>
         {/* 변경 전 - 변경 후 카드 Container */}
         <div className={styles.cardContainer}>
           {/* 변경 전 Card */}
@@ -108,6 +150,8 @@ function RequestEditCheck() {
             담당자 거절 시, 요청이 취소되고 접근 권한이 회수돼요.
           </span>
         )}
+          </>
+        )}
       </main>
 
       {/* 하단 Footer */}
@@ -116,6 +160,7 @@ function RequestEditCheck() {
         type="primary"
         onClick={handleReconfirmBtnClick}
       />
+      {toast && <DefaultToast key={toast.id} message={toast.message} onHide={hideToast} />}
     </div>
   );
 }

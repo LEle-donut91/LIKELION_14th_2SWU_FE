@@ -1,5 +1,3 @@
-import postEditFormMock from "@/features/request/mock/RequestEdit/postEditFormMock";
-import postEditReconfirmMock from "@/features/request/mock/RequestEdit/postEditReconfirmMock";
 import { axiosInstance } from "@/shared/api/axiosInstance";
 import { REQUEST_API_URLS } from "@/shared/constants/apiUrlConstants";
 
@@ -63,20 +61,6 @@ export const postReconfirmRejectApi = async ({ requestId, proposalId }) => {
     REQUEST_API_URLS.reconfirmReject(requestId, proposalId),
   );
   return response.data;
-};
-
-// TODO: API 연동 로직 수정 필요
-// [H-03-01-02] 요청 수정 - 수정안 저장
-export const postEditFormApi = (payload) => {
-  console.log("전송한 Payload:", payload);
-  return postEditFormMock;
-};
-
-// TODO: API 연동 로직 수정 필요
-// [H-03-01-02] 요청 수정 내용 확인 - 재확인 요청
-export const postEditReconfirmApi = (payload) => {
-  console.log("전송한 Payload:", payload);
-  return postEditReconfirmMock;
 };
 
 // 다시 부탁하기 - 새 대상 지정

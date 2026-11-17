@@ -9,22 +9,23 @@
 import styles from "@/features/request/pages/RequestEditForm.module.css";
 
 // 일반 라이브러리
-import { Fragment, useMemo, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 
 // Custom Hooks
 import { useRequestNav } from "@/features/request/hooks/useRequestNav";
-import { useRequestForm } from "@/features/request/hooks/useRequestForm";
-import { useCheckForm } from "@/features/request/hooks/useCheckForm";
+import { useRequestFormStore } from "@/features/request/stores/useRequestFormStore";
 import { useToast } from "@/features/request/hooks/useToast";
 
 // Constants
 import { REQUEST_ROUTES } from "@/features/request/constants/routerConstants";
+import { REQUEST_QUERY_KEYS } from "@/features/request/constants/requestQueryKeys";
+import { getErrorMessage } from "@/shared/utils/apiError";
 import {
   REQUEST_FORM_FIELD_KEY,
   REQUEST_SHEET,
   DATE_TIME_SECTIONS,
-  INFO_PREVIEW_SECTIONS,
   EDIT_FORM_VALIDATE_FIELDS,
 } from "@/features/request/constants/requestConstants";
 
@@ -32,20 +33,20 @@ import {
 import {
   getDateTimeText,
   getSelectedTitles,
+  getCategoryInformationIds,
+  replaceCategoryInformationIds,
 } from "@/features/request/utils/requestUtils";
+import { validateInput } from "@/features/request/utils/validateInput";
 
 // API, Services
 import {
-  getEditFormApi,
+  getRequestDetailApi,
+  getInformationOptionsApi,
 } from "@/features/request/api/getApi";
 import {
-  postEditFormApi,
+  postCancelApi,
 } from "@/features/request/api/postApi";
-import {
-  patchRequestCancelApi,
-} from "@/features/request/api/patchApi";
-import { getEditFormService } from "@/features/request/services/getService";
-import { postEditFormService } from "@/features/request/services/postService";
+import { getEditFormService, getInformationOptionsService } from "@/features/request/services/getService";
 
 // 일반 Components
 import SubpageHeader from "@/shared/components/subpage-header/SubpageHeader";
@@ -62,35 +63,53 @@ import DefaultToast from "@/shared/components/Toast/DefaultToast";
 
 // 페이지 컴포넌트
 function RequestEditForm() {
-  // useNavigation 커스텀 훅의 함수
-  const { handleGoBack, handleGoNext } = useRequestNav();
-
-  // path parameter (요청 ID)
   const paramId = useParams().id;
-
-  // TODO: API 연동 시 useEffect로 교체 (지금은 mock 이라 렌더마다 호출돼도 문제 없음)
-  // [H-03-01-02] 요청 수정 - 데이터 조회 (GET 1회)
-  const { userName, dueDate, sections, initialRequestForm } = useMemo(
-    () => getEditFormService(getEditFormApi(paramId)),
-    [paramId],
-  );
-
-  // 시작/종료/장소 입력값 (isEditing이 true면 기존 수정안이 초기값)
-  const {
-    form: requestForm,
-    setField: setRequestField,
-    validate,
-  } = useRequestForm(initialRequestForm);
-
-  // 공유 정보 체크값 (sections 각 항목의 isDefault가 초기 체크 상태)
-  const {
-    form: checkForm,
-    setField: setCheckField,
-    isSensitiveIncluded,
-  } = useCheckForm(sections);
-
-  // 토스트 메시지
+  const { handleGoBack, handleGoNext } = useRequestNav();
   const { toast, showToast, hideToast } = useToast();
+  const { entryId, form: requestForm, initForm, setForm } = useRequestFormStore((state) => state);
+  const formEntryId = `requestEdit:${paramId}`;
+  const { data: detail, isPending: isDetailPending, error: detailError } = useQuery({
+    queryKey: REQUEST_QUERY_KEYS.detail(paramId),
+    queryFn: () => getRequestDetailApi(paramId),
+    select: getEditFormService,
+    enabled: Boolean(paramId),
+  });
+  const { data: informationOptions, isPending: isInformationPending, error: informationError } = useQuery({
+    queryKey: REQUEST_QUERY_KEYS.informationOptions(detail?.helpType, paramId),
+    queryFn: () => getInformationOptionsApi({ helpType: detail.helpType, requestId: paramId }),
+    select: (response) => getInformationOptionsService(response, requestForm),
+    enabled: Boolean(detail?.helpType && paramId),
+  });
+  useEffect(() => {
+    if (detailError) showToast(getErrorMessage(detailError));
+  }, [detailError, showToast]);
+
+  useEffect(() => {
+    if (informationError) showToast(getErrorMessage(informationError));
+  }, [informationError, showToast]);
+
+  const { userName, dueDate, initialRequestForm } = detail ?? {};
+  const { categories = [], selectedIds = [], isSensitiveIncluded = false } = informationOptions ?? {};
+
+  // 같은 요청의 수정 화면으로 돌아오면 사용자가 입력한 값을 유지
+  useEffect(() => {
+    if (!initialRequestForm || !informationOptions || entryId === formEntryId) return;
+    initForm(formEntryId, {
+      ...initialRequestForm,
+      situationId: detail.situationId,
+      helpType: detail.helpType,
+      informationIds: informationOptions.defaultIds,
+    });
+  }, [initialRequestForm, informationOptions, entryId, formEntryId, initForm, detail]);
+
+  const setRequestField = (key, value) =>
+    setForm((prev) => ({ ...prev, [key]: value }));
+
+  const setCategorySelection = (items, ids) =>
+    setForm((prev) => ({
+      ...prev,
+      informationIds: replaceCategoryInformationIds(prev.informationIds, items, ids),
+    }));
 
   // 열려 있는 시트 (한 번에 하나만 열림) - REQUEST_SHEET(START/END) 또는 CHECK_FORM_FIELD_KEY 중 하나
   const [openSheet, setOpenSheet] = useState(null);
@@ -100,19 +119,11 @@ function RequestEditForm() {
   const [isCancelModalOpen, setCancelModalOpen] = useState(false);
   const [isSensitiveModalOpen, setSensitiveModalOpen] = useState(false);
 
-  // TODO: API 연동 로직 수정 필요
-  // [H-03-01-02] 수정안 저장 후 [요청 수정 내용 확인] 페이지로 이동
-  const handleGoEditCheck = () => {
-    const reqRefinedData = postEditFormService(paramId, requestForm, checkForm);
-    postEditFormApi(reqRefinedData);
-
-    handleGoNext(REQUEST_ROUTES.editCheck(paramId));
-  };
-
   // 다음 버튼 클릭 핸들러
   const handleNextBtnClick = () => {
+    if (isDetailPending || isInformationPending || detailError || informationError) return;
     // 입력값 유효성 검사 (첫 번째 에러 문구 하나만 토스트로)
-    const errors = validate(EDIT_FORM_VALIDATE_FIELDS);
+    const errors = validateInput(requestForm, new Date(), EDIT_FORM_VALIDATE_FIELDS);
     const [firstError] = Object.values(errors);
     if (firstError) {
       showToast(firstError);
@@ -124,23 +135,25 @@ function RequestEditForm() {
       setSensitiveModalOpen(true);
       return;
     }
-    handleGoEditCheck();
+    handleGoNext(REQUEST_ROUTES.editCheck(paramId));
   };
 
   // 민감 정보 확인 모달의 확인 버튼
   const handleSensitiveConfirm = () => {
     setSensitiveModalOpen(false);
-    handleGoEditCheck();
+    handleGoNext(REQUEST_ROUTES.editCheck(paramId));
   };
 
-  // TODO: API 연동 로직 수정 필요
-  // 요청 취소 모달의 확인 버튼
-  const handleCancelConfirm = () => {
-    patchRequestCancelApi(paramId);
-    setCancelModalOpen(false);
+  const { mutate: cancelRequest, isPending: isCanceling } = useMutation({
+    mutationFn: postCancelApi,
+    onSuccess: () => handleGoBack(),
+    onError: (error) => showToast(getErrorMessage(error)),
+  });
 
-    // [요청 상세 · 요청자 뷰]로 이동
-    handleGoBack();
+  const handleCancelConfirm = () => {
+    if (isCanceling) return;
+    setCancelModalOpen(false);
+    cancelRequest(paramId);
   };
 
   return (
@@ -150,6 +163,8 @@ function RequestEditForm() {
 
       {/* 메인 컨텐츠 */}
       <main className={styles.content}>
+        {isDetailPending || isInformationPending ? <div role="status">로딩중</div> : (
+          <>
         {/* 시작 - 종료 */}
         <div className={styles.timeSectionContainer}>
           <SelectSection
@@ -223,11 +238,11 @@ function RequestEditForm() {
             공유 정보
           </span>
           {/* 기본 정보 / 건강 정보 / 생활 정보 / 미리 남기는 말 */}
-          {INFO_PREVIEW_SECTIONS.map(({ key, title, description }) => (
+          {categories.filter(({ items }) => items.length > 0).map(({ key, title, description, items }) => (
             <Fragment key={key}>
               <SafetyCardGroup
                 title={title}
-                information={getSelectedTitles(checkForm[key], sections[key])}
+                information={getSelectedTitles(getCategoryInformationIds(selectedIds, items), items)}
                 onClick={() => setOpenSheet(key)}
               />
 
@@ -236,12 +251,12 @@ function RequestEditForm() {
                 onClose={closeSheet}
                 title={title}
                 description={description}
-                value={checkForm[key]}
-                onConfirm={(v) => setCheckField(key, v)}
+                value={getCategoryInformationIds(selectedIds, items)}
+                onConfirm={(v) => setCategorySelection(items, v)}
               >
                 {(temp, setTemp) => (
                   <CheckOption
-                    data={sections[key]}
+                    data={items}
                     checkedValue={temp}
                     onChecked={setTemp}
                   />
@@ -250,6 +265,8 @@ function RequestEditForm() {
             </Fragment>
           ))}
         </div>
+          </>
+        )}
       </main>
 
       {/* 하단 Footer(버튼) */}

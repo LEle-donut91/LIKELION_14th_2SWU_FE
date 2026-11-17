@@ -34,16 +34,13 @@ import {
   VIEWER_ROLE,
   REQUEST_ACTION,
 } from "@/features/request/constants/enumConstants";
-import {
-  getInfoPreviewService,
-} from "@/features/request/services/createService";
 import iconDate from "@/shared/assets/icons/iconDate.svg";
 import iconLocation from "@/shared/assets/icons/iconLocation.svg";
 import iconHealthy from "@/shared/assets/icons/iconHealthy.svg";
 import { getInformationSummary } from "@/features/request/utils/requestUtils";
 import { getRequesterFooter, getAssigneeFooter } from "@/features/request/utils/getFooter";
 import { getTargetNotice, getOrderState, getRequesterNotices } from "@/features/request/utils/getRequestDetail";
-import { toDateTimeInput } from "@/features/request/utils/dateFormat";
+import { toDateTimeInput, toDateFromInput } from "@/features/request/utils/dateFormat";
 
 // 대상 후보 조회 API 관련
 export const getRequestTargetsService = (raw) =>
@@ -263,53 +260,66 @@ export const getReceivedInfoService = (response = {}) => {
   };
 };
 
-export const getEditFormService = (raw) => {
-  const isEditing = raw?.isEditing ?? false;
-  const draft = raw?.draft;
+export const getEditFormService = (response = {}) => {
+  const raw = response?.data ?? response ?? {};
+  const isEditing = raw.latestProposal != null;
+  const draft = isEditing ? raw.latestProposal.after : raw;
 
   return {
-    situationId: raw?.situationId ?? "",
+    situationId: raw.situation?.situationId ?? "",
     requestId: raw?.requestId ?? "",
     isEditing,
-    userName: raw?.userName ?? "",
-    dueDate: raw?.dueDate ?? "",
-    sections: getInfoPreviewService(draft?.sharedInfo).sections,
-    initialRequestForm:
-      isEditing && draft
-        ? {
-            startDateTime: draft.startAt,
-            endDateTime: draft.endAt,
-            location: draft.location,
-          }
-        : {},
+    userName: raw.currentAssignment?.target?.name ?? "",
+    dueDate: draft?.endsAt ? formatShortDateTime(draft.endsAt) : "",
+    helpType: raw.helpType,
+    initialRequestForm: {
+      startDateTime: toDateTimeInput(draft?.startsAt),
+      endDateTime: toDateTimeInput(draft?.endsAt),
+      location: draft?.place ?? null,
+    },
   };
 };
 
-export const getEditCheckService = (raw) => ({
-  situationId: raw?.situationId ?? "",
-  requestId: raw?.requestId ?? "",
-  isConfirmRequired: raw?.isAccepted ?? false,
-  userName: raw?.userName ?? "",
-  userPart: raw?.userPart ?? "",
+export const getEditCheckService = (response = {}, requestForm = {}, informationOptions) => {
+  const raw = response?.data ?? response ?? {};
+  const target = raw.currentAssignment?.target;
+  const start = toDateFromInput(requestForm.startDateTime);
+  const end = toDateFromInput(requestForm.endDateTime);
+  const selectedItems = (informationOptions?.data?.categories ?? [])
+    .flatMap((category) => category.items ?? [])
+    .filter((item) => requestForm.informationIds?.includes(item.informationId));
+
+  return {
+  situationId: raw.situation?.situationId ?? "",
+  requestId: raw.requestId ?? "",
+  isConfirmRequired: raw.status === REQUEST_STATE.ACCEPTED,
+  userName: target?.name ?? "",
+  userPart: target ? (target.isGuardian ? "보호자" : "나의 사람") : "",
   beforeInfoList: [
-    { icon: iconDate, label: "일정", value: raw?.beforeInfo?.time ?? "" },
+    { icon: iconDate, label: "일정", value: raw.startsAt && raw.endsAt
+      ? formatShortDateTimeRange(raw.startsAt, raw.endsAt) : "" },
     {
       icon: iconLocation,
       label: "장소",
-      value: raw?.beforeInfo?.location ?? "",
+      value: raw.place ?? "",
     },
-    { icon: iconHealthy, label: "정보", value: raw?.beforeInfo?.message ?? "" },
+    { icon: iconHealthy, label: "정보", value: getInformationSummary(
+      raw.informations ?? raw.latestProposal?.before?.informations,
+    ) },
   ],
   afterInfoList: [
-    { icon: iconDate, label: "일정", value: raw?.afterInfo?.time ?? "" },
+    { icon: iconDate, label: "일정", value: start && end ? formatShortDateTimeRange(start, end) : "" },
     {
       icon: iconLocation,
       label: "장소",
-      value: raw?.afterInfo?.location ?? "",
+      value: requestForm.location ?? "",
     },
-    { icon: iconHealthy, label: "정보", value: raw?.afterInfo?.message ?? "" },
+    { icon: iconHealthy, label: "정보", value: getInformationSummary(
+      selectedItems.map((item) => ({ name: item.typeName })),
+    ) },
   ],
-});
+  };
+};
 
 export const getAskAgainInformationService = (response) => {
   const items = (response?.data?.categories ?? [])

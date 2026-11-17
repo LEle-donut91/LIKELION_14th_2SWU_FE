@@ -1,9 +1,9 @@
-import patchRequestCancelMock from "@/features/request/mock/RequestEdit/patchRequestCancelMock";
+import { axiosInstance } from "@/shared/api/axiosInstance";
+import { REQUEST_API_URLS } from "@/shared/constants/apiUrlConstants";
 
-// TODO: API 연동 로직 수정 필요
-// 요청 취소
-export const patchRequestCancelApi = (requestId) => {
-  console.log("요청 취소:", requestId);
-  return patchRequestCancelMock;
+// 요청 수정 API
+export const patchEditApi = async ({ requestId, payload }) => {
+  const response = await axiosInstance.patch(REQUEST_API_URLS.detail(requestId), payload);
+  return response.data;
 };
 
