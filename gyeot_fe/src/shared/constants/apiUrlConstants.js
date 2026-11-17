@@ -20,4 +20,8 @@ export const REQUEST_API_URLS = {
 // D. 안심카드·정보 공유
 export const INFO_SHARE_API_URLS = {
   sharingOptions: "/api/safety-information/sharing-options", // 공개 항목 선택지 조회
+  summary: "/api/safety-information/summary", // 안심카드 메인 조회 (GET)
+  items: "/api/safety-information", // 분류별 항목 조회 (GET ?category) / 항목 작성 (POST)
+  item: (informationId) => `/api/safety-information/${informationId}`, // 항목 수정 (PATCH) / 항목 삭제 (DELETE)
 }
+
