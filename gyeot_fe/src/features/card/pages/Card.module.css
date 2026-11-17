@@ -16,3 +16,21 @@
   gap: 48px;
   padding: 16px 16px 240px;
 }
+
+/* 토스트 위치 */
+.toastArea {
+  position: fixed;
+  bottom: 94px; 
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1;
+  width: 402px; /* BottomNav와 같은 너비 */
+  height: 0;
+  pointer-events: none; 
+}
+
+.toastArea > * {
+  width: max-content;
+  max-width: calc(100% - 32px);
+  box-sizing: border-box;
+}

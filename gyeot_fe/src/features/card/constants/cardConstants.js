@@ -14,6 +14,26 @@ export const CARD_NAVIGATION_PATH = {
 // '추가하기' 텍스트 버튼 문구 (CardAddButton 기본값)
 export const CARD_ADD_BTN_TEXT = "추가하기";
 
+// 안심카드 분류 (API category 값)
+export const SAFETY_INFO_CATEGORY = {
+  BASIC: "BASIC",
+  HEALTH: "HEALTH",
+  LIFE: "LIFE",
+  ADVANCE_MESSAGE: "ADVANCE_MESSAGE",
+};
+
+// 분류 → C-00 메뉴 key 매핑 (CARD_MENU_SECTION_LIST의 item.key)
+export const CARD_MENU_KEY_BY_CATEGORY = {
+  [SAFETY_INFO_CATEGORY.BASIC]: "basic",
+  [SAFETY_INFO_CATEGORY.HEALTH]: "health",
+  [SAFETY_INFO_CATEGORY.LIFE]: "life",
+  [SAFETY_INFO_CATEGORY.ADVANCE_MESSAGE]: "message",
+};
+
+// C-00 공유 관리 카드: 공유 중 건수가 0건일 때 문구
+// TODO: 디자인에서 문구가 정해지면 교체
+export const CARD_SHARING_COUNT_EMPTY_TEXT = "공유 중 건수 없음";
+
 // C-00 메뉴 구성 (고정 텍스트)
 // - key: mock/API 데이터에서 해당 항목 값을 찾는 키
 // - description: 카드 설명 (공유 관리는 공유 건수로 동적 생성하므로 없음)

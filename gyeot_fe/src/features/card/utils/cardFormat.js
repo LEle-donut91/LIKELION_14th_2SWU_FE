@@ -2,6 +2,7 @@
 import {
   BIRTH_DATE_INPUT_LENGTH,
   BLOOD_TYPE_LABELS,
+  CARD_SHARING_COUNT_EMPTY_TEXT,
   SHARE_AUTO_REVOKE_TEXT,
   SHARE_HELP_TYPE_LABELS,
 } from "@/features/card/constants/cardConstants";
@@ -13,8 +14,12 @@ export const formatUpdatedDate = (value) => {
   return `갱신 ${date.getMonth() + 1}/${date.getDate()}`;
 };
 
-// 공유 건수 표시: 2 → "지금 공유 중 2건"
-export const formatSharingCount = (count = 0) => `지금 공유 중 ${count}건`;
+// 공유 건수 표시: 2 → "지금 공유 중 2건" / 0 → "공유 중 건수 없음" / 값 없음(조회 전·실패) → ""
+export const formatSharingCount = (count) => {
+  if (count == null) return "";
+  if (count === 0) return CARD_SHARING_COUNT_EMPTY_TEXT;
+  return `지금 공유 중 ${count}건`;
+};
 
 /**
  * =====================================================================

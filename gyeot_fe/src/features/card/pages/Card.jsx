@@ -1,13 +1,17 @@
 // C-00
 
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "@/features/card/pages/Card.module.css";
 import MainHeader from "@/shared/components/main-header/MainHeader";
 import BottomNav from "@/shared/components/BottomNav/BottomNav";
+import DefaultToast from "@/shared/components/Toast/DefaultToast";
+import { useToast } from "@/shared/hooks/useToast";
+import { getErrorMessage } from "@/shared/utils/apiError";
 import CardMenuSection from "@/features/card/components/CardMenuSection";
 import CardMenuItem from "@/features/card/components/CardMenuItem";
 import { CARD_MENU_SECTION_LIST } from "@/features/card/constants/cardConstants";
-import { CARD_SUMMARY_MOCK } from "@/features/card/mocks/cardMockData";
+import { useCardSummary } from "@/features/card/hooks/useCardSummary";
 import {
   formatSharingCount,
   formatUpdatedDate,
@@ -16,7 +20,16 @@ import {
 // 안심카드 (C-00)
 function Card() {
   const navigate = useNavigate();
-  const cardSummary = CARD_SUMMARY_MOCK; // TODO: API 스펙 확정 후 교체
+  const { toast, showToast, hideToast } = useToast();
+
+  // 안심카드 메인 조회 (조회 전·실패 시 cardSummary는 undefined)
+  const { cardSummary, error } = useCardSummary();
+
+  // 조회 실패 시 토스트 안내 (메뉴는 고정 설명만 표시)
+  useEffect(() => {
+    if (!error) return;
+    showToast(getErrorMessage(error));
+  }, [error, showToast]);
 
   // TODO: 알림은 MVP 제외, 설정은 와이어프레임에 이동 화면 없음
   const handleAlarmClick = () => console.log("[TODO] 알림");
@@ -26,14 +39,14 @@ function Card() {
   const handleMenuItemClick = (path) => navigate(path);
 
   // 카드 설명 줄 구성
-  // - 공유 관리: "지금 공유 중 N건"
+  // - 공유 관리: "지금 공유 중 N건" / 0건이면 "공유 중 건수 없음" / 조회 전·실패 시 빈칸
   // - 그 외: 고정 설명 + (갱신일이 있는 항목만) "갱신 M/D"
   const getSubItems = (item) => {
     if (item.key === "share") {
-      return [formatSharingCount(cardSummary.sharingCount)];
+      return [formatSharingCount(cardSummary?.sharingCount)];
     }
     const updatedDate = item.hasUpdatedDate
-      ? formatUpdatedDate(cardSummary.updatedDate?.[item.key])
+      ? formatUpdatedDate(cardSummary?.lastUpdatedAt?.[item.key])
       : "";
     return [item.description, updatedDate];
   };
@@ -62,6 +75,14 @@ function Card() {
           </CardMenuSection>
         ))}
       </main>
+
+      {/* 조회 실패 토스트
+          - toastArea: 하단 내비(fixed) 위 경계에 고정해 내비에 가려지지 않도록 위치 조정 */}
+      {toast && (
+        <div className={styles.toastArea}>
+          <DefaultToast key={toast.id} message={toast.message} onHide={hideToast} />
+        </div>
+      )}
 
       <BottomNav />
     </div>
