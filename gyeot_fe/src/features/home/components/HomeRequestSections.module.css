@@ -1,0 +1,6 @@
+/* 각 섹션 사이 간격 48 (기존 SituationTabContent 섹션 간격과 동일) */
+.homeRequestSections {
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+}

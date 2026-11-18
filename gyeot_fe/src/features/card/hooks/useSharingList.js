@@ -8,6 +8,8 @@ import {
 } from "@/features/card/api/sharingApi";
 import { getSharingsService } from "@/features/card/services/sharingService";
 import { CARD_QUERY_KEYS } from "@/features/card/constants/cardQueryKeys";
+// 홈 상단 '공유중' 건수도 바뀌므로 홈 조회 key를 함께 무효화 (API_CONVENTIONS 5-2, card → home 의존)
+import { HOME_QUERY_KEYS } from "@/features/home/constants/homeQueryKeys";
 import {
   SHARING_MOCK_FAIL_QUERY_KEY,
   SHARING_MOCK_QUERY_KEY,
@@ -25,7 +27,7 @@ const RELOAD_ERROR_CODE_LIST = [
 /**
  * [C-06] 공유 중 목록 조회 · 직접 철회 · 다시 허용 Hook
  * - 조회: 공유 중 목록 조회 → 카드 목록 (빈 배열이면 빈 상태 화면)
- * - 철회 / 다시 허용 성공: 서버 message 안내(onActionSuccess) + 공유 목록·C-00 메인 조회 무효화
+ * - 철회 / 다시 허용 성공: 서버 message 안내(onActionSuccess) + 공유 목록·C-00 메인 조회·H-00 홈 조회 무효화
  *   다시 불러오기가 끝날 때까지 처리 중 상태 유지 (바뀌기 전 카드가 잠깐 보이지 않도록)
  * - 철회 / 다시 허용 실패: 에러 문구 안내(onActionError), 404·409면 목록을 다시 불러옴
  *   (화면을 열어 둔 사이 요청이 끝나 서버에서 사라진 카드도 이때 정리됨)
@@ -59,13 +61,15 @@ export const useSharingList = ({ userId, onActionSuccess, onActionError } = {}) 
   });
 
   // 성공: 안내 후 다시 불러오기 (Promise를 반환해 다시 불러오기가 끝날 때까지 isPending 유지)
-  // - 공유 중 건수가 바뀌므로 C-00 메인 조회도 함께 무효화
-  // TODO: 홈(H-00) 연동 시 홈 조회 key(sharingCount)도 무효화
+  // - 공유 중 건수가 바뀌므로 C-00 메인 조회, H-00 홈 조회(상단 '공유중' 건수)도 함께 무효화
+  //   (홈은 C-06에 있는 동안 화면에 없으므로 다시 불러오지 않고 표시만 해 둠 → 처리 시간 변화 없음,
+  //    홈에 다시 들어갈 때 새로 조회)
   const handleActionSuccess = (response) => {
     if (response?.message) onActionSuccess?.(response.message);
     return Promise.all([
       queryClient.invalidateQueries({ queryKey: CARD_QUERY_KEYS.sharings() }),
       queryClient.invalidateQueries({ queryKey: CARD_QUERY_KEYS.summary() }),
+      queryClient.invalidateQueries({ queryKey: HOME_QUERY_KEYS.home() }),
     ]);
   };
 
