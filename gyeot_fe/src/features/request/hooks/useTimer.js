@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { formatSecondsToTime } from "@/features/request/utils/requestUtils";
+import { formatSecondsToTime } from "@/features/request/utils/getTimer";
 
 /**
  * =====================================================================
@@ -37,7 +37,9 @@ export function useTimer(initialSeconds = 0, enabled = true, deadline = null) {
   }, [enabled, deadline]);
 
   const deadlineSeconds = Math.floor((Date.parse(deadline) - now) / 1000);
-  return formatSecondsToTime(deadline
-    ? Math.max(Number.isFinite(deadlineSeconds) ? deadlineSeconds : 0, 0)
-    : remaining);
+  return formatSecondsToTime(
+    deadline
+      ? Math.max(Number.isFinite(deadlineSeconds) ? deadlineSeconds : 0, 0)
+      : remaining,
+  );
 }
