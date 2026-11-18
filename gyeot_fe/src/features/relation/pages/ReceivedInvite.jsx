@@ -16,7 +16,7 @@ function ReceivedInvite() {
 
   // 수락 (TODO: 수락 API 연결)
   const handleAccept = () => {
-    navigate("/relation"); // 관계 화면으로 이동
+    navigate("/relation/reverse-invite", { state: { inviterName: invite.inviterName } }); // N-01 역초대 제안으로 이동
   };
 
   // 거절 (TODO: 거절 API 연결)

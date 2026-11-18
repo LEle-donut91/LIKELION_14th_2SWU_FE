@@ -1,0 +1,173 @@
+/* 페이지 전체 (시트 위치 기준) */
+.page {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  background: #fcfbfa; /* 다른 화면과 같은 배경 */
+  font-family: var(--font-gothic); /* 팀 기본 폰트 (index.css) */
+}
+
+/* 버튼도 페이지 폰트 따라가게 */
+.page button {
+  font-family: inherit;
+}
+
+/* 공통 헤더 배경을 페이지 배경과 같게 (이 페이지에서만 적용) */
+.page header {
+  background: transparent;
+}
+
+/* 공통 헤더의 '뒤로' 글자를 < 아이콘으로 바꾸기 (이 페이지에서만 적용) */
+.page header button[aria-label="뒤로 가기"] {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  font-size: 0; /* '뒤로' 글자 숨기기 */
+  background: url("../../../shared/assets/icons/iconLeft.svg") center / 24px no-repeat;
+  cursor: pointer;
+}
+
+/* 본문 (가운데 정렬) */
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 16px 24px;
+}
+
+/* 보낸 사람 아바타 + 뒤로 퍼지는 올리브 빛 */
+.avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  background: var(--color-beige-100);
+  box-shadow: 0 0 36px 22px rgba(205, 220, 184, 0.45); /* N-02, N-03과 같은 빛 */
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-beige-800);
+}
+
+/* 수락 완료 카드 (연한 올리브) */
+.acceptedCard {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin-top: 40px;
+  padding: 16px;
+  background: var(--color-olive-100);
+  border: 1px solid var(--color-olive-200);
+  border-radius: 14px;
+  box-sizing: border-box;
+}
+
+.acceptedTitle {
+  font-size: 12px;
+  font-weight: 700;
+  color: #222;
+}
+
+.acceptedDesc {
+  margin: 2px 0 0;
+  font-size: 10px;
+  color: #6f6f6f;
+}
+
+/* ===== 역초대 제안 시트 ===== */
+
+/* 어두운 배경 (시트를 아래에 붙임) */
+.overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: flex-end;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* 흰 시트 (위쪽만 둥글게) */
+.sheet {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 10px 16px 28px;
+  background: #fff;
+  border-radius: 20px 20px 0 0;
+  box-sizing: border-box;
+}
+
+/* 위쪽 손잡이 */
+.handle {
+  width: 36px;
+  height: 4px;
+  margin: 0 auto 20px;
+  border-radius: 2px;
+  background: var(--color-gray-200);
+}
+
+/* 아이콘 + 제목 */
+.sheetTop {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* 연한 올리브 원 안의 사람+ 아이콘 */
+.personIcon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--color-olive-100);
+  color: var(--color-olive-600);
+}
+
+.sheetTitle {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: #222;
+}
+
+/* 나의 사람으로 추가 (진한 올리브) */
+.addBtn {
+  height: 46px;
+  margin-top: 16px;
+  background: var(--color-olive-500);
+  border: none;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  cursor: pointer;
+}
+
+.caption {
+  margin: 12px 0 0;
+  font-size: 10px;
+  text-align: center;
+  color: #555;
+}
+
+/* 괜찮아요 (회색 밑줄 글자) */
+.skipBtn {
+  align-self: center;
+  margin-top: 12px;
+  padding: 0;
+  background: none;
+  border: none;
+  font-size: 10px;
+  color: #a5a29c;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
