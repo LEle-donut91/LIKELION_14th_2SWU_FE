@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import SubpageHeader from "@/shared/components/subpage-header/SubpageHeader"; // 팀 공통 서브 헤더
+import ReleaseSheet from "@/features/relation/components/ReleaseSheet"; // N-08 관계 해제 확인
 import { MOCK_RELATION } from "@/features/relation/constants/relation";
 import iconEdit from "@/shared/assets/icons/iconEdit.svg";
 import iconDocument from "@/shared/assets/icons/iconDocument.svg";
@@ -30,10 +31,17 @@ function AcquaintanceDetail() {
 
   const [label, setLabel] = useState(person.label); // 관계 형태 (나만 보이는 라벨)
   const labelInputRef = useRef(null);
+  const [isReleaseOpen, setReleaseOpen] = useState(false); // 관계 해제 확인 시트(N-08) 열림 여부
 
   // 라벨 저장 (TODO: 라벨 수정 API 연결)
   const handleLabelSave = () => {
     console.log("라벨 저장", person.id, label.trim());
+  };
+
+  // 관계 해제 확정 (TODO: 관계 해제 API 연결 — DELETE /api/relationships/{relationshipId})
+  const handleRelease = () => {
+    setReleaseOpen(false);
+    navigate("/relation"); // 관계 화면으로 돌아가기
   };
 
   return (
@@ -104,15 +112,20 @@ function AcquaintanceDetail() {
           <img src={iconRight} alt="" width={16} height={16} />
         </button>
 
-        {/* 관계 해제 (N-08로 이동) */}
-        <button
-          type="button"
-          className={styles.releaseBtn}
-          onClick={() => navigate("/relation/release", { state: { id: person.id } })}
-        >
+        {/* 관계 해제 (N-08 확인 시트 열기) */}
+        <button type="button" className={styles.releaseBtn} onClick={() => setReleaseOpen(true)}>
           관계 해제
         </button>
       </div>
+
+      {/* N-08 관계 해제 확인 시트 */}
+      <ReleaseSheet
+        isOpen={isReleaseOpen}
+        type={person.type}
+        name={person.name}
+        onCancel={() => setReleaseOpen(false)}
+        onConfirm={handleRelease}
+      />
     </div>
   );
 }
