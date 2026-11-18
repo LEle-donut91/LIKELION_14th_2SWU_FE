@@ -14,6 +14,7 @@ import { CARD_MENU_SECTION_LIST } from "@/features/card/constants/cardConstants"
 import { useCardSummary } from "@/features/card/hooks/useCardSummary";
 import {
   formatSharingCount,
+  formatToastMessage,
   formatUpdatedDate,
 } from "@/features/card/utils/cardFormat";
 
@@ -77,10 +78,15 @@ function Card() {
       </main>
 
       {/* 조회 실패 토스트
-          - toastArea: 하단 내비(fixed) 위 경계에 고정해 내비에 가려지지 않도록 위치 조정 */}
+          - toastArea: 하단 내비(fixed) 위 경계에 고정해 내비에 가려지지 않도록 위치 조정
+          - 문장이 여러 개면 문장마다 줄바꿈 (toastArea의 white-space: pre-line으로 표시) */}
       {toast && (
         <div className={styles.toastArea}>
-          <DefaultToast key={toast.id} message={toast.message} onHide={hideToast} />
+          <DefaultToast
+            key={toast.id}
+            message={formatToastMessage(toast.message)}
+            onHide={hideToast}
+          />
         </div>
       )}
 

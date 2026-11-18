@@ -20,13 +20,15 @@
 /* 토스트 위치 */
 .toastArea {
   position: fixed;
-  bottom: 94px; 
+  bottom: 94px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 1;
-  width: 402px; /* BottomNav와 같은 너비 */
+  width: 402px; 
   height: 0;
-  pointer-events: none; 
+  pointer-events: none; /* 높이 0이지만 아래 요소 클릭을 막지 않도록 */
+  white-space: pre-line; /* 토스트 문구의 \n을 줄바꿈으로 표시 */
+  word-break: keep-all; /* 한국어도 띄어쓰기 기준으로 줄바꿈 (단어 중간에서 끊기지 않게) */
 }
 
 .toastArea > * {

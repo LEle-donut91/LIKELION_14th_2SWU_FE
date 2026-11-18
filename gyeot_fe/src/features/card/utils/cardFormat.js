@@ -21,7 +21,9 @@ export const formatSharingCount = (count) => {
   return `지금 공유 중 ${count}건`;
 };
 
-// 토스트 문구: 문장마다 줄바꿈 ("A입니다. B해 주세요." → "A입니다.\nB해 주세요.")
+// 토스트 문구: 문장이 여러 개면 문장마다 줄바꿈
+// 예: "이미 등록된 항목입니다. 기존 항목을 수정해 주세요." → "이미 등록된 항목입니다.\n기존 항목을 수정해 주세요."
+// - 화면에 줄바꿈으로 보이려면 토스트를 감싼 요소에 white-space: pre-line 필요
 export const formatToastMessage = (message = "") => message.replace(/\.\s+/g, ".\n");
 
 /**
