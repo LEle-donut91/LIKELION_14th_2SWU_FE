@@ -1,43 +1,17 @@
 import Modal from "react-modal";
-import styles from "@/features/test/components/RequestModal.module.css";
-
-// 사유별 태그 · 안내 문구 설정 (키는 API의 reason 값과 동일)
-// 이름 뒤 조사/위치가 사유마다 달라서 message는 이름을 받아 문장을 만드는 함수로 둠
-const REQUEST_MODAL_CONFIG = {
-  UNAVAILABLE: {
-    tag: "어려움",
-    message: (name) => `${name}님이 이번 요청은 어렵다고 응답하셨어요.`,
-  },
-  ACCEPTANCE_WITHDRAWN: {
-    tag: "어려움",
-    message: (name) => `${name}님이 요청이 어렵다고 응답을 수정하셨어요.`,
-  },
-  DEADLINE_PASSED: {
-    tag: "기한 초과",
-    message: (name) => `${name}님이 기한 내에 응답하지 않았어요.`,
-  },
-  RELATIONSHIP_ENDED: {
-    tag: "관계 해제",
-    message: (name) => `${name}님과 관계가 해제되어 요청할 수 없어요.`,
-  },
-  PARTICIPANT_LEFT: {
-    tag: "상황 이탈",
-    message: (name) => `${name}님이 상황에서 제외되어 요청할 수 없어요.`,
-  },
-  USER_WITHDRAWN: {
-    tag: "탈퇴",
-    message: (name) => `지금은 ${name}님께 요청이 불가능해요.`,
-  },
-};
+import styles from "@/features/home/components/RequestModal.module.css";
+import { NO_ASSIGNEE_MODAL_CONFIG } from "@/features/home/constants/homeConstants";
 
 /**
  * 요청 관련 정보를 보여주는 모달 컴포넌트 (M-01 담당자 없음)
+ * - 데이터는 noAssigneeNoticeService가 만든 값을 사용
+ * - 바깥 영역 클릭·ESC로는 닫히지 않음 (닫기 기록이 의도치 않게 남지 않도록 버튼으로만 닫음)
  * @param {boolean} modalOpen - 모달의 열림/닫힘 상태 여부
  * @param {Object} modalItem - 모달에 표시할 데이터 객체
  * @param {string} modalItem.userName - 응답 대상 (사용자명)
  * @param {string} modalItem.request - 요청 내용
- * @param {string} modalItem.state - 담당자 없음 사유 (REQUEST_MODAL_CONFIG의 키)
- * @param {string} modalItem.time - 요청 시간
+ * @param {string} modalItem.state - 담당자 없음 사유 (NO_ASSIGNEE_MODAL_CONFIG의 키)
+ * @param {string | null} modalItem.time - 요청 시간 (급한 요청은 null → 시간·점 숨김)
  * @param {string} modalItem.location - 요청 장소
  * @param {number} currentNumber - 현재 모달 순번 (1부터 시작)
  * @param {number} totalCount - 전체 모달 개수
@@ -53,15 +27,16 @@ function RequestModal({
   onCancelClick,
   onConfirmClick,
 }) {
-  // 현재 사유의 설정 (정의되지 않은 사유면 모달을 그리지 않음)
-  const config = REQUEST_MODAL_CONFIG[modalItem.state];
+  // 현재 사유의 설정 (정의되지 않은 사유는 service에서 제외되지만, 대비로 그리지 않음)
+  const config = NO_ASSIGNEE_MODAL_CONFIG[modalItem.state];
   if (!config) return null;
 
   return (
     // 모달 (react-modal 라이브러리 사용)
     <Modal
       isOpen={modalOpen}
-      onRequestClose={onCancelClick}
+      shouldCloseOnOverlayClick={false}
+      shouldCloseOnEsc={false}
       overlayClassName={styles.overlayContent}
       className={styles.modalContent}
       ariaHideApp={false}
@@ -90,12 +65,16 @@ function RequestModal({
             <div className={`${styles.tag} typoCaptionMedium`}>{config.tag}</div>
           </div>
 
-          {/* 시간 + 장소 */}
+          {/* 시간 + 장소 (시간이 없으면 시간·점을 숨기고 장소만) */}
           <div className={styles.resSubTxt}>
-            <span className="typoBodySmall">{modalItem.time}</span>
-            <div className={styles.pointIcon}>
-              <div className={styles.ellipse} />
-            </div>
+            {modalItem.time && (
+              <>
+                <span className="typoBodySmall">{modalItem.time}</span>
+                <div className={styles.pointIcon}>
+                  <div className={styles.ellipse} />
+                </div>
+              </>
+            )}
             <span className="typoBodySmall">{modalItem.location}</span>
           </div>
         </article>
@@ -112,6 +91,7 @@ function RequestModal({
       <section className={styles.btnContainer}>
         {/* [닫기] 버튼 */}
         <button
+          type="button"
           onClick={onCancelClick}
           className={`${styles.modalBtn} ${styles.cancelBtn} typoBodySmall`}
         >
@@ -120,6 +100,7 @@ function RequestModal({
 
         {/* [다른 사람] 버튼 */}
         <button
+          type="button"
           onClick={onConfirmClick}
           className={`${styles.modalBtn} ${styles.confirmBtn} typoBodySmall`}
         >
