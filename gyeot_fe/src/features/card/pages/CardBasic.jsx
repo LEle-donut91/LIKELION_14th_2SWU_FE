@@ -3,6 +3,7 @@
  * [C-01] 안심카드 - 기본 정보
  *  - 페이지 컴포넌트
  *  - 목록 화면 ↔ 편집 화면(생년월일/혈액형)을 라우트 분리 없이 상태(editingKey)로 전환
+ *  - 조회·저장·삭제는 useBasicInfo(분류별 항목 조회 / 항목 작성·수정·삭제 API)로 처리
  * =====================================================================
  */
 
@@ -10,10 +11,11 @@
 import styles from "@/features/card/pages/CardBasic.module.css";
 
 // 일반 라이브러리
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 // Custom Hooks
 import { useToast } from "@/shared/hooks/useToast";
+import { useBasicInfo } from "@/features/card/hooks/useBasicInfo";
 
 // Constants
 import {
@@ -26,6 +28,7 @@ import {
 } from "@/features/card/constants/cardConstants";
 
 // Utils
+import { getErrorMessage } from "@/shared/utils/apiError";
 import {
   formatShortDate,
   formatBirthDate,
@@ -35,12 +38,7 @@ import {
   isBirthDateLengthValid,
   isExistingDate,
   isFutureDate,
-  getTodayDateString,
 } from "@/features/card/utils/cardFormat";
-
-// Mocks
-// TODO: API 연동 시 조회 결과로 교체
-import { CARD_BASIC_MOCK } from "@/features/card/mocks/cardMockData";
 
 // 일반 Components
 import SubpageHeader from "@/shared/components/subpage-header/SubpageHeader";
@@ -81,9 +79,6 @@ const getBirthDateErrorMessage = (input) => {
 
 // 페이지 컴포넌트
 function CardBasic() {
-  // 기본 정보 데이터 (API 연동 전까지 mock으로 화면 안에서만 관리)
-  const [basicInfo, setBasicInfo] = useState(CARD_BASIC_MOCK);
-
   // 편집 중인 항목 키 (null이면 목록 화면, BASIC_INFO_KEY 값이면 해당 편집 화면)
   const [editingKey, setEditingKey] = useState(null);
 
@@ -96,64 +91,79 @@ function CardBasic() {
   // 토스트 메시지
   const { toast, showToast, hideToast } = useToast();
 
+  // 기본 정보 조회·저장·삭제 (성공·실패 안내는 토스트로)
+  // - basicInfo: { birthDate, bloodType } / 항목마다 { informationId, value, updatedAt } 또는 null
+  const { basicInfo, isPending, error, isSaving, saveBasicInfo, deleteBasicInfo } =
+    useBasicInfo({ onMessage: showToast });
+
+  // 조회 실패 시 토스트 안내 (목록은 그리지 않음)
+  useEffect(() => {
+    if (!error) return;
+    showToast(getErrorMessage(error));
+  }, [error, showToast]);
+
   // 현재 편집 중인 항목 설정 (헤더/라벨 제목에 사용)
   const editingItem = BASIC_INFO_ITEM_LIST.find(
     (item) => item.key === editingKey,
   );
 
-  // 항목 값 변경 + 갱신일을 오늘로 변경
-  // TODO: API 연동 시 수정/삭제 요청 후 응답 기준으로 갱신
-  const updateBasicInfo = (key, value) => {
-    setBasicInfo((prev) => ({
-      ...prev,
-      [key]: { value, updatedDate: getTodayDateString() },
-    }));
-  };
+  // 등록된 값이 없는 항목을 편집 중인지 (오른쪽 버튼 [추가], [삭제]는 모달 없이 닫기)
+  const isAddMode = Boolean(editingItem) && !basicInfo?.[editingKey];
 
   // 목록 카드의 '수정하기' 클릭 → 편집 화면으로 전환
   const handleEditOpen = (key) => {
-    setDraftValue(getInitialDraft(key, basicInfo[key]?.value));
+    setDraftValue(getInitialDraft(key, basicInfo?.[key]?.value));
     setEditingKey(key);
   };
 
-  // 편집 화면 닫기 (X 버튼) → 입력값 버리고 목록 화면으로
+  // 편집 화면 닫기 (X 버튼 / 저장·삭제 성공) → 입력값 버리고 목록 화면으로
   const handleEditClose = () => {
     setEditingKey(null);
     setDraftValue("");
   };
 
-  // [수정] 버튼 클릭 → 검증 후 저장하고 목록 화면으로 (실패 시 토스트)
-  const handleUpdateClick = () => {
+  // [수정]/[추가] 버튼 클릭 → 검증 후 저장, 성공하면 목록 화면으로 (실패 시 토스트, 편집 화면 유지)
+  const handleSaveClick = () => {
+    if (isSaving) return;
+
+    let value = draftValue;
+
     if (editingKey === BASIC_INFO_KEY.BIRTH_DATE) {
       const errorMessage = getBirthDateErrorMessage(draftValue);
       if (errorMessage) {
         showToast(errorMessage);
         return;
       }
-      updateBasicInfo(editingKey, toBirthDateValue(draftValue));
+      value = toBirthDateValue(draftValue);
     }
 
-    if (editingKey === BASIC_INFO_KEY.BLOOD_TYPE) {
-      if (!draftValue) {
-        showToast(BASIC_INFO_TOAST_MESSAGE.BLOOD_TYPE_REQUIRED);
-        return;
-      }
-      updateBasicInfo(editingKey, draftValue);
+    if (editingKey === BASIC_INFO_KEY.BLOOD_TYPE && !draftValue) {
+      showToast(BASIC_INFO_TOAST_MESSAGE.BLOOD_TYPE_REQUIRED);
+      return;
     }
 
-    handleEditClose();
+    saveBasicInfo({ key: editingKey, value }, { onSuccess: handleEditClose });
   };
 
-  // [삭제] 버튼 클릭 → 삭제 확인 모달 열기
+  // [삭제] 버튼 클릭
+  // - 등록된 값이 없으면 지울 값이 없으므로 모달 없이 바로 닫기
+  // - 등록된 값이 있으면 삭제 확인 모달 열기
   const handleDeleteClick = () => {
+    if (isAddMode) {
+      handleEditClose();
+      return;
+    }
     setDeleteModalOpen(true);
   };
 
-  // 모달의 [삭제] 클릭 → 값 삭제 후 목록 화면으로
+  // 모달의 [삭제] 클릭 → 삭제 요청, 성공하면 목록 화면으로 (성공·실패 모두 모달 닫기)
   const handleDeleteConfirm = () => {
-    updateBasicInfo(editingKey, null);
-    setDeleteModalOpen(false);
-    handleEditClose();
+    if (isSaving) return;
+
+    deleteBasicInfo(editingKey, {
+      onSuccess: handleEditClose,
+      onSettled: () => setDeleteModalOpen(false),
+    });
   };
 
   return (
@@ -189,9 +199,13 @@ function CardBasic() {
             leftType="tertiary"
             rightType="primary"
             leftTitle={BASIC_INFO_FOOTER_TEXT.DELETE}
-            rightTitle={BASIC_INFO_FOOTER_TEXT.UPDATE}
+            rightTitle={
+              isAddMode
+                ? BASIC_INFO_FOOTER_TEXT.ADD
+                : BASIC_INFO_FOOTER_TEXT.UPDATE
+            }
             leftOnClick={handleDeleteClick}
-            rightOnClick={handleUpdateClick}
+            rightOnClick={handleSaveClick}
           />
 
           {/* 삭제 확인 모달 (안내문은 줄 단위로 <br /> 처리) */}
@@ -218,17 +232,20 @@ function CardBasic() {
           <SubpageHeader title="기본 정보" />
 
           <main className={styles.listContent}>
-            <ul className={styles.infoList}>
-              {BASIC_INFO_ITEM_LIST.map(({ key, title }) => (
-                <BasicInfoItem
-                  key={key}
-                  title={title}
-                  description={getDescriptionText(key, basicInfo[key]?.value)}
-                  updatedDateText={formatShortDate(basicInfo[key]?.updatedDate)}
-                  onEditClick={() => handleEditOpen(key)}
-                />
-              ))}
-            </ul>
+            {/* TODO: 로딩·에러 화면 디자인이 정해지면 추가 (지금은 헤더만 표시, C-03·C-06과 동일) */}
+            {!isPending && !error && (
+              <ul className={styles.infoList}>
+                {BASIC_INFO_ITEM_LIST.map(({ key, title }) => (
+                  <BasicInfoItem
+                    key={key}
+                    title={title}
+                    description={getDescriptionText(key, basicInfo?.[key]?.value)}
+                    updatedDateText={formatShortDate(basicInfo?.[key]?.updatedAt)}
+                    onEditClick={() => handleEditOpen(key)}
+                  />
+                ))}
+              </ul>
+            )}
           </main>
         </>
       )}

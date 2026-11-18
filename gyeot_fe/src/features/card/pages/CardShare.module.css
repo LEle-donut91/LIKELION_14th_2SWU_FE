@@ -30,6 +30,11 @@
   color: var(--color-gray-900);
 }
 
+.toastArea {
+  white-space: pre-line;
+  word-break: keep-all;
+}
+
 /* 토스트 너비를 글자 길이에 맞춤 (화면 절반으로 줄어드는 문제 방지)
  * - max-width: 문구가 아주 길면 좌우 16px 여백을 남기고 줄바꿈 */
 .toastArea > * {
