@@ -17,6 +17,7 @@ export const HOME_NAVIGATION_PATH = {
   SITUATION_DETAIL: "/situation/detail", // H-03 상황 상세
   SITUATION_CREATE: "/situation/create", // H-01 상황 만들기
   REQUEST_CREATE: (situationId) => `/request/${situationId}`, // H-03-02 요청 작성
+  ASK_AGAIN: (requestId) => `/request/ask-again/${requestId}`, // N-06 다시 부탁하기 (M-01 '다른 사람')
   ACQUAINTANCE_INVITE: "/relation/acquaintance-invite", // R-01 나의 사람 초대
   CARD: "/card", // C-00 안심카드
   CARD_SHARE: "/card/share", // C-06 공유 관리
@@ -54,6 +55,41 @@ export const HOME_HELP_TYPE_LABELS = {
   CHECK_IN: "연락/안부",
   OTHER: "기타",
 };
+
+// M-01 담당자 없음 모달: 사유(reason)별 태그 · 안내 문구 (키는 담당자 없음 안내 목록의 reason 값과 동일)
+// - 이름 뒤 조사/위치가 사유마다 달라서 message는 이름을 받아 문장을 만드는 함수로 둠
+// - 여기에 없는 사유는 noAssigneeNoticeService에서 제외 (모달을 그리지 못해 다음 안내가 막히지 않도록)
+// - 문구는 디자인 시안 기준. USER_WITHDRAWN은 서버 이름이 "탈퇴한 사용자"라
+//   "지금은 탈퇴한 사용자님께 요청이 불가능해요."로 표시됨 (11/19 디자인 유지 결정)
+export const NO_ASSIGNEE_MODAL_CONFIG = {
+  UNAVAILABLE: {
+    tag: "어려움",
+    message: (name) => `${name}님이 이번 요청은 어렵다고 응답하셨어요.`,
+  },
+  ACCEPTANCE_WITHDRAWN: {
+    tag: "어려움",
+    message: (name) => `${name}님이 요청이 어렵다고 응답을 수정하셨어요.`,
+  },
+  DEADLINE_PASSED: {
+    tag: "기한 초과",
+    message: (name) => `${name}님이 기한 내에 응답하지 않았어요.`,
+  },
+  RELATIONSHIP_ENDED: {
+    tag: "관계 해제",
+    message: (name) => `${name}님과 관계가 해제되어 요청할 수 없어요.`,
+  },
+  PARTICIPANT_LEFT: {
+    tag: "상황 이탈",
+    message: (name) => `${name}님이 상황에서 제외되어 요청할 수 없어요.`,
+  },
+  USER_WITHDRAWN: {
+    tag: "탈퇴",
+    message: (name) => `지금은 ${name}님께 요청이 불가능해요.`,
+  },
+};
+
+// M-01 대상 이름이 null일 때 표시할 이름 (서버의 탈퇴 사용자 표시와 같은 문구)
+export const NO_ASSIGNEE_FALLBACK_NAME = "탈퇴한 사용자";
 
 // 상황 카드 하단 태그: 홈 통합 조회 requestCounts의 key → 태그 종류(SITUATION_TAG의 key)
 // - 화면에 그릴 순서대로 작성. 응답에 없는 key는 태그를 그리지 않음

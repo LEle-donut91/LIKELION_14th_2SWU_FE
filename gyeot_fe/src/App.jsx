@@ -3,7 +3,6 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import ErrorBoundary from "@/shared/components/ErrorBoundary";
 import ErrorFallback from "@/shared/components/ErrorFallback";
 import Test from "@/features/test/pages/Test";
-import ModalTest from "@/features/test/pages/ModalTest";
 
 // 나의 사람 및 보호자
 import Start from "@/features/relation/pages/Start";
@@ -64,9 +63,8 @@ function App() {
         >
           <BrowserRouter>
             <Routes>
-              {/* CSS 변수 테스트, M-01 모달 테스트 */}
+              {/* CSS 변수 테스트 */}
               <Route path="/test" element={<Test />} />
-              <Route path="/modal-test" element={<ModalTest/>}/>
 
               {/* 나의 사람 및 보호자 */}
               <Route path="/" element={<Start />} />  {/* A-01 */}

@@ -3,7 +3,9 @@ import { useLocation, useNavigate } from "react-router-dom";
 import styles from "@/features/home/pages/Home.module.css";
 import MainHeader from "@/shared/components/main-header/MainHeader";
 import BottomNav from "@/shared/components/BottomNav/BottomNav";
+import { useToast } from "@/shared/hooks/useToast";
 import { useHome } from "@/features/home/hooks/useHome";
+import { useNoAssigneeNotice } from "@/features/home/hooks/useNoAssigneeNotice";
 import HomeEmpty from "@/features/home/components/HomeEmpty";
 import StatusCardList from "@/features/home/components/StatusCardList";
 import SectionTab from "@/features/home/components/SectionTab";
@@ -12,6 +14,7 @@ import HomeRequestSections from "@/features/home/components/HomeRequestSections"
 import HelpFloatingButton from "@/features/home/components/HelpFloatingButton";
 import SituationSelectSheet from "@/features/home/components/SituationSelectSheet";
 import HomeToast from "@/features/home/components/HomeToast";
+import RequestModal from "@/features/home/components/RequestModal";
 import HomeTestSwitcher from "@/features/home/components/HomeTestSwitcher"; // [테스트용] 제거 가능
 import {
   HOME_NAVIGATION_PATH,
@@ -42,6 +45,18 @@ function Home() {
   const location = useLocation();
   const navigate = useNavigate();
   const { homeData, isLoading, hasError } = useHome();
+
+  // 담당자 없음 안내 닫기 실패 토스트 (M-01)
+  const { toast, showToast, hideToast } = useToast();
+
+  // 담당자 없음 안내 (M-01): 홈 조회와 함께 조회, 정상 홈 화면에서만 모달 표시
+  const {
+    currentItem: noAssigneeNotice,
+    currentNumber: noAssigneeNoticeNumber,
+    totalCount: noAssigneeNoticeCount,
+    handleClose: handleNoAssigneeNoticeClose,
+    handleAskAgain: handleNoAssigneeNoticeAskAgain,
+  } = useNoAssigneeNotice({ onDismissError: showToast });
 
   const [activeTab, setActiveTab] = useState(SITUATION_TAB.MY);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
@@ -177,8 +192,25 @@ function Home() {
         />
       )}
 
+      {/* M-01 담당자 없음 모달: 안내가 있으면 하나씩 표시 (닫으면 다음 안내) */}
+      {noAssigneeNotice && (
+        <RequestModal
+          modalOpen
+          modalItem={noAssigneeNotice}
+          currentNumber={noAssigneeNoticeNumber}
+          totalCount={noAssigneeNoticeCount}
+          onCancelClick={handleNoAssigneeNoticeClose}
+          onConfirmClick={handleNoAssigneeNoticeAskAgain}
+        />
+      )}
+
       {isToastVisible && (
         <HomeToast message="상황을 종료했어요." onHide={handleToastHide} />
+      )}
+
+      {/* M-01 닫기 실패 안내 (key가 바뀌면 새로 마운트되어 타이머가 다시 시작됨) */}
+      {toast && (
+        <HomeToast key={toast.id} message={toast.message} onHide={hideToast} />
       )}
 
       {/* [테스트용] 상황별 화면 전환 - 제거 시 이 줄과 import만 삭제 */}
