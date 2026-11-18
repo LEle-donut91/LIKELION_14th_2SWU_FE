@@ -12,27 +12,19 @@ import styles from "@/features/request/pages/RequestEditCheck.module.css";
 import iconToggle from "@/shared/assets/icons/iconToggle.svg";
 
 // 일반 라이브러리
-import { useEffect } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 
 // Custom Hooks
 import { useRequestNav } from "@/features/request/hooks/useRequestNav";
+import { useRequestDetailQuery } from "@/features/request/hooks/queries/useRequestDetailQuery";
+import { useInformationOptionsQuery } from "@/features/request/hooks/queries/useInformationOptionsQuery";
+import { useEditRequestMutation } from "@/features/request/hooks/mutations/useEditRequestMutation";
+import { useErrorToast } from "@/features/request/hooks/useErrorToast";
 import { useRequestFormStore } from "@/features/request/stores/useRequestFormStore";
 import { useToast } from "@/shared/hooks/useToast";
-import { REQUEST_QUERY_KEYS } from "@/features/request/constants/requestQueryKeys";
-import { getErrorMessage } from "@/shared/utils/apiError";
 
-// API, Services
-import {
-  getRequestDetailApi,
-  getInformationOptionsApi,
-} from "@/features/request/api/getApi";
-import {
-  patchEditApi,
-} from "@/features/request/api/patchApi";
-import { getEditCheckService } from "@/features/request/services/getService";
-import { patchEditService } from "@/features/request/services/patchService";
+// Services
+import { getEditCheckService } from "@/features/request/services/editRequestService";
 
 // 일반 Components
 import SubpageHeader from "@/shared/components/subpage-header/SubpageHeader";
@@ -43,34 +35,41 @@ import DefaultToast from "@/shared/components/Toast/DefaultToast";
 
 // 페이지 컴포넌트
 function RequestEditCheck() {
-  // useNavigation 커스텀 훅의 함수
   const { handleGoBack, handleGoBackTwice } = useRequestNav();
-
-  // path parameter (요청 ID)
+  const { toast, showToast, hideToast } = useToast();
   const paramId = useParams().id;
 
+  // Zustand Store
   const requestForm = useRequestFormStore((state) => state.form);
-  const { toast, showToast, hideToast } = useToast();
-  // 선택한 정보 ID를 표시 이름으로 변환하기 위한 선택지 조회
-  const { data: informationOptions, isPending: isInformationPending, error: informationError } = useQuery({
-    queryKey: REQUEST_QUERY_KEYS.informationOptions(requestForm.helpType, paramId),
-    queryFn: () => getInformationOptionsApi({ helpType: requestForm.helpType, requestId: paramId }),
-    enabled: Boolean(requestForm.helpType && paramId),
+
+  // 1. 공개 항목 선택지 조회 API
+  const {
+    data: informationOptions,
+    isPending: isInformationPending,
+    error: informationError,
+  } = useInformationOptionsQuery(
+    { helpType: requestForm.helpType, requestId: paramId },
+    { enabled: Boolean(requestForm.helpType && paramId) },
+  );
+
+  // 2. 요청 상세 조회 API
+  const {
+    data: requestDetail,
+    isPending: isDetailPending,
+    error: detailError,
+  } = useRequestDetailQuery(paramId);
+  useErrorToast(showToast, detailError, informationError);
+
+  // 3. 요청 수정 API (변경된 필드만 PATCH - 바뀐 내용이 없으면 토스트만 표시)
+  const { editRequest } = useEditRequestMutation({
+    requestId: paramId,
+    requestDetail,
+    informationOptions,
+    showToast,
+    onSuccess: () => handleGoBackTwice(),
   });
-  const { data: requestDetail, isPending: isDetailPending, error: detailError } = useQuery({
-    queryKey: REQUEST_QUERY_KEYS.detail(paramId),
-    queryFn: () => getRequestDetailApi(paramId),
-    enabled: Boolean(paramId),
-  });
 
-  useEffect(() => {
-    if (detailError) showToast(getErrorMessage(detailError));
-  }, [detailError, showToast]);
-
-  useEffect(() => {
-    if (informationError) showToast(getErrorMessage(informationError));
-  }, [informationError, showToast]);
-
+  // API 응답 데이터 (정제된 형태)
   const {
     userName,
     isConfirmRequired,
@@ -79,77 +78,74 @@ function RequestEditCheck() {
     afterInfoList,
   } = getEditCheckService(requestDetail, requestForm, informationOptions);
 
-  const { mutate: editRequest, isPending: isEditing } = useMutation({
-    mutationFn: (form) => patchEditApi(patchEditService(paramId, form, requestDetail, informationOptions)),
-    onSuccess: () => {
-      handleGoBackTwice();
-    },
-    onError: (error) => {
-      showToast(getErrorMessage(error));
-    },
-  });
-
-  // [H-03-01-02] 재확인 요청 후 [요청 상세 · 요청자 뷰]로 이동
+  // "재확인 요청" 버튼 핸들러
   const handleReconfirmBtnClick = () => {
-    if (isEditing || isDetailPending || isInformationPending || detailError || informationError) return;
-    const { payload } = patchEditService(paramId, requestForm, requestDetail, informationOptions);
-    if (Object.keys(payload).length === 0) {
-      showToast("변경된 내용이 없어요.");
+    if (
+      isDetailPending ||
+      isInformationPending ||
+      detailError ||
+      informationError
+    )
       return;
-    }
     editRequest(requestForm);
   };
 
   return (
     <div className={styles.page}>
-      <SubpageHeader title="요청 수정" rightText="2 / 2" onBackClick={handleGoBack} />
+      <SubpageHeader
+        title="요청 수정"
+        rightText="2 / 2"
+        onBackClick={handleGoBack}
+      />
 
       {/* 실제 컨텐츠가 들어갈 자리 */}
       <main className={styles.content}>
-        {isDetailPending || isInformationPending ? <div role="status">로딩중</div> : (
+        {isDetailPending || isInformationPending ? (
+          <div role="status">로딩중</div>
+        ) : (
           <>
-        {/* 변경 전 - 변경 후 카드 Container */}
-        <div className={styles.cardContainer}>
-          {/* 변경 전 Card */}
-          <RequestSummary
-            isAfterInfo={false}
-            hasBeigeBorder={false}
-            title="변경 전"
-            hasTag={false}
-            infoList={beforeInfoList}
-          />
+            {/* 변경 전 - 변경 후 카드 Container */}
+            <div className={styles.cardContainer}>
+              {/* 변경 전 Card */}
+              <RequestSummary
+                isAfterInfo={false}
+                hasBeigeBorder={false}
+                title="변경 전"
+                hasTag={false}
+                infoList={beforeInfoList}
+              />
 
-          {/* Toggle 아이콘 이미지 */}
-          <div className={styles.imgContainer}>
-            <img className={styles.toggleImg} src={iconToggle} />
-          </div>
+              {/* Toggle 아이콘 이미지 */}
+              <div className={styles.imgContainer}>
+                <img className={styles.toggleImg} src={iconToggle} />
+              </div>
 
-          {/* 변경 후 Card */}
-          <RequestSummary
-            isAfterInfo={true}
-            hasBeigeBorder={false}
-            title="변경 후"
-            hasTag={false}
-            infoList={afterInfoList}
-          />
-        </div>
+              {/* 변경 후 Card */}
+              <RequestSummary
+                isAfterInfo={true}
+                hasBeigeBorder={false}
+                title="변경 후"
+                hasTag={false}
+                infoList={afterInfoList}
+              />
+            </div>
 
-        {/* 요청 대상 Card */}
-        <UserInfo
-          isAgain={false}
-          state="받는 사람"
-          userName={userName}
-          part={userPart}
-        />
+            {/* 요청 대상 Card */}
+            <UserInfo
+              isAgain={false}
+              state="받는 사람"
+              userName={userName}
+              part={userPart}
+            />
 
-        {/* 가이드 Text */}
-        {isConfirmRequired && (
-          <span className={`${styles.guideTxt} typoBodySmall`}>
-            확인 전까지 기존 내용과 접근 권한이 유지돼요.
-            <br />
-            담당자 거절 시, 요청이 취소되고 접근 권한이 회수돼요.
-          </span>
-        )}
+            {/* 가이드 Text */}
+            {isConfirmRequired && (
+              <span className={`${styles.guideTxt} typoBodySmall`}>
+                확인 전까지 기존 내용과 접근 권한이 유지돼요.
+                <br />
+                담당자 거절 시, 요청이 취소되고 접근 권한이 회수돼요.
+              </span>
+            )}
           </>
         )}
       </main>
@@ -160,7 +156,13 @@ function RequestEditCheck() {
         type="primary"
         onClick={handleReconfirmBtnClick}
       />
-      {toast && <DefaultToast key={toast.id} message={toast.message} onHide={hideToast} />}
+      {toast && (
+        <DefaultToast
+          key={toast.id}
+          message={toast.message}
+          onHide={hideToast}
+        />
+      )}
     </div>
   );
 }

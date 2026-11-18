@@ -1,27 +1,16 @@
-import { getRequestDetailService } from "@/features/request/services/getService";
-import { Fragment, useEffect, useState } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { Fragment, useState } from "react";
 import { useParams } from "react-router-dom";
 import styles from "./RequestDetail.module.css";
 import { useRequestNav } from "@/features/request/hooks/useRequestNav";
+import { useRequestDetailQuery } from "@/features/request/hooks/queries/useRequestDetailQuery";
+import { useRequestDetailMutations } from "@/features/request/hooks/mutations/useRequestDetailMutations";
+import { useErrorToast } from "@/features/request/hooks/useErrorToast";
 import { useToast } from "@/shared/hooks/useToast";
-import { getErrorMessage } from "@/shared/utils/apiError";
+import { getRequestDetailService } from "@/features/request/services/requestDetailService";
 import { REQUEST_ROUTES } from "@/features/request/constants/routerConstants";
-import { REQUEST_QUERY_KEYS } from "@/features/request/constants/requestQueryKeys";
 import { RESPONSE_STATUS } from "@/features/request/constants/enumConstants";
-import {
-  REQUESTER_CANCEL_BTN_TITLE,
-  REQUEST_FORM_FIELD_KEY,
-} from "@/features/request/constants/requestConstants";
-import { getRequestDetailApi } from "@/features/request/api/getApi";
-import {
-  postCancelApi,
-  postStartApi,
-  postDoneApi,
-  postAcceptWithdrawApi,
-  postEditWithdrawApi,
-  postResponseApi,
-} from "@/features/request/api/postApi";
+import { REQUEST_FORM_FIELD_KEY } from "@/features/request/constants/requestFormConstants";
+import { REQUESTER_CANCEL_BTN_TITLE } from "@/features/request/constants/requesterViewConstants";
 
 import SubpageHeader from "@/shared/components/subpage-header/SubpageHeader";
 import SmallFooter from "@/shared/components/SmallFooter/SmallFooter";
@@ -46,134 +35,59 @@ function RequestDetail() {
   const [isWithdrawModalOpen, setWithdrawModalOpen] = useState(false);
   const { toast, showToast, hideToast } = useToast();
 
+  // 1. 요청 상세 조회 API (응답의 viewerRole로 화면이 결정됨)
   const {
     data: detail,
     isPending,
     error,
-    refetch,
-  } = useQuery({
-    queryKey: REQUEST_QUERY_KEYS.detail(paramId),
-    queryFn: () => getRequestDetailApi(paramId),
+  } = useRequestDetailQuery(paramId, {
     select: getRequestDetailService,
-    enabled: Boolean(paramId),
   });
 
-  useEffect(() => {
-    if (!error) return;
-    showToast(getErrorMessage(error));
-  }, [error, showToast]);
-
-  const { mutate: cancelRequest, isPending: isCanceling } = useMutation({
-    mutationFn: postCancelApi,
-    onSuccess: () => refetch(),
-    onError: (error) => {
-      showToast(getErrorMessage(error));
-    },
-  });
-
-  const { mutate: withdrawAcceptance, isPending: isWithdrawing } = useMutation({
-    mutationFn: postAcceptWithdrawApi,
-    onSuccess: () => {
-      handleGoNext(REQUEST_ROUTES.home, true);
-    },
-    onError: (error) => {
-      showToast(getErrorMessage(error));
-    },
-  });
-
-  const { mutate: withdrawProposal, isPending: isWithdrawingProposal } = useMutation({
-    mutationFn: postEditWithdrawApi,
-    onSuccess: () => refetch(),
-    onError: (error) => {
-      showToast(getErrorMessage(error));
-    },
-  });
-
-  const { mutate: startCare, isPending: isStarting } = useMutation({
-    mutationFn: postStartApi,
-    onSuccess: () => refetch(),
-    onError: (error) => {
-      showToast(getErrorMessage(error));
-    },
-  });
-
-  const { mutate: respondToRequest, isPending: isResponding } = useMutation({
-    mutationFn: postResponseApi,
-    onSuccess: () => refetch(),
-    onError: (error) => {
-      showToast(getErrorMessage(error));
-    },
-  });
-
-  const { mutate: completeCare, isPending: isCompleting } = useMutation({
-    mutationFn: postDoneApi,
-    onSuccess: () => refetch(),
-    onError: (error) => {
-      showToast(getErrorMessage(error));
-    },
-  });
-
+  // 2. 요청 취소 / 수락 철회 / 수정안 철회 / 돌봄 시작 / 돌봄 완료 / 요청 응답 API
   const {
-    situationId, proposalId, stepState, userName, userId, requestType, message,
-    dueDate, initialDueDate, infoList, userList, flags = {}, notices = [],
-    notice, footerConfig, role, orderTitle, userStateText, safetyInformation,
+    cancelRequest,
+    withdrawAcceptance,
+    withdrawProposal,
+    startCare,
+    completeCare,
+    respondToRequest,
+  } = useRequestDetailMutations(paramId, {
+    showToast,
+    onAcceptanceWithdrawn: () => handleGoNext(REQUEST_ROUTES.home, true),
+  });
+
+  // API 에러 메시지 출력
+  useErrorToast(showToast, error);
+
+  // API 응답 데이터 (정제된 형태)
+  const {
+    situationId,
+    proposalId,
+    stepState,
+    userName,
+    userId,
+    requestType,
+    message,
+    dueDate,
+    initialDueDate,
+    infoList,
+    userList,
+    flags = {},
+    notices = [],
+    notice,
+    footerConfig,
+    role,
+    orderTitle,
+    userStateText,
+    safetyInformation,
     guideLines = [],
   } = detail ?? {};
   const isRequester = role === "requester";
   const isAssignee = role === "assignee";
   const isTarget = role === "target";
 
-  const handleResponse = (response) => {
-    if (isResponding) return;
-    respondToRequest({ requestId: paramId, response });
-  };
-
-  const footerActions = {
-    edit: () => handleGoNext(REQUEST_ROUTES.editForm(paramId)),
-    askAgain: () => handleGoNext(REQUEST_ROUTES.askAgain(paramId)),
-    withdraw: () => setWithdrawModalOpen(true),
-    withdrawProposal: () => {
-      if (isWithdrawingProposal || !proposalId) return;
-      withdrawProposal({ requestId: paramId, proposalId });
-    },
-    done: () => {
-      if (isStarting || isCompleting) return;
-      completeCare(paramId);
-    },
-    sameRequest: () => setSameModalOpen(true),
-    checkChange: () => handleGoNext(REQUEST_ROUTES.assigneeReconfirm(paramId)),
-    start: () => {
-      if (isStarting || isCompleting) return;
-      startCare(paramId);
-    },
-    pastSituation: () => handleGoNextWithState(
-      REQUEST_ROUTES.pastSituationDetail, { situationId }, true,
-    ),
-    hold: () => handleResponse(RESPONSE_STATUS.CHECK_LATER),
-    refuse: () => handleResponse(RESPONSE_STATUS.UNAVAILABLE),
-    accept: () => handleResponse(RESPONSE_STATUS.AVAILABLE),
-    changeToRefuse: () => handleResponse(RESPONSE_STATUS.UNAVAILABLE),
-    changeToAccept: () => handleResponse(RESPONSE_STATUS.AVAILABLE),
-  };
-
-  const handleCancelConfirm = () => {
-    if (isCanceling) return;
-    setCancelModalOpen(false);
-    cancelRequest(paramId);
-  };
-
-  const handleSameConfirm = () => {
-    setSameModalOpen(false);
-    handleGoNextWithState(REQUEST_ROUTES.request(situationId), {
-      [REQUEST_FORM_FIELD_KEY.USER_ID]: userId,
-      [REQUEST_FORM_FIELD_KEY.DUE_DATE]: initialDueDate,
-    });
-  };
-  const handleWithdrawConfirm = () => {
-    if (isWithdrawing) return;
-    setWithdrawModalOpen(false);
-    withdrawAcceptance(paramId);
-  };
+  // Header별 action 연결
   const headerActions = {
     requester: {
       text: flags.isCancelable ? REQUESTER_CANCEL_BTN_TITLE : undefined,
@@ -181,7 +95,9 @@ function RequestDetail() {
     },
     assignee: {
       text: flags.showWithdrawBtn ? "철회" : undefined,
-      onClick: flags.showWithdrawBtn ? () => setWithdrawModalOpen(true) : undefined,
+      onClick: flags.showWithdrawBtn
+        ? () => setWithdrawModalOpen(true)
+        : undefined,
     },
     target: {
       text: flags.showHoldBtn ? "보류" : undefined,
@@ -189,6 +105,50 @@ function RequestDetail() {
     },
   };
   const headerAction = headerActions[role] ?? {};
+
+  // Footer별 action 연결
+  const footerActions = {
+    edit: () => handleGoNext(REQUEST_ROUTES.editForm(paramId)),
+    askAgain: () => handleGoNext(REQUEST_ROUTES.askAgain(paramId)),
+    withdraw: () => setWithdrawModalOpen(true),
+    withdrawProposal: () => withdrawProposal(proposalId),
+    done: completeCare,
+    sameRequest: () => setSameModalOpen(true),
+    checkChange: () => handleGoNext(REQUEST_ROUTES.assigneeReconfirm(paramId)),
+    start: startCare,
+    pastSituation: () =>
+      handleGoNextWithState(
+        REQUEST_ROUTES.pastSituationDetail,
+        { situationId },
+        true,
+      ),
+    hold: () => respondToRequest(RESPONSE_STATUS.CHECK_LATER),
+    refuse: () => respondToRequest(RESPONSE_STATUS.UNAVAILABLE),
+    accept: () => respondToRequest(RESPONSE_STATUS.AVAILABLE),
+    changeToRefuse: () => respondToRequest(RESPONSE_STATUS.UNAVAILABLE),
+    changeToAccept: () => respondToRequest(RESPONSE_STATUS.AVAILABLE),
+  };
+
+  // [요청 취소] 모달의 confirm 버튼 핸들러
+  const handleCancelConfirm = () => {
+    setCancelModalOpen(false);
+    cancelRequest();
+  };
+
+  // "같은 내용 요청" 버튼 핸들러
+  const handleSameConfirm = () => {
+    setSameModalOpen(false);
+    handleGoNextWithState(REQUEST_ROUTES.request(situationId), {
+      [REQUEST_FORM_FIELD_KEY.USER_ID]: userId,
+      [REQUEST_FORM_FIELD_KEY.DUE_DATE]: initialDueDate,
+    });
+  };
+
+  // [수락 철회] 모달의 confirm 버튼 핸들러
+  const handleWithdrawConfirm = () => {
+    setWithdrawModalOpen(false);
+    withdrawAcceptance();
+  };
 
   return (
     <div className={`${styles.page} ${styles[role]}`}>
@@ -205,159 +165,170 @@ function RequestDetail() {
       )}
       {detail && (
         <>
-      <div className={styles.content}>
-        {!isTarget && (
-          <div className={styles.stepContainer}>
-            <RequestStep isRequester={isRequester} state={stepState} />
-          </div>
-        )}
-        {notices.map(({ key, title, information }) => (
-          <div className={styles.requestStateContainer} key={key}>
-            <RequestState title={title} information={information} />
-          </div>
-        ))}
-        {isAssignee && flags.showChangedNotice && (
-          <RequestState isAssignee={true} title="요청 수정" information="수정된 정보를 확인해 주세요." />
-        )}
-        {notice && (
-          <RequestState isAssignee={false} title={notice.title} information={notice.information} />
-        )}
-        <RequestSummary
-          isAfterInfo={false}
-          hasBeigeBorder={true}
-          title={isRequester ? `To. ${userName}` : `${userName}님의 요청`}
-          hasTag={true}
-          type={requestType}
-          infoList={infoList}
-          message={isRequester && !flags.showMessage ? undefined : message}
-        />
-        {flags.showDueDate && (
-          <div className={styles.dueDateContainer}>
-            <DueDateState
-              isResponse={true}
-              isDeadline={true}
-              title="응답 기한"
-              dueDate={dueDate}
-            />
-          </div>
-        )}
-        {isAssignee && (
-          <SafetyCardGroup
-            title="전달받은 정보"
-            information={safetyInformation}
-            onClick={() => handleGoNext(REQUEST_ROUTES.receivedInfo(paramId))}
-          />
-        )}
-        {isAssignee && flags.showDoneNotice && (
-          <span className={`${styles.doneNotice} typoBodySmall`}>
-            완료된 요청은 다시 열 수 없어요
-          </span>
-        )}
-        {isRequester && flags.showUserState && (
-          <div className={styles.useStateContainer}>
-            <UserState userName={userName} userState={userStateText} />
-          </div>
-        )}
-        {isRequester && flags.showUserOrder && (
-          <div className={styles.orderContainer}>
-            <UserOrder title={orderTitle} orderList={userList} />
-          </div>
-        )}
-        {isRequester && flags.showProgress && (
-          <div className={styles.progressContainer}>
-            <div className={styles.imgContainer}>
-              <img className={styles.imgBg} src={iconResGradientRadial} />
-              <img className={styles.withImg} src={resImgWith} />
-            </div>
-            <span className="typoDisplaySmall">
-              {userName}님과 요청사항을 진행 중이에요.
-              <br />
-              종료 시간은 늦출 수 없어요.
-            </span>
-          </div>
-        )}
-        {guideLines.length > 0 && (
-          <span className={`${styles.guideTxt} typoBodySmall`}>
-            {guideLines.map((line, index) => (
-              <Fragment key={line}>
-                {index > 0 && <br />}
-                {line}
-              </Fragment>
+          <div className={styles.content}>
+            {!isTarget && (
+              <div className={styles.stepContainer}>
+                <RequestStep isRequester={isRequester} state={stepState} />
+              </div>
+            )}
+            {notices.map(({ key, title, information }) => (
+              <div className={styles.requestStateContainer} key={key}>
+                <RequestState title={title} information={information} />
+              </div>
             ))}
-          </span>
-        )}
-      </div>
-      {footerConfig && (footerConfig.size === "small" ? (
-        <SmallFooter
-          leftType={footerConfig.leftType}
-          rightType={footerConfig.rightType}
-          leftTitle={footerConfig.leftTitle}
-          rightTitle={footerConfig.rightTitle}
-          leftOnClick={footerActions[footerConfig.leftAction]}
-          rightOnClick={footerActions[footerConfig.rightAction]}
-        />
-      ) : (
-        <LargeFooter
-          title={footerConfig.title}
-          type={footerConfig.type}
-          onClick={footerActions[footerConfig.action]}
-        />
-      ))}
-      {isRequester && (
-        <>
-          <DefaultModal
-            modalOpen={isCancelModalOpen}
-            setModalOpen={setCancelModalOpen}
-            title="요청 취소"
-            description={
-              <>
-                담당자에게 취소가 전달되고,
-                <br />
-                정보 접근 권한이 바로 회수돼요.
-                <br />
-                취소하는 경우, 이전 상태로 돌아올 수 없어요.
-              </>
-            }
-            cancelTxt="돌아가기"
-            confirmTxt="요청 취소"
-            onConfirmClick={handleCancelConfirm}
-          />
-
-          {/* 같은 내용 요청 모달 */}
-          <DefaultModal
-            modalOpen={isSameModalOpen}
-            setModalOpen={setSameModalOpen}
-            title="같은 내용 요청"
-            description={
-              <>
-                내용을 복제하여 같은 내용으로
-                <br />
-                새로운 요청을 만들까요?
-              </>
-            }
-            cancelTxt="취소"
-            confirmTxt="복제 요청"
-            onConfirmClick={handleSameConfirm}
-          />
-        </>
-      )}
-      {isAssignee && (
-        <DefaultModal
-          modalOpen={isWithdrawModalOpen}
-          setModalOpen={setWithdrawModalOpen}
-          title="수락 철회"
-          description={
+            {isAssignee && flags.showChangedNotice && (
+              <RequestState
+                isAssignee={true}
+                title="요청 수정"
+                information="수정된 정보를 확인해 주세요."
+              />
+            )}
+            {notice && (
+              <RequestState
+                isAssignee={false}
+                title={notice.title}
+                information={notice.information}
+              />
+            )}
+            <RequestSummary
+              isAfterInfo={false}
+              hasBeigeBorder={true}
+              title={isRequester ? `To. ${userName}` : `${userName}님의 요청`}
+              hasTag={true}
+              type={requestType}
+              infoList={infoList}
+              message={isRequester && !flags.showMessage ? undefined : message}
+            />
+            {flags.showDueDate && (
+              <div className={styles.dueDateContainer}>
+                <DueDateState
+                  isResponse={true}
+                  isDeadline={true}
+                  title="응답 기한"
+                  dueDate={dueDate}
+                />
+              </div>
+            )}
+            {isAssignee && (
+              <SafetyCardGroup
+                title="전달받은 정보"
+                information={safetyInformation}
+                onClick={() =>
+                  handleGoNext(REQUEST_ROUTES.receivedInfo(paramId))
+                }
+              />
+            )}
+            {isAssignee && flags.showDoneNotice && (
+              <span className={`${styles.doneNotice} typoBodySmall`}>
+                완료된 요청은 다시 열 수 없어요
+              </span>
+            )}
+            {isRequester && flags.showUserState && (
+              <div className={styles.useStateContainer}>
+                <UserState userName={userName} userState={userStateText} />
+              </div>
+            )}
+            {isRequester && flags.showUserOrder && (
+              <div className={styles.orderContainer}>
+                <UserOrder title={orderTitle} orderList={userList} />
+              </div>
+            )}
+            {isRequester && flags.showProgress && (
+              <div className={styles.progressContainer}>
+                <div className={styles.imgContainer}>
+                  <img className={styles.imgBg} src={iconResGradientRadial} />
+                  <img className={styles.withImg} src={resImgWith} />
+                </div>
+                <span className="typoDisplaySmall">
+                  {userName}님과 요청사항을 진행 중이에요.
+                  <br />
+                  종료 시간은 늦출 수 없어요.
+                </span>
+              </div>
+            )}
+            {guideLines.length > 0 && (
+              <span className={`${styles.guideTxt} typoBodySmall`}>
+                {guideLines.map((line, index) => (
+                  <Fragment key={line}>
+                    {index > 0 && <br />}
+                    {line}
+                  </Fragment>
+                ))}
+              </span>
+            )}
+          </div>
+          {footerConfig &&
+            (footerConfig.size === "small" ? (
+              <SmallFooter
+                leftType={footerConfig.leftType}
+                rightType={footerConfig.rightType}
+                leftTitle={footerConfig.leftTitle}
+                rightTitle={footerConfig.rightTitle}
+                leftOnClick={footerActions[footerConfig.leftAction]}
+                rightOnClick={footerActions[footerConfig.rightAction]}
+              />
+            ) : (
+              <LargeFooter
+                title={footerConfig.title}
+                type={footerConfig.type}
+                onClick={footerActions[footerConfig.action]}
+              />
+            ))}
+          {isRequester && (
             <>
-              철회 시 전달받은 정보가 모두 회수되며,
-              <br />
-              수락 상태로 돌아올 수 없습니다.
+              <DefaultModal
+                modalOpen={isCancelModalOpen}
+                setModalOpen={setCancelModalOpen}
+                title="요청 취소"
+                description={
+                  <>
+                    담당자에게 취소가 전달되고,
+                    <br />
+                    정보 접근 권한이 바로 회수돼요.
+                    <br />
+                    취소하는 경우, 이전 상태로 돌아올 수 없어요.
+                  </>
+                }
+                cancelTxt="돌아가기"
+                confirmTxt="요청 취소"
+                onConfirmClick={handleCancelConfirm}
+              />
+
+              {/* 같은 내용 요청 모달 */}
+              <DefaultModal
+                modalOpen={isSameModalOpen}
+                setModalOpen={setSameModalOpen}
+                title="같은 내용 요청"
+                description={
+                  <>
+                    내용을 복제하여 같은 내용으로
+                    <br />
+                    새로운 요청을 만들까요?
+                  </>
+                }
+                cancelTxt="취소"
+                confirmTxt="복제 요청"
+                onConfirmClick={handleSameConfirm}
+              />
             </>
-          }
-          cancelTxt="취소"
-          confirmTxt="철회"
-          onConfirmClick={handleWithdrawConfirm}
-        />
-      )}
+          )}
+          {isAssignee && (
+            <DefaultModal
+              modalOpen={isWithdrawModalOpen}
+              setModalOpen={setWithdrawModalOpen}
+              title="수락 철회"
+              description={
+                <>
+                  철회 시 전달받은 정보가 모두 회수되며,
+                  <br />
+                  수락 상태로 돌아올 수 없습니다.
+                </>
+              }
+              cancelTxt="취소"
+              confirmTxt="철회"
+              onConfirmClick={handleWithdrawConfirm}
+            />
+          )}
         </>
       )}
       {toast && (

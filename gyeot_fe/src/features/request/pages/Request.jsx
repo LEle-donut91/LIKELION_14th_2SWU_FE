@@ -9,14 +9,14 @@
 import styles from "@/features/request/pages/Request.module.css";
 
 // 일반 라이브러리
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
 
 // Custom Hooks
 import { useRequestNav } from "@/features/request/hooks/useRequestNav";
+import { useRequestTargetsQuery } from "@/features/request/hooks/queries/useRequestTargetsQuery";
+import { useErrorToast } from "@/features/request/hooks/useErrorToast";
 import { useToast } from "@/shared/hooks/useToast";
-import { getErrorMessage } from "@/shared/utils/apiError";
 
 // Zustand Store
 import { useRequestFormStore } from "@/features/request/stores/useRequestFormStore";
@@ -26,32 +26,31 @@ import { REQUEST_ROUTES } from "@/features/request/constants/routerConstants";
 import {
   REQUEST_FORM_FIELD_KEY,
   REQUEST_SHEET,
+} from "@/features/request/constants/requestFormConstants";
+import {
   DATE_TIME_SECTIONS,
   DUE_DATE_SECTIONS,
-} from "@/features/request/constants/requestConstants";
-import { REQUEST_QUERY_KEYS } from "@/features/request/constants/requestQueryKeys";
+} from "@/features/request/constants/dateTimeInputConstants";
 
 // Utils
 import {
+  isReadOnly,
+  isPrerequisiteEnsured,
+  validateInput,
+} from "@/features/request/utils/validateInput";
+import { normalizeResponseDeadline } from "@/features/request/utils/dueDateUtils";
+import {
+  getSelectedUser,
+  getSelectedSituation,
   getSelectedSituationText,
   getSelectedUserText,
   getDateTimeText,
   getDueDateText,
-  normalizeResponseDeadline,
-  isReadOnly,
-  isPrerequisiteEnsured,
-} from "@/features/request/utils/requestUtils";
-import { validateInput } from "@/features/request/utils/validateInput";
-import {
-  getSelectedUser,
-  getSelectedSituation,
-} from "@/features/request/utils/getSelectedItem";
+} from "@/features/request/utils/getSelectionInput";
 
 // API, Services
 import { getReqFormApi } from "@/features/request/api/createApi";
-import { getReqFormService } from "@/features/request/services/createService";
-import { getRequestTargetsApi } from "@/features/request/api/getApi";
-import { getRequestTargetsService } from "@/features/request/services/getService";
+import { getReqFormService } from "@/features/request/services/createRequestService";
 
 // 일반 Components
 import SubpageHeader from "@/shared/components/subpage-header/SubpageHeader";
@@ -68,27 +67,45 @@ import DefaultToast from "@/shared/components/Toast/DefaultToast";
 
 // 페이지 컴포넌트
 function Request() {
-  // useNavigation 커스텀 훅의 함수
   const { handleGoBack, handleGoNext } = useRequestNav();
-
-  // path parameter, useLocation
   const paramId = useParams().id;
-  const location = useLocation();
+  const { toast, showToast, hideToast } = useToast();
+
+  // 열려 있는 시트 (한 번에 하나만 열림)
+  const [openSheet, setOpenSheet] = useState(null);
+  const closeSheet = () => setOpenSheet(null);
 
   // 이전 페이지에서 전달받은 state 데이터 가져오기 (요청 대상 ID, 응답 기한)
+  const location = useLocation();
   const state = location.state || {};
   const passedUserId = state[REQUEST_FORM_FIELD_KEY.USER_ID];
   const passedDueDate = state[REQUEST_FORM_FIELD_KEY.DUE_DATE];
 
-  // TODO: 상황 목록 조회 API 연동 시 교체
+  // 1. TODO: 상황 목록 조회 API 연동 시 교체
   const { situation } = useMemo(() => getReqFormService(getReqFormApi()), []);
 
-  // 입력값 전체는 Zustand store의 form 하나
-  // - 같은 진입(paramId)으로 돌아온 경우(예: 미리보기에서 뒤로가기) 입력값 유지
-  // - 다른 진입이면 새로 초기화 (초기값 전달)
-  const { entryId, form, initForm, changeSituation, changeUser, setForm, resetForm } =
-    useRequestFormStore((state) => state);
+  // 2. 대상 후보 조회 API (상황 선택 후 호출, 상황이 바뀌면 자동으로 다시 조회)
+  const {
+    data: user = [],
+    isPending: isTargetsPending,
+    error: targetsError,
+  } = useRequestTargetsQuery({ situationId: form.situationId });
+  useErrorToast(showToast, targetsError);
 
+  // Zustand Store
+  // 입력값 전체는 Zustand store의 form 하나
+  const {
+    entryId,
+    form,
+    initForm,
+    changeSituation,
+    changeUser,
+    setForm,
+    resetForm,
+  } = useRequestFormStore((state) => state);
+
+  // 같은 진입(paramId)으로 돌아온 경우(예: 미리보기에서 뒤로가기) 입력값 유지
+  // 다른 진입이면 새로 초기화 (초기값 전달)
   useState(() => {
     if (entryId !== paramId) {
       const selectedSituation = getSelectedSituation(situation, paramId);
@@ -102,38 +119,11 @@ function Request() {
     }
   });
 
-  // 토스트 메시지
-  const { toast, showToast, hideToast } = useToast();
-
-  // 열려 있는 시트 (한 번에 하나만 열림)
-  const [openSheet, setOpenSheet] = useState(null);
-  const closeSheet = () => setOpenSheet(null);
-
   // 하위 항목 (시작/종료/요청 대상/응답 기한) 시트 열기 핸들러
   const handleSubItemOpenSheet = (sheet) => {
     // 선행 조건(상황/도움 종류를 모두 선택)을 만족했을 때만 시트 열기
     if (isPrerequisiteEnsured(form, showToast)) setOpenSheet(sheet);
   };
-
-  // 대상 후보 조회 (TanStack Query, 상황 선택 후 호출)
-  // - 상황이 바뀌면 queryKey가 달라져 자동으로 다시 조회
-  const {
-    data: user = [],
-    isPending: isTargetsPending,
-    error: targetsError,
-  } = useQuery({
-    queryKey: REQUEST_QUERY_KEYS.targets(form.situationId),
-    queryFn: () =>
-      getRequestTargetsApi({ situationId: Number(form.situationId) }),
-    select: getRequestTargetsService,
-    enabled: Boolean(form.situationId),
-  });
-
-  // API 호출 에러 처리
-  useEffect(() => {
-    if (!targetsError) return;
-    showToast(getErrorMessage(targetsError));
-  }, [targetsError, showToast]);
 
   // 상황 선택 확정 핸들러
   // - store: 상황 변경 + 요청 대상 해제
@@ -146,13 +136,13 @@ function Request() {
     handleGoNext(REQUEST_ROUTES.request(situationId), true);
   };
 
-  // 뒤로가기: 작성 중이던 입력값 비우고 이전 페이지로
+  // 뒤로가기 버튼 핸들러 (작성 중이던 입력값 비우고 이전 페이지로)
   const handleHeaderBackClick = () => {
     resetForm();
     handleGoBack();
   };
 
-  // Footer 버튼 눌렀을 때 실행될 핸들러
+  // Footer 버튼 핸들러
   const handleFooterBtnClick = () => {
     // 입력값 유효성 검사 (첫 번째 에러 문구 하나만 토스트로)
     const now = new Date();
@@ -171,7 +161,11 @@ function Request() {
   return (
     <div className={styles.page}>
       {/* 헤더 */}
-      <SubpageHeader title="요청 작성" rightText="1 / 2" onBackClick={handleHeaderBackClick} />
+      <SubpageHeader
+        title="요청 작성"
+        rightText="1 / 2"
+        onBackClick={handleHeaderBackClick}
+      />
 
       {/* 메인 컨텐츠 */}
       <main className={styles.content}>
