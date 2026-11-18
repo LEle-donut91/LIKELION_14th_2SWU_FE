@@ -12,6 +12,7 @@ export const AUTH_API_URLS = {
 // B. 상황
 export const SITUATION_API_URLS = {
   // 여기에 상황 관련 API URL 상수를 정의합니다.
+  home: "/api/home", // 홈 통합 조회 (GET)
 }
 
 // C. 도움 요청

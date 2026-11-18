@@ -1,46 +1,40 @@
-import { useCallback, useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "react-router-dom";
-import { getHome } from "@/features/home/api/homeApi";
+import { getHomeApi } from "@/features/home/api/homeApi";
+import { getHomeService } from "@/features/home/services/homeService";
+import { HOME_QUERY_KEYS } from "@/features/home/constants/homeQueryKeys";
 import { MOCK_QUERY_KEY } from "@/features/home/mocks/homeMockData";
 
-// 홈 화면 데이터 조회 Hook
+/**
+ * [H-00] 홈 통합 조회 Hook
+ * - 홈 통합 조회 → 상단 건수 · 탭별 상황 카드 · 요청 · 일정 (homeService에서 화면용으로 변환)
+ * - 조회 실패 시 hasError로 홈 에러 화면 유지 (토스트 없음, API_CONVENTIONS 6-3)
+ * - 공유 철회·다시 허용 후 HOME_QUERY_KEYS.home()이 무효화되면 다시 조회됨
+ * - 테스트: ?mock=new·empty·single·default (USE_MOCK일 때만, 바뀌면 다시 조회)
+ *
+ * @returns {{
+ *   homeData: ReturnType<typeof getHomeService> | null, // 조회 전·실패 시 null
+ *   isLoading: boolean, // 첫 조회 중
+ *   hasError: boolean,  // 조회 실패
+ *   refetch: Function,  // 다시 조회
+ * }}
+ */
 export const useHome = () => {
-  const [homeData, setHomeData] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [hasError, setHasError] = useState(false);
-  // 값이 바뀌면 재조회 (refetch)
-  const [requestKey, setRequestKey] = useState(0);
-
-  // 테스트 시나리오 (?mock=...) - 바뀌면 재조회. 실제 API 연동 시에는 무시됨
+  // 테스트 시나리오 (?mock=...) - 실제 API 연동 시에는 무시됨
   const [searchParams] = useSearchParams();
   const mockScenario = searchParams.get(MOCK_QUERY_KEY) ?? undefined;
 
-  useEffect(() => {
-    let isUnmounted = false; // 언마운트·재조회 이후 도착한 이전 응답 무시
-
-    getHome({ mockScenario })
-      .then((data) => {
-        if (isUnmounted) return;
-        setHomeData(data);
-        setHasError(false);
-      })
-      .catch(() => {
-        if (!isUnmounted) setHasError(true);
-      })
-      .finally(() => {
-        if (!isUnmounted) setIsLoading(false);
-      });
-
-    return () => {
-      isUnmounted = true;
-    };
-  }, [requestKey, mockScenario]);
-
-  // 재조회 (예: 에러 화면 "다시 시도")
-  const refetch = useCallback(() => {
-    setIsLoading(true);
-    setRequestKey((prevKey) => prevKey + 1);
-  }, []);
+  const {
+    data: homeData = null,
+    isPending: isLoading,
+    isError: hasError,
+    refetch,
+  } = useQuery({
+    // 시나리오를 바꾸면 다시 조회되도록 key 뒤에 붙임 (앞부분 ["home"]으로 무효화 가능)
+    queryKey: [...HOME_QUERY_KEYS.home(), { mockScenario }],
+    queryFn: () => getHomeApi({ mockScenario }),
+    select: getHomeService,
+  });
 
   return { homeData, isLoading, hasError, refetch };
 };
