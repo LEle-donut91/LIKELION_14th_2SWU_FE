@@ -44,9 +44,6 @@ export const SAFETY_INFO_ITEM_MOCK = [
   { informationId: 23, informationType: "PET", title: "나롱이", informationValue: "하루에 3번 끼니 제공", updatedAt: "2026-09-25T18:00:00" },
 ];
 
-// 메인 조회의 공유 중 건수 (공유 API는 이 목업과 연결하지 않으므로 고정값)
-export const SAFETY_INFO_SHARING_COUNT_MOCK = 2;
-
 // 성공 응답 message (명세 응답 예시 문구)
 export const SAFETY_INFO_MOCK_MESSAGE = {
   CREATE: "항목을 추가했습니다.",

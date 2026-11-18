@@ -655,12 +655,3 @@ export const SHARE_EMPTY = {
   message: "현재 공유 중인 상황이 없어요.",
   guide: "도움 요청을 수락받으면 여기에 표시돼요",
 };
-
-// 토스트 문구
-// - 철회 / 다시 허용 성공·실패 시 서버 응답의 message를 우선 사용하고, 없을 때만 아래 문구 사용
-// TODO: 디자인에서 토스트 문구가 정해지면 교체
-export const SHARE_TOAST_MESSAGE = {
-  REVOKE_SUCCESS: "공유를 철회했습니다.",
-  REALLOW_SUCCESS: "다시 허용했습니다.",
-  ERROR: "요청을 처리하지 못했어요. 다시 시도해 주세요.",
-};

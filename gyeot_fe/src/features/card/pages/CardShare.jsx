@@ -1,9 +1,11 @@
 // C-06 공유 관리
 
+import { useEffect } from "react";
 import styles from "@/features/card/pages/CardShare.module.css";
 import SubpageHeader from "@/shared/components/subpage-header/SubpageHeader";
 import DefaultToast from "@/shared/components/Toast/DefaultToast";
 import { useToast } from "@/shared/hooks/useToast";
+import { getErrorMessage } from "@/shared/utils/apiError";
 import ShareCardList from "@/features/card/components/ShareCardList";
 import ShareEmpty from "@/features/card/components/ShareEmpty";
 import { useSharingList } from "@/features/card/hooks/useSharingList";
@@ -11,13 +13,20 @@ import {
   SHARE_LIST_TITLE,
   SHARE_PAGE_TITLE,
 } from "@/features/card/constants/cardConstants";
+import { formatToastMessage } from "@/features/card/utils/cardFormat";
 
 function CardShare() {
   const { toast, showToast, hideToast } = useToast();
 
   // 철회 / 다시 허용 성공·실패 모두 토스트로 안내 (showToast는 참조가 유지됨)
-  const { items, isLoading, hasError, pendingId, handleRevoke, handleReallow } =
+  const { items, isLoading, hasError, error, pendingId, handleRevoke, handleReallow } =
     useSharingList({ onActionSuccess: showToast, onActionError: showToast });
+
+  // 조회 실패 시 토스트 안내 (본문은 그리지 않음)
+  useEffect(() => {
+    if (!error) return;
+    showToast(getErrorMessage(error));
+  }, [error, showToast]);
 
   // 본문: 조회 중 / 실패 / 빈 상태 / 목록
   const renderContent = () => {
@@ -49,10 +58,15 @@ function CardShare() {
       </main>
 
       {/* 토스트 (DefaultToast 기본 위치: 페이지 하단 기준)
-          - toastArea: 토스트 너비를 글자 길이에 맞춤 (위치 기준점은 그대로 .page) */}
+          - toastArea: 토스트 너비를 글자 길이에 맞춤 (위치 기준점은 그대로 .page)
+          - 문장이 여러 개면 문장마다 줄바꿈 (toastArea의 white-space: pre-line으로 표시) */}
       {toast && (
         <div className={styles.toastArea}>
-          <DefaultToast key={toast.id} message={toast.message} onHide={hideToast} />
+          <DefaultToast
+            key={toast.id}
+            message={formatToastMessage(toast.message)}
+            onHide={hideToast}
+          />
         </div>
       )}
     </div>

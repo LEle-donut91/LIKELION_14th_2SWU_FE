@@ -4,10 +4,15 @@ import {
   SAFETY_INFO_CATEGORY_MOCK,
   SAFETY_INFO_TYPE_MOCK,
   SAFETY_INFO_ITEM_MOCK,
-  SAFETY_INFO_SHARING_COUNT_MOCK,
   SAFETY_INFO_MOCK_MESSAGE,
   SAFETY_INFO_MOCK_ERROR,
 } from "@/features/card/mocks/safetyInfoMockData";
+import {
+  createMockError,
+  createMockResponse,
+  wait,
+} from "@/features/card/mocks/mockUtils";
+import { countSharingMockItems } from "@/features/card/mocks/sharingMockStore";
 
 // 안심카드 항목 API (API 명세서 F-02: 메인 조회, 분류별 항목 조회, 항목 작성, 항목 수정, 항목 삭제)
 // - 모든 함수는 공통 응답 전체 { status, code, message, data }를 반환
@@ -22,11 +27,9 @@ const USE_MOCK = true;
  * 목업 (USE_MOCK일 때만 사용)
  * - 작성·수정·삭제 결과를 아래 저장소에 반영해, 다시 조회하면 바뀐 목록과 lastUpdatedAt이 보이도록 함
  * - 새로고침하면 처음 데이터로 돌아감
+ * - 공통 함수(wait, createMockResponse, createMockError)는 mockUtils.js
  * =====================================================================
  */
-
-// 목업 응답 지연 시간(ms): 로딩·저장 중 버튼 잠금을 확인할 수 있도록 약간 늦게 응답
-const MOCK_DELAY = 500;
 
 // 항목 이름 / 내용 최대 글자 수 (명세 기준)
 const MOCK_TITLE_MAX_LENGTH = 150;
@@ -39,8 +42,6 @@ let mockItems = structuredClone(SAFETY_INFO_ITEM_MOCK);
 let mockNextInformationId =
   Math.max(...SAFETY_INFO_ITEM_MOCK.map((item) => item.informationId)) + 1;
 
-const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
 const padTwo = (number) => String(number).padStart(2, "0");
 
 // 로컬(KST) 날짜 "YYYY-MM-DD" (toISOString은 UTC로 바뀌므로 사용하지 않음)
@@ -50,21 +51,6 @@ const toMockDate = (date) =>
 // 로컬(KST) 날짜·시간 "YYYY-MM-DDTHH:mm:ss"
 const toMockDateTime = (date) =>
   `${toMockDate(date)}T${padTwo(date.getHours())}:${padTwo(date.getMinutes())}:${padTwo(date.getSeconds())}`;
-
-// 목업 성공 응답: 공통 응답 형태
-const createMockResponse = (data, message = null) => ({
-  status: "success",
-  code: null,
-  message,
-  data,
-});
-
-// 목업 실패 응답: axios 에러와 같은 형태 (error.response.status, error.response.data)
-const createMockError = ({ status, code, message }) => {
-  const error = new Error(code);
-  error.response = { status, data: { status: "error", code, message, data: null } };
-  return error;
-};
 
 const findMockType = (informationType) =>
   SAFETY_INFO_TYPE_MOCK.find((type) => type.informationType === informationType);
@@ -130,7 +116,7 @@ const isValidMockInput = (type, { title, informationValue }) => {
 // → data: { categories: [{ category, categoryName, lastUpdatedAt }], sharingCount }
 export const getSafetyInfoSummaryApi = async () => {
   if (USE_MOCK) {
-    await wait(MOCK_DELAY);
+    await wait();
     const categories = SAFETY_INFO_CATEGORY_MOCK.map(({ category, categoryName }) => {
       // 분류 안 남아 있는 항목 중 가장 최근 수정 시각 (항목이 없으면 null)
       // 같은 형식의 문자열이라 문자열 비교로 최신값을 고름
@@ -140,7 +126,8 @@ export const getSafetyInfoSummaryApi = async () => {
         .sort();
       return { category, categoryName, lastUpdatedAt: updatedAtList.at(-1) ?? null };
     });
-    return createMockResponse({ categories, sharingCount: SAFETY_INFO_SHARING_COUNT_MOCK });
+    // 공유 중 건수: 공유 목업 저장소 기준 (C-06에서 철회·다시 허용하면 함께 바뀜)
+    return createMockResponse({ categories, sharingCount: countSharingMockItems() });
   }
 
   const response = await axiosInstance.get(INFO_SHARE_API_URLS.summary);
@@ -152,7 +139,7 @@ export const getSafetyInfoSummaryApi = async () => {
 // → data: { category, categoryName, types: [{ informationType, typeName, sensitive, multiple, titleRequired, items }] }
 export const getSafetyInfoItemsApi = async ({ category }) => {
   if (USE_MOCK) {
-    await wait(MOCK_DELAY);
+    await wait();
     const categoryInfo = SAFETY_INFO_CATEGORY_MOCK.find((item) => item.category === category);
     if (!categoryInfo) {
       throw createMockError(SAFETY_INFO_MOCK_ERROR.INVALID_INPUT);
@@ -195,7 +182,7 @@ export const postSafetyInfoApi = async ({
   shouldMockFail = false,
 }) => {
   if (USE_MOCK) {
-    await wait(MOCK_DELAY);
+    await wait();
     if (shouldMockFail) {
       throw createMockError(SAFETY_INFO_MOCK_ERROR.SAFETY_INFO_ALREADY_EXISTS);
     }
@@ -243,7 +230,7 @@ export const patchSafetyInfoApi = async ({
   shouldMockFail = false,
 }) => {
   if (USE_MOCK) {
-    await wait(MOCK_DELAY);
+    await wait();
     const targetItem = mockItems.find((item) => item.informationId === informationId);
     if (shouldMockFail || !targetItem) {
       throw createMockError(SAFETY_INFO_MOCK_ERROR.SAFETY_INFO_NOT_FOUND);
@@ -283,7 +270,7 @@ export const patchSafetyInfoApi = async ({
 // → data: { informationId }
 export const deleteSafetyInfoApi = async ({ informationId, shouldMockFail = false }) => {
   if (USE_MOCK) {
-    await wait(MOCK_DELAY);
+    await wait();
     const hasItem = mockItems.some((item) => item.informationId === informationId);
     if (shouldMockFail || !hasItem) {
       throw createMockError(SAFETY_INFO_MOCK_ERROR.SAFETY_INFO_NOT_FOUND);

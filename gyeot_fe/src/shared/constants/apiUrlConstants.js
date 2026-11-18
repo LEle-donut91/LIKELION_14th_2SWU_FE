@@ -23,5 +23,7 @@ export const INFO_SHARE_API_URLS = {
   summary: "/api/safety-information/summary", // 안심카드 메인 조회 (GET)
   items: "/api/safety-information", // 분류별 항목 조회 (GET ?category) / 항목 작성 (POST)
   item: (informationId) => `/api/safety-information/${informationId}`, // 항목 수정 (PATCH) / 항목 삭제 (DELETE)
+  sharings: "/api/sharings", // 공유 중 목록 조회 (GET ?userId)
+  revoke: (assignmentId) => `/api/sharings/${assignmentId}/revoke`, // 공유 직접 철회 (POST)
+  reallow: (assignmentId) => `/api/sharings/${assignmentId}/reallow`, // 공유 다시 허용 (POST)
 }
-

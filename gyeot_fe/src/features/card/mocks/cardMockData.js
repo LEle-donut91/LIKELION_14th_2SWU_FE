@@ -45,7 +45,8 @@ export const CARD_CONTACT_MOCK = {
 
 // C-06 공유 관리 목업 데이터
 // TODO: API 연동 후 sharingApi.js의 USE_MOCK을 false로 바꾸면 사용하지 않음
-// - 공유 중 목록 조회 API(GET /api/sharings) 응답의 data와 같은 형태
+// - 공유 중 목록 조회 API(GET /api/sharings) 응답의 data.items와 같은 형태
+// - sharingMockStore.js가 시나리오별로 복사해 두고 철회·다시 허용 결과를 반영함
 // - 받는 사람·항목은 C-02~C-04 목업과 같은 값 사용 (민재·하은, 혈압약·페니실린·나롱이)
 // - sharedItems: 삭제된 항목은 서버에서 제외하고 내려줌 (title이 null이면 원래 이름이 없는 유형)
 
@@ -132,7 +133,3 @@ export const CARD_SHARING_MOCK = {
   // 공유 중인 카드 없음 (C-06 공유 관리 - 공유 중인 정보 없음)
   empty: { items: [] },
 };
-
-// 다시 허용 목업 응답에 쓸 공유 항목 찾기 (assignmentId 기준)
-export const findSharingMockItem = (assignmentId) =>
-  SHARING_ITEM_LIST.find((item) => item.assignmentId === assignmentId);
