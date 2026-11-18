@@ -7,3 +7,20 @@ export const COMMON_ERROR_CODE = {
   UNSUPPORTED_MEDIA_TYPE: "UNSUPPORTED_MEDIA_TYPE",
   INTERNAL_SERVER_ERROR: "INTERNAL_SERVER_ERROR",
 };
+
+// A. 회원·인증·관계 (API 명세서 기준)
+// - 현재는 C-03(비상연락망)에서 쓰는 코드만 정의. 나머지 A 영역 코드는 해당 화면 연동 시 추가
+export const AUTH_ERROR_CODE = {
+  CONTACT_ORDER_CHANGED: "CONTACT_ORDER_CHANGED", // 409 연락 순서 변경: 화면을 연 뒤 연락 대상 목록이 바뀜
+};
+
+// D. 안심카드·정보 공유 (API 명세서 'D 에러 코드' 표 기준)
+export const INFO_SHARE_ERROR_CODE = {
+  SAFETY_INFO_INVALID_SELECTION: "SAFETY_INFO_INVALID_SELECTION", // 400 요청 생성·수정 시 공개 항목 ID 검증 실패
+  SAFETY_INFO_NOT_FOUND: "SAFETY_INFO_NOT_FOUND", // 404 항목 수정·삭제
+  SHARED_INFO_NOT_FOUND: "SHARED_INFO_NOT_FOUND", // 404 전달받은 정보 조회
+  SHARING_NOT_FOUND: "SHARING_NOT_FOUND", // 404 공유 직접 철회·다시 허용
+  SAFETY_INFO_ALREADY_EXISTS: "SAFETY_INFO_ALREADY_EXISTS", // 409 항목 작성
+  SHARING_REALLOW_NOT_ALLOWED: "SHARING_REALLOW_NOT_ALLOWED", // 409 공유 다시 허용
+  SHARING_NOTHING_TO_REALLOW: "SHARING_NOTHING_TO_REALLOW", // 409 공유 다시 허용
+};

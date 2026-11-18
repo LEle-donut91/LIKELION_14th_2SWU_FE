@@ -2,6 +2,7 @@
 import {
   BIRTH_DATE_INPUT_LENGTH,
   BLOOD_TYPE_LABELS,
+  CARD_SHARING_COUNT_EMPTY_TEXT,
   SHARE_AUTO_REVOKE_TEXT,
   SHARE_HELP_TYPE_LABELS,
 } from "@/features/card/constants/cardConstants";
@@ -13,8 +14,17 @@ export const formatUpdatedDate = (value) => {
   return `갱신 ${date.getMonth() + 1}/${date.getDate()}`;
 };
 
-// 공유 건수 표시: 2 → "지금 공유 중 2건"
-export const formatSharingCount = (count = 0) => `지금 공유 중 ${count}건`;
+// 공유 건수 표시: 2 → "지금 공유 중 2건" / 0 → "공유 중 건수 없음" / 값 없음(조회 전·실패) → ""
+export const formatSharingCount = (count) => {
+  if (count == null) return "";
+  if (count === 0) return CARD_SHARING_COUNT_EMPTY_TEXT;
+  return `지금 공유 중 ${count}건`;
+};
+
+// 토스트 문구: 문장이 여러 개면 문장마다 줄바꿈
+// 예: "이미 등록된 항목입니다. 기존 항목을 수정해 주세요." → "이미 등록된 항목입니다.\n기존 항목을 수정해 주세요."
+// - 화면에 줄바꿈으로 보이려면 토스트를 감싼 요소에 white-space: pre-line 필요
+export const formatToastMessage = (message = "") => message.replace(/\.\s+/g, ".\n");
 
 /**
  * =====================================================================
@@ -24,10 +34,11 @@ export const formatSharingCount = (count = 0) => `지금 공유 중 ${count}건`
  * =====================================================================
  */
 
-// "YYYY-MM-DD" → { year, month, day } (숫자) / 형식이 다르면 null
+// "YYYY-MM-DD" 또는 "YYYY-MM-DDTHH:mm:ss" → { year, month, day } (숫자) / 형식이 다르면 null
+// - 날짜·시간 문자열도 받을 수 있도록 앞 10자리(날짜)만 사용
 const parseDateString = (value) => {
   if (!value) return null;
-  const [year, month, day] = value.split("-").map(Number);
+  const [year, month, day] = value.slice(0, 10).split("-").map(Number);
   if (!year || !month || !day) return null;
   return { year, month, day };
 };
