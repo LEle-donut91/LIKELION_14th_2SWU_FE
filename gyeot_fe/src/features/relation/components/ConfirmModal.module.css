@@ -20,6 +20,19 @@
   text-align: center;
 }
 
+/* 제목 위 아이콘 (베이지 원) */
+.iconCircle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin: 0 auto 12px;
+  border-radius: 50%;
+  background: var(--color-beige-100);
+  color: var(--color-gray-700);
+}
+
 .title {
   margin: 0 0 12px;
   font-size: 14px;

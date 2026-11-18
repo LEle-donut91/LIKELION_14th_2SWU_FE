@@ -3,6 +3,7 @@ import styles from "./ConfirmModal.module.css";
 /**
  * 버튼 2개짜리 확인 모달
  * @param {boolean}  isOpen       모달 열림 여부
+ * @param {node}     icon         (선택) 제목 위에 보여줄 아이콘
  * @param {string}   title        제목
  * @param {string}   description  본문 (줄바꿈은 \n)
  * @param {string}   cancelText   왼쪽 버튼 글자
@@ -12,6 +13,7 @@ import styles from "./ConfirmModal.module.css";
  */
 function ConfirmModal({
   isOpen,
+  icon,
   title,
   description,
   cancelText = "돌아가기",
@@ -26,6 +28,7 @@ function ConfirmModal({
     <div className={styles.overlay} onClick={onCancel}>
       {/* 모달 박스 (안쪽 클릭은 닫히지 않게 막기) */}
       <div className={styles.modal} role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
+        {icon && <span className={styles.iconCircle}>{icon}</span>} {/* 아이콘이 있을 때만 */}
         <h2 className={styles.title}>{title}</h2>
         <p className={styles.description}>{description}</p>
 
