@@ -30,6 +30,9 @@ export const REQUEST_API_URLS = {
   respond: (requestId) => `/api/care-requests/${requestId}/respond`, // 요청 응답
   start: (requestId) => `/api/care-requests/${requestId}/start`, // 돌봄 시작
   complete: (requestId) => `/api/care-requests/${requestId}/complete`, // 돌봄 완료
+  noAssigneeNotices: "/api/care-requests/no-assignee-notices", // 담당자 없음 안내 목록 (GET)
+  noAssigneeNoticeDismiss: (requestId) =>
+    `/api/care-requests/${requestId}/no-assignee-notice/dismiss`, // 담당자 없음 안내 닫기 (POST)
 };
 
 // D. 안심카드·정보 공유
