@@ -8,6 +8,12 @@ export const COMMON_ERROR_CODE = {
   INTERNAL_SERVER_ERROR: "INTERNAL_SERVER_ERROR",
 };
 
+// A. 회원·인증·관계 (API 명세서 기준)
+// - 현재는 C-03(비상연락망)에서 쓰는 코드만 정의. 나머지 A 영역 코드는 해당 화면 연동 시 추가
+export const AUTH_ERROR_CODE = {
+  CONTACT_ORDER_CHANGED: "CONTACT_ORDER_CHANGED", // 409 연락 순서 변경: 화면을 연 뒤 연락 대상 목록이 바뀜
+};
+
 // D. 안심카드·정보 공유 (API 명세서 'D 에러 코드' 표 기준)
 export const INFO_SHARE_ERROR_CODE = {
   SAFETY_INFO_INVALID_SELECTION: "SAFETY_INFO_INVALID_SELECTION", // 400 요청 생성·수정 시 공개 항목 ID 검증 실패

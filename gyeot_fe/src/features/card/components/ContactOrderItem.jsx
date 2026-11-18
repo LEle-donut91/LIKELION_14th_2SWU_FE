@@ -6,6 +6,7 @@ import {
   CONTACT_ORDER_RANK_SUFFIX,
   CONTACT_RELATIONSHIP_LABELS,
   CONTACT_RELATIONSHIP_TYPE,
+  CONTACT_WITHDRAWN_NAME_TEXT,
 } from "@/features/card/constants/cardConstants";
 
 // 연락 순서 카드 1개 (아바타 / 이름 / 관계 / 순위 뱃지 / 드래그 핸들)
@@ -27,9 +28,11 @@ function ContactOrderItem({
   const isGuardian = contact.relationshipType === CONTACT_RELATIONSHIP_TYPE.GUARDIAN;
 
   // 이름 칸: 사용자가 지정한 표시명 우선, 없으면 가입 시 등록한 이름
-  const displayName = contact.personalLabel || contact.name;
+  // - 탈퇴로 이름이 비식별화되면(name: null) "탈퇴한 사용자"
+  const displayName = contact.personalLabel || contact.name || CONTACT_WITHDRAWN_NAME_TEXT;
 
   // 아바타: 가입 시 등록한 이름의 첫 글자 (예: 표시명 "민재의 친구", 이름 "하준" → "하")
+  // - 탈퇴로 이름이 없으면 빈칸
   const avatarText = contact.name?.[0] ?? "";
 
   const handleDragHandlePointerDown = (event) => {

@@ -1,8 +1,7 @@
 // 안심카드 TanStack Query key
 // - 앞부분만으로 한 번에 무효화할 수 있도록 계층형 배열로 작성
 //   예: 항목 작성·수정·삭제 후 CARD_QUERY_KEYS.safetyInfo 무효화 → 메인 조회 + 분류별 조회 모두 갱신
-//       공유 철회·다시 허용 후 ["sharings"] 무효화 → 전체 갱신
-// - 비상연락망(contacts) key는 해당 API 연동 단계에서 추가
+//       공유 철회·다시 허용 후 ["sharings"] 무효화 → 전체 목록 + 한 사람 기준 목록(R-02-01) 모두 갱신
 
 export const CARD_QUERY_KEYS = {
   // 안심카드 전체 (무효화용)
@@ -16,4 +15,7 @@ export const CARD_QUERY_KEYS = {
 
   // 3. 공유 중 목록 조회 (GET) - userId: 받는 사람 ID (R-02-01에서만, 전체 목록은 null)
   sharings: (userId = null) => ["sharings", { userId }],
+
+  // 4. 비상연락망 조회 (GET) - 연락 순서 변경 성공·409 시 무효화
+  contacts: () => ["emergencyContacts"],
 };

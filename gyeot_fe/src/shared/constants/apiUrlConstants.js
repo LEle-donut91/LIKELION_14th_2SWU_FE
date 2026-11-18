@@ -5,6 +5,8 @@
 // A. 회원·인증·관계
 export const AUTH_API_URLS = {
   // 여기에 회원·인증·관계 관련 API URL 상수를 정의합니다.
+  emergencyContacts: "/api/emergency-contacts", // 비상연락망 조회 (GET)
+  emergencyContactsOrder: "/api/emergency-contacts/order", // 연락 순서 변경 (PATCH)
 }
 
 // B. 상황

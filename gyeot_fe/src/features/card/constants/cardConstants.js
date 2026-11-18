@@ -385,10 +385,20 @@ export const CONTACT_ORDER_EMPTY = {
   guardianRequestBtnText: "보호자 요청하기",
 };
 
-// 토스트 문구
+// 토스트 문구 (FE 고정 문구, 끝 마침표 없음)
+// - 실패 후 FE가 재조회·되돌리기를 하고 그 결과를 안내하는 화면이라 서버 문구 대신 사용 (API_CONVENTIONS 9-3)
+// - SAVE_SUCCESS: 순서 변경 성공 (바뀐 순서 유지)
+// - ORDER_CHANGED: 409 CONTACT_ORDER_CHANGED (연락 대상이 바뀌어 최신 목록으로 갱신)
+// - SAVE_FAILED: 그 외 실패 (마지막으로 저장된 순서로 되돌림)
 export const CONTACT_ORDER_TOAST_MESSAGE = {
-  SAVE_SUCCESS: "순서를 바꿨어요",
+  SAVE_SUCCESS: "순서를 바꿨어요.",
+  ORDER_CHANGED: "연락 대상이 바뀌어 목록을 새로 불러왔어요.",
+  SAVE_FAILED: "순서를 바꾸지 못했어요.\n다시 시도해 주세요.",
 };
+
+// 탈퇴한 연락 대상 이름 (비상연락망 조회의 name이 null일 때 이름 칸에 표시)
+// - M-01 담당자 없음 안내의 서버 문구("탈퇴한 사용자")와 같은 표현 사용
+export const CONTACT_WITHDRAWN_NAME_TEXT = "탈퇴한 사용자";
 
 /**
  * =====================================================================

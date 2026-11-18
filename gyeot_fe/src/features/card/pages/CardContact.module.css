@@ -75,3 +75,21 @@
 .noticeLine {
   display: block;
 }
+
+/* 토스트 위치 조정용 래퍼 (SmallFooter 위에 뜨도록) */
+.toastArea {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 70px;
+  white-space: pre-line; /* 토스트 문구의 \n을 줄바꿈으로 표시 */
+  word-break: keep-all;  /* 단어 중간에서 끊기지 않게 */
+}
+
+/* 토스트 너비를 글자 길이에 맞춤 (화면 절반으로 줄어드는 문제 방지)
+ * - max-width: 문구가 아주 길면 좌우 16px 여백을 남기고 줄바꿈 */
+.toastArea > * {
+  width: max-content;
+  max-width: calc(100% - 32px);
+  box-sizing: border-box;
+}

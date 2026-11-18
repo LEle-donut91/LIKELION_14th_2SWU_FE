@@ -4,6 +4,7 @@
 // C-03 연락 순서 목업 데이터
 // TODO: API 연동 후 contactApi.js의 USE_MOCK을 false로 바꾸면 사용하지 않음
 // - 비상연락망 조회 API(GET /api/emergency-contacts) 응답의 data와 같은 형태
+// - contactApi.js가 시나리오별로 복사해 두고 순서 변경 결과를 반영함
 // - name: 연락 대상이 가입 시 등록한 이름 (아바타 첫 글자에 사용)
 // - personalLabel: 사용자가 지정한 표시명 / 없으면 null (카드 이름 칸에 우선 표시)
 // - priority: 전체 연락 순서 / guardianPriority: 보호자끼리의 순서 (보호자가 아니면 null)
@@ -19,6 +20,11 @@ const MY_PERSON_LIST = [
   { userId: 13, name: "하준", relationshipType: "MY_PERSON", personalLabel: "민재의 친구", guardianPriority: null },
 ];
 
+// 탈퇴한 연락 대상 (이름이 비식별화되어 name이 null)
+const WITHDRAWN_PERSON = {
+  userId: 14, name: null, relationshipType: "MY_PERSON", personalLabel: null, guardianPriority: null,
+};
+
 // 전체 순서(priority)를 앞에서부터 다시 매김
 const withPriority = (items) =>
   items.map((item, index) => ({ ...item, priority: index + 1 }));
@@ -26,7 +32,9 @@ const withPriority = (items) =>
 // 테스트 시나리오를 지정하는 URL 쿼리 키 (예: /card/contact?mock=empty)
 export const CONTACT_MOCK_QUERY_KEY = "mock";
 
-// 저장 실패를 흉내 내는 URL 쿼리 키 (예: /card/contact?mockFail=true)
+// 저장 실패를 흉내 내는 URL 쿼리 키
+// - ?mockFail=true: 400 INVALID_INPUT (마지막 저장 순서로 되돌림)
+// - ?mockFail=changed: 409 CONTACT_ORDER_CHANGED (최신 목록으로 갱신)
 export const CONTACT_MOCK_FAIL_QUERY_KEY = "mockFail";
 
 export const DEFAULT_CONTACT_MOCK_SCENARIO = "default";
@@ -41,6 +49,8 @@ export const CARD_CONTACT_MOCK = {
   guardianOnly: { items: withPriority(GUARDIAN_LIST) },
   // 아무도 없음 (C-03 연락 순서 - 빈 상태)
   empty: { items: [] },
+  // 탈퇴한 연락 대상 포함 (이름 칸 "탈퇴한 사용자" 확인용)
+  withdrawn: { items: withPriority([...GUARDIAN_LIST, MY_PERSON_LIST[0], WITHDRAWN_PERSON]) },
 };
 
 // C-06 공유 관리 목업 데이터
