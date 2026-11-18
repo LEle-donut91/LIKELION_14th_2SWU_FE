@@ -4,6 +4,18 @@
  * =====================================================================
  */
 
+// 상황 상태 (items[].status)
+export const SITUATION_STATUS = {
+  ACTIVE: "ACTIVE",
+  ENDED: "ENDED",
+};
+
+// 상황 참여 역할 (items[].role)
+export const SITUATION_ROLE = {
+  OWNER: "OWNER",
+  PARTICIPANT: "PARTICIPANT",
+};
+
 // 요청 진행 상태 (status)
 export const REQUEST_STATE = {
   REQUESTED: "REQUESTED",
@@ -29,37 +41,54 @@ export const RESPONSE_STATUS = {
   CHECK_LATER: "CHECK_LATER",
 };
 
-// 담당자 없음 사유 (noAssignedReason)
+// 담당자 없음 사유 (noAssigneeReason)
 export const NO_ASSIGNEE_REASON = {
-  REJECTED: "REJECTED", // 요청 거절
-  EXPIRED: "EXPIRED", // 기한 지남
-  ACCEPT_WITHDRAWN: "ACCEPT_WITHDRAWN", // 수락 철회
-  LEFT_SITUATION: "LEFT_SITUATION", // 상황 나가기
-  RELATION_RELEASED: "RELATION_RELEASED", // 관계 해제
+  UNAVAILABLE: "UNAVAILABLE",
+  DEADLINE_PASSED: "DEADLINE_PASSED",
+  ACCEPTANCE_WITHDRAWN: "ACCEPTANCE_WITHDRAWN",
+  PARTICIPANT_LEFT: "PARTICIPANT_LEFT",
+  RELATIONSHIP_ENDED: "RELATIONSHIP_ENDED",
+  USER_WITHDRAWN: "USER_WITHDRAWN",
 };
 
 // 요청 취소 사유 (cancelReason)
 export const CANCEL_REASON = {
-  SELF: "SELF", // 직접 취소
-  EXPIRED: "EXPIRED", // 담당자 없음으로 만료
-  REJECTED: "REJECTED", // 담당자 거절
+  REQUESTER_CANCELED: "REQUESTER_CANCELED",
+  ASSIGNEE_LEFT: "ASSIGNEE_LEFT",
+  RELATIONSHIP_ENDED: "RELATIONSHIP_ENDED",
+  SITUATION_ENDED: "SITUATION_ENDED",
+  USER_WITHDRAWN: "USER_WITHDRAWN",
+  RECONFIRMATION_REJECTED: "RECONFIRMATION_REJECTED",
 };
 
-// TODO : API 명세서 확인 후 삭제 여부 검토
-// 요청 수정 상태 (서버 값)
-export const CHANGE_STATE = {
-  BEFORE_EDIT: "BEFORE_EDIT", // 수정 전
-  RECONFIRMING: "RECONFIRMING", // 재확인 중
-  RECONFIRMED: "RECONFIRMED", // 재확인 수락
-  INVALID: "INVALID", // 수정 무효
+export const VIEWER_ROLE = {
+  REQUESTER: "REQUESTER",
+  TARGET: "TARGET",
+  ASSIGNEE: "ASSIGNEE",
 };
 
-// 부탁 순서 마감 사유
-export const USER_ORDER_STATE = {
-  EXPIRED: "EXPIRED",
-  WAITING: "WAITING",
-  DIFFICULTY: "DIFFICULTY",
+export const ASSIGNMENT_CLOSE_REASON = {
+  TARGET_CHANGED: "TARGET_CHANGED",
+  ACCEPTANCE_WITHDRAWN: "ACCEPTANCE_WITHDRAWN",
+  PARTICIPANT_LEFT: "PARTICIPANT_LEFT",
+  RELATIONSHIP_ENDED: "RELATIONSHIP_ENDED",
+  USER_WITHDRAWN: "USER_WITHDRAWN",
+  REQUEST_ENDED: "REQUEST_ENDED",
+};
+
+export const REQUEST_ACTION = {
+  RESPOND: "RESPOND",
+  WITHDRAW: "WITHDRAW",
+  START: "START",
+  COMPLETE: "COMPLETE",
   CANCEL: "CANCEL",
+  EDIT: "EDIT",
+  REASSIGN: "REASSIGN",
+  ACCEPT_PROPOSAL: "ACCEPT_PROPOSAL",
+  REJECT_PROPOSAL: "REJECT_PROPOSAL",
+  WITHDRAW_PROPOSAL: "WITHDRAW_PROPOSAL",
+  DUPLICATE: "DUPLICATE",
+  VIEW_PAST_SITUATION: "VIEW_PAST_SITUATION",
 };
 
 // 화면 상태 (displayStatus)
@@ -81,14 +110,6 @@ export const HELP_TYPE = {
   PET_CARE: "PET_CARE",
   CHECK_IN: "CHECK_IN",
   OTHER: "OTHER",
-};
-
-// 전달받은 정보 - 분류 (categories[].category)
-export const INFORMATION_CATEGORY = {
-  BASIC: "BASIC", // 기본 정보
-  HEALTH: "HEALTH", // 건강 정보
-  LIFE: "LIFE", // 생활 정보
-  ADVANCE_MESSAGE: "ADVANCE_MESSAGE", // 미리 남기는 말
 };
 
 // 전달받은 정보 - 항목 유형 (items[].informationType)

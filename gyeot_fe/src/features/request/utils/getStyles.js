@@ -1,7 +1,7 @@
 import {
   REQUEST_STEP_ORDER,
   REQUEST_ENDED_STATES,
-} from "@/features/request/constants/requestConstants";
+} from "@/features/request/constants/requestDetailConstants";
 
 /**
  * RequestStep 컴포넌트의 진행 상태에 따른 스타일 클래스명을 반환

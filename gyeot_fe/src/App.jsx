@@ -41,9 +41,7 @@ import PastSituationDetail from "@/features/situation/pages/PastSituationDetail"
 import Request from "@/features/request/pages/Request";
 import InfoPreview from "@/features/request/pages/InfoPreview";
 import RequestSend from "@/features/request/pages/RequestSend";
-import RequestAssignee from "@/features/request/pages/RequestAssignee";
-import RequestRequester from "@/features/request/pages/RequestRequester";
-import RequestTarget from "@/features/request/pages/RequestTarget";
+import RequestDetail from "@/features/request/pages/RequestDetail";
 import ReceivedInfo from "@/features/request/pages/ReceivedInfo";
 import RequestEditForm from "@/features/request/pages/RequestEditForm";
 import RequestEditCheck from "@/features/request/pages/RequestEditCheck";
@@ -103,9 +101,7 @@ function App() {
               <Route path="/request/:id" element={<Request />} />  {/* H-03-02 (상황 ID를 Path Parameter로 받음) */}
               <Route path="/request/info-preview/:id" element={<InfoPreview />} />  {/* H-03-02-01 (정보확인) */}
               <Route path="/request/send/:id" element={<RequestSend />} />  {/* H-03-02-01 (완료) */}
-              <Route path="/request/assignee/:id" element={<RequestAssignee />} />  {/* H-03-01 */}
-              <Route path="/request/requester/:id" element={<RequestRequester />} />  {/* H-03-01-A */}
-              <Route path="/request/target/:id" element={<RequestTarget />} />  {/* H-03-01-B */}
+              <Route path="/request/detail/:id" element={<RequestDetail />} />  {/* H-03-01, H-03-01-A, H-03-01-B */}
               <Route path="/request/received-info/:id" element={<ReceivedInfo />} />  {/* H-03-01-01 */}
               <Route path="/request/edit-form/:id" element={<RequestEditForm />} />  {/* H-03-01-02 (수정) */}
               <Route path="/request/edit-check/:id" element={<RequestEditCheck />} />  {/* H-03-01-02 (내용확인) */}

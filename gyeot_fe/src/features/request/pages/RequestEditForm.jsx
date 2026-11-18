@@ -9,85 +9,57 @@
 import styles from "@/features/request/pages/RequestEditForm.module.css";
 
 // 일반 라이브러리
-import { Fragment, useMemo, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 // Custom Hooks
 import { useRequestNav } from "@/features/request/hooks/useRequestNav";
-import { useRequestForm } from "@/features/request/hooks/useRequestForm";
-import { useCheckForm } from "@/features/request/hooks/useCheckForm";
-import { useToast } from "@/features/request/hooks/useToast";
+import { useRequestDetailQuery } from "@/features/request/hooks/queries/useRequestDetailQuery";
+import { useInformationOptionsQuery } from "@/features/request/hooks/queries/useInformationOptionsQuery";
+import { useCancelRequestMutation } from "@/features/request/hooks/mutations/useCancelRequestMutation";
+import { useErrorToast } from "@/features/request/hooks/useErrorToast";
+import { useRequestFormStore } from "@/features/request/stores/useRequestFormStore";
+import { useToast } from "@/shared/hooks/useToast";
 
 // Constants
 import { REQUEST_ROUTES } from "@/features/request/constants/routerConstants";
 import {
   REQUEST_FORM_FIELD_KEY,
   REQUEST_SHEET,
-  DATE_TIME_SECTIONS,
-  INFO_PREVIEW_SECTIONS,
   EDIT_FORM_VALIDATE_FIELDS,
-} from "@/features/request/constants/requestConstants";
+} from "@/features/request/constants/requestFormConstants";
+import { DATE_TIME_SECTIONS } from "@/features/request/constants/dateTimeInputConstants";
 
 // Utils
+import { getDateTimeText } from "@/features/request/utils/getSelectionInput";
 import {
-  getDateTimeText,
   getSelectedTitles,
-} from "@/features/request/utils/requestUtils";
+  getCategoryInformationIds,
+  replaceCategoryInformationIds,
+} from "@/features/request/utils/getSafetyCardInfo";
+import { validateInput } from "@/features/request/utils/validateInput";
 
-// API, Services
-import {
-  getEditFormApi,
-  postEditFormApi,
-  patchRequestCancelApi,
-} from "@/features/request/api/requesterApi";
-import {
-  getEditFormService,
-  postEditFormService,
-} from "@/features/request/services/requesterService";
+// Services
+import { getEditFormService } from "@/features/request/services/editRequestService";
+import { getInformationOptionsService } from "@/features/request/services/informationOptionsService";
 
 // 일반 Components
-import StepHeader from "@/features/request/components/Header/StepHeader";
-import SelectSection from "@/features/request/components/Section/SelectSection";
-import InputSection from "@/features/request/components/Section/InputSection";
-import TimeSheet from "@/features/request/components/Sheet/TimeSheet";
+import SubpageHeader from "@/shared/components/subpage-header/SubpageHeader";
+import SelectSection from "@/shared/components/SelectSection/SelectSection";
+import InputSection from "@/shared/components/InputSection/InputSection";
+import TimeSheet from "@/shared/components/TimeSheet/TimeSheet";
 import DateTimeOption from "@/features/request/components/Option/DateTimeOption";
-import DefaultSheet from "@/features/request/components/Sheet/DefaultSheet";
+import DefaultSheet from "@/shared/components/DefaultSheet/DefaultSheet";
 import CheckOption from "@/features/request/components/Option/CheckOption";
 import SafetyCardGroup from "@/features/request/components/SafetyCard/SafetyCardGroup";
-import SmallFooter from "@/features/request/components/Footer/SmallFooter";
-import DefaultModal from "@/features/request/components/Modal/DefaultModal";
-import DefaultToast from "@/features/request/components/Toast/DefaultToast";
+import SmallFooter from "@/shared/components/SmallFooter/SmallFooter";
+import DefaultModal from "@/shared/components/DefaultModal/DefaultModal";
+import DefaultToast from "@/shared/components/Toast/DefaultToast";
 
 // 페이지 컴포넌트
 function RequestEditForm() {
-  // useNavigation 커스텀 훅의 함수
-  const { handleGoBack, handleGoNext } = useRequestNav();
-
-  // path parameter (요청 ID)
   const paramId = useParams().id;
-
-  // TODO: API 연동 시 useEffect로 교체 (지금은 mock 이라 렌더마다 호출돼도 문제 없음)
-  // [H-03-01-02] 요청 수정 - 데이터 조회 (GET 1회)
-  const { userName, dueDate, sections, initialRequestForm } = useMemo(
-    () => getEditFormService(getEditFormApi(paramId)),
-    [paramId],
-  );
-
-  // 시작/종료/장소 입력값 (isEditing이 true면 기존 수정안이 초기값)
-  const {
-    form: requestForm,
-    setField: setRequestField,
-    validate,
-  } = useRequestForm(initialRequestForm);
-
-  // 공유 정보 체크값 (sections 각 항목의 isDefault가 초기 체크 상태)
-  const {
-    form: checkForm,
-    setField: setCheckField,
-    isSensitiveIncluded,
-  } = useCheckForm(sections);
-
-  // 토스트 메시지
+  const { handleGoBack, handleGoNext } = useRequestNav();
   const { toast, showToast, hideToast } = useToast();
 
   // 열려 있는 시트 (한 번에 하나만 열림) - REQUEST_SHEET(START/END) 또는 CHECK_FORM_FIELD_KEY 중 하나
@@ -98,19 +70,103 @@ function RequestEditForm() {
   const [isCancelModalOpen, setCancelModalOpen] = useState(false);
   const [isSensitiveModalOpen, setSensitiveModalOpen] = useState(false);
 
-  // TODO: API 연동 로직 수정 필요
-  // [H-03-01-02] 수정안 저장 후 [요청 수정 내용 확인] 페이지로 이동
-  const handleGoEditCheck = () => {
-    const reqRefinedData = postEditFormService(paramId, requestForm, checkForm);
-    postEditFormApi(reqRefinedData);
+  // Zustand Store
+  const {
+    entryId,
+    form: requestForm,
+    initForm,
+    setForm,
+  } = useRequestFormStore((state) => state);
+  const formEntryId = `requestEdit:${paramId}`;
 
-    handleGoNext(REQUEST_ROUTES.editCheck(paramId));
-  };
+  // 1. 요청 상세 조회 API (수정 폼 초기값) 
+  const {
+    data: detail,
+    isPending: isDetailPending,
+    error: detailError,
+  } = useRequestDetailQuery(paramId, {
+    select: getEditFormService,
+  });
 
-  // 다음 버튼 클릭 핸들러
+  // 2. 공개 항목 선택지 조회 API
+  const {
+    data: informationOptions,
+    isPending: isInformationPending,
+    error: informationError,
+  } = useInformationOptionsQuery(
+    { helpType: detail?.helpType, requestId: paramId },
+    {
+      select: (response) => getInformationOptionsService(response, requestForm),
+      enabled: Boolean(detail?.helpType && paramId),
+    },
+  );
+
+  // 3. 요청 취소 API
+  const { cancelRequest } = useCancelRequestMutation(paramId, {
+    showToast,
+    onSuccess: () => handleGoBack(),
+  });
+
+  // API 에러 메시지 출력
+  useErrorToast(showToast, detailError, informationError);
+
+  // API 응답 데이터 (정제된 형태)
+  const { userName, dueDate, initialRequestForm } = detail ?? {};
+  const {
+    categories = [],
+    selectedIds = [],
+    isSensitiveIncluded = false,
+  } = informationOptions ?? {};
+
+  // 같은 요청의 수정 화면으로 돌아오면 사용자가 입력한 값을 유지
+  useEffect(() => {
+    if (!initialRequestForm || !informationOptions || entryId === formEntryId)
+      return;
+    initForm(formEntryId, {
+      ...initialRequestForm,
+      situationId: detail.situationId,
+      helpType: detail.helpType,
+      informationIds: informationOptions.defaultIds,
+    });
+  }, [
+    initialRequestForm,
+    informationOptions,
+    entryId,
+    formEntryId,
+    initForm,
+    detail,
+  ]);
+
+  // 요청 입력폼(시작/종료/장소) 업데이트 (Zustand)
+  const setRequestField = (key, value) =>
+    setForm((prev) => ({ ...prev, [key]: value }));
+
+  // 요청 입력폼(공개 정보 항목) 업데이트 (Zustand)
+  const setCategorySelection = (items, ids) =>
+    setForm((prev) => ({
+      ...prev,
+      informationIds: replaceCategoryInformationIds(
+        prev.informationIds,
+        items,
+        ids,
+      ),
+    }));
+
+  // 다음 버튼 클릭 handler
   const handleNextBtnClick = () => {
+    if (
+      isDetailPending ||
+      isInformationPending ||
+      detailError ||
+      informationError
+    )
+      return;
     // 입력값 유효성 검사 (첫 번째 에러 문구 하나만 토스트로)
-    const errors = validate(EDIT_FORM_VALIDATE_FIELDS);
+    const errors = validateInput(
+      requestForm,
+      new Date(),
+      EDIT_FORM_VALIDATE_FIELDS,
+    );
     const [firstError] = Object.values(errors);
     if (firstError) {
       showToast(firstError);
@@ -122,132 +178,145 @@ function RequestEditForm() {
       setSensitiveModalOpen(true);
       return;
     }
-    handleGoEditCheck();
+    handleGoNext(REQUEST_ROUTES.editCheck(paramId));
   };
 
-  // 민감 정보 확인 모달의 확인 버튼
+  // [민감 정보 확인] 모달의 confirm 버튼 handler
   const handleSensitiveConfirm = () => {
     setSensitiveModalOpen(false);
-    handleGoEditCheck();
+    handleGoNext(REQUEST_ROUTES.editCheck(paramId));
   };
 
-  // TODO: API 연동 로직 수정 필요
-  // 요청 취소 모달의 확인 버튼
+  // [요청 취소] 모달의 confirm 버튼 handler
   const handleCancelConfirm = () => {
-    patchRequestCancelApi(paramId);
     setCancelModalOpen(false);
-
-    // [요청 상세 · 요청자 뷰]로 이동
-    handleGoBack();
+    cancelRequest();
   };
 
   return (
     <div className={styles.page}>
       {/* 헤더 */}
-      <StepHeader title="요청 수정" step="1" onClick={handleGoBack} />
+      <SubpageHeader
+        title="요청 수정"
+        rightText="1 / 2"
+        onBackClick={handleGoBack}
+      />
 
       {/* 메인 컨텐츠 */}
       <main className={styles.content}>
-        {/* 시작 - 종료 */}
-        <div className={styles.timeSectionContainer}>
-          <SelectSection
-            title="시작"
-            isRequired
-            text={getDateTimeText(requestForm.startDateTime)}
-            border={
-              requestForm.startDateTime ? "borderActive" : "borderDefault"
-            }
-            width="small"
-            onClick={() => setOpenSheet(REQUEST_SHEET.START)}
-          />
-          <SelectSection
-            title="종료"
-            isRequired
-            text={getDateTimeText(requestForm.endDateTime)}
-            border={requestForm.endDateTime ? "borderActive" : "borderDefault"}
-            width="small"
-            onClick={() => setOpenSheet(REQUEST_SHEET.END)}
-          />
-        </div>
-        <TimeSheet
-          isOpen={openSheet === REQUEST_SHEET.START}
-          onClose={closeSheet}
-          value={requestForm.startDateTime}
-          onConfirm={(v) =>
-            setRequestField(REQUEST_FORM_FIELD_KEY.START_DATE_TIME, v)
-          }
-        >
-          {(temp, setTemp) => (
-            <DateTimeOption
-              sections={DATE_TIME_SECTIONS}
-              value={temp}
-              onChange={setTemp}
-            />
-          )}
-        </TimeSheet>
-        <TimeSheet
-          isOpen={openSheet === REQUEST_SHEET.END}
-          onClose={closeSheet}
-          value={requestForm.endDateTime}
-          onConfirm={(v) =>
-            setRequestField(REQUEST_FORM_FIELD_KEY.END_DATE_TIME, v)
-          }
-        >
-          {(temp, setTemp) => (
-            <DateTimeOption
-              sections={DATE_TIME_SECTIONS}
-              value={temp}
-              onChange={setTemp}
-            />
-          )}
-        </TimeSheet>
-
-        {/* 장소 */}
-        <InputSection
-          title="장소"
-          isRequired
-          size="small"
-          value={requestForm.location}
-          onChange={(e) =>
-            setRequestField(
-              REQUEST_FORM_FIELD_KEY.LOCATION,
-              e.target.value || null,
-            )
-          }
-        />
-
-        <div className={styles.sectionGroup}>
-          <span className={`${styles.groupTitle} typoTitleMedium`}>
-            공유 정보
-          </span>
-          {/* 기본 정보 / 건강 정보 / 생활 정보 / 미리 남기는 말 */}
-          {INFO_PREVIEW_SECTIONS.map(({ key, title, description }) => (
-            <Fragment key={key}>
-              <SafetyCardGroup
-                title={title}
-                information={getSelectedTitles(checkForm[key], sections[key])}
-                onClick={() => setOpenSheet(key)}
+        {isDetailPending || isInformationPending ? (
+          <div role="status">로딩중</div>
+        ) : (
+          <>
+            {/* 시작 - 종료 */}
+            <div className={styles.timeSectionContainer}>
+              <SelectSection
+                title="시작"
+                isRequired
+                text={getDateTimeText(requestForm.startDateTime)}
+                border={
+                  requestForm.startDateTime ? "borderActive" : "borderDefault"
+                }
+                width="small"
+                onClick={() => setOpenSheet(REQUEST_SHEET.START)}
               />
+              <SelectSection
+                title="종료"
+                isRequired
+                text={getDateTimeText(requestForm.endDateTime)}
+                border={
+                  requestForm.endDateTime ? "borderActive" : "borderDefault"
+                }
+                width="small"
+                onClick={() => setOpenSheet(REQUEST_SHEET.END)}
+              />
+            </div>
+            <TimeSheet
+              isOpen={openSheet === REQUEST_SHEET.START}
+              onClose={closeSheet}
+              value={requestForm.startDateTime}
+              onConfirm={(v) =>
+                setRequestField(REQUEST_FORM_FIELD_KEY.START_DATE_TIME, v)
+              }
+            >
+              {(temp, setTemp) => (
+                <DateTimeOption
+                  sections={DATE_TIME_SECTIONS}
+                  value={temp}
+                  onChange={setTemp}
+                />
+              )}
+            </TimeSheet>
+            <TimeSheet
+              isOpen={openSheet === REQUEST_SHEET.END}
+              onClose={closeSheet}
+              value={requestForm.endDateTime}
+              onConfirm={(v) =>
+                setRequestField(REQUEST_FORM_FIELD_KEY.END_DATE_TIME, v)
+              }
+            >
+              {(temp, setTemp) => (
+                <DateTimeOption
+                  sections={DATE_TIME_SECTIONS}
+                  value={temp}
+                  onChange={setTemp}
+                />
+              )}
+            </TimeSheet>
 
-              <DefaultSheet
-                isOpen={openSheet === key}
-                onClose={closeSheet}
-                title={title}
-                description={description}
-                value={checkForm[key]}
-                onConfirm={(v) => setCheckField(key, v)}
-              >
-                {(temp, setTemp) => (
-                  <CheckOption
-                    data={sections[key]}
-                    checkedValue={temp}
-                    onChecked={setTemp}
-                  />
-                )}
-              </DefaultSheet>
-            </Fragment>
-          ))}
-        </div>
+            {/* 장소 */}
+            <InputSection
+              title="장소"
+              isRequired
+              size="small"
+              value={requestForm.location}
+              onChange={(e) =>
+                setRequestField(
+                  REQUEST_FORM_FIELD_KEY.LOCATION,
+                  e.target.value || null,
+                )
+              }
+            />
+
+            <div className={styles.sectionGroup}>
+              <span className={`${styles.groupTitle} typoTitleMedium`}>
+                공유 정보
+              </span>
+              {/* 기본 정보 / 건강 정보 / 생활 정보 / 미리 남기는 말 */}
+              {categories
+                .filter(({ items }) => items.length > 0)
+                .map(({ key, title, description, items }) => (
+                  <Fragment key={key}>
+                    <SafetyCardGroup
+                      title={title}
+                      information={getSelectedTitles(
+                        getCategoryInformationIds(selectedIds, items),
+                        items,
+                      )}
+                      onClick={() => setOpenSheet(key)}
+                    />
+
+                    <DefaultSheet
+                      isOpen={openSheet === key}
+                      onClose={closeSheet}
+                      title={title}
+                      description={description}
+                      value={getCategoryInformationIds(selectedIds, items)}
+                      onConfirm={(v) => setCategorySelection(items, v)}
+                    >
+                      {(temp, setTemp) => (
+                        <CheckOption
+                          data={items}
+                          checkedValue={temp}
+                          onChecked={setTemp}
+                        />
+                      )}
+                    </DefaultSheet>
+                  </Fragment>
+                ))}
+            </div>
+          </>
+        )}
       </main>
 
       {/* 하단 Footer(버튼) */}

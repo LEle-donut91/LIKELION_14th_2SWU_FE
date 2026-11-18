@@ -18,8 +18,8 @@ import { useRequestNav } from "@/features/request//hooks/useRequestNav";
 import { REQUEST_ROUTES } from "@/features/request/constants/routerConstants";
 
 // 일반 Components
-import DefaultHeader from "@/features/request/components/Header/DefaultHeader";
-import LargeFooter from "@/features/request/components/Footer/LargeFooter";
+import SubpageHeader from "@/shared/components/subpage-header/SubpageHeader";
+import LargeFooter from "@/shared/components/LargeFooter/LargeFooter";
 
 function RequestSend() {
   // navigation 커스텀 훅 불러오기
@@ -27,7 +27,7 @@ function RequestSend() {
 
   return (
     <div className={styles.page}>
-      <DefaultHeader title="요청 작성" onClick={handleGoBack} />
+      <SubpageHeader title="요청 작성" onBackClick={handleGoBack} />
       <main className={styles.content}>
         <img className={styles.requestSendImg} src={resImgSend} />
         <span className={`${styles.requestSendTxt} typoDisplaySmall`}>

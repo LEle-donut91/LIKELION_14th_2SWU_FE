@@ -10,84 +10,96 @@ import styles from "@/features/request/pages/InfoPreview.module.css";
 
 // 일반 라이브러리
 import { Fragment, useEffect, useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useSearchParams } from "react-router-dom";
 
 // Custom Hooks
 import { useRequestNav } from "@/features/request/hooks/useRequestNav";
+import { useRequestTargetsQuery } from "@/features/request/hooks/queries/useRequestTargetsQuery";
+import { useInformationOptionsQuery } from "@/features/request/hooks/queries/useInformationOptionsQuery";
+import { useSendRequestMutation } from "@/features/request/hooks/mutations/useSendRequestMutation";
+import { useErrorToast } from "@/features/request/hooks/useErrorToast";
 import { useRequestFormStore } from "@/features/request/stores/useRequestFormStore";
-import { useToast } from "@/features/request/hooks/useToast";
+import { useToast } from "@/shared/hooks/useToast";
 
 // Constants
 import { REQUEST_ROUTES } from "@/features/request/constants/routerConstants";
-import { REQUEST_QUERY_KEYS } from "@/features/request/constants/requestQueryKeys";
 
 // Utils
+import { getSelectedUserInfo } from "@/features/request/utils/getSelectionInput";
 import {
   getSelectedTitles,
-  getSelectedUserInfo,
   getCategoryInformationIds,
   replaceCategoryInformationIds,
-} from "@/features/request/utils/requestUtils";
+} from "@/features/request/utils/getSafetyCardInfo";
 
-// API, Services
-import {
-  getRequestTargetsApi,
-  getInformationOptionsApi,
-} from "@/features/request/api/getApi";
-import {
-  getRequestTargetsService,
-  getInformationOptionsService,
-} from "@/features/request/services/getService";
-import { postInfoPreviewApi } from "@/features/request/api/createApi";
+// Services
+import { getInformationOptionsService } from "@/features/request/services/informationOptionsService";
 
 // 일반 Components
-import StepHeader from "@/features/request/components/Header/StepHeader";
+import SubpageHeader from "@/shared/components/subpage-header/SubpageHeader";
 import UserInfo from "@/features/request/components/User/UserInfo";
 import DueDateState from "@/features/request/components/State/DueDateState";
 import SafetyCardGroup from "@/features/request/components/SafetyCard/SafetyCardGroup";
-import DefaultSheet from "@/features/request/components/Sheet/DefaultSheet";
+import DefaultSheet from "@/shared/components/DefaultSheet/DefaultSheet";
 import CheckOption from "@/features/request/components/Option/CheckOption";
-import LargeFooter from "@/features/request/components/Footer/LargeFooter";
-import DefaultModal from "@/features/request/components/Modal/DefaultModal";
-import DefaultToast from "@/features/request/components/Toast/DefaultToast";
+import LargeFooter from "@/shared/components/LargeFooter/LargeFooter";
+import DefaultModal from "@/shared/components/DefaultModal/DefaultModal";
+import DefaultToast from "@/shared/components/Toast/DefaultToast";
 
 // 페이지 컴포넌트
 function InfoPreview() {
   const { handleGoNext, handleGoBack } = useRequestNav(); // useNavigation 커스텀 훅의 함수
-  const paramId = useParams().id; // path parameter (situationId)
   const { toast, showToast, hideToast } = useToast(); // 토스트 메시지
-  const { form: requestForm, setForm } = useRequestFormStore((state) => state); // 요청 작성 폼 상태 관리
 
-  // 요청 대상 후보 조회 (요청 작성 시 선택한 대상)
+  // 이전 페이지가 "다시 부탁하기"였는지 여부
+  const [searchParams] = useSearchParams();
+  const reassignRequestId = searchParams.get("askAgain");
+
+  // 열려 있는 시트 (한 번에 하나만 열림)
+  const [openSheet, setOpenSheet] = useState(null);
+  const closeSheet = () => setOpenSheet(null);
+
+  // 민감정보 확인 모달의 열림/닫힘 상태
+  const [isModalOpen, setModalOpen] = useState(false);
+
+  // Zustand Store
+  const {
+    form: requestForm,
+    setForm,
+    resetForm,
+  } = useRequestFormStore((state) => state);
+
+  // 1. 대상 후보 조회 API
   const {
     data: users = [],
     isPending: isTargetsPending,
     error: targetsError,
-  } = useQuery({
-    queryKey: REQUEST_QUERY_KEYS.targets(requestForm.situationId),
-    queryFn: () =>
-      getRequestTargetsApi({ situationId: Number(requestForm.situationId) }),
-    select: getRequestTargetsService,
-    enabled: Boolean(requestForm.situationId),
-  });
+  } = useRequestTargetsQuery({ situationId: requestForm.situationId });
 
-  // API 호출 에러 처리
-  useEffect(() => {
-    if (!targetsError) return;
-    showToast(targetsError.response?.data?.message);
-  }, [targetsError, showToast]);
-
-  // 공개 항목 선택지 조회 (새 요청이므로 requestId는 전달하지 않음)
+  // 2. 공개 항목 선택지 조회 (도움 종류로 조회하고, 다시 부탁하기에서는 기존 요청 ID도 전달)
   const {
     data: informationOptions,
     isPending: isInformationPending,
     error: informationError,
-  } = useQuery({
-    queryKey: REQUEST_QUERY_KEYS.informationOptions(requestForm.helpType),
-    queryFn: () => getInformationOptionsApi({ helpType: requestForm.helpType }),
-    enabled: Boolean(requestForm.helpType),
+  } = useInformationOptionsQuery(
+    { helpType: requestForm.helpType, requestId: reassignRequestId },
+    { enabled: Boolean(requestForm.helpType) },
+  );
+
+  // 3. 도움 요청 생성 API
+  const { mutate: sendRequest, isPending: isSending } = useSendRequestMutation({
+    reassignRequestId,
+    showToast,
+    onSuccess: ({ requestId }) => {
+      resetForm();
+      handleGoNext(REQUEST_ROUTES.send(requestId), true);
+    },
   });
+
+  // API 에러 메시지 출력
+  useErrorToast(showToast, targetsError, informationError);
+
+  // API 응답 데이터 (정제된 형태)
   const {
     categories,
     selectedIds,
@@ -99,11 +111,6 @@ function InfoPreview() {
     [informationOptions, requestForm],
   );
 
-  // API 호출 에러 처리
-  useEffect(() => {
-    if (informationError) showToast(informationError.response?.data?.message);
-  }, [informationError, showToast]);
-
   // 공개 항목 선택지 조회 후, 기본값이 있는 경우 requestForm에 반영
   useEffect(() => {
     if (!informationOptions) return;
@@ -114,15 +121,8 @@ function InfoPreview() {
     }));
   }, [informationOptions, setForm]);
 
-  // 선택한 대상의 이름과 보호자 여부를 가져오는 함수
+  // 선택한 대상의 이름과 보호자 여부를 가져옴
   const { userName, userPart } = getSelectedUserInfo(users, requestForm.userId);
-
-  // 열려 있는 시트 (한 번에 하나만 열림) - 값은 CHECK_FORM_FIELD_KEY 중 하나
-  const [openSheet, setOpenSheet] = useState(null);
-  const closeSheet = () => setOpenSheet(null);
-
-  // 민감정보 확인 모달의 열림/닫힘 상태
-  const [isModalOpen, setModalOpen] = useState(false);
 
   // 선택한 공개 항목을 카테고리별로 교체하는 함수
   const setCategorySelection = (categoryItems, ids) => {
@@ -136,18 +136,23 @@ function InfoPreview() {
     }));
   };
 
-  // TODO: API 연동 로직 수정 필요
-  // [H-03-02-01] 공개 정보 제출 후 [요청 완료] 페이지로 이동
+  // [민감 정보 확인] 모달의 confirm 버튼 핸들러 / 요청 보내기 핸들러
   const handleGoSend = () => {
-    const reqRefinedData = { ...requestForm, informationIds: selectedIds };
-    postInfoPreviewApi(reqRefinedData);
-
-    handleGoNext(REQUEST_ROUTES.send(paramId), true);
+    if (isSending) return;
+    setModalOpen(false);
+    sendRequest({ ...requestForm, informationIds: selectedIds });
   };
 
-  // 요청 보내기 버튼 클릭 핸들러 (민감정보가 있으면 확인 모달을 먼저 띄움)
+  // "요청 보내기" 버튼 핸들러 (민감정보가 있으면 확인 모달을 먼저 띄움)
   const handleSendBtnClick = () => {
-    if (isTargetsPending || isInformationPending || informationError) return;
+    if (
+      isSending ||
+      isTargetsPending ||
+      targetsError ||
+      isInformationPending ||
+      informationError
+    )
+      return;
 
     if (isSensitiveIncluded) {
       setModalOpen(true);
@@ -159,7 +164,11 @@ function InfoPreview() {
   return (
     <div className={styles.page}>
       {/* 헤더 */}
-      <StepHeader title="요청 작성" step="2" onClick={handleGoBack} />
+      <SubpageHeader
+        title="요청 작성"
+        rightText="2 / 2"
+        onBackClick={handleGoBack}
+      />
 
       {/* 메인 컨텐츠 */}
       <main className={styles.content}>

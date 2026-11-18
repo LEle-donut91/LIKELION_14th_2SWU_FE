@@ -8,7 +8,7 @@
 import styles from "@/features/request/pages/AssigneeReconfirm.module.css";
 
 // 일반 라이브러리
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useParams } from "react-router-dom";
 
 // icons/images
@@ -16,120 +16,151 @@ import iconToggle from "@/shared/assets/icons/iconToggle.svg";
 
 // Custom Hooks
 import { useRequestNav } from "@/features/request/hooks/useRequestNav";
+import { useRequestDetailQuery } from "@/features/request/hooks/queries/useRequestDetailQuery";
+import { useReconfirmMutations } from "@/features/request/hooks/mutations/useReconfirmMutations";
+import { useErrorToast } from "@/features/request/hooks/useErrorToast";
+import { useToast } from "@/shared/hooks/useToast";
 
 // Constants
 import { REQUEST_ROUTES } from "@/features/request/constants/routerConstants";
 
-// API, Services
-import {
-  getAssigneeReconfirmApi,
-  postAssigneeReconfirmAcceptApi,
-  postAssigneeReconfirmRejectApi,
-} from "@/features/request/api/assigneeApi";
-import { getAssigneeReconfirmService } from "@/features/request/services/assigneeService";
+// Services
+import { getAssigneeReconfirmService } from "@/features/request/services/reconfirmService";
 
 // 일반 Components
-import ExitHeader from "@/features/request/components/Header/ExitHeader";
-import SmallFooter from "@/features/request/components/Footer/SmallFooter";
+import SubpageHeader from "@/shared/components/subpage-header/SubpageHeader";
+import SmallFooter from "@/shared/components/SmallFooter/SmallFooter";
 import RequestSummary from "@/features/request/components/Request/RequestSummary";
-import DefaultModal from "@/features/request/components/Modal/DefaultModal";
+import DefaultModal from "@/shared/components/DefaultModal/DefaultModal";
+import DefaultToast from "@/shared/components/Toast/DefaultToast";
 
 function AssigneeReconfirm() {
-  const paramId = useParams().id; // path parameter (요청 ID)
+  const paramId = useParams().id;
   const { handleGoBack, handleGoNext } = useRequestNav();
+  const { toast, showToast, hideToast } = useToast();
 
-  const [isModalOpen, setModalOpen] = useState(false); // "변경 내용 거절" 모달
+  // [변경 내용 거절] 모달
+  const [isModalOpen, setModalOpen] = useState(false);
 
-  // TODO: API 연동 시 useEffect로 교체 (지금은 mock 이라 렌더마다 호출돼도 문제 없음)
-  // [N-05] 변경 내용 확인 - 데이터 조회 (가공은 service에서 처리)
+  // 1. 요청 상세 조회 API
+  const {
+    data: detail,
+    isPending,
+    error,
+  } = useRequestDetailQuery(paramId, {
+    select: getAssigneeReconfirmService,
+  });
+
+  // 2. 재확인 수락 / 재확인 거절 API
+  const { acceptReconfirmation, rejectReconfirmation } = useReconfirmMutations({
+    requestId: paramId,
+    proposalId,
+    showToast,
+    onAccepted: () => handleGoBack(),
+    onRejected: () => {
+      setModalOpen(false);
+      handleGoNext(REQUEST_ROUTES.home, true);
+    },
+  });
+
+  // API 에러 메시지 출력
+  useErrorToast(showToast, error);
+
+  // API 응답 데이터 (정제된 형태)
   const { proposalId, userName, requestType, beforeInfoList, afterInfoList } =
-    useMemo(
-      () => getAssigneeReconfirmService(getAssigneeReconfirmApi(paramId)),
-      [paramId],
-    );
-
-  // TODO: API 연동 시 응답의 isSuccess 확인 후 이동 처리
-  // [Footer의 확인 버튼] 클릭 이벤트 핸들러
-  const handleConfirmBtnClick = () => {
-    postAssigneeReconfirmAcceptApi(paramId, proposalId);
-    handleGoBack();
-  };
-
-  // [모달의 거절 버튼] 클릭 이벤트 핸들러
-  const handleRejectConfirm = () => {
-    postAssigneeReconfirmRejectApi(paramId, proposalId);
-    setModalOpen(false);
-    handleGoNext(REQUEST_ROUTES.home, true);
-  };
+    detail ?? {};
 
   return (
     <div className={styles.page}>
       {/* 헤더 (닫기 버튼이 있는 컴포넌트) */}
-      <ExitHeader title="변경 내용 확인" onClick={() => handleGoBack()} />
+      <SubpageHeader
+        hasBackButton={false}
+        hasCloseButton
+        title="변경 내용 확인"
+        onCloseClick={() => handleGoBack()}
+      />
 
-      {/* 메인 컨텐츠 */}
-      <main className={styles.content}>
-        {/* 요청자 정보 카드 */}
-        <RequestSummary
-          isAfterInfo={false}
-          hasBeigeBorder={true}
-          title={`${userName}님의 요청`}
-          hasTag={true}
-          type={requestType}
-        />
-
-        {/* 변경 전 - 변경 후 카드 Container */}
-        <div className={styles.cardContainer}>
-          {/* 변경 전 Card */}
-          <RequestSummary
-            isAfterInfo={false}
-            hasBeigeBorder={false}
-            title="변경 전"
-            hasTag={false}
-            infoList={beforeInfoList}
-          />
-
-          {/* Toggle 아이콘 이미지 */}
-          <div className={styles.imgContainer}>
-            <img className={styles.toggleImg} src={iconToggle} />
-          </div>
-
-          {/* 변경 후 Card */}
-          <RequestSummary
-            isAfterInfo={true}
-            hasBeigeBorder={false}
-            title="변경 후"
-            hasTag={false}
-            infoList={afterInfoList}
-          />
+      {isPending && (
+        <div className={styles.content}>
+          <p role="status">요청 정보를 불러오는 중이에요.</p>
         </div>
-      </main>
+      )}
+      {detail && (
+        <>
+          {/* 메인 컨텐츠 */}
+          <main className={styles.content}>
+            {/* 요청자 정보 카드 */}
+            <RequestSummary
+              isAfterInfo={false}
+              hasBeigeBorder={true}
+              title={`${userName}님의 요청`}
+              hasTag={true}
+              type={requestType}
+            />
 
-      {/* 하단 Footer */}
-      <SmallFooter
-        leftType="tertiary"
-        leftTitle="거절"
-        rightTitle="확인"
-        leftOnClick={() => setModalOpen(true)}
-        rightOnClick={handleConfirmBtnClick}
-      />
+            {/* 변경 전 - 변경 후 카드 Container */}
+            <div className={styles.cardContainer}>
+              {/* 변경 전 Card */}
+              <RequestSummary
+                isAfterInfo={false}
+                hasBeigeBorder={false}
+                title="변경 전"
+                hasTag={false}
+                infoList={beforeInfoList}
+              />
 
-      {/* 변경 내용 거절 */}
-      <DefaultModal
-        modalOpen={isModalOpen}
-        setModalOpen={setModalOpen}
-        title="변경 내용 거절"
-        description={
-          <>
-            요청이 취소되고, 정보 접근 권한이 회수돼요.
-            <br />
-            거절은 돌이킬 수 없어요.
-          </>
-        }
-        cancelTxt="돌아가기"
-        confirmTxt="거절"
-        onConfirmClick={handleRejectConfirm}
-      />
+              {/* Toggle 아이콘 이미지 */}
+              <div className={styles.imgContainer}>
+                <img className={styles.toggleImg} src={iconToggle} />
+              </div>
+
+              {/* 변경 후 Card */}
+              <RequestSummary
+                isAfterInfo={true}
+                hasBeigeBorder={false}
+                title="변경 후"
+                hasTag={false}
+                infoList={afterInfoList}
+              />
+            </div>
+          </main>
+
+          {/* 하단 Footer */}
+          {proposalId && (
+            <SmallFooter
+              leftType="tertiary"
+              leftTitle="거절"
+              rightTitle="확인"
+              leftOnClick={() => setModalOpen(true)}
+              rightOnClick={acceptReconfirmation}
+            />
+          )}
+
+          {/* 변경 내용 거절 */}
+          <DefaultModal
+            modalOpen={isModalOpen}
+            setModalOpen={setModalOpen}
+            title="변경 내용 거절"
+            description={
+              <>
+                요청이 취소되고, 정보 접근 권한이 회수돼요.
+                <br />
+                거절은 돌이킬 수 없어요.
+              </>
+            }
+            cancelTxt="돌아가기"
+            confirmTxt="거절"
+            onConfirmClick={rejectReconfirmation}
+          />
+        </>
+      )}
+      {toast && (
+        <DefaultToast
+          key={toast.id}
+          message={toast.message}
+          onHide={hideToast}
+        />
+      )}
     </div>
   );
 }

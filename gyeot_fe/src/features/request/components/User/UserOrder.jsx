@@ -1,10 +1,8 @@
 import styles from "@/features/request/components/User/UserOrder.module.css";
 import {
   USER_ORDER_STATE_TEXT,
-} from "@/features/request/constants/requestConstants";
-import {
   USER_ORDER_STATE,
-} from "@/features/request/constants/enumConstants";
+} from "@/features/request/constants/requestDetailConstants";
 
 function UserOrder({ title, orderList }) {
   return (
@@ -33,7 +31,9 @@ function UserOrder({ title, orderList }) {
                 </span>
               </div>
 
-              <div className={`${tagStyle} typoCaptionMedium`}>{stateText}</div>
+              {stateText && (
+                <div className={`${tagStyle} typoCaptionMedium`}>{stateText}</div>
+              )}
             </div>
           );
         })}

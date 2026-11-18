@@ -1,0 +1,70 @@
+import { axiosInstance } from "@/shared/api/axiosInstance";
+import { REQUEST_API_URLS } from "@/shared/constants/apiUrlConstants";
+
+// 도움 요청 생성 API
+export const postCareRequestApi = async (payload) => {
+  const response = await axiosInstance.post(REQUEST_API_URLS.create, payload);
+  return response.data;
+};
+
+// 수락 철회 API
+export const postAcceptWithdrawApi = async (requestId) => {
+  const response = await axiosInstance.post(REQUEST_API_URLS.withdraw(requestId));
+  return response.data;
+};
+
+// 돌봄 시작 API
+export const postStartApi = async (requestId) => {
+  const response = await axiosInstance.post(REQUEST_API_URLS.start(requestId));
+  return response.data;
+};
+
+// 돌봄 완료 API (담당자·요청자 공통)
+export const postDoneApi = async (requestId) => {
+  const response = await axiosInstance.post(REQUEST_API_URLS.complete(requestId));
+  return response.data;
+};
+
+// 요청 응답 API (대상자 뷰) - 보류, 거절, 수락
+export const postResponseApi = async ({ requestId, response }) => {
+  const result = await axiosInstance.post(REQUEST_API_URLS.respond(requestId), {
+    response,
+  });
+  return result.data;
+};
+
+// 요청 취소 API (요청자 뷰)
+export const postCancelApi = async (requestId) => {
+  const response = await axiosInstance.post(REQUEST_API_URLS.cancel(requestId));
+  return response.data;
+};
+
+// 수정안 철회 API (요청자 뷰)
+export const postEditWithdrawApi = async ({ requestId, proposalId }) => {
+  const response = await axiosInstance.post(
+    REQUEST_API_URLS.editWithdraw(requestId, proposalId),
+  );
+  return response.data;
+};
+
+// 재확인 수락 API
+export const postReconfirmAcceptApi = async ({ requestId, proposalId }) => {
+  const response = await axiosInstance.post(
+    REQUEST_API_URLS.reconfirmAccept(requestId, proposalId),
+  );
+  return response.data;
+};
+
+// 재확인 거절 API
+export const postReconfirmRejectApi = async ({ requestId, proposalId }) => {
+  const response = await axiosInstance.post(
+    REQUEST_API_URLS.reconfirmReject(requestId, proposalId),
+  );
+  return response.data;
+};
+
+// 다시 부탁하기 API
+export const postAskAgainApi = async ({ requestId, payload }) => {
+  const response = await axiosInstance.post(REQUEST_API_URLS.assignments(requestId), payload);
+  return response.data;
+};
