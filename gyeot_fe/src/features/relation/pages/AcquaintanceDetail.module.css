@@ -1,0 +1,223 @@
+/* 페이지 전체 (관계 해제 버튼을 맨 아래로 보내기 위한 세로 배치) */
+.page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  background: #fcfbfa; /* 다른 화면과 같은 배경 */
+  font-family: var(--font-gothic); /* 팀 기본 폰트 (index.css) */
+}
+
+/* 버튼·입력 칸도 페이지 폰트 따라가게 */
+.page button,
+.page input {
+  font-family: inherit;
+}
+
+/* 공통 헤더 배경을 페이지 배경과 같게 (이 페이지에서만 적용) */
+.page header {
+  background: transparent;
+}
+
+/* 공통 헤더의 '뒤로' 글자를 < 아이콘으로 바꾸기 (이 페이지에서만 적용) */
+.page header button[aria-label="뒤로 가기"] {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  font-size: 0; /* '뒤로' 글자 숨기기 */
+  background: url("../../../shared/assets/icons/iconLeft.svg") center / 24px no-repeat;
+  cursor: pointer;
+}
+
+/* 본문 */
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 24px 16px 32px;
+}
+
+/* ===== 프로필 ===== */
+.profile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 28px;
+}
+
+/* 큰 이니셜 아바타 (흰 테두리 + 은은한 올리브 빛) */
+.avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  background: var(--color-beige-100);
+  box-shadow: 0 0 0 12px var(--color-olive-100);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-beige-800);
+}
+
+.name {
+  margin: 28px 0 6px;
+  font-size: 17px;
+  font-weight: 700;
+  color: #222;
+}
+
+/* 배지 줄 */
+.badges {
+  display: flex;
+  gap: 4px;
+}
+
+/* 공통 배지 모양 */
+.myPersonBadge,
+.guardianBadge,
+.priorityBadge {
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 9px;
+  font-weight: 600;
+}
+
+/* 내가 등록한 사람 */
+.myPersonBadge {
+  background: var(--color-olive-200);
+  color: var(--color-olive-700);
+}
+
+/* 서로의 보호자 (진한 올리브) */
+.guardianBadge {
+  background: var(--color-olive-600);
+  color: #fff;
+}
+
+/* 연락 순서 */
+.priorityBadge {
+  background: var(--color-beige-100);
+  color: var(--color-beige-600);
+}
+
+/* ===== 관계 형태 카드 ===== */
+.card {
+  padding: 14px 12px 12px;
+  background: #fff;
+  border: 1px solid #ebe7df;
+  border-radius: 14px;
+}
+
+.label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #222;
+}
+
+/* 입력 칸 + 연필 아이콘 */
+.inputBox {
+  position: relative;
+}
+
+.input {
+  width: 100%;
+  height: 40px;
+  padding: 0 40px 0 12px; /* 오른쪽은 연필 자리 */
+  background: #fff;
+  border: 1px solid #e2ded6;
+  border-radius: 8px;
+  font-size: 12px;
+  color: #222;
+  box-sizing: border-box;
+}
+
+.input::placeholder {
+  color: #a5a29c;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--color-olive-500);
+}
+
+.editBtn {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  display: flex;
+  padding: 0;
+  background: none;
+  border: none;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+.helper {
+  margin: 6px 0 0;
+  font-size: 9px;
+  color: #a5a29c;
+}
+
+/* ===== 공유 중인 정보 카드 ===== */
+.sharedCard {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin-top: 20px;
+  padding: 16px 14px;
+  background: var(--color-olive-100);
+  border: 1px solid var(--color-olive-200);
+  border-radius: 14px;
+  text-align: left;
+  cursor: pointer;
+}
+
+/* 흰 원 안의 문서 아이콘 */
+.docIcon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.sharedText {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sharedTitle {
+  font-size: 12px;
+  font-weight: 700;
+  color: #222;
+}
+
+.sharedSub {
+  font-size: 9px;
+  color: #6f6f6f;
+}
+
+/* ===== 관계 해제 (빨간 밑줄 글자, 맨 아래) ===== */
+.releaseBtn {
+  align-self: center;
+  margin-top: auto;
+  padding: 0;
+  background: none;
+  border: none;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-red-700);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
