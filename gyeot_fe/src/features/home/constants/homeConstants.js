@@ -16,7 +16,7 @@ export const SITUATION_TAB_LIST = [
 export const HOME_NAVIGATION_PATH = {
   SITUATION_DETAIL: "/situation/detail", // H-03 상황 상세
   SITUATION_CREATE: "/situation/create", // H-01 상황 만들기
-  REQUEST_CREATE: "/request", // H-03-02 요청 작성
+  REQUEST_CREATE: (situationId) => `/request/${situationId}`, // H-03-02 요청 작성
   ACQUAINTANCE_INVITE: "/relation/acquaintance-invite", // R-01 나의 사람 초대
   CARD: "/card", // C-00 안심카드
   CARD_SHARE: "/card/share", // C-06 공유 관리

@@ -72,7 +72,7 @@ function Home() {
   const handleSituationDetailClick = (situationId) =>
     navigate(HOME_NAVIGATION_PATH.SITUATION_DETAIL, { state: { situationId } }); // H-03
   const handleRequestCreate = (situationId) =>
-    navigate(HOME_NAVIGATION_PATH.REQUEST_CREATE, { state: { situationId } }); // H-03-02
+    navigate(HOME_NAVIGATION_PATH.REQUEST_CREATE(situationId)); // H-03-02
 
   // TODO: 와이어프레임 화면 코드와 App.jsx 라우트가 일치하지 않아 연결 보류
   // - 받은 요청 → 요청 상세(대상자 뷰) "H-03-01-tgt": App.jsx에 해당 코드 없음
