@@ -8,6 +8,7 @@ import HomeEmpty from "@/features/home/components/HomeEmpty";
 import StatusCardList from "@/features/home/components/StatusCardList";
 import SectionTab from "@/features/home/components/SectionTab";
 import SituationTabContent from "@/features/home/components/SituationTabContent";
+import HomeRequestSections from "@/features/home/components/HomeRequestSections";
 import HelpFloatingButton from "@/features/home/components/HelpFloatingButton";
 import SituationSelectSheet from "@/features/home/components/SituationSelectSheet";
 import HomeToast from "@/features/home/components/HomeToast";
@@ -97,11 +98,9 @@ function Home() {
     );
   }
 
-  const mySituations = homeData.mySituation?.situations ?? [];
-  const tabContent =
-    activeTab === SITUATION_TAB.MY
-      ? homeData.mySituation
-      : homeData.participatingSituation;
+  // 탭별 상황 카드 (홈 통합 조회 situationCards.my / participating)
+  const mySituations = homeData.situations[SITUATION_TAB.MY];
+  const tabSituations = homeData.situations[activeTab];
 
   // 진행 중인 나의 상황이 1개면 바로 요청 작성, 2개 이상이면 상황 선택 시트
   const handleHelpClick = () => {
@@ -148,13 +147,20 @@ function Home() {
               />
               <SituationTabContent
                 tabKey={activeTab}
-                content={tabContent}
+                situations={tabSituations}
                 onSituationDetailClick={handleSituationDetailClick}
                 onSituationCreateClick={handleSituationCreateClick}
-                onReceivedRequestClick={handleReceivedRequestClick}
-                onSentRequestClick={handleSentRequestClick}
               />
             </div>
+
+            {/* 탭 밖 공통 영역: 탭과 관계없이 같은 목록 (mainContainer 간격 48 = 기존 섹션 간격) */}
+            <HomeRequestSections
+              receivedRequests={homeData.receivedRequests}
+              sentRequests={homeData.sentRequests}
+              upcomingSchedules={homeData.upcomingSchedules}
+              onReceivedRequestClick={handleReceivedRequestClick}
+              onSentRequestClick={handleSentRequestClick}
+            />
           </div>
         )}
       </main>

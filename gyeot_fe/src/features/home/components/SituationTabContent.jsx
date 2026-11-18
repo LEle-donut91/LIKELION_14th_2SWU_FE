@@ -1,32 +1,17 @@
 import styles from "@/features/home/components/SituationTabContent.module.css";
 import SituationCard from "@/shared/components/SituationCard/SituationCard";
 import SituationEmpty from "@/features/home/components/SituationEmpty";
-import HomeSection from "@/features/home/components/HomeSection";
-import ReceivedRequestItem from "@/features/home/components/ReceivedRequestItem";
-import SentRequestItem from "@/features/home/components/SentRequestItem";
-import ScheduleItem from "@/features/home/components/ScheduleItem";
-import {
-  MAX_UPCOMING_SCHEDULE_COUNT,
-  SITUATION_TAB,
-} from "@/features/home/constants/homeConstants";
+import { SITUATION_TAB } from "@/features/home/constants/homeConstants";
 
-// 탭(나의 상황 / 참여 상황) 하단 콘텐츠
-// 상황 카드 목록 → 응답이 필요한 요청 → 보낸 요청 → 다가오는 일정
+// 탭(나의 상황 / 참여 상황) 하단 콘텐츠: 상황 카드 목록
+// - 응답이 필요한 요청 · 보낸 요청 · 다가오는 일정은 탭과 관계없는 공통 영역이라
+//   HomeRequestSections에서 탭 밖에 그림 (홈 통합 조회에서 탭별로 나뉘지 않음)
 function SituationTabContent({
   tabKey,
-  content,
+  situations = [],
   onSituationDetailClick,
   onSituationCreateClick,
-  onReceivedRequestClick,
-  onSentRequestClick,
 }) {
-  const {
-    situations = [],
-    receivedRequests = [],
-    sentRequests = [],
-    upcomingSchedules = [],
-  } = content ?? {};
-
   const isMyTab = tabKey === SITUATION_TAB.MY;
 
   return (
@@ -51,42 +36,6 @@ function SituationTabContent({
           onCreateClick={isMyTab ? onSituationCreateClick : undefined}
         />
       )}
-
-      {receivedRequests.length > 0 && (
-        <HomeSection title="응답이 필요한 요청">
-          {receivedRequests.map((request) => (
-            <ReceivedRequestItem
-              key={request.id}
-              request={request}
-              onClick={() => onReceivedRequestClick?.(request.id)}
-            />
-          ))}
-        </HomeSection>
-      )}
-
-      {sentRequests.length > 0 && (
-        <HomeSection title="보낸 요청">
-          {sentRequests.map((request) => (
-            <SentRequestItem
-              key={request.id}
-              request={request}
-              onClick={() => onSentRequestClick?.(request.id)}
-            />
-          ))}
-        </HomeSection>
-      )}
-
-      <HomeSection
-        title="다가오는 일정"
-        isEmpty={upcomingSchedules.length === 0}
-        emptyText="다가오는 일정이 없어요."
-      >
-        {upcomingSchedules
-          .slice(0, MAX_UPCOMING_SCHEDULE_COUNT)
-          .map((schedule) => (
-            <ScheduleItem key={schedule.id} schedule={schedule} />
-          ))}
-      </HomeSection>
     </div>
   );
 }
