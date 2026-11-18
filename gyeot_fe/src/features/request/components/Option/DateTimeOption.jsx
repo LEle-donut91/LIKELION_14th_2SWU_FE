@@ -1,6 +1,6 @@
 import styles from "@/features/request/components/Option/DateTimeOption.module.css";
-import { DATE_TIME_OPTION_CONFIGS } from "@/features/request/constants/requestConstants";
-import { getValidatedNumericValue } from "@/features/request/utils/requestUtils";
+import { DATE_TIME_OPTION_CONFIGS } from "@/features/request/constants/dateTimeInputConstants";
+import { getValidatedNumericValue } from "@/features/request/utils/validateInput";
 
 /**
  * sections: [{ type: "date" | "time" | "dueDate", title: "날짜" }, ...]

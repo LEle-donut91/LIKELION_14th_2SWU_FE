@@ -1,6 +1,6 @@
 import styles from "@/features/request/components/State/DueDateState.module.css";
 import { useTimer } from "@/features/request/hooks/useTimer";
-import { parseTimeToSeconds } from "@/features/request/utils/requestUtils";
+import { parseTimeToSeconds } from "@/features/request/utils/getTimer";
 
 function DueDateState({ isResponse, isDeadline = false, title, dueDate }) {
   const { hour, minute, second } = useTimer(

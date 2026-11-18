@@ -2,7 +2,7 @@ import styles from "@/features/request/components/User/UserOrder.module.css";
 import {
   USER_ORDER_STATE_TEXT,
   USER_ORDER_STATE,
-} from "@/features/request/constants/requestConstants";
+} from "@/features/request/constants/requestDetailConstants";
 
 function UserOrder({ title, orderList }) {
   return (

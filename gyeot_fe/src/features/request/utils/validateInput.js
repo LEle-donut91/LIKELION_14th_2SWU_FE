@@ -3,14 +3,68 @@ import {
   DUE_DATE_MAX_MINUTES,
   DUE_DATE_MIN_MINUTES,
   START_MIN_LEAD_MINUTES,
-  REQUEST_FORM_FIELD_KEY,
-} from "@/features/request/constants/requestConstants";
+} from "@/features/request/constants/timeConstants";
+import { REQUEST_FORM_FIELD_KEY } from "@/features/request/constants/requestFormConstants";
+import { toMinutes } from "@/features/request/utils/dueDateUtils";
 import {
-  isDueDateEntered,
-  toMinutes,
-} from "@/features/request/utils/requestUtils";
+  formatDateToLocalDayBoundary,
+  toDateFromInput,
+} from "@/features/request/utils/dateTimeFormat";
+import {
+  DATE_TIME_KEYS,
+  DUE_DATE_KEYS,
+  DATE_TIME_MAX_LIMITS,
+  DATE_TIME_MIN_LIMITS,
+  DUE_DATE_MAX_LIMITS,
+  DUE_DATE_MIN_LIMITS,
+} from "@/features/request/constants/dateTimeInputConstants";
+import { REQUEST_PREREQUISITE_TOAST_MESSAGE } from "@/features/request/constants/messageConstants";
 
-import { formatDateToLocalDayBoundary, toDateFromInput } from "@/features/request/utils/dateFormat";
+// 시작/종료 Section에 입력된 시간, 날짜 값에서 숫자만 남기고, 필드(key)별 최대값/유효성에 맞게 값을 보정
+export const getValidatedNumericValue = (key, rawValue) => {
+  let val = rawValue.replace(/[^0-9]/g, ""); // 숫자만 입력 가능
+  if (val === "") return "";
+
+  let num = parseInt(val, 10);
+
+  // 최소값 미만 또는 최대값 초과 시 "" 반환
+  const minLimit = DUE_DATE_MIN_LIMITS[key] || DATE_TIME_MIN_LIMITS[key];
+  const maxLimit = DUE_DATE_MAX_LIMITS[key] || DATE_TIME_MAX_LIMITS[key];
+  if (num < minLimit || num > maxLimit) return "";
+
+  return String(num);
+};
+
+// 시간/날짜 입력 칸의 5개 필드가 전부 채워졌는지 체크 (null / undefined / "" 은 모두 미입력으로 취급)
+export const isDateTimeComplete = (v) =>
+  !!v && DATE_TIME_KEYS.every((k) => v[k] != null && v[k] !== "");
+
+// 응답 기한 입력 칸의 3개 필드 중 1개 이상 입력했는지 체크 (null / undefined / "" 은 모두 미입력으로 취급)
+export const isDueDateEntered = (d) =>
+  DUE_DATE_KEYS.some((k) => d?.[k] != null && d?.[k] !== "");
+
+// 장소/부탁 내용(input/textarea)이 read only인지 체크
+// 상황이나 도움 종류 중 하나라도 없으면 true(읽기 전용), 둘 다 있으면 false
+export const isReadOnly = (form) =>
+  !(
+    form[REQUEST_FORM_FIELD_KEY.SITUATION_ID] &&
+    form[REQUEST_FORM_FIELD_KEY.HELP_TYPE]
+  );
+
+// 선행 조건 미충족 시 토스트를 띄우고 false 반환 (충족 시 true 반환)
+export const isPrerequisiteEnsured = (form, showToast) => {
+  if (!form[REQUEST_FORM_FIELD_KEY.SITUATION_ID]) {
+    showToast(REQUEST_PREREQUISITE_TOAST_MESSAGE.SITUATION_REQUIRED);
+    return false;
+  }
+
+  if (!form[REQUEST_FORM_FIELD_KEY.HELP_TYPE]) {
+    showToast(REQUEST_PREREQUISITE_TOAST_MESSAGE.HELP_TYPE_REQUIRED);
+    return false;
+  }
+
+  return true;
+};
 
 export const validateInput = (form, now, fields = null) => {
   // REQUEST_FORM_FIELD_KEY 구조분해 할당 (유효성 검사 후보 필드만 가져옴)
@@ -72,8 +126,7 @@ export const validateInput = (form, now, fields = null) => {
     const end = toDateFromInput(form.endDateTime);
     if (!end) {
       errors.endDateTime = "종료 일시를 모두 입력해 주세요.";
-    }
-    else if (start && end <= start) {
+    } else if (start && end <= start) {
       errors.endDateTime = "종료 시간은 시작 시간보다 늦어야 해요.";
     }
   }
@@ -99,10 +152,18 @@ export const validateInput = (form, now, fields = null) => {
   }
   // 상황 기간은 ISO 날짜(YYYY-MM-DD)이며, 종료일 전체를 포함한다.
   const situationStart = formatDateToLocalDayBoundary(form.situationStartDate);
-  const situationEnd = formatDateToLocalDayBoundary(form.situationEndDate, true);
+  const situationEnd = formatDateToLocalDayBoundary(
+    form.situationEndDate,
+    true,
+  );
   for (const field of [START_DATE_TIME, END_DATE_TIME]) {
     const date = toDateFromInput(form[field]);
-    if (targetFields.includes(field) && date && ((situationStart && date < situationStart) || (situationEnd && date > situationEnd))) {
+    if (
+      targetFields.includes(field) &&
+      date &&
+      ((situationStart && date < situationStart) ||
+        (situationEnd && date > situationEnd))
+    ) {
       errors[field] = "시작·종료 일시는 상황 기간 안에 있어야 해요.";
     }
   }

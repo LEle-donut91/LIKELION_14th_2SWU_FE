@@ -44,6 +44,8 @@ export const getAssigneeFooter = (actions) => {
     ASSIGNEE_FOOTER_KEY.START,
     ASSIGNEE_FOOTER_KEY.DONE,
     ASSIGNEE_FOOTER_KEY.PAST_SITUATION,
-  ].find((key) => actions.includes(FOOTER_ACTIONS[ASSIGNEE_FOOTER_CONFIG[key].action]));
+  ].find((key) =>
+    actions.includes(FOOTER_ACTIONS[ASSIGNEE_FOOTER_CONFIG[key].action]),
+  );
   return ASSIGNEE_FOOTER_CONFIG[key] ?? null;
 };

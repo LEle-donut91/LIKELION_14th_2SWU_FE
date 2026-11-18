@@ -2,7 +2,7 @@ import styles from "@/features/request/components/Section/RadioSection.module.cs
 import {
   HELP_TYPE_OPTIONS,
   HELP_TYPE_LABELS,
-} from "@/features/request/constants/requestConstants";
+} from "@/features/request/constants/requestFormConstants";
 
 function RadioSection({ value, onChange }) {
   return (

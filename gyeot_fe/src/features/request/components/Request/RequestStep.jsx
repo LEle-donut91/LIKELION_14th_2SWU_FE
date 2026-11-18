@@ -3,7 +3,7 @@ import { REQUEST_STATE } from "@/features/request/constants/enumConstants";
 import {
   REQUEST_STEP_LABELS,
   REQUEST_STEP_ORDER,
-} from "@/features/request/constants/requestConstants";
+} from "@/features/request/constants/requestDetailConstants";
 import { getRequestStepStyle } from "@/features/request/utils/getStyles";
 
 /**
