@@ -9,12 +9,13 @@
 import styles from "@/features/request/pages/Request.module.css";
 
 // 일반 라이브러리
-import { useMemo, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
 
 // Custom Hooks
 import { useRequestNav } from "@/features/request/hooks/useRequestNav";
 import { useRequestTargetsQuery } from "@/features/request/hooks/queries/useRequestTargetsQuery";
+import { useSituationsQuery } from "@/features/request/hooks/queries/useSituationsQuery";
 import { useErrorToast } from "@/features/request/hooks/useErrorToast";
 import { useToast } from "@/shared/hooks/useToast";
 
@@ -48,10 +49,6 @@ import {
   getDueDateText,
 } from "@/features/request/utils/getSelectionInput";
 
-// API, Services
-import { getReqFormApi } from "@/features/request/api/createApi";
-import { getReqFormService } from "@/features/request/services/createRequestService";
-
 // 일반 Components
 import SubpageHeader from "@/shared/components/subpage-header/SubpageHeader";
 import LargeFooter from "@/shared/components/LargeFooter/LargeFooter";
@@ -69,6 +66,7 @@ import DefaultToast from "@/shared/components/Toast/DefaultToast";
 function Request() {
   const { handleGoBack, handleGoNext } = useRequestNav();
   const paramId = useParams().id;
+  const initializedParamId = useRef(null);
   const { toast, showToast, hideToast } = useToast();
 
   // 열려 있는 시트 (한 번에 하나만 열림)
@@ -80,17 +78,6 @@ function Request() {
   const state = location.state || {};
   const passedUserId = state[REQUEST_FORM_FIELD_KEY.USER_ID];
   const passedDueDate = state[REQUEST_FORM_FIELD_KEY.DUE_DATE];
-
-  // 1. TODO: 상황 목록 조회 API 연동 시 교체
-  const { situation } = useMemo(() => getReqFormService(getReqFormApi()), []);
-
-  // 2. 대상 후보 조회 API (상황 선택 후 호출, 상황이 바뀌면 자동으로 다시 조회)
-  const {
-    data: user = [],
-    isPending: isTargetsPending,
-    error: targetsError,
-  } = useRequestTargetsQuery({ situationId: form.situationId });
-  useErrorToast(showToast, targetsError);
 
   // Zustand Store
   // 입력값 전체는 Zustand store의 form 하나
@@ -104,10 +91,36 @@ function Request() {
     resetForm,
   } = useRequestFormStore((state) => state);
 
+  // 1. 진행 중 상황 목록 조회
+  const {
+    data: situationData,
+    isPending: isSituationsPending,
+    error: situationsError,
+  } = useSituationsQuery();
+  const situation = situationData?.situation;
+
+  // 2. 대상 후보 조회 API (상황 선택 후 호출, 상황이 바뀌면 자동으로 다시 조회)
+  const {
+    data: user = [],
+    isPending: isTargetsPending,
+    error: targetsError,
+  } = useRequestTargetsQuery({
+    situationId:
+      String(entryId) === paramId && String(form.situationId) === paramId
+        ? form.situationId
+        : undefined,
+  });
+
+  // API 호출 에러 처리
+  useErrorToast(showToast, situationsError, targetsError);
+
   // 같은 진입(paramId)으로 돌아온 경우(예: 미리보기에서 뒤로가기) 입력값 유지
   // 다른 진입이면 새로 초기화 (초기값 전달)
-  useState(() => {
-    if (entryId !== paramId) {
+  useEffect(() => {
+    // store가 먼저 변경되고 URL이 갱신되기 전에는 이전 상황으로 초기화하지 않는다.
+    if (initializedParamId.current === paramId) return;
+    initializedParamId.current = paramId;
+    if (String(entryId) !== paramId) {
       const selectedSituation = getSelectedSituation(situation, paramId);
       initForm(paramId, {
         situationId: paramId,
@@ -117,7 +130,20 @@ function Request() {
         ...(passedDueDate && { dueDate: passedDueDate }),
       });
     }
-  });
+  }, [entryId, paramId, initForm, passedUserId, passedDueDate, situation]);
+
+  useEffect(() => {
+    const selectedSituation = getSelectedSituation(situation, form.situationId);
+    if (!selectedSituation) return;
+    setForm((current) => ({
+      ...current,
+      // 초기화 effect가 상황을 변경했다면 이전 렌더의 기간을 덮어쓰지 않는다.
+      ...(String(current.situationId) === selectedSituation.id && {
+        situationStartDate: selectedSituation.startDate,
+        situationEndDate: selectedSituation.endDate,
+      }),
+    }));
+  }, [situation, form.situationId, setForm]);
 
   // 하위 항목 (시작/종료/요청 대상/응답 기한) 시트 열기 핸들러
   const handleSubItemOpenSheet = (sheet) => {
@@ -184,13 +210,17 @@ function Request() {
           value={form.situationId}
           onConfirm={(v) => handleSituationConfirm(v)}
         >
-          {(temp, setTemp) => (
-            <SituationOption
-              data={situation}
-              selectedValue={temp}
-              onSelect={setTemp}
-            />
-          )}
+          {(temp, setTemp) =>
+            isSituationsPending ? (
+              <div>Loading...</div>
+            ) : (
+              <SituationOption
+                data={situation}
+                selectedValue={temp}
+                onSelect={setTemp}
+              />
+            )
+          }
         </DefaultSheet>
 
         {/* 도움 종류 */}

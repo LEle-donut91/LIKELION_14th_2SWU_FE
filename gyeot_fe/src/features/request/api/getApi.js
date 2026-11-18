@@ -1,5 +1,13 @@
-import { REQUEST_API_URLS, INFO_SHARE_API_URLS } from "@/shared/constants/apiUrlConstants";
+import { REQUEST_API_URLS, INFO_SHARE_API_URLS, SITUATION_API_URLS } from "@/shared/constants/apiUrlConstants";
 import { axiosInstance } from "@/shared/api/axiosInstance";
+
+// 진행 중 상황 목록 조회
+export const getSituationApi = async ({ page = 0, size = 20 } = {}) => {
+  const response = await axiosInstance.get(SITUATION_API_URLS.inProgressList, {
+    params: { page, size },
+  });
+  return response.data;
+};
 
 // 대상 후보 조회 API
 export const getRequestTargetsApi = async ({ situationId, requestId } = {}) => {

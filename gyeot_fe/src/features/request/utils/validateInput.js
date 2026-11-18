@@ -150,19 +150,21 @@ export const validateInput = (form, now, fields = null) => {
       }
     }
   }
-  // 상황 기간은 ISO 날짜(YYYY-MM-DD)이며, 종료일 전체를 포함한다.
-  const situationStart = formatDateToLocalDayBoundary(form.situationStartDate);
-  const situationEnd = formatDateToLocalDayBoundary(
-    form.situationEndDate,
-    true,
-  );
+  // 날짜시각 응답은 [startAt, endAt), 기존 날짜 응답은 종료일 전체를 포함한다.
+  const hasTime = (value) => value?.includes("T");
+  const situationStart = hasTime(form.situationStartDate)
+    ? new Date(form.situationStartDate)
+    : formatDateToLocalDayBoundary(form.situationStartDate);
+  const situationEnd = hasTime(form.situationEndDate)
+    ? new Date(form.situationEndDate)
+    : formatDateToLocalDayBoundary(form.situationEndDate, true);
   for (const field of [START_DATE_TIME, END_DATE_TIME]) {
     const date = toDateFromInput(form[field]);
     if (
       targetFields.includes(field) &&
       date &&
       ((situationStart && date < situationStart) ||
-        (situationEnd && date > situationEnd))
+        (situationEnd && (hasTime(form.situationEndDate) ? date >= situationEnd : date > situationEnd)))
     ) {
       errors[field] = "시작·종료 일시는 상황 기간 안에 있어야 해요.";
     }

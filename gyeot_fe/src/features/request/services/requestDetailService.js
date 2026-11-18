@@ -150,7 +150,7 @@ const getInitialDueDateInput = (raw) => {
 export const getRequestDetailService = (response = {}) => {
   const raw = response?.data ?? response ?? {};
   const ctx = getViewerContext(raw);
-  const { isRequester, isTarget, isDoneState, isAssignedNoti } = ctx;
+  const { isRequester, isAssignee, isTarget, isDoneState, isAssignedNoti } = ctx;
 
   const flags = getFlags(raw, ctx);
   const notice = isTarget ? getTargetNotice(raw) : null;
@@ -160,6 +160,9 @@ export const getRequestDetailService = (response = {}) => {
 
   return {
     role: raw.viewerRole?.toLowerCase(),
+    isRequester,
+    isAssignee,
+    isTarget,
     situation: raw.situation,
     situationId: raw.situation?.situationId ?? "",
     requestId: raw.requestId ?? "",

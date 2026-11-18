@@ -28,24 +28,3 @@ export const postCareRequestService = (requestForm, now = new Date()) => {
 // 도움 요청 생성 응답에서 생성된 요청 정보를 추출한다.
 export const postCareRequestResultService = (raw) => raw.data;
 
-// TODO: 상황 목록 조회 API 연동 시 교체 (현재는 mock 데이터 가공)
-export const getReqFormService = (raw) => {
-  if (!raw) return { situation: [], user: [] };
-
-  return {
-    situation:
-      raw.situation?.map((item) => ({
-        id: item.id,
-        title: item.title,
-        startDate: item.startDate,
-        endDate: item.endDate,
-        joinCount: Number(item.joinCount),
-      })) || [],
-    user:
-      raw.user?.map((user) => ({
-        id: user.id,
-        userName: user.userName,
-        isGuardian: user.isGuardian,
-      })) || [],
-  };
-};

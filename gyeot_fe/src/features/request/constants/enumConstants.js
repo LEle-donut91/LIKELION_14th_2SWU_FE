@@ -4,6 +4,18 @@
  * =====================================================================
  */
 
+// 상황 상태 (items[].status)
+export const SITUATION_STATUS = {
+  ACTIVE: "ACTIVE",
+  ENDED: "ENDED",
+};
+
+// 상황 참여 역할 (items[].role)
+export const SITUATION_ROLE = {
+  OWNER: "OWNER",
+  PARTICIPANT: "PARTICIPANT",
+};
+
 // 요청 진행 상태 (status)
 export const REQUEST_STATE = {
   REQUESTED: "REQUESTED",

@@ -78,14 +78,14 @@ function RequestDetail() {
     notice,
     footerConfig,
     role,
+    isRequester = false,
+    isAssignee = false,
+    isTarget = false,
     orderTitle,
     userStateText,
     safetyInformation,
     guideLines = [],
   } = detail ?? {};
-  const isRequester = role === "requester";
-  const isAssignee = role === "assignee";
-  const isTarget = role === "target";
 
   // Header별 action 연결
   const headerActions = {
