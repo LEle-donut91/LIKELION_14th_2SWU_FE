@@ -71,8 +71,7 @@ function InfoPreview() {
   // 1. 대상 후보 조회 API
   const {
     data: users = [],
-    isPending: isTargetsPending,
-    error: targetsError,
+    isPending: isTargetPending,
   } = useRequestTargetsQuery(
     reassignRequestId
       ? { requestId: reassignRequestId }
@@ -83,8 +82,7 @@ function InfoPreview() {
   // 2. 공개 항목 선택지 조회 (도움 종류로 조회하고, 다시 부탁하기에서는 기존 요청 ID도 전달)
   const {
     data: informationOptions,
-    isPending: isInformationPending,
-    error: informationError,
+    isPending: isInfoPending,
     refetch: refetchInformation,
   } = useInformationOptionsQuery(
     { helpType: requestForm.helpType, requestId: reassignRequestId },
@@ -92,7 +90,7 @@ function InfoPreview() {
   );
 
   // 3. 도움 요청 생성 API
-  const { mutate: sendRequest, isPending: isSending } = useSendRequestMutation({
+  const { mutate: sendRequest } = useSendRequestMutation({
     reassignRequestId,
     showToast,
     onRefreshInformation: refetchInformation,
@@ -101,6 +99,11 @@ function InfoPreview() {
       handleGoNext(REQUEST_ROUTES.send(requestId), true);
     },
   });
+
+  // GET 요청 로딩중 상태
+  const isLoading =
+  isTargetPending ||
+  isInfoPending
 
   // API 응답 데이터 (정제된 형태)
   const {
@@ -141,22 +144,12 @@ function InfoPreview() {
 
   // [민감 정보 확인] 모달의 confirm 버튼 핸들러 / 요청 보내기 핸들러
   const handleGoSend = () => {
-    if (isSending) return;
     setModalOpen(false);
     sendRequest({ ...requestForm, informationIds: selectedIds });
   };
 
   // "요청 보내기" 버튼 핸들러 (민감정보가 있으면 확인 모달을 먼저 띄움)
   const handleSendBtnClick = () => {
-    if (
-      isSending ||
-      isTargetsPending ||
-      targetsError ||
-      isInformationPending ||
-      informationError
-    )
-      return;
-
     if (isSensitiveIncluded) {
       setModalOpen(true);
       return;
@@ -172,14 +165,16 @@ function InfoPreview() {
         rightText="2 / 2"
         onBackClick={handleGoBack}
       />
+      {!isLoading && (
+<>
 
       {/* 메인 컨텐츠 */}
       <main className={styles.content}>
         <UserInfo
           isAgain={false}
           state="받는 사람"
-          userName={isTargetsPending ? "..." : userName}
-          part={isTargetsPending ? "..." : userPart}
+          userName={userName}
+          part={userPart}
         />
 
         <DueDateState
@@ -193,7 +188,6 @@ function InfoPreview() {
             공유 정보
           </span>
           {/* 기본 정보 / 건강 정보 / 생활 정보 / 미리 남기는 말 */}
-          {isInformationPending && <div role="status">로딩중</div>}
           {categories
             .filter(({ items }) => items.length > 0)
             .map(({ key, title, description, items }) => (
@@ -257,6 +251,8 @@ function InfoPreview() {
         confirmTxt="공유"
         onConfirmClick={handleGoSend}
       />
+</>
+      )}
       {toast && (
         <DefaultToast
           key={toast.id}

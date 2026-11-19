@@ -44,7 +44,7 @@ function AssigneeReconfirm() {
   // 1. 요청 상세 조회 API
   const {
     data: detail,
-    isPending,
+    isPending, // GET 요청 로딩중 상태
   } = useRequestDetailQuery(paramId, {
     showToast,
     select: getAssigneeReconfirmService,
@@ -75,13 +75,7 @@ function AssigneeReconfirm() {
         title="변경 내용 확인"
         onCloseClick={() => handleGoBack()}
       />
-
-      {isPending && (
-        <div className={styles.content}>
-          <p role="status">요청 정보를 불러오는 중이에요.</p>
-        </div>
-      )}
-      {detail && (
+      {!isPending && (
         <>
           {/* 메인 컨텐츠 */}
           <main className={styles.content}>

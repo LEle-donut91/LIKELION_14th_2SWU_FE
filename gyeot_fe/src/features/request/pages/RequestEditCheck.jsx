@@ -45,7 +45,6 @@ function RequestEditCheck() {
   const {
     data: informationOptions,
     isPending: isInformationPending,
-    error: informationError,
     refetch: refetchInformation,
   } = useInformationOptionsQuery(
     { helpType: requestForm.helpType, requestId: paramId },
@@ -56,7 +55,6 @@ function RequestEditCheck() {
   const {
     data: requestDetail,
     isPending: isDetailPending,
-    error: detailError,
   } = useRequestDetailQuery(paramId, { showToast });
 
   // 3. 요청 수정 API (변경된 필드만 PATCH - 바뀐 내용이 없으면 토스트만 표시)
@@ -78,15 +76,13 @@ function RequestEditCheck() {
     afterInfoList,
   } = getEditCheckService(requestDetail, requestForm, informationOptions);
 
+  // GET 요청 로딩중 상태
+  const isLoading =
+    isDetailPending ||
+    isInformationPending;
+
   // "재확인 요청" 버튼 핸들러
   const handleReconfirmBtnClick = () => {
-    if (
-      isDetailPending ||
-      isInformationPending ||
-      detailError ||
-      informationError
-    )
-      return;
     editRequest(requestForm);
   };
 
@@ -98,12 +94,10 @@ function RequestEditCheck() {
         onBackClick={handleGoBack}
       />
 
+      {!isLoading && (
+<>
       {/* 실제 컨텐츠가 들어갈 자리 */}
       <main className={styles.content}>
-        {isDetailPending || isInformationPending ? (
-          <div role="status">로딩중</div>
-        ) : (
-          <>
             {/* 변경 전 - 변경 후 카드 Container */}
             <div className={styles.cardContainer}>
               {/* 변경 전 Card */}
@@ -146,8 +140,6 @@ function RequestEditCheck() {
                 담당자 거절 시, 요청이 취소되고 접근 권한이 회수돼요.
               </span>
             )}
-          </>
-        )}
       </main>
 
       {/* 하단 Footer */}
@@ -156,6 +148,8 @@ function RequestEditCheck() {
         type="primary"
         onClick={handleReconfirmBtnClick}
       />
+</>
+      )}
       {toast && (
         <DefaultToast
           key={toast.id}

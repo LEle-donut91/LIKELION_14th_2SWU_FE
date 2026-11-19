@@ -126,6 +126,11 @@ function Request() {
     onSituationInvalid: () => setOpenSheet(REQUEST_SHEET.SITUATION),
   });
 
+  // GET 요청 로딩중 상태
+  const isLoading =
+    isSituationsPending ||
+    isTargetsPending;
+
   // 같은 진입(paramId)으로 돌아온 경우(예: 미리보기에서 뒤로가기) 입력값 유지
   // 다른 진입이면 새로 초기화 (초기값 전달)
   useEffect(() => {
@@ -202,7 +207,8 @@ function Request() {
         rightText="1 / 2"
         onBackClick={handleHeaderBackClick}
       />
-
+      {!isLoading && (
+<>
       {/* 메인 컨텐츠 */}
       <main className={styles.content}>
         {/* 상황 */}
@@ -221,15 +227,11 @@ function Request() {
           onConfirm={(v) => handleSituationConfirm(v)}
         >
           {(temp, setTemp) =>
-            isSituationsPending ? (
-              <div>Loading...</div>
-            ) : (
-              <SituationOption
-                data={situation}
-                selectedValue={temp}
-                onSelect={setTemp}
-              />
-            )
+            <SituationOption
+              data={situation}
+              selectedValue={temp}
+              onSelect={setTemp}
+            />
           }
         </DefaultSheet>
 
@@ -334,11 +336,7 @@ function Request() {
           }}
         >
           {(temp, setTemp) =>
-            isTargetsPending ? (
-              <div>Loading...</div>
-            ) : (
-              <UserOption data={user} selectedValue={temp} onSelect={setTemp} />
-            )
+            <UserOption data={user} selectedValue={temp} onSelect={setTemp} />
           }
         </DefaultSheet>
 
@@ -367,7 +365,8 @@ function Request() {
 
       {/* 하단 Footer(버튼) */}
       <LargeFooter title="다음" type="primary" onClick={handleFooterBtnClick} />
-
+</>
+      )}
       {/* 토스트 (key 가 바뀌면 새로 마운트되어 타이머가 다시 시작됨) */}
       {toast && (
         <DefaultToast

@@ -115,15 +115,11 @@ function AskAgain() {
     initialForm,
   } = detail ?? {};
 
-  // 로딩/에러 등의 상태
-  const isDetailReady = !detailQuery.isPending && !detailQuery.error;
+  // GET 요청 로딩중 상태
   const isLoading =
     targetsQuery.isPending ||
     informationQuery.isPending ||
     detailQuery.isPending;
-  const hasError = Boolean(
-    targetsQuery.error || informationQuery.error || detailQuery.error,
-  );
 
   // 요청 작성과 진입 ID가 겹치지 않도록 구분하고, 같은 요청의 입력값은 유지
   const formEntryId = `askAgain:${paramId}`;
@@ -136,7 +132,6 @@ function AskAgain() {
 
   // 항목 버튼 핸들러 (동작: 선택 시트 열기)
   const handleSubItemOpenSheet = (sheet) => {
-    if (entryId !== formEntryId || !isDetailReady) return;
     if (isPrerequisiteEnsured(form, showToast)) setOpenSheet(sheet);
   };
 
@@ -148,8 +143,6 @@ function AskAgain() {
 
   // 다음 버튼 핸들러
   const handleNextBtnClick = () => {
-    if (isLoading || hasError || entryId !== formEntryId) return;
-
     // 입력값 유효성 검사 (첫 번째 에러 문구 하나만 토스트로)
     const now = new Date();
     const errors = validateInput(form, now, ASK_AGAIN_VALIDATE_FIELDS_FLEXIBLE);
@@ -177,6 +170,9 @@ function AskAgain() {
         onBackClick={handleHeaderBackClick}
       />
 
+      {!isLoading && (
+<>
+      {/* 메인 컨텐츠 */}
       <div className={styles.content}>
         {/* 요청 요약 카드 */}
         <RequestSummary
@@ -225,15 +221,11 @@ function AskAgain() {
           }}
         >
           {(temp, setTemp) =>
-            targetsQuery.isFetching ? (
-              <div role="status">로딩중</div>
-            ) : (
               <UserOption
                 data={userList}
                 selectedValue={temp}
                 onSelect={setTemp}
               />
-            )
           }
         </DefaultSheet>
 
@@ -263,6 +255,9 @@ function AskAgain() {
 
       {/* 하단 푸터 */}
       <LargeFooter title="다음" type="primary" onClick={handleNextBtnClick} />
+</>
+      )}
+
 
       {/* 토스트 (key 가 바뀌면 새로 마운트되어 타이머가 다시 시작됨) */}
       {toast && (

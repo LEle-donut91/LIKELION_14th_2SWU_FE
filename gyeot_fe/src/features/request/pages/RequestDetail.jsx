@@ -168,12 +168,7 @@ function RequestDetail() {
         onBackClick={() => handleGoBack()}
         onRightTextClick={headerAction.onClick}
       />
-      {isPending && (
-        <div className={styles.content}>
-          <p role="status">요청 정보를 불러오는 중이에요.</p>
-        </div>
-      )}
-      {detail && (
+      {!isPending && (
         <>
           <div className={styles.content}>
             {!isTarget && (
