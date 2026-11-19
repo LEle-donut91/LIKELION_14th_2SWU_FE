@@ -1,4 +1,5 @@
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
+import { useRequestFormStore } from "@/features/request/stores/useRequestFormStore";
 import { useParams } from "react-router-dom";
 import styles from "./RequestDetail.module.css";
 import { useRequestNav } from "@/features/request/hooks/useRequestNav";
@@ -40,6 +41,7 @@ function RequestDetail() {
     data: detail,
     isPending,
     error,
+    refetch: refetchDetail,
   } = useRequestDetailQuery(paramId, {
     select: getRequestDetailService,
   });
@@ -59,6 +61,14 @@ function RequestDetail() {
 
   // API 에러 메시지 출력
   useErrorToast(showToast, error);
+
+  useEffect(() => {
+    const { reassignError, setReassignError } = useRequestFormStore.getState();
+    if (reassignError?.requestId !== paramId || !reassignError.returnToDetail) return;
+    setReassignError(null);
+    showToast(reassignError.message);
+    refetchDetail({ cancelRefetch: false });
+  }, [paramId, showToast, refetchDetail]);
 
   // API 응답 데이터 (정제된 형태)
   const {

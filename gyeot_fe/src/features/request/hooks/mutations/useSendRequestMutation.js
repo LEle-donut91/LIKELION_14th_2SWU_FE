@@ -30,11 +30,26 @@ export function useSendRequestMutation({
   onSuccess,
   onRefreshInformation,
 }) {
-  const { handleGoBack, handleGoNextWithState } = useRequestNav();
+  const { handleGoBack, handleGoBackTwice, handleGoNextWithState } = useRequestNav();
   const setCreationError = useRequestFormStore((state) => state.setCreationError);
+  const setReassignError = useRequestFormStore((state) => state.setReassignError);
 
   const returnFromCreation = (error, correction) => {
     setCreationError({ ...correction, message: getErrorMessage(error) });
+    handleGoBack();
+  };
+
+  const returnFromReassignment = (error, correction, returnToDetail = false) => {
+    setReassignError({
+      ...correction,
+      requestId: String(reassignRequestId),
+      message: getErrorMessage(error),
+      returnToDetail,
+    });
+    if (returnToDetail) {
+      handleGoBackTwice();
+      return;
+    }
     handleGoBack();
   };
 
@@ -46,7 +61,35 @@ export function useSendRequestMutation({
     onSuccess: (data) => onSuccess(postCareRequestResultService(data)),
     onError: (error) => {
       showToast(getErrorMessage(error));
-      if (reassignRequestId) return;
+      if (reassignRequestId) {
+        switch (getErrorCode(error)) {
+          case REQUEST_ERROR_CODE.REQUEST_NOT_FOUND:
+            handleGoNextWithState(REQUEST_ROUTES.home, { requestErrorMessage: getErrorMessage(error) }, true);
+            break;
+          case REQUEST_ERROR_CODE.REQUEST_NOT_REASSIGNABLE:
+            returnFromReassignment(error, {}, true);
+            break;
+          case REQUEST_ERROR_CODE.REQUEST_ALREADY_STARTED:
+            returnFromReassignment(error, {}, true);
+            break;
+          case REQUEST_ERROR_CODE.REQUEST_ALREADY_ENDED:
+            returnFromReassignment(error, {}, true);
+            break;
+          case REQUEST_ERROR_CODE.REQUEST_TARGET_INVALID:
+            returnFromReassignment(error, { sheet: REQUEST_SHEET.USER, refreshTargets: true });
+            break;
+          case REQUEST_ERROR_CODE.REQUEST_TARGET_ALREADY_ASSIGNED:
+            returnFromReassignment(error, { sheet: REQUEST_SHEET.USER, refreshTargets: true });
+            break;
+          case REQUEST_ERROR_CODE.REQUEST_DEADLINE_INVALID:
+            returnFromReassignment(error, { sheet: REQUEST_SHEET.DUE_DATE });
+            break;
+          case INFO_SHARE_ERROR_CODE.SAFETY_INFO_INVALID_SELECTION:
+            onRefreshInformation();
+            break;
+        }
+        return;
+      }
 
       switch (getErrorCode(error)) {
         case REQUEST_ERROR_CODE.REQUEST_SITUATION_INVALID:

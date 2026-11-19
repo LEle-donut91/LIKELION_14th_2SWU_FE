@@ -7,6 +7,8 @@ export const useRequestFormStore = create((set) => ({
   form: INITIAL_FORM, // 사용자 입력값과 공개할 항목 ID 목록
   creationError: null,
   setCreationError: (creationError) => set({ creationError }),
+  reassignError: null,
+  setReassignError: (reassignError) => set({ reassignError }),
 
   // 진입 시 초기화
   initForm: (entryId, initialValues = {}) =>
@@ -49,5 +51,5 @@ export const useRequestFormStore = create((set) => ({
 
   // 요청 완료 / 작성 취소 시 비우기
   resetForm: () =>
-    set({ entryId: null, form: INITIAL_FORM, creationError: null }),
+    set({ entryId: null, form: INITIAL_FORM, creationError: null, reassignError: null }),
 }));

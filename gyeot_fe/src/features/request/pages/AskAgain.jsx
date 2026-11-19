@@ -66,11 +66,26 @@ function AskAgain() {
   const { toast, showToast, hideToast } = useToast();
 
   // 열려 있는 시트 (한 번에 하나만 열림)
-  const [openSheet, setOpenSheet] = useState(null);
+  const [openSheet, setOpenSheet] = useState(() => {
+    const { reassignError } = useRequestFormStore.getState();
+    return reassignError?.requestId === paramId ? reassignError.sheet ?? null : null;
+  });
   const closeSheet = () => setOpenSheet(null);
 
   // 1. 대상 후보 조회 API
   const targetsQuery = useRequestTargetsQuery({ requestId: paramId });
+  const refetchTargets = targetsQuery.refetch;
+
+  useEffect(() => {
+    const { reassignError, setReassignError, changeUser } = useRequestFormStore.getState();
+    if (reassignError?.requestId !== paramId || reassignError.returnToDetail) return;
+    setReassignError(null);
+    showToast(reassignError.message);
+    if (reassignError.refreshTargets) {
+      changeUser({ id: null });
+      refetchTargets({ cancelRefetch: false });
+    }
+  }, [paramId, showToast, refetchTargets]);
 
   // 2. 공개 정보 선택지 조회 API
   const informationQuery = useInformationOptionsQuery(
@@ -212,13 +227,17 @@ function AskAgain() {
             changeUser({ ...selectedUser, id: v });
           }}
         >
-          {(temp, setTemp) => (
-            <UserOption
-              data={userList}
-              selectedValue={temp}
-              onSelect={setTemp}
-            />
-          )}
+          {(temp, setTemp) =>
+            targetsQuery.isFetching ? (
+              <div role="status">로딩중</div>
+            ) : (
+              <UserOption
+                data={userList}
+                selectedValue={temp}
+                onSelect={setTemp}
+              />
+            )
+          }
         </DefaultSheet>
 
         {/* 응답 기한 */}
