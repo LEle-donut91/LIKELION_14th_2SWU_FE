@@ -10,7 +10,7 @@ import styles from "@/features/request/pages/Request.module.css";
 
 // 일반 라이브러리
 import { useEffect, useRef, useState } from "react";
-import { useLocation, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 // Custom Hooks
 import { useRequestNav } from "@/features/request/hooks/useRequestNav";
@@ -72,6 +72,7 @@ function Request() {
 
   // 열려 있는 시트 (한 번에 하나만 열림)
   const [openSheet, setOpenSheet] = useState(() => {
+    // 다른 페이지에서 전달 받은 에러 처리
     const { error } = useRequestErrorStore.getState();
     return error?.targetPage === REQUEST_ERROR_TARGET_PAGE.REQUEST ? error.sheet ?? null : null;
   });
@@ -79,11 +80,18 @@ function Request() {
   const contentInputRef = useRef(null);
   const closeSheet = () => setOpenSheet(null);
 
-  // 이전 페이지에서 전달받은 state 데이터 가져오기 (요청 대상 ID, 응답 기한)
-  const location = useLocation();
-  const state = location.state || {};
-  const passedUserId = state[REQUEST_FORM_FIELD_KEY.USER_ID];
-  const passedDueDate = state[REQUEST_FORM_FIELD_KEY.DUE_DATE];
+  // 다른 페이지에서 전달 받은 에러 처리
+  useEffect(() => {
+    const { error, setError } = useRequestErrorStore.getState();
+    if (error?.targetPage !== REQUEST_ERROR_TARGET_PAGE.REQUEST) return;
+    setError(null);
+    if (error.field === REQUEST_FORM_FIELD_KEY.LOCATION) {
+      locationInputRef.current?.querySelector("input")?.focus();
+    }
+    if (error.field === REQUEST_FORM_FIELD_KEY.CONTENT) {
+      contentInputRef.current?.querySelector("textarea")?.focus();
+    }
+  }, []);
 
   // Zustand Store
   // 입력값 전체는 Zustand store의 form 하나
@@ -118,19 +126,6 @@ function Request() {
     onSituationInvalid: () => setOpenSheet(REQUEST_SHEET.SITUATION),
   });
 
-  // 다른 페이지에서 전달 받은 에러 처리
-  useEffect(() => {
-    const { error, setError } = useRequestErrorStore.getState();
-    if (error?.targetPage !== REQUEST_ERROR_TARGET_PAGE.REQUEST) return;
-    setError(null);
-    if (error.field === REQUEST_FORM_FIELD_KEY.LOCATION) {
-      locationInputRef.current?.querySelector("input")?.focus();
-    }
-    if (error.field === REQUEST_FORM_FIELD_KEY.CONTENT) {
-      contentInputRef.current?.querySelector("textarea")?.focus();
-    }
-  }, []);
-
   // 같은 진입(paramId)으로 돌아온 경우(예: 미리보기에서 뒤로가기) 입력값 유지
   // 다른 진입이면 새로 초기화 (초기값 전달)
   useEffect(() => {
@@ -143,11 +138,9 @@ function Request() {
         situationId: paramId,
         situationStartDate: selectedSituation?.startDate ?? null,
         situationEndDate: selectedSituation?.endDate ?? null,
-        ...(passedUserId && { userId: passedUserId }),
-        ...(passedDueDate && { dueDate: passedDueDate }),
       });
     }
-  }, [entryId, paramId, initForm, passedUserId, passedDueDate, situation]);
+  }, [entryId, paramId, initForm, situation]);
 
   useEffect(() => {
     const selectedSituation = getSelectedSituation(situation, form.situationId);

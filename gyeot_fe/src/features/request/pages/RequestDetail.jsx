@@ -1,5 +1,6 @@
 import { Fragment, useEffect, useState } from "react";
 import { useRequestErrorStore } from "@/features/request/stores/useRequestErrorStore";
+import { useRequestFormStore } from "@/features/request/stores/useRequestFormStore";
 import { useParams } from "react-router-dom";
 import styles from "./RequestDetail.module.css";
 import { useRequestNav } from "@/features/request/hooks/useRequestNav";
@@ -10,7 +11,6 @@ import { getRequestDetailService } from "@/features/request/services/requestDeta
 import { REQUEST_ROUTES } from "@/features/request/constants/routerConstants";
 import { REQUEST_ERROR_TARGET_PAGE } from "@/features/request/constants/requestErrorConstants";
 import { RESPONSE_STATUS } from "@/features/request/constants/enumConstants";
-import { REQUEST_FORM_FIELD_KEY } from "@/features/request/constants/requestFormConstants";
 import { REQUESTER_CANCEL_BTN_TITLE } from "@/features/request/constants/requesterViewConstants";
 
 import SubpageHeader from "@/shared/components/subpage-header/SubpageHeader";
@@ -35,6 +35,7 @@ function RequestDetail() {
   const [isSameModalOpen, setSameModalOpen] = useState(false);
   const [isWithdrawModalOpen, setWithdrawModalOpen] = useState(false);
   const { toast, showToast, hideToast } = useToast();
+  const initForm = useRequestFormStore((state) => state.initForm);
 
   // 1. 요청 상세 조회 API (응답의 viewerRole로 화면이 결정됨)
   const {
@@ -59,6 +60,7 @@ function RequestDetail() {
     onAcceptanceWithdrawn: () => handleGoNext(REQUEST_ROUTES.home, true),
   });
 
+  // 다른 페이지에서 전달 받은 에러 처리
   useEffect(() => {
     const { error, setError } = useRequestErrorStore.getState();
     if (error?.targetPage !== REQUEST_ERROR_TARGET_PAGE.REQUEST_DETAIL || error.requestId !== paramId) return;
@@ -144,10 +146,12 @@ function RequestDetail() {
   // "같은 내용 요청" 버튼 핸들러
   const handleSameConfirm = () => {
     setSameModalOpen(false);
-    handleGoNextWithState(REQUEST_ROUTES.request(situationId), {
-      [REQUEST_FORM_FIELD_KEY.USER_ID]: userId,
-      [REQUEST_FORM_FIELD_KEY.DUE_DATE]: initialDueDate,
+    initForm(situationId, {
+      situationId,
+      userId,
+      dueDate: initialDueDate,
     });
+    handleGoNext(REQUEST_ROUTES.request(situationId));
   };
 
   // [수락 철회] 모달의 confirm 버튼 핸들러
