@@ -56,7 +56,19 @@ export function useRequestDetailMutations(
   const withdrawProposalMutation = useMutation({
     mutationFn: postEditWithdrawApi,
     onSuccess: refreshDetail,
-    onError,
+    onError: (error) => {
+      onError(error);
+
+      switch (getErrorCode(error)) {
+        case REQUEST_ERROR_CODE.REQUEST_NOT_FOUND:
+          handleGoBack();
+          break;
+        case REQUEST_ERROR_CODE.REQUEST_PROPOSAL_NOT_FOUND:
+          return refreshDetail();
+        case REQUEST_ERROR_CODE.REQUEST_PROPOSAL_NOT_PENDING:
+          return refreshDetail();
+      }
+    },
   });
   const startMutation = useMutation({
     mutationFn: postStartApi,

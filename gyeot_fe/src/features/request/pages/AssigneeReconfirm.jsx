@@ -51,6 +51,10 @@ function AssigneeReconfirm() {
     select: getAssigneeReconfirmService,
   });
 
+  // API 응답 데이터 (정제된 형태)
+  const { proposalId, userName, requestType, beforeInfoList, afterInfoList } =
+    detail ?? {};
+
   // 2. 재확인 수락 / 재확인 거절 API
   const { acceptReconfirmation, rejectReconfirmation } = useReconfirmMutations({
     requestId: paramId,
@@ -65,10 +69,6 @@ function AssigneeReconfirm() {
 
   // API 에러 메시지 출력
   useErrorToast(showToast, error);
-
-  // API 응답 데이터 (정제된 형태)
-  const { proposalId, userName, requestType, beforeInfoList, afterInfoList } =
-    detail ?? {};
 
   return (
     <div className={styles.page}>
