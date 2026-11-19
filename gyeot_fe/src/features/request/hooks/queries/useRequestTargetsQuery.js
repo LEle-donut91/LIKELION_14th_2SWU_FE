@@ -74,7 +74,6 @@ export const useRequestTargetsQuery = (
               ? REQUEST_ERROR_TARGET_PAGE.ASK_AGAIN // 다시 부탁하기 화면에 에러 전달
               : REQUEST_ERROR_TARGET_PAGE.REQUEST, // 요청 작성 화면에 에러 전달
             requestId,
-            message: getErrorMessage(query.error),
             ...(!requestId && { sheet: REQUEST_SHEET.SITUATION }), // 새 요청 작성 흐름인 경우 상황 선택 시트가 뜨도록
           });
           handleGoBack();
@@ -85,7 +84,6 @@ export const useRequestTargetsQuery = (
       case REQUEST_ERROR_CODE.REQUEST_SITUATION_ENDED:
         setError({
           targetPage: REQUEST_ERROR_TARGET_PAGE.HOME,
-          message: getErrorMessage(query.error),
         });
         handleGoNext(REQUEST_ROUTES.home, true);
         break;

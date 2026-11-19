@@ -25,12 +25,11 @@ export function useEditRequestMutation({
   const { handleGoBack, handleGoBackTwice } = useRequestNav();
   const setError = useRequestErrorStore((state) => state.setError);
 
-  const returnToStartTimeSheet = (error) => {
+  const returnToStartTimeSheet = () => {
     setError({
       targetPage: REQUEST_ERROR_TARGET_PAGE.EDIT_FORM,
       requestId: String(requestId),
       sheet: REQUEST_SHEET.START,
-      message: getErrorMessage(error),
     });
     handleGoBack();
   };

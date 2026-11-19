@@ -35,7 +35,7 @@ export function useSendRequestMutation({
   const setError = useRequestErrorStore((state) => state.setError);
 
   const returnFromCreation = (error, correction) => {
-    setError({ ...correction, targetPage: REQUEST_ERROR_TARGET_PAGE.REQUEST, message: getErrorMessage(error) });
+    setError({ ...correction, targetPage: REQUEST_ERROR_TARGET_PAGE.REQUEST });
     handleGoBack();
   };
 
@@ -44,7 +44,6 @@ export function useSendRequestMutation({
       ...correction,
       targetPage,
       requestId: String(reassignRequestId),
-      message: getErrorMessage(error),
     });
     if (targetPage === REQUEST_ERROR_TARGET_PAGE.REQUEST_DETAIL) {
       handleGoBackTwice();
@@ -67,7 +66,6 @@ export function useSendRequestMutation({
             handleGoBack();
             break;
           case REQUEST_ERROR_CODE.REQUEST_NOT_FOUND:
-            setError({ targetPage: REQUEST_ERROR_TARGET_PAGE.HOME, message: getErrorMessage(error) });
             handleGoNext(REQUEST_ROUTES.home, true);
             break;
           case REQUEST_ERROR_CODE.REQUEST_NOT_REASSIGNABLE:
@@ -100,7 +98,7 @@ export function useSendRequestMutation({
           returnFromCreation(error, { sheet: REQUEST_SHEET.SITUATION });
           break;
         case REQUEST_ERROR_CODE.REQUEST_SITUATION_ENDED:
-          setError({ targetPage: REQUEST_ERROR_TARGET_PAGE.HOME, message: getErrorMessage(error) });
+          setError({ targetPage: REQUEST_ERROR_TARGET_PAGE.HOME });
           handleGoNext(REQUEST_ROUTES.home, true);
           break;
         case REQUEST_ERROR_CODE.REQUEST_TARGET_INVALID:
