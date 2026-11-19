@@ -8,7 +8,9 @@ import {
 } from "@/features/request/api/postApi";
 import { REQUEST_QUERY_KEYS } from "@/features/request/constants/requestQueryKeys";
 import { useCancelRequestMutation } from "@/features/request/hooks/mutations/useCancelRequestMutation";
-import { getErrorMessage } from "@/shared/utils/apiError";
+import { useRequestNav } from "@/features/request/hooks/useRequestNav";
+import { REQUEST_ERROR_CODE } from "@/shared/constants/errorCodeConstants";
+import { getErrorCode, getErrorMessage } from "@/shared/utils/apiError";
 
 /**
  * [H-03-01] 요청 상세 - 역할별 액션(취소/수락 철회/수정안 철회/시작/완료/응답) 모음
@@ -22,6 +24,7 @@ export function useRequestDetailMutations(
   { showToast, onAcceptanceWithdrawn },
 ) {
   const queryClient = useQueryClient();
+  const { handleGoBack } = useRequestNav();
   const refreshDetail = () =>
     queryClient.invalidateQueries({
       queryKey: REQUEST_QUERY_KEYS.detail(requestId),
@@ -36,7 +39,19 @@ export function useRequestDetailMutations(
   const withdrawAcceptanceMutation = useMutation({
     mutationFn: postAcceptWithdrawApi,
     onSuccess: onAcceptanceWithdrawn,
-    onError,
+    onError: (error) => {
+      onError(error);
+
+      switch (getErrorCode(error)) {
+        case REQUEST_ERROR_CODE.REQUEST_NOT_FOUND:
+          handleGoBack();
+          break;
+        case REQUEST_ERROR_CODE.REQUEST_NOT_WITHDRAWABLE:
+          return refreshDetail();
+        case REQUEST_ERROR_CODE.REQUEST_ALREADY_ENDED:
+          return refreshDetail();
+      }
+    },
   });
   const withdrawProposalMutation = useMutation({
     mutationFn: postEditWithdrawApi,
@@ -46,17 +61,59 @@ export function useRequestDetailMutations(
   const startMutation = useMutation({
     mutationFn: postStartApi,
     onSuccess: refreshDetail,
-    onError,
+    onError: (error) => {
+      onError(error);
+
+      switch (getErrorCode(error)) {
+        case REQUEST_ERROR_CODE.REQUEST_NOT_FOUND:
+          handleGoBack();
+          break;
+        case REQUEST_ERROR_CODE.REQUEST_ALREADY_STARTED:
+          return refreshDetail();
+        case REQUEST_ERROR_CODE.REQUEST_ALREADY_ENDED:
+          return refreshDetail();
+      }
+    },
   });
   const doneMutation = useMutation({
     mutationFn: postDoneApi,
     onSuccess: refreshDetail,
-    onError,
+    onError: (error) => {
+      onError(error);
+
+      switch (getErrorCode(error)) {
+        case REQUEST_ERROR_CODE.REQUEST_NOT_FOUND:
+          handleGoBack();
+          break;
+        case REQUEST_ERROR_CODE.REQUEST_NOT_STARTED:
+          return refreshDetail();
+        case REQUEST_ERROR_CODE.REQUEST_ALREADY_ENDED:
+          return refreshDetail();
+      }
+    },
   });
   const respondMutation = useMutation({
     mutationFn: postResponseApi,
     onSuccess: refreshDetail,
-    onError,
+    onError: (error) => {
+      onError(error);
+
+      switch (getErrorCode(error)) {
+        case REQUEST_ERROR_CODE.REQUEST_NOT_FOUND:
+          handleGoBack();
+          break;
+        case REQUEST_ERROR_CODE.REQUEST_ASSIGNMENT_CLOSED:
+          return refreshDetail();
+        case REQUEST_ERROR_CODE.REQUEST_ALREADY_ACCEPTED:
+          return refreshDetail();
+        case REQUEST_ERROR_CODE.REQUEST_RESPONSE_NOT_CHANGEABLE:
+          return refreshDetail();
+        case REQUEST_ERROR_CODE.REQUEST_ALREADY_ENDED:
+          return refreshDetail();
+        case REQUEST_ERROR_CODE.REQUEST_ALREADY_STARTED:
+          return refreshDetail();
+      }
+    },
   });
 
   return {
