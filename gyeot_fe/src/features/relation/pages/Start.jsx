@@ -8,7 +8,8 @@ import LoginForm from "@/features/relation/components/LoginForm";
 import DefaultToast from "@/shared/components/Toast/DefaultToast"; // 팀 공통 토스트
 import { useToast } from "@/shared/hooks/useToast";
 import { useLoginMutation, useSignupMutation } from "@/features/relation/hooks/mutations/useAuthMutations";
-import { MOCK_RECEIVED_INVITE } from "@/features/relation/constants/relation";
+import { useInvitationQuery } from "@/features/relation/hooks/queries/useInvitationQuery";
+import { INVITATION_TYPE } from "@/features/relation/services/invitationService";
 import resImgLogo from "@/shared/assets/images/resImgLogo.png";
 import styles from "./Start.module.css";
 
@@ -18,9 +19,19 @@ function Start() {
   const [step, setStep] = useState("start"); // "start" 시작 화면 / "signup" 회원가입 / "login" 로그인
   const { toast, showToast, hideToast } = useToast(); // 실패·안내 토스트
 
-  // 초대 링크로 들어왔는지 (예: /?invite=1) — TODO: 초대 ID로 초대 정보 API 조회
-  const isFromInvite = searchParams.has("invite");
-  const inviterName = MOCK_RECEIVED_INVITE.inviterName; // TODO: API 연결 후 교체
+  // 초대 링크로 들어왔는지 (예: /?invite=토큰) — 로그인 안 한 상태로 초대 링크를 열면 여기로 옴
+  const inviteToken = searchParams.get("invite");
+  const { data: invitation } = useInvitationQuery(inviteToken); // 초대 보낸 사람 이름 등
+  const isFromInvite = Boolean(invitation); // 초대 정보를 불러왔을 때만 초대 화면으로
+  const inviterName = invitation?.inviterName ?? "";
+
+  // 로그인 후 이동할 곳: 초대 유형에 맞는 받은 초대 화면(R-03 / N-03), 아니면 홈
+  const getNextPath = () => {
+    if (!isFromInvite) return "/home";
+    const invitePage =
+      invitation.type === INVITATION_TYPE.GUARDIAN ? "/relation/received-guardian" : "/relation/received-invite";
+    return `${invitePage}?token=${inviteToken}`;
+  };
 
   // 회원가입 (POST /api/auth/signup)
   // - 가입 후 자동 로그인을 하지 않으므로(명세) 로그인 화면으로 넘김
@@ -33,10 +44,10 @@ function Start() {
   });
 
   // 로그인 (POST /api/auth/login)
-  // - 초대 링크로 왔으면 받은 초대 확인(R-03)으로, 아니면 홈으로
+  // - 초대 링크로 왔으면 받은 초대 확인(R-03 / N-03)으로, 아니면 홈으로
   const { login, isLoggingIn } = useLoginMutation({
     showToast,
-    onSuccess: () => navigate(isFromInvite ? "/relation/received-invite" : "/home"),
+    onSuccess: () => navigate(getNextPath()),
   });
 
   // 토스트 (모든 화면 공통)
