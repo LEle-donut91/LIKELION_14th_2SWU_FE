@@ -33,7 +33,7 @@ export function useSendRequestMutation({
   const { handleGoBack, handleGoNextWithState } = useRequestNav();
   const setCreationError = useRequestFormStore((state) => state.setCreationError);
 
-  const returnToForm = (error, correction) => {
+  const returnFromCreation = (error, correction) => {
     setCreationError({ ...correction, message: getErrorMessage(error) });
     handleGoBack();
   };
@@ -50,31 +50,31 @@ export function useSendRequestMutation({
 
       switch (getErrorCode(error)) {
         case REQUEST_ERROR_CODE.REQUEST_SITUATION_INVALID:
-          returnToForm(error, { sheet: REQUEST_SHEET.SITUATION });
+          returnFromCreation(error, { sheet: REQUEST_SHEET.SITUATION });
           break;
         case REQUEST_ERROR_CODE.REQUEST_SITUATION_ENDED:
           handleGoNextWithState(REQUEST_ROUTES.home, { requestErrorMessage: getErrorMessage(error) }, true);
           break;
         case REQUEST_ERROR_CODE.REQUEST_TARGET_INVALID:
-          returnToForm(error, { sheet: REQUEST_SHEET.USER });
+          returnFromCreation(error, { sheet: REQUEST_SHEET.USER });
           break;
         case REQUEST_ERROR_CODE.REQUEST_START_TOO_SOON:
-          returnToForm(error, { sheet: REQUEST_SHEET.START });
+          returnFromCreation(error, { sheet: REQUEST_SHEET.START });
           break;
         case REQUEST_ERROR_CODE.REQUEST_SCHEDULE_INVALID:
-          returnToForm(error, { sheet: REQUEST_SHEET.START });
+          returnFromCreation(error, { sheet: REQUEST_SHEET.START });
           break;
         case REQUEST_ERROR_CODE.REQUEST_DEADLINE_INVALID:
-          returnToForm(error, { sheet: REQUEST_SHEET.DUE_DATE });
+          returnFromCreation(error, { sheet: REQUEST_SHEET.DUE_DATE });
           break;
         case INFO_SHARE_ERROR_CODE.SAFETY_INFO_INVALID_SELECTION:
           onRefreshInformation();
           break;
         case REQUEST_ERROR_CODE.REQUEST_PLACE_TOO_LONG:
-          returnToForm(error, { field: REQUEST_FORM_FIELD_KEY.LOCATION });
+          returnFromCreation(error, { field: REQUEST_FORM_FIELD_KEY.LOCATION });
           break;
         case REQUEST_ERROR_CODE.REQUEST_DESCRIPTION_TOO_LONG:
-          returnToForm(error, { field: REQUEST_FORM_FIELD_KEY.CONTENT });
+          returnFromCreation(error, { field: REQUEST_FORM_FIELD_KEY.CONTENT });
           break;
       }
     },
