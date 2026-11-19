@@ -10,6 +10,8 @@ export const AUTH_API_URLS = {
   refresh: "/api/auth/refresh", // Access Token 재발급 (POST)
   logout: "/api/auth/logout", // 로그아웃 (POST)
   csrf: "/api/auth/csrf", // CSRF 토큰 조회 (GET)
+  relationships: "/api/relationships", // 활성 관계 조회 (GET)
+  relationship: (relationshipId) => `/api/relationships/${relationshipId}`, // 관계 해제 (DELETE)
   emergencyContacts: "/api/emergency-contacts", // 비상연락망 조회 (GET)
   emergencyContactsOrder: "/api/emergency-contacts/order", // 연락 순서 변경 (PATCH)
 }
