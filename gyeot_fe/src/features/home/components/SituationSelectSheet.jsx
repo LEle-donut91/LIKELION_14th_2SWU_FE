@@ -3,8 +3,8 @@ import styles from "@/features/home/components/SituationSelectSheet.module.css";
 import MaskIcon from "@/shared/components/MaskIcon/MaskIcon";
 import ActionButton from "@/features/home/components/ActionButton";
 import DotSeparatedText from "@/shared/components/DotSeparatedText/DotSeparatedText";
-import iconRadioOn from "@/shared/assets/icons/IconRadioOn.svg";
-import iconRadioOff from "@/shared/assets/icons/IconRadioOff.svg";
+import iconRadioOn from "@/shared/assets/icons/iconRadioOn.svg";
+import iconRadioOff from "@/shared/assets/icons/iconRadioOff.svg";
 import { formatDateRange } from "@/shared/utils/dateFormat";
 
 // 도움 요청 시 상황 선택 바텀시트 (진행 중 상황이 2개 이상일 때)

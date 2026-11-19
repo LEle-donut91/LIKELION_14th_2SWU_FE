@@ -1,7 +1,7 @@
 import styles from "@/features/situation/components/PastSituationItem.module.css";
 import MaskIcon from "@/shared/components/MaskIcon/MaskIcon";
 import DotSeparatedText from "@/shared/components/DotSeparatedText/DotSeparatedText";
-import iconSituation from "@/shared/assets/icons/IconSituation.svg";
+import iconSituation from "@/shared/assets/icons/iconSituation.svg";
 import { formatMonthDayRange } from "@/features/situation/utils/situationFormat";
 
 // 지난 상황 목록의 한 줄 (아이콘 · 제목 · 기간 · 요청 수 · 종료 태그)
