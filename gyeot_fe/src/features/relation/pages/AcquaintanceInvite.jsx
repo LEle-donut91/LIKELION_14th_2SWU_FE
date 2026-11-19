@@ -4,6 +4,13 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import SubpageHeader from "@/shared/components/subpage-header/SubpageHeader"; // 팀 공통 서브 헤더
 import ConfirmModal from "@/features/relation/components/ConfirmModal";
+import DefaultToast from "@/shared/components/Toast/DefaultToast"; // 팀 공통 토스트
+import { useToast } from "@/shared/hooks/useToast";
+import { INVITATION_TYPE } from "@/features/relation/services/invitationService";
+import {
+  useCancelInvitationMutation,
+  useCreateInvitationMutation,
+} from "@/features/relation/hooks/mutations/useInvitationMutations";
 import {
   RELATION_TYPE_CHIPS,
   DEFAULT_INVITE_MESSAGE,
@@ -14,16 +21,32 @@ import styles from "./AcquaintanceInvite.module.css";
 function AcquaintanceInvite() {
   const navigate = useNavigate();
 
-  const [message, setMessage] = useState(DEFAULT_INVITE_MESSAGE); // 기본 멘트
-  const [relationType, setRelationType] = useState(""); // 관계 형태 (나만 보는 라벨)
-  const [inviteLink, setInviteLink] = useState(""); // 만들어진 초대 링크 (있으면 링크 화면으로 전환)
+  // ※ 명세상 나의 사람 초대 문구는 고정이고 관계 형태는 초대 때 저장하지 않음 (BE 답변)
+  //   → 두 입력 칸은 디자인 수정 전까지 화면에만 남겨두고 서버로 보내지 않음
+  const [message, setMessage] = useState(DEFAULT_INVITE_MESSAGE); // 기본 멘트 (공유 문구에만 사용)
+  const [relationType, setRelationType] = useState(""); // 관계 형태 (서버로 보내지 않음)
+  const [invitation, setInvitation] = useState(null); // 만들어진 초대 { invitationId, invitationUrl } (있으면 링크 화면)
   const [isCancelOpen, setCancelOpen] = useState(false); // 초대 취소 모달 열림 여부
+  const { toast, showToast, hideToast } = useToast(); // 실패 안내 토스트
 
+  const inviteLink = invitation?.invitationUrl ?? ""; // 공유할 초대 링크
   const shareText = `${message}\n${inviteLink}`; // 공유할 문구 (멘트 + 링크)
 
-  // 초대 링크 만들기 (TODO: API 연결 후 서버에서 받은 링크로 교체)
+  // 초대 링크 생성 (POST /api/invitations, invitationType: MY_PERSON)
+  const { createInvitation, isCreating } = useCreateInvitationMutation({
+    showToast,
+    onSuccess: (data) => setInvitation(data), // { invitationId, invitationUrl, expiresAt }
+  });
+
+  // 발신 초대 취소 (DELETE /api/invitations/{invitationId}) → 관계 화면으로
+  const { cancelInvitation, isCanceling } = useCancelInvitationMutation({
+    showToast,
+    onSuccess: () => navigate("/relation", { replace: true }),
+  });
+
+  // 초대 링크 만들기
   const handleCreateLink = () => {
-    setInviteLink(`https://gyeot.app/i/${Math.random().toString(36).slice(2, 10)}`);
+    createInvitation({ invitationType: INVITATION_TYPE.MY_PERSON });
   };
 
   // 문자로 보내기
@@ -66,10 +89,10 @@ function AcquaintanceInvite() {
     { label: "기타", onClick: handleMore },
   ];
 
-  // 초대 취소 확정 (TODO: 초대 취소 API 연결)
+  // 초대 취소 확정
   const handleCancelConfirm = () => {
     setCancelOpen(false);
-    navigate("/relation"); // 관계 화면으로 돌아가기
+    cancelInvitation(invitation.invitationId);
   };
 
   return (
@@ -130,7 +153,7 @@ function AcquaintanceInvite() {
             type="button"
             className={styles.primaryBtn}
             onClick={handleCreateLink}
-            disabled={!message.trim()}
+            disabled={!message.trim() || isCreating} // 요청 중 중복 클릭 방지
           >
             초대 링크 만들기
           </button>
@@ -162,7 +185,12 @@ function AcquaintanceInvite() {
           <hr className={styles.divider} />
 
           {/* 초대 취소 */}
-          <button type="button" className={styles.cancelBtn} onClick={() => setCancelOpen(true)}>
+          <button
+            type="button"
+            className={styles.cancelBtn}
+            onClick={() => setCancelOpen(true)}
+            disabled={isCanceling}
+          >
             초대 취소
           </button>
           <p className={styles.caption}>수락 전에만 취소 가능</p>
@@ -179,6 +207,8 @@ function AcquaintanceInvite() {
         onCancel={() => setCancelOpen(false)}
         onConfirm={handleCancelConfirm}
       />
+
+      {toast && <DefaultToast key={toast.id} message={toast.message} onHide={hideToast} />}
     </div>
   );
 }
