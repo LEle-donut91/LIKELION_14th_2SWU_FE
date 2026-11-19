@@ -11,7 +11,14 @@ export const AUTH_API_URLS = {
   logout: "/api/auth/logout", // 로그아웃 (POST)
   csrf: "/api/auth/csrf", // CSRF 토큰 조회 (GET)
   relationships: "/api/relationships", // 활성 관계 조회 (GET)
-  relationship: (relationshipId) => `/api/relationships/${relationshipId}`, // 관계 해제 (DELETE)
+  relationship: (relationshipId) => `/api/relationships/${relationshipId}`, // 관계 해제 (DELETE)\
+    invitations: "/api/invitations", // 초대 링크 생성 (POST) — 나의 사람·보호자 공통
+  invitation: (token) => `/api/invitations/${token}`, // 초대 링크 정보 조회 (GET)
+  invitationAccept: (token) => `/api/invitations/${token}/accept`, // 초대 수락 (POST)
+  invitationReject: (token) => `/api/invitations/${token}/reject`, // 초대 거절 (POST)
+  invitationReciprocal: (token) => `/api/invitations/${token}/reciprocal`, // 반대 방향 나의 사람 추가 (POST)
+  invitationEligibility: (token) => `/api/invitations/${token}/eligibility`, // 보호자 요청 수락 가능 여부 (POST)
+  invitationCancel: (invitationId) => `/api/invitations/${invitationId}`, // 발신 초대 취소 (DELETE)
   emergencyContacts: "/api/emergency-contacts", // 비상연락망 조회 (GET)
   emergencyContactsOrder: "/api/emergency-contacts/order", // 연락 순서 변경 (PATCH)
 }

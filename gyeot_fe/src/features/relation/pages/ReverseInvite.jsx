@@ -2,7 +2,9 @@
 
 import { useLocation, useNavigate } from "react-router-dom";
 import SubpageHeader from "@/shared/components/subpage-header/SubpageHeader"; // 팀 공통 서브 헤더
-import { MOCK_RECEIVED_INVITE } from "@/features/relation/constants/relation";
+import DefaultToast from "@/shared/components/Toast/DefaultToast"; // 팀 공통 토스트
+import { useToast } from "@/shared/hooks/useToast";
+import { useReciprocalMutation } from "@/features/relation/hooks/mutations/useInvitationMutations";
 import iconCheckCircle from "@/shared/assets/icons/iconCheckCircle.svg";
 import styles from "./ReverseInvite.module.css";
 
@@ -19,12 +21,18 @@ function PersonPlusIcon() {
 
 function ReverseInvite() {
   const navigate = useNavigate();
-  const { state } = useLocation(); // R-03에서 넘겨준 { inviterName }
-  const inviterName = state?.inviterName ?? MOCK_RECEIVED_INVITE.inviterName; // 주소로 바로 들어오면 임시 이름
+  const { state } = useLocation(); // R-03에서 넘겨준 { inviterName, token }
+  const inviterName = state?.inviterName ?? "";
+  const { toast, showToast, hideToast } = useToast(); // 실패 안내 토스트
 
-  // 나의 사람으로 추가 (TODO: POST /api/invitations/{token}/reciprocal 연결)
+  // 나의 사람으로 추가 (POST /api/invitations/{token}/reciprocal) → 관계 화면으로
+  const { addReciprocal, isAdding } = useReciprocalMutation(state?.token, {
+    showToast,
+    onSuccess: () => navigate("/relation", { replace: true }),
+  });
+
   const handleAdd = () => {
-    navigate("/relation"); // 관계 화면으로 이동
+    addReciprocal();
   };
 
   // 괜찮아요 (추가하지 않고 넘어가기)
@@ -62,7 +70,7 @@ function ReverseInvite() {
             <h2 className={styles.sheetTitle}>{inviterName}님도 나의 사람으로 추가할까요?</h2>
           </div>
 
-          <button type="button" className={styles.addBtn} onClick={handleAdd}>
+          <button type="button" className={styles.addBtn} onClick={handleAdd} disabled={isAdding}>
             나의 사람으로 추가
           </button>
           <p className={styles.caption}>추가하면 나도 {inviterName}님에게 도움을 요청할 수 있어요</p>
@@ -72,6 +80,8 @@ function ReverseInvite() {
           </button>
         </div>
       </div>
+
+      {toast && <DefaultToast key={toast.id} message={toast.message} onHide={hideToast} />}
     </div>
   );
 }

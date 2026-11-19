@@ -15,6 +15,7 @@ import ReverseInvite from "@/features/relation/pages/ReverseInvite";
 import GuardianRequest from "@/features/relation/pages/GuardianRequest";
 import ReceivedGuardian from "@/features/relation/pages/ReceivedGuardian";
 import RelationRelease from "@/features/relation/pages/RelationRelease";
+import InvitationEntry from "@/features/relation/pages/InvitationEntry";
 
 // 홈
 import Home from "@/features/home/pages/Home";
@@ -75,6 +76,7 @@ function App() {
               <Route path="/relation/guardian-request" element={<GuardianRequest />} />  {/* N-02 */}
               <Route path="/relation/received-guardian" element={<ReceivedGuardian />} />  {/* N-03 */}
               <Route path="/relation/release" element={<RelationRelease />} />  {/* N-08 */}
+                            <Route path="/invitations/:token" element={<InvitationEntry />} />  {/* 초대 링크 진입 (화면 없이 알맞은 화면으로 이동) */}
 
               {/* 홈 */}
               <Route path="/home" element={<Home />} />  {/* H-00 */}
