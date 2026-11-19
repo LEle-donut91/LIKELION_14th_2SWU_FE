@@ -1,6 +1,6 @@
 import styles from "@/features/home/components/HelpFloatingButton.module.css";
 import MaskIcon from "@/shared/components/MaskIcon/MaskIcon";
-import iconPlus from "@/shared/assets/icons/IconPlus.svg";
+import iconPlus from "@/shared/assets/icons/iconPlus.svg";
 
 // 도움 요청 플로팅 버튼
 function HelpFloatingButton({ onClick }) {

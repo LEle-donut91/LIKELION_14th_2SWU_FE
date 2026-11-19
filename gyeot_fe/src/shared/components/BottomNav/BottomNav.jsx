@@ -2,10 +2,10 @@ import { NavLink } from "react-router-dom"; // 페이지 이동 버튼 도구
 import styles from "./BottomNav.module.css"; // 디자인 파일 연결
 
 // 아이콘 파일 가져오기
-import IconHome from "../../assets/icons/IconHome.svg";
-import IconSituation from "../../assets/icons/IconSituation.svg";
-import IconPeople from "../../assets/icons/IconPeople.svg";
-import IconHealthy from "../../assets/icons/IconHealthy.svg";
+import IconHome from "../../assets/icons/iconHome.svg";
+import IconSituation from "../../assets/icons/iconSituation.svg";
+import IconPeople from "../../assets/icons/iconPeople.svg";
+import IconHealthy from "../../assets/icons/iconHealthy.svg";
 
 // 탭 목록 (이름, 이동할 주소, 아이콘)
 const tabs = [

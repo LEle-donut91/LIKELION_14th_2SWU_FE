@@ -13,7 +13,7 @@ import {
   useRejectInvitationMutation,
 } from "@/features/relation/hooks/mutations/useInvitationMutations";
 import iconLink from "@/shared/assets/icons/iconLink.svg";
-import IconPeople from "@/shared/assets/icons/IconPeople.svg";
+import IconPeople from "@/shared/assets/icons/iconPeople.svg";
 import styles from "./ReceivedInvite.module.css";
 
 function ReceivedInvite() {

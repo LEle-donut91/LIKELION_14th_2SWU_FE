@@ -1,5 +1,5 @@
-import iconRadioOff from "@/shared/assets/icons/IconRadioOff.svg";
-import iconRadioOn from "@/shared/assets/icons/IconRadioOn.svg";
+import iconRadioOff from "@/shared/assets/icons/iconRadioOff.svg";
+import iconRadioOn from "@/shared/assets/icons/iconRadioOn.svg";
 import styles from "@/features/request/components/Option/SituationOption.module.css";
 
 function SituationOption({

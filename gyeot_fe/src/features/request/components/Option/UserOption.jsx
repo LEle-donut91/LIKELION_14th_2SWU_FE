@@ -1,6 +1,6 @@
 import styles from "@/features/request/components/Option/UserOption.module.css";
-import iconRadioOff from "@/shared/assets/icons/IconRadioOff.svg";
-import iconRadioOn from "@/shared/assets/icons/IconRadioOn.svg";
+import iconRadioOff from "@/shared/assets/icons/iconRadioOff.svg";
+import iconRadioOn from "@/shared/assets/icons/iconRadioOn.svg";
 
 function UserOption({
   data = [], // 요청 대상 목록 [{ id, userName, isGuardian }, ...]
