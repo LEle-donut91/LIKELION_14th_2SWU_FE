@@ -17,12 +17,13 @@ import { useRequestNav } from "@/features/request/hooks/useRequestNav";
 import { useRequestDetailQuery } from "@/features/request/hooks/queries/useRequestDetailQuery";
 import { useInformationOptionsQuery } from "@/features/request/hooks/queries/useInformationOptionsQuery";
 import { useCancelRequestMutation } from "@/features/request/hooks/mutations/useCancelRequestMutation";
-import { useErrorToast } from "@/features/request/hooks/useErrorToast";
 import { useRequestFormStore } from "@/features/request/stores/useRequestFormStore";
+import { useRequestErrorStore } from "@/features/request/stores/useRequestErrorStore";
 import { useToast } from "@/shared/hooks/useToast";
 
 // Constants
 import { REQUEST_ROUTES } from "@/features/request/constants/routerConstants";
+import { REQUEST_ERROR_TARGET_PAGE } from "@/features/request/constants/requestErrorConstants";
 import {
   REQUEST_FORM_FIELD_KEY,
   REQUEST_SHEET,
@@ -63,8 +64,21 @@ function RequestEditForm() {
   const { toast, showToast, hideToast } = useToast();
 
   // 열려 있는 시트 (한 번에 하나만 열림) - REQUEST_SHEET(START/END) 또는 CHECK_FORM_FIELD_KEY 중 하나
-  const [openSheet, setOpenSheet] = useState(null);
+  const [openSheet, setOpenSheet] = useState(() => {
+    // 다른 페이지에서 전달 받은 에러 처리
+    const { error } = useRequestErrorStore.getState();
+    return error?.targetPage === REQUEST_ERROR_TARGET_PAGE.EDIT_FORM && error.requestId === paramId
+      ? error.sheet ?? null
+      : null;
+  });
   const closeSheet = () => setOpenSheet(null);
+
+  // 다른 페이지에서 전달 받은 에러 처리
+  useEffect(() => {
+    const { error, setError } = useRequestErrorStore.getState();
+    if (error?.targetPage !== REQUEST_ERROR_TARGET_PAGE.EDIT_FORM || error.requestId !== paramId) return;
+    setError(null);
+  }, [paramId]);
 
   // 모달의 열림/닫힘 상태
   const [isCancelModalOpen, setCancelModalOpen] = useState(false);
@@ -83,8 +97,8 @@ function RequestEditForm() {
   const {
     data: detail,
     isPending: isDetailPending,
-    error: detailError,
   } = useRequestDetailQuery(paramId, {
+    showToast,
     select: getEditFormService,
   });
 
@@ -92,10 +106,10 @@ function RequestEditForm() {
   const {
     data: informationOptions,
     isPending: isInformationPending,
-    error: informationError,
   } = useInformationOptionsQuery(
     { helpType: detail?.helpType, requestId: paramId },
     {
+      showToast,
       select: (response) => getInformationOptionsService(response, requestForm),
       enabled: Boolean(detail?.helpType && paramId),
     },
@@ -107,9 +121,6 @@ function RequestEditForm() {
     onSuccess: () => handleGoBack(),
   });
 
-  // API 에러 메시지 출력
-  useErrorToast(showToast, detailError, informationError);
-
   // API 응답 데이터 (정제된 형태)
   const { userName, dueDate, initialRequestForm } = detail ?? {};
   const {
@@ -117,6 +128,11 @@ function RequestEditForm() {
     selectedIds = [],
     isSensitiveIncluded = false,
   } = informationOptions ?? {};
+  // GET 요청 로딩중 상태
+  const isLoading =
+    isDetailPending ||
+    isInformationPending;
+
 
   // 같은 요청의 수정 화면으로 돌아오면 사용자가 입력한 값을 유지
   useEffect(() => {
@@ -154,13 +170,6 @@ function RequestEditForm() {
 
   // 다음 버튼 클릭 handler
   const handleNextBtnClick = () => {
-    if (
-      isDetailPending ||
-      isInformationPending ||
-      detailError ||
-      informationError
-    )
-      return;
     // 입력값 유효성 검사 (첫 번째 에러 문구 하나만 토스트로)
     const errors = validateInput(
       requestForm,
@@ -202,12 +211,10 @@ function RequestEditForm() {
         onBackClick={handleGoBack}
       />
 
+      {!isLoading && (
+<>
       {/* 메인 컨텐츠 */}
       <main className={styles.content}>
-        {isDetailPending || isInformationPending ? (
-          <div role="status">로딩중</div>
-        ) : (
-          <>
             {/* 시작 - 종료 */}
             <div className={styles.timeSectionContainer}>
               <SelectSection
@@ -315,8 +322,6 @@ function RequestEditForm() {
                   </Fragment>
                 ))}
             </div>
-          </>
-        )}
       </main>
 
       {/* 하단 Footer(버튼) */}
@@ -363,6 +368,8 @@ function RequestEditForm() {
         confirmTxt="공유"
         onConfirmClick={handleSensitiveConfirm}
       />
+</>
+      )}
 
       {/* 토스트 (key 가 바뀌면 새로 마운트되어 타이머가 다시 시작됨) */}
       {toast && (

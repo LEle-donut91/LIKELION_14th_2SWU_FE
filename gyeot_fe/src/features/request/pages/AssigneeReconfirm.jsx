@@ -18,7 +18,6 @@ import iconToggle from "@/shared/assets/icons/iconToggle.svg";
 import { useRequestNav } from "@/features/request/hooks/useRequestNav";
 import { useRequestDetailQuery } from "@/features/request/hooks/queries/useRequestDetailQuery";
 import { useReconfirmMutations } from "@/features/request/hooks/mutations/useReconfirmMutations";
-import { useErrorToast } from "@/features/request/hooks/useErrorToast";
 import { useToast } from "@/shared/hooks/useToast";
 
 // Constants
@@ -45,11 +44,15 @@ function AssigneeReconfirm() {
   // 1. 요청 상세 조회 API
   const {
     data: detail,
-    isPending,
-    error,
+    isPending, // GET 요청 로딩중 상태
   } = useRequestDetailQuery(paramId, {
+    showToast,
     select: getAssigneeReconfirmService,
   });
+
+  // API 응답 데이터 (정제된 형태)
+  const { proposalId, userName, requestType, beforeInfoList, afterInfoList } =
+    detail ?? {};
 
   // 2. 재확인 수락 / 재확인 거절 API
   const { acceptReconfirmation, rejectReconfirmation } = useReconfirmMutations({
@@ -63,13 +66,6 @@ function AssigneeReconfirm() {
     },
   });
 
-  // API 에러 메시지 출력
-  useErrorToast(showToast, error);
-
-  // API 응답 데이터 (정제된 형태)
-  const { proposalId, userName, requestType, beforeInfoList, afterInfoList } =
-    detail ?? {};
-
   return (
     <div className={styles.page}>
       {/* 헤더 (닫기 버튼이 있는 컴포넌트) */}
@@ -79,13 +75,7 @@ function AssigneeReconfirm() {
         title="변경 내용 확인"
         onCloseClick={() => handleGoBack()}
       />
-
-      {isPending && (
-        <div className={styles.content}>
-          <p role="status">요청 정보를 불러오는 중이에요.</p>
-        </div>
-      )}
-      {detail && (
+      {!isPending && (
         <>
           {/* 메인 컨텐츠 */}
           <main className={styles.content}>

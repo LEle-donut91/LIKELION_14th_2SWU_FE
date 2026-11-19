@@ -46,6 +46,5 @@ export const useRequestFormStore = create((set) => ({
     })),
 
   // 요청 완료 / 작성 취소 시 비우기
-  resetForm: () =>
-    set({ entryId: null, form: INITIAL_FORM }),
+  resetForm: () => set({ entryId: null, form: INITIAL_FORM }),
 }));

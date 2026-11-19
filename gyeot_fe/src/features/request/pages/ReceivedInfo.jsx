@@ -7,7 +7,6 @@ import { useParams } from "react-router-dom";
 // Custom Hooks
 import { useRequestNav } from "@/features/request/hooks/useRequestNav";
 import { useReceivedInfoQuery } from "@/features/request/hooks/queries/useReceivedInfoQuery";
-import { useErrorToast } from "@/features/request/hooks/useErrorToast";
 import { useToast } from "@/shared/hooks/useToast";
 
 // 일반 Components
@@ -27,10 +26,8 @@ function ReceivedInfo() {
   // 전달받은 정보 조회 API
   const {
     data: receivedInfo,
-    isPending,
-    error,
-  } = useReceivedInfoQuery(paramId);
-  useErrorToast(showToast, error);
+    isPending, // GET 요청 로딩중 상태
+  } = useReceivedInfoQuery(paramId, { showToast });
 
   // API 응답 데이터 (정제된 형태)
   const {
@@ -49,8 +46,9 @@ function ReceivedInfo() {
         onCloseClick={handleGoBack}
       />
 
+      {!isPending && (
+<>
       <main className={styles.content}>
-        {isPending && <p role="status">전달받은 정보를 불러오는 중이에요.</p>}
         {receivedInfo && (
           <>
             <DueDateState
@@ -82,6 +80,8 @@ function ReceivedInfo() {
           </>
         )}
       </main>
+</>
+      )}
       {toast && (
         <DefaultToast
           key={toast.id}

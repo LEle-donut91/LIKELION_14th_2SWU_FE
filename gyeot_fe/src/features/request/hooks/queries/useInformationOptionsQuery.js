@@ -1,4 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
+import { useEffect, useRef } from "react";
+import { getErrorMessage } from "@/shared/utils/apiError";
 import { getInformationOptionsApi } from "@/features/request/api/getApi";
 import { REQUEST_QUERY_KEYS } from "@/features/request/constants/requestQueryKeys";
 
@@ -9,11 +11,30 @@ import { REQUEST_QUERY_KEYS } from "@/features/request/constants/requestQueryKey
  */
 export const useInformationOptionsQuery = (
   { helpType, requestId } = {},
-  { select, enabled = true } = {},
-) =>
-  useQuery({
+  { select, enabled = true, showToast } = {},
+) => {
+  const handledError = useRef(null);
+  const query = useQuery({
     queryKey: REQUEST_QUERY_KEYS.informationOptions(helpType, requestId),
     queryFn: () => getInformationOptionsApi({ helpType, requestId }),
     select,
     enabled,
   });
+
+  useEffect(() => {
+    if (!query.error) {
+      handledError.current = null;
+      return;
+    }
+    if (query.isFetching || !showToast) return;
+    if (
+      handledError.current?.error === query.error &&
+      handledError.current?.updatedAt === query.errorUpdatedAt
+    ) return;
+
+    handledError.current = { error: query.error, updatedAt: query.errorUpdatedAt };
+    showToast(getErrorMessage(query.error));
+  }, [query.error, query.errorUpdatedAt, query.isFetching, showToast]);
+
+  return query;
+};

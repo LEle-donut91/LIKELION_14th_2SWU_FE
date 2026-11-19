@@ -12,6 +12,7 @@ import styles from "@/features/request/pages/RequestEditCheck.module.css";
 import iconToggle from "@/shared/assets/icons/iconToggle.svg";
 
 // 일반 라이브러리
+import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 
 // Custom Hooks
@@ -19,7 +20,6 @@ import { useRequestNav } from "@/features/request/hooks/useRequestNav";
 import { useRequestDetailQuery } from "@/features/request/hooks/queries/useRequestDetailQuery";
 import { useInformationOptionsQuery } from "@/features/request/hooks/queries/useInformationOptionsQuery";
 import { useEditRequestMutation } from "@/features/request/hooks/mutations/useEditRequestMutation";
-import { useErrorToast } from "@/features/request/hooks/useErrorToast";
 import { useRequestFormStore } from "@/features/request/stores/useRequestFormStore";
 import { useToast } from "@/shared/hooks/useToast";
 
@@ -41,24 +41,27 @@ function RequestEditCheck() {
 
   // Zustand Store
   const requestForm = useRequestFormStore((state) => state.form);
+  const hasForm = Boolean(requestForm.helpType);
+  useEffect(() => {
+    if (hasForm) return;
+    showToast("작성 중인 요청 정보가 없어요.");
+  }, [hasForm, showToast]);
 
   // 1. 공개 항목 선택지 조회 API
   const {
     data: informationOptions,
     isPending: isInformationPending,
-    error: informationError,
+    refetch: refetchInformation,
   } = useInformationOptionsQuery(
     { helpType: requestForm.helpType, requestId: paramId },
-    { enabled: Boolean(requestForm.helpType && paramId) },
+    { enabled: Boolean(requestForm.helpType && paramId), showToast },
   );
 
   // 2. 요청 상세 조회 API
   const {
     data: requestDetail,
     isPending: isDetailPending,
-    error: detailError,
-  } = useRequestDetailQuery(paramId);
-  useErrorToast(showToast, detailError, informationError);
+  } = useRequestDetailQuery(paramId, { showToast });
 
   // 3. 요청 수정 API (변경된 필드만 PATCH - 바뀐 내용이 없으면 토스트만 표시)
   const { editRequest } = useEditRequestMutation({
@@ -67,6 +70,7 @@ function RequestEditCheck() {
     informationOptions,
     showToast,
     onSuccess: () => handleGoBackTwice(),
+    onRefreshInformation: refetchInformation,
   });
 
   // API 응답 데이터 (정제된 형태)
@@ -78,15 +82,13 @@ function RequestEditCheck() {
     afterInfoList,
   } = getEditCheckService(requestDetail, requestForm, informationOptions);
 
+  // GET 요청 로딩중 상태
+  const isLoading =
+    isDetailPending ||
+    isInformationPending;
+
   // "재확인 요청" 버튼 핸들러
   const handleReconfirmBtnClick = () => {
-    if (
-      isDetailPending ||
-      isInformationPending ||
-      detailError ||
-      informationError
-    )
-      return;
     editRequest(requestForm);
   };
 
@@ -98,12 +100,10 @@ function RequestEditCheck() {
         onBackClick={handleGoBack}
       />
 
+      {!isLoading && (
+<>
       {/* 실제 컨텐츠가 들어갈 자리 */}
       <main className={styles.content}>
-        {isDetailPending || isInformationPending ? (
-          <div role="status">로딩중</div>
-        ) : (
-          <>
             {/* 변경 전 - 변경 후 카드 Container */}
             <div className={styles.cardContainer}>
               {/* 변경 전 Card */}
@@ -146,8 +146,6 @@ function RequestEditCheck() {
                 담당자 거절 시, 요청이 취소되고 접근 권한이 회수돼요.
               </span>
             )}
-          </>
-        )}
       </main>
 
       {/* 하단 Footer */}
@@ -156,6 +154,8 @@ function RequestEditCheck() {
         type="primary"
         onClick={handleReconfirmBtnClick}
       />
+</>
+      )}
       {toast && (
         <DefaultToast
           key={toast.id}
