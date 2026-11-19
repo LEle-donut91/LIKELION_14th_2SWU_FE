@@ -5,6 +5,11 @@
 // A. 회원·인증·관계
 export const AUTH_API_URLS = {
   // 여기에 회원·인증·관계 관련 API URL 상수를 정의합니다.
+  signup: "/api/auth/signup", // 회원가입 (POST)
+  login: "/api/auth/login", // 로그인 (POST)
+  refresh: "/api/auth/refresh", // Access Token 재발급 (POST)
+  logout: "/api/auth/logout", // 로그아웃 (POST)
+  csrf: "/api/auth/csrf", // CSRF 토큰 조회 (GET)
   emergencyContacts: "/api/emergency-contacts", // 비상연락망 조회 (GET)
   emergencyContactsOrder: "/api/emergency-contacts/order", // 연락 순서 변경 (PATCH)
 }

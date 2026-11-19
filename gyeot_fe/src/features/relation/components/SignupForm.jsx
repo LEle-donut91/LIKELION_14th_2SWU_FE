@@ -29,9 +29,10 @@ function CheckMark() {
 
 /**
  * 이메일 회원가입 폼
- * @param {Function} onSubmit  가입하기 클릭 시 동작 (입력값 전달)
+ * @param {Function} onSubmit      가입하기 클릭 시 동작 ({ name, email, password, privacyConsent } 전달)
+ * @param {boolean}  isSubmitting  가입 요청 중이면 버튼 비활성
  */
-function SignupForm({ onSubmit }) {
+function SignupForm({ onSubmit, isSubmitting = false }) {
   const [form, setForm] = useState({ name: "", email: "", password: "", passwordConfirm: "" }); // 입력값
   const [isPasswordVisible, setPasswordVisible] = useState(false); // 비밀번호 보이기 여부
   const [isAgreed, setAgreed] = useState(false); // 개인정보 제공 동의 여부
@@ -56,8 +57,14 @@ function SignupForm({ onSubmit }) {
 
   const handleSubmit = (e) => {
     e.preventDefault(); // 새로고침 막기
-    if (!isValid) return;
-    onSubmit(form);
+    if (!isValid || isSubmitting) return;
+    // 명세(POST /api/auth/signup)에 맞춰 보낼 값만 전달 (비밀번호 확인은 화면에서만 사용)
+    onSubmit({
+      name: form.name.trim(),
+      email: form.email.trim(),
+      password: form.password,
+      privacyConsent: isAgreed,
+    });
   };
 
   return (
@@ -134,7 +141,7 @@ function SignupForm({ onSubmit }) {
         </span>
       </button>
 
-      <button type="submit" className={styles.submitBtn} disabled={!isValid}>
+      <button type="submit" className={styles.submitBtn} disabled={!isValid || isSubmitting}>
         가입하기
       </button>
     </form>

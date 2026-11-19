@@ -15,4 +15,15 @@ export default defineConfig({
       entries: [{ find: "@", replacement: resolve(__dirname, "src") }],
     }),
   ],
+  server: {
+    proxy: {
+      // 로컬 개발: /api 요청을 백엔드로 넘김 (로그인 유지 쿠키를 같은 출처로 주고받기 위해)
+      // - 백엔드 경로에도 /api가 있으므로 접두사는 지우지 않음
+      "/api": {
+        target: "https://api.gyeot.shop",
+        changeOrigin: true,
+        cookieDomainRewrite: { "*": "" }, // 백엔드가 준 쿠키를 localhost에 저장되도록 도메인 제거
+      },
+    },
+  },
 });

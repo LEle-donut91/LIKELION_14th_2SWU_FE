@@ -12,6 +12,14 @@ export const COMMON_ERROR_CODE = {
 // - 현재는 C-03(비상연락망)에서 쓰는 코드만 정의. 나머지 A 영역 코드는 해당 화면 연동 시 추가
 export const AUTH_ERROR_CODE = {
   CONTACT_ORDER_CHANGED: "CONTACT_ORDER_CHANGED", // 409 연락 순서 변경: 화면을 연 뒤 연락 대상 목록이 바뀜
+  PASSWORD_TOO_LONG: "PASSWORD_TOO_LONG", // 400 회원가입·로그인: 비밀번호가 UTF-8 기준 72바이트 초과
+  EMAIL_ALREADY_REGISTERED: "EMAIL_ALREADY_REGISTERED", // 409 회원가입: 이미 가입된 이메일
+  LOGIN_FAILED: "LOGIN_FAILED", // 401 로그인: 이메일·비밀번호 불일치 또는 탈퇴 계정
+  REFRESH_TOKEN_NOT_FOUND: "REFRESH_TOKEN_NOT_FOUND", // 401 재발급: Refresh Token 쿠키 없음
+  REFRESH_TOKEN_REVOKED: "REFRESH_TOKEN_REVOKED", // 401 재발급: 폐기된 Refresh Token
+  REFRESH_TOKEN_EXPIRED: "REFRESH_TOKEN_EXPIRED", // 401 재발급: 만료된 Refresh Token
+  REFRESH_TOKEN_ALREADY_USED: "REFRESH_TOKEN_ALREADY_USED", // 401 재발급: 이미 사용된 Refresh Token
+  USER_NOT_ACTIVE: "USER_NOT_ACTIVE", // 401 재발급: 활성 상태가 아닌 계정
 };
 
 // D. 안심카드·정보 공유 (API 명세서 'D 에러 코드' 표 기준)
