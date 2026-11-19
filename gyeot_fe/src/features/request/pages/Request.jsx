@@ -26,7 +26,6 @@ import { useRequestErrorStore } from "@/features/request/stores/useRequestErrorS
 // Constants
 import { REQUEST_ROUTES } from "@/features/request/constants/routerConstants";
 import { REQUEST_ERROR_TARGET_PAGE } from "@/features/request/constants/requestErrorConstants";
-import { REQUEST_ERROR_CODE } from "@/shared/constants/errorCodeConstants";
 import {
   REQUEST_FORM_FIELD_KEY,
   REQUEST_SHEET,
@@ -51,7 +50,6 @@ import {
   getDateTimeText,
   getDueDateText,
 } from "@/features/request/utils/getSelectionInput";
-import { getErrorCode, getErrorMessage } from "@/shared/utils/apiError";
 
 // 일반 Components
 import SubpageHeader from "@/shared/components/subpage-header/SubpageHeader";
@@ -118,6 +116,8 @@ function Request() {
       String(entryId) === paramId && String(form.situationId) === paramId
         ? form.situationId
         : undefined,
+  }, {
+    onSituationInvalid: () => setOpenSheet(REQUEST_SHEET.SITUATION),
   });
 
   // API 호출 에러 처리

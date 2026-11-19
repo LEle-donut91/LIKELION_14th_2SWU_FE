@@ -31,8 +31,6 @@ import {
 // Constants
 import { REQUEST_ROUTES } from "@/features/request/constants/routerConstants";
 import { REQUEST_ERROR_TARGET_PAGE } from "@/features/request/constants/requestErrorConstants";
-import { REQUEST_ERROR_CODE } from "@/shared/constants/errorCodeConstants";
-import { getErrorCode, getErrorMessage } from "@/shared/utils/apiError";
 import {
   REQUEST_SHEET,
   ASK_AGAIN_VALIDATE_FIELDS_FLEXIBLE,

@@ -74,7 +74,11 @@ function InfoPreview() {
     data: users = [],
     isPending: isTargetsPending,
     error: targetsError,
-  } = useRequestTargetsQuery({ situationId: requestForm.situationId });
+  } = useRequestTargetsQuery(
+    reassignRequestId
+      ? { requestId: reassignRequestId }
+      : { situationId: requestForm.situationId },
+  );
 
   // 2. 공개 항목 선택지 조회 (도움 종류로 조회하고, 다시 부탁하기에서는 기존 요청 ID도 전달)
   const {
