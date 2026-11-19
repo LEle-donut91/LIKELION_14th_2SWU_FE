@@ -95,25 +95,6 @@ function RequestDetail() {
     guideLines = [],
   } = detail ?? {};
 
-  // Header별 action 연결
-  const headerActions = {
-    requester: {
-      text: flags.isCancelable ? REQUESTER_CANCEL_BTN_TITLE : undefined,
-      onClick: () => setCancelModalOpen(true),
-    },
-    assignee: {
-      text: flags.showWithdrawBtn ? "철회" : undefined,
-      onClick: flags.showWithdrawBtn
-        ? () => setWithdrawModalOpen(true)
-        : undefined,
-    },
-    target: {
-      text: flags.showHoldBtn ? "보류" : undefined,
-      onClick: flags.showHoldBtn ? footerActions.hold : undefined,
-    },
-  };
-  const headerAction = headerActions[role] ?? {};
-
   // Footer별 action 연결
   const footerActions = {
     edit: () => handleGoNext(REQUEST_ROUTES.editForm(paramId)),
@@ -136,6 +117,25 @@ function RequestDetail() {
     changeToRefuse: () => respondToRequest(RESPONSE_STATUS.UNAVAILABLE),
     changeToAccept: () => respondToRequest(RESPONSE_STATUS.AVAILABLE),
   };
+
+  // Header별 action 연결
+  const headerActions = {
+    requester: {
+      text: flags.isCancelable ? REQUESTER_CANCEL_BTN_TITLE : undefined,
+      onClick: () => setCancelModalOpen(true),
+    },
+    assignee: {
+      text: flags.showWithdrawBtn ? "철회" : undefined,
+      onClick: flags.showWithdrawBtn
+        ? () => setWithdrawModalOpen(true)
+        : undefined,
+    },
+    target: {
+      text: flags.showHoldBtn ? "보류" : undefined,
+      onClick: flags.showHoldBtn ? footerActions.hold : undefined,
+    },
+  };
+  const headerAction = headerActions[role] ?? {};
 
   // [요청 취소] 모달의 confirm 버튼 핸들러
   const handleCancelConfirm = () => {
