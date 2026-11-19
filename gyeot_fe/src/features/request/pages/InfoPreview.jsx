@@ -67,6 +67,11 @@ function InfoPreview() {
     setForm,
     resetForm,
   } = useRequestFormStore((state) => state);
+  const hasForm = Boolean(requestForm.helpType);
+  useEffect(() => {
+    if (hasForm) return;
+    showToast("작성 중인 요청 정보가 없어요.");
+  }, [hasForm, showToast]);
 
   // 1. 대상 후보 조회 API
   const {

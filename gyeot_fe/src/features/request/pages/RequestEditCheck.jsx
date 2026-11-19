@@ -12,6 +12,7 @@ import styles from "@/features/request/pages/RequestEditCheck.module.css";
 import iconToggle from "@/shared/assets/icons/iconToggle.svg";
 
 // 일반 라이브러리
+import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 
 // Custom Hooks
@@ -40,6 +41,11 @@ function RequestEditCheck() {
 
   // Zustand Store
   const requestForm = useRequestFormStore((state) => state.form);
+  const hasForm = Boolean(requestForm.helpType);
+  useEffect(() => {
+    if (hasForm) return;
+    showToast("작성 중인 요청 정보가 없어요.");
+  }, [hasForm, showToast]);
 
   // 1. 공개 항목 선택지 조회 API
   const {
