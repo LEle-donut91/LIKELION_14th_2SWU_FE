@@ -70,7 +70,11 @@ function Request() {
   const { toast, showToast, hideToast } = useToast();
 
   // 열려 있는 시트 (한 번에 하나만 열림)
-  const [openSheet, setOpenSheet] = useState(null);
+  const [openSheet, setOpenSheet] = useState(
+    () => useRequestFormStore.getState().creationError?.sheet ?? null,
+  );
+  const locationInputRef = useRef(null);
+  const contentInputRef = useRef(null);
   const closeSheet = () => setOpenSheet(null);
 
   // 이전 페이지에서 전달받은 state 데이터 가져오기 (요청 대상 ID, 응답 기한)
@@ -113,6 +117,19 @@ function Request() {
 
   // API 호출 에러 처리
   useErrorToast(showToast, situationsError, targetsError);
+
+  useEffect(() => {
+    const { creationError, setCreationError } = useRequestFormStore.getState();
+    if (!creationError) return;
+    showToast(creationError.message);
+    if (creationError.field === REQUEST_FORM_FIELD_KEY.LOCATION) {
+      locationInputRef.current?.querySelector("input")?.focus();
+    }
+    if (creationError.field === REQUEST_FORM_FIELD_KEY.CONTENT) {
+      contentInputRef.current?.querySelector("textarea")?.focus();
+    }
+    setCreationError(null);
+  }, [showToast]);
 
   // 같은 진입(paramId)으로 돌아온 경우(예: 미리보기에서 뒤로가기) 입력값 유지
   // 다른 진입이면 새로 초기화 (초기값 전달)
@@ -276,30 +293,34 @@ function Request() {
         {/* 장소 */}
         {/* 선행 조건(상황/도움 종류를 모두 선택) 미충족 시 readOnly */}
         {/* 선행 조건(상황/도움 종류를 모두 선택)을 만족했을 때만 입력 가능 (onFocus) */}
-        <InputSection
-          title="장소 *"
-          size="small"
-          value={form.location}
-          readOnly={isReadOnly(form)}
-          onFocus={() => isPrerequisiteEnsured(form, showToast)}
-          onChange={(e) =>
-            setForm({ ...form, location: e.target.value || null })
-          }
-        />
+        <div ref={locationInputRef}>
+          <InputSection
+            title="장소 *"
+            size="small"
+            value={form.location}
+            readOnly={isReadOnly(form)}
+            onFocus={() => isPrerequisiteEnsured(form, showToast)}
+            onChange={(e) =>
+              setForm({ ...form, location: e.target.value || null })
+            }
+          />
+        </div>
 
         {/* 부탁 내용 */}
         {/* 선행 조건(상황/도움 종류를 모두 선택) 미충족 시 readOnly */}
         {/* 선행 조건(상황/도움 종류를 모두 선택)을 만족했을 때만 입력 가능 (onFocus) */}
-        <InputSection
-          title="부탁 내용"
-          size="large"
-          value={form.content}
-          readOnly={isReadOnly(form)}
-          onFocus={() => isPrerequisiteEnsured(form, showToast)}
-          onChange={(e) =>
-            setForm({ ...form, content: e.target.value || null })
-          }
-        />
+        <div ref={contentInputRef}>
+          <InputSection
+            title="부탁 내용"
+            size="large"
+            value={form.content}
+            readOnly={isReadOnly(form)}
+            onFocus={() => isPrerequisiteEnsured(form, showToast)}
+            onChange={(e) =>
+              setForm({ ...form, content: e.target.value || null })
+            }
+          />
+        </div>
 
         {/* 요청 대상 */}
         <SelectSection

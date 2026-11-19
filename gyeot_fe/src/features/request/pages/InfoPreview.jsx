@@ -81,6 +81,7 @@ function InfoPreview() {
     data: informationOptions,
     isPending: isInformationPending,
     error: informationError,
+    refetch: refetchInformation,
   } = useInformationOptionsQuery(
     { helpType: requestForm.helpType, requestId: reassignRequestId },
     { enabled: Boolean(requestForm.helpType) },
@@ -90,6 +91,7 @@ function InfoPreview() {
   const { mutate: sendRequest, isPending: isSending } = useSendRequestMutation({
     reassignRequestId,
     showToast,
+    onRefreshInformation: refetchInformation,
     onSuccess: ({ requestId }) => {
       resetForm();
       handleGoNext(REQUEST_ROUTES.send(requestId), true);
