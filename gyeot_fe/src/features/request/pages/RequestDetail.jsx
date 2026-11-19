@@ -1,5 +1,4 @@
-import { Fragment, useEffect, useState } from "react";
-import { useRequestErrorStore } from "@/features/request/stores/useRequestErrorStore";
+import { Fragment, useState } from "react";
 import { useRequestFormStore } from "@/features/request/stores/useRequestFormStore";
 import { useParams } from "react-router-dom";
 import styles from "./RequestDetail.module.css";
@@ -9,7 +8,6 @@ import { useRequestDetailMutations } from "@/features/request/hooks/mutations/us
 import { useToast } from "@/shared/hooks/useToast";
 import { getRequestDetailService } from "@/features/request/services/requestDetailService";
 import { REQUEST_ROUTES } from "@/features/request/constants/routerConstants";
-import { REQUEST_ERROR_TARGET_PAGE } from "@/features/request/constants/requestErrorConstants";
 import { RESPONSE_STATUS } from "@/features/request/constants/enumConstants";
 import { REQUESTER_CANCEL_BTN_TITLE } from "@/features/request/constants/requesterViewConstants";
 
@@ -41,7 +39,6 @@ function RequestDetail() {
   const {
     data: detail,
     isPending,
-    refetch: refetchDetail,
   } = useRequestDetailQuery(paramId, {
     showToast,
     select: getRequestDetailService,
@@ -59,14 +56,6 @@ function RequestDetail() {
     showToast,
     onAcceptanceWithdrawn: () => handleGoNext(REQUEST_ROUTES.home, true),
   });
-
-  // 다른 페이지에서 전달 받은 에러 처리
-  useEffect(() => {
-    const { error, setError } = useRequestErrorStore.getState();
-    if (error?.targetPage !== REQUEST_ERROR_TARGET_PAGE.REQUEST_DETAIL || error.requestId !== paramId) return;
-    setError(null);
-    refetchDetail({ cancelRefetch: false });
-  }, [paramId, refetchDetail]);
 
   // API 응답 데이터 (정제된 형태)
   const {
@@ -98,7 +87,7 @@ function RequestDetail() {
   // Footer별 action 연결
   const footerActions = {
     edit: () => handleGoNext(REQUEST_ROUTES.editForm(paramId)),
-    askAgain: () => handleGoNext(REQUEST_ROUTES.askAgain(paramId)),
+    askAgain: () => handleGoNext(`${REQUEST_ROUTES.askAgain(paramId)}?from=detail`),
     withdraw: () => setWithdrawModalOpen(true),
     withdrawProposal: () => withdrawProposal(proposalId),
     done: completeCare,

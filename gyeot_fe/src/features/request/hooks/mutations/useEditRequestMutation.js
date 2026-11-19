@@ -57,13 +57,13 @@ export function useEditRequestMutation({
           handleGoBackTwice();
           break;
         case REQUEST_ERROR_CODE.REQUEST_START_TOO_SOON:
-          returnToStartTimeSheet(error);
+          returnToStartTimeSheet();
           break;
         case REQUEST_ERROR_CODE.REQUEST_SCHEDULE_INVALID:
-          returnToStartTimeSheet(error);
+          returnToStartTimeSheet();
           break;
         case REQUEST_ERROR_CODE.REQUEST_PROPOSAL_NO_TIME:
-          returnToStartTimeSheet(error);
+          returnToStartTimeSheet();
           break;
         case INFO_SHARE_ERROR_CODE.SAFETY_INFO_INVALID_SELECTION:
           return onRefreshInformation();

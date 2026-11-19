@@ -31,24 +31,20 @@ export function useSendRequestMutation({
   onSuccess,
   onRefreshInformation,
 }) {
-  const { handleGoBack, handleGoBackTwice, handleGoNext } = useRequestNav();
+  const { handleGoBack, handleGoNext } = useRequestNav();
   const setError = useRequestErrorStore((state) => state.setError);
 
-  const returnFromCreation = (error, correction) => {
+  const returnFromCreation = (correction) => {
     setError({ ...correction, targetPage: REQUEST_ERROR_TARGET_PAGE.REQUEST });
     handleGoBack();
   };
 
-  const returnFromReassignment = (error, correction, targetPage = REQUEST_ERROR_TARGET_PAGE.ASK_AGAIN) => {
+  const returnFromReassignment = (correction, targetPage = REQUEST_ERROR_TARGET_PAGE.ASK_AGAIN) => {
     setError({
       ...correction,
       targetPage,
       requestId: String(reassignRequestId),
     });
-    if (targetPage === REQUEST_ERROR_TARGET_PAGE.REQUEST_DETAIL) {
-      handleGoBackTwice();
-      return;
-    }
     handleGoBack();
   };
 
@@ -69,22 +65,22 @@ export function useSendRequestMutation({
             handleGoNext(REQUEST_ROUTES.home, true);
             break;
           case REQUEST_ERROR_CODE.REQUEST_NOT_REASSIGNABLE:
-            returnFromReassignment(error, {}, REQUEST_ERROR_TARGET_PAGE.REQUEST_DETAIL);
+            returnFromReassignment({}, REQUEST_ERROR_TARGET_PAGE.REQUEST_DETAIL);
             break;
           case REQUEST_ERROR_CODE.REQUEST_ALREADY_STARTED:
-            returnFromReassignment(error, {}, REQUEST_ERROR_TARGET_PAGE.REQUEST_DETAIL);
+            returnFromReassignment({}, REQUEST_ERROR_TARGET_PAGE.REQUEST_DETAIL);
             break;
           case REQUEST_ERROR_CODE.REQUEST_ALREADY_ENDED:
-            returnFromReassignment(error, {}, REQUEST_ERROR_TARGET_PAGE.REQUEST_DETAIL);
+            returnFromReassignment({}, REQUEST_ERROR_TARGET_PAGE.REQUEST_DETAIL);
             break;
           case REQUEST_ERROR_CODE.REQUEST_TARGET_INVALID:
-            returnFromReassignment(error, { sheet: REQUEST_SHEET.USER, refreshTargets: true });
+            returnFromReassignment({ sheet: REQUEST_SHEET.USER, clearSelectedUser: true });
             break;
           case REQUEST_ERROR_CODE.REQUEST_TARGET_ALREADY_ASSIGNED:
-            returnFromReassignment(error, { sheet: REQUEST_SHEET.USER, refreshTargets: true });
+            returnFromReassignment({ sheet: REQUEST_SHEET.USER, clearSelectedUser: true });
             break;
           case REQUEST_ERROR_CODE.REQUEST_DEADLINE_INVALID:
-            returnFromReassignment(error, { sheet: REQUEST_SHEET.DUE_DATE });
+            returnFromReassignment({ sheet: REQUEST_SHEET.DUE_DATE });
             break;
           case INFO_SHARE_ERROR_CODE.SAFETY_INFO_INVALID_SELECTION:
             onRefreshInformation();
@@ -95,32 +91,31 @@ export function useSendRequestMutation({
 
       switch (getErrorCode(error)) {
         case REQUEST_ERROR_CODE.REQUEST_SITUATION_INVALID:
-          returnFromCreation(error, { sheet: REQUEST_SHEET.SITUATION });
+          returnFromCreation({ sheet: REQUEST_SHEET.SITUATION });
           break;
         case REQUEST_ERROR_CODE.REQUEST_SITUATION_ENDED:
-          setError({ targetPage: REQUEST_ERROR_TARGET_PAGE.HOME });
           handleGoNext(REQUEST_ROUTES.home, true);
           break;
         case REQUEST_ERROR_CODE.REQUEST_TARGET_INVALID:
-          returnFromCreation(error, { sheet: REQUEST_SHEET.USER });
+          returnFromCreation({ sheet: REQUEST_SHEET.USER });
           break;
         case REQUEST_ERROR_CODE.REQUEST_START_TOO_SOON:
-          returnFromCreation(error, { sheet: REQUEST_SHEET.START });
+          returnFromCreation({ sheet: REQUEST_SHEET.START });
           break;
         case REQUEST_ERROR_CODE.REQUEST_SCHEDULE_INVALID:
-          returnFromCreation(error, { sheet: REQUEST_SHEET.START });
+          returnFromCreation({ sheet: REQUEST_SHEET.START });
           break;
         case REQUEST_ERROR_CODE.REQUEST_DEADLINE_INVALID:
-          returnFromCreation(error, { sheet: REQUEST_SHEET.DUE_DATE });
+          returnFromCreation({ sheet: REQUEST_SHEET.DUE_DATE });
           break;
         case INFO_SHARE_ERROR_CODE.SAFETY_INFO_INVALID_SELECTION:
           onRefreshInformation();
           break;
         case REQUEST_ERROR_CODE.REQUEST_PLACE_TOO_LONG:
-          returnFromCreation(error, { field: REQUEST_FORM_FIELD_KEY.LOCATION });
+          returnFromCreation({ field: REQUEST_FORM_FIELD_KEY.LOCATION });
           break;
         case REQUEST_ERROR_CODE.REQUEST_DESCRIPTION_TOO_LONG:
-          returnFromCreation(error, { field: REQUEST_FORM_FIELD_KEY.CONTENT });
+          returnFromCreation({ field: REQUEST_FORM_FIELD_KEY.CONTENT });
           break;
       }
     },

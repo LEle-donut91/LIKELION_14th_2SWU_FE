@@ -10,7 +10,7 @@ import styles from "@/features/request/pages/AskAgain.module.css";
 
 // 일반 라이브러리
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 
 // Custom Hooks
 import { useRequestNav } from "@/features/request/hooks/useRequestNav";
@@ -64,6 +64,8 @@ import DefaultToast from "@/shared/components/Toast/DefaultToast";
 function AskAgain() {
   const { handleGoNext, handleGoBack } = useRequestNav();
   const paramId = useParams().id;
+  const [searchParams] = useSearchParams();
+  const fromDetail = searchParams.get("from") === "detail";
   const { toast, showToast, hideToast } = useToast();
 
   // 열려 있는 시트 (한 번에 하나만 열림)
@@ -77,7 +79,6 @@ function AskAgain() {
 
   // 1. 대상 후보 조회 API
   const targetsQuery = useRequestTargetsQuery({ requestId: paramId }, { showToast });
-  const refetchTargets = targetsQuery.refetch;
 
   // 2. 공개 정보 선택지 조회 API
   const informationQuery = useInformationOptionsQuery(
@@ -95,13 +96,19 @@ function AskAgain() {
   useEffect(() => {
     const { error, setError } = useRequestErrorStore.getState();
     const { changeUser } = useRequestFormStore.getState();
-    if (error?.targetPage !== REQUEST_ERROR_TARGET_PAGE.ASK_AGAIN || error.requestId !== paramId) return;
-    setError(null);
-    if (error.refreshTargets) {
-      changeUser({ id: null });
-      refetchTargets({ cancelRefetch: false });
+    if (error?.requestId !== paramId) return;
+    if (error.targetPage === REQUEST_ERROR_TARGET_PAGE.REQUEST_DETAIL) {
+      setError(null);
+      if (fromDetail) handleGoBack();
+      else handleGoNext(REQUEST_ROUTES.detail(paramId), true);
+      return;
     }
-  }, [paramId, refetchTargets]);
+    if (error.targetPage !== REQUEST_ERROR_TARGET_PAGE.ASK_AGAIN) return;
+    setError(null);
+    if (error.clearSelectedUser) {
+      changeUser({ id: null });
+    }
+  }, [paramId, fromDetail, handleGoBack, handleGoNext]);
 
   // API 응답 데이터 (정제된 형태)
   const userList = targetsQuery.data ?? [];

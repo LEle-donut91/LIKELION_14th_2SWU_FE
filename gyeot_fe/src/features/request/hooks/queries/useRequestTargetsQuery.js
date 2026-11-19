@@ -82,9 +82,6 @@ export const useRequestTargetsQuery = (
         }
         break;
       case REQUEST_ERROR_CODE.REQUEST_SITUATION_ENDED:
-        setError({
-          targetPage: REQUEST_ERROR_TARGET_PAGE.HOME,
-        });
         handleGoNext(REQUEST_ROUTES.home, true);
         break;
       case COMMON_ERROR_CODE.FORBIDDEN:
