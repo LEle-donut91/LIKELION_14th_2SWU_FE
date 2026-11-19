@@ -80,18 +80,6 @@ function AskAgain() {
   const targetsQuery = useRequestTargetsQuery({ requestId: paramId });
   const refetchTargets = targetsQuery.refetch;
 
-  useEffect(() => {
-    const { error, setError } = useRequestErrorStore.getState();
-    const { changeUser } = useRequestFormStore.getState();
-    if (error?.targetPage !== REQUEST_ERROR_TARGET_PAGE.ASK_AGAIN || error.requestId !== paramId) return;
-    setError(null);
-    showToast(error.message);
-    if (error.refreshTargets) {
-      changeUser({ id: null });
-      refetchTargets({ cancelRefetch: false });
-    }
-  }, [paramId, showToast, refetchTargets]);
-
   // 2. 공개 정보 선택지 조회 API
   const informationQuery = useInformationOptionsQuery(
     { requestId: paramId },
@@ -110,6 +98,19 @@ function AskAgain() {
     informationQuery.error,
     detailQuery.error,
   );
+
+  // 다른 페이지에서 전달 받은 에러 처리
+  useEffect(() => {
+    const { error, setError } = useRequestErrorStore.getState();
+    const { changeUser } = useRequestFormStore.getState();
+    if (error?.targetPage !== REQUEST_ERROR_TARGET_PAGE.ASK_AGAIN || error.requestId !== paramId) return;
+    setError(null);
+    showToast(error.message);
+    if (error.refreshTargets) {
+      changeUser({ id: null });
+      refetchTargets({ cancelRefetch: false });
+    }
+  }, [paramId, showToast, refetchTargets]);
 
   // API 응답 데이터 (정제된 형태)
   const userList = targetsQuery.data ?? [];

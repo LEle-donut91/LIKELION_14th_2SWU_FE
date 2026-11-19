@@ -123,6 +123,7 @@ function Request() {
   // API 호출 에러 처리
   useErrorToast(showToast, situationsError, targetsError);
 
+  // 다른 페이지에서 전달 받은 에러 처리
   useEffect(() => {
     const { error, setError } = useRequestErrorStore.getState();
     if (error?.targetPage !== REQUEST_ERROR_TARGET_PAGE.REQUEST) return;
