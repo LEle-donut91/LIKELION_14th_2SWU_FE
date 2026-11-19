@@ -1,28 +1,34 @@
 // R-00
 
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import RelationSection, { EmptyBox, Card } from "@/features/relation/components/RelationSection";
 import PersonItem from "@/features/relation/components/PersonItem";
 import SentInviteItem from "@/features/relation/components/SentInviteItem";
-import { MAX_GUARDIANS, MOCK_RELATION } from "@/features/relation/constants/relation";
+import { MAX_GUARDIANS } from "@/features/relation/constants/relation";
+import { useRelationshipsQuery } from "@/features/relation/hooks/queries/useRelationshipsQuery";
 import MainHeader from "@/shared/components/main-header/MainHeader"; // 팀 공통 헤더
 import BottomNav from "@/shared/components/BottomNav/BottomNav"; // 팀 공통 바텀 내비
 import styles from "./Relation.module.css";
 
 function Relation() {
   const navigate = useNavigate();
-  const [data, setData] = useState(MOCK_RELATION); // TODO: API 연결 후 교체
-  const { guardians, myPeople, registeredMe, sentInvites } = data;
+  // 보호자 / 내가 등록한 사람 (GET /api/relationships)
+  const { data, isLoading } = useRelationshipsQuery();
+  const guardians = data?.guardians ?? [];
+  const myPeople = data?.myPeople ?? [];
+
+  // TODO: 아래 두 목록은 조회 API가 아직 없음 (명세서 댓글로 문의함) — API 추가되면 연결
+  const registeredMe = []; // 나를 나의 사람으로 등록한 사람
+  const sentInvites = []; // 보낸 초대
 
   const isGuardianFull = guardians.length >= MAX_GUARDIANS; // 보호자 3명이면 요청 버튼 비활성화
 
-  // 보낸 초대 취소 (목록에서 제거)
+  // 보낸 초대 취소 (TODO: 보낸 초대 목록 API 추가 후 DELETE /api/invitations/{invitationId} 연결)
   const handleCancel = (id) => {
-    setData((prev) => ({ ...prev, sentInvites: prev.sentInvites.filter((v) => v.id !== id) }));
+    console.log("초대 취소", id);
   };
 
-  // 다시 초대 (TODO: API 연결)
+  // 다시 초대 (TODO: 보낸 초대 목록 API 추가 후 연결)
   const handleResend = (id) => {
     console.log("다시 초대", id);
   };
@@ -41,89 +47,94 @@ function Relation() {
         onSettingClick={() => console.log("설정")} // TODO: 설정 화면 연결
       />
 
-      {/* 서로의 보호자 */}
-      <RelationSection title="서로의 보호자" hint={`최대 ${MAX_GUARDIANS}명`}>
-        {guardians.length === 0 ? (
-          <EmptyBox text="아직 보호자가 없어요">
-            <button type="button" className={styles.primaryBtn} onClick={() => navigate("/relation/guardian-request")}>
-              보호자 요청 보내기
-            </button>
-          </EmptyBox>
-        ) : (
-          <>
+      {/* 관계 목록을 불러오는 동안은 빈 화면 안내가 깜빡이지 않도록 숨김 */}
+      {!isLoading && (
+        <>
+          {/* 서로의 보호자 */}
+          <RelationSection title="서로의 보호자" hint={`최대 ${MAX_GUARDIANS}명`}>
+            {guardians.length === 0 ? (
+              <EmptyBox text="아직 보호자가 없어요">
+                <button type="button" className={styles.primaryBtn} onClick={() => navigate("/relation/guardian-request")}>
+                  보호자 요청 보내기
+                </button>
+              </EmptyBox>
+            ) : (
+              <>
+                <ul className={styles.list}>
+                  {guardians.map((g) => (
+                    <li key={g.id}>
+                      <Card>
+                        <PersonItem
+                          name={g.name}
+                          sub={`연락 순서 ${g.priority}순위`}
+                          badge={<span className={styles.guardianBadge}>보호자</span>}
+                          showArrow
+                          onClick={() => goDetail(g.id)}
+                        />
+                      </Card>
+                    </li>
+                  ))}
+                </ul>
+
+                <button
+                  type="button"
+                  className={styles.primaryBtn}
+                  disabled={isGuardianFull} // 3명이면 회색 비활성
+                  onClick={() => navigate("/relation/guardian-request")}
+                >
+                  보호자 요청 보내기
+                </button>
+                {isGuardianFull && (
+                  <p className={styles.notice}>보호자가 있어서 새 요청을 보낼 수 없어요 · 바꾸려면 기존 관계를 해제해요</p>
+                )}
+            </>
+          )}
+        </RelationSection>
+
+        {/* 내가 등록한 사람 (빈 상태 시안은 "나의 사람") */}
+        <RelationSection title={myPeople.length ? "내가 등록한 사람" : "나의 사람"}>
+          {myPeople.length === 0 ? (
+            <EmptyBox text="등록한 사람이 없어요" />
+          ) : (
             <ul className={styles.list}>
-              {guardians.map((g) => (
-                <li key={g.id}>
+              {myPeople.map((p) => (
+                <li key={p.id}>
                   <Card>
-                    <PersonItem
-                      name={g.name}
-                      sub={`연락 순서 ${g.priority}순위`}
-                      badge={<span className={styles.guardianBadge}>보호자</span>}
-                      showArrow
-                      onClick={() => goDetail(g.id)}
-                    />
+                    <PersonItem name={p.name} sub={p.label} color="olive" showArrow onClick={() => goDetail(p.id)} />
                   </Card>
                 </li>
               ))}
             </ul>
-
-            <button
-              type="button"
-              className={styles.primaryBtn}
-              disabled={isGuardianFull} // 3명이면 회색 비활성
-              onClick={() => navigate("/relation/guardian-request")}
-            >
-              보호자 요청 보내기
-            </button>
-            {isGuardianFull && (
-              <p className={styles.notice}>보호자가 있어서 새 요청을 보낼 수 없어요 · 바꾸려면 기존 관계를 해제해요</p>
-            )}
-          </>
-        )}
-      </RelationSection>
-
-      {/* 내가 등록한 사람 (빈 상태 시안은 "나의 사람") */}
-      <RelationSection title={myPeople.length ? "내가 등록한 사람" : "나의 사람"}>
-        {myPeople.length === 0 ? (
-          <EmptyBox text="등록한 사람이 없어요" />
-        ) : (
-          <ul className={styles.list}>
-            {myPeople.map((p) => (
-              <li key={p.id}>
-                <Card>
-                  <PersonItem name={p.name} sub={p.relation} color="olive" showArrow onClick={() => goDetail(p.id)} />
-                </Card>
-              </li>
-            ))}
-          </ul>
-        )}
-        <button type="button" className={styles.outlineBtn} onClick={() => navigate("/relation/acquaintance-invite")}>
-          + 나의 사람 초대
-        </button>
-      </RelationSection>
-
-      {/* 나를 나의 사람으로 등록한 사람 (조회만) */}
-      <RelationSection title="나를 나의 사람으로 등록한 사람" hint="조회만 가능">
-        {registeredMe.length === 0 ? (
-          <EmptyBox text="아직 없어요" />
-        ) : (
-          <Card className={styles.divided}>
-            {registeredMe.map((p) => (
-              <PersonItem key={p.id} name={p.name} color="gray" />
-            ))}
-          </Card>
-        )}
-      </RelationSection>
-
-      {/* 보낸 초대 (있을 때만 노출) */}
-      {sentInvites.length > 0 && (
-        <RelationSection title="보낸 초대">
-          <Card>
-            {sentInvites.map((invite) => (
-              <SentInviteItem key={invite.id} invite={invite} onCancel={handleCancel} onResend={handleResend} />
-            ))}
-          </Card>
+          )}
+          <button type="button" className={styles.outlineBtn} onClick={() => navigate("/relation/acquaintance-invite")}>
+            + 나의 사람 초대
+          </button>
         </RelationSection>
+
+        {/* 나를 나의 사람으로 등록한 사람 (조회만) */}
+        <RelationSection title="나를 나의 사람으로 등록한 사람" hint="조회만 가능">
+          {registeredMe.length === 0 ? (
+            <EmptyBox text="아직 없어요" />
+          ) : (
+            <Card className={styles.divided}>
+              {registeredMe.map((p) => (
+                <PersonItem key={p.id} name={p.name} color="gray" />
+              ))}
+            </Card>
+          )}
+        </RelationSection>
+
+        {/* 보낸 초대 (있을 때만 노출) */}
+        {sentInvites.length > 0 && (
+          <RelationSection title="보낸 초대">
+            <Card>
+              {sentInvites.map((invite) => (
+                <SentInviteItem key={invite.id} invite={invite} onCancel={handleCancel} onResend={handleResend} />
+              ))}
+            </Card>
+          </RelationSection>
+        )}
+        </>
       )}
 
       <BottomNav /> {/* 하단 탭 */}

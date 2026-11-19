@@ -16,8 +16,8 @@ function findName(id) {
 }
 
 function AcquaintanceShared() {
-  const { state } = useLocation(); // R-02에서 넘겨준 { id }
-  const name = findName(state?.id);
+  const { state } = useLocation(); // R-02에서 넘겨준 { id, userId, name }
+  const name = state?.name ?? findName(state?.id); // R-02에서 받은 이름 우선 (주소로 바로 들어오면 임시 이름)
 
   const [sharing, setSharing] = useState(MOCK_SHARED_INFO.sharing); // 내가 공유 중인 정보
   const received = MOCK_SHARED_INFO.received; // 받은 정보 (조회만)
