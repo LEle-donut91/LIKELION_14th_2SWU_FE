@@ -1,0 +1,51 @@
+.userInfo {
+  display: flex;
+  padding: 16px;
+  gap: 16px;
+  border-radius: 16px;
+  border: 1px solid var(--color-opacity-100);
+  background-color: var(--color-base-000);
+  box-shadow: 0px 0px 4px var(--color-box-shadow);
+}
+
+.userImg {
+  width: 52px;
+  height: 52px;
+  border-radius: 999px;
+  background-color: var(--color-user-profile);
+}
+
+.txtContainer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.stateTxt {
+  color: var(--color-gray-900);
+}
+
+.subTxtContainer {
+  display: flex;
+  align-items: center;
+}
+
+.userNameTxt {
+  color: var(--color-olive-600);
+}
+
+.circleContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+}
+
+.circleContainer > img {
+  width: 13.3px;
+}
+
+.partTxt {
+  color: var(--color-gray-900);
+}

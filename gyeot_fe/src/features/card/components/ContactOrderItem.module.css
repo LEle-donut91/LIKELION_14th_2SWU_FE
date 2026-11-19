@@ -1,0 +1,111 @@
+/* 연락 순서 카드 */
+.contactOrderItem {
+  position: relative; /* 드래그 중인 카드가 다른 카드 위로 올라오도록 (motion이 z-index 적용) */
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  padding: 16px;
+  box-sizing: border-box;
+  border: 1px solid var(--color-olive-200);
+  border-radius: 16px;
+
+  list-style: none;
+}
+
+/* 보호자 카드 */
+.guardian {
+  background-color: var(--color-olive-100);
+}
+
+/* 나의 사람 카드 */
+.myPerson {
+  background-color: var(--color-base-000);
+}
+
+/* 이름 첫 글자 아바타 (폰트: index.css의 typoBodyStrong 사용) */
+.avatar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+}
+
+.guardian .avatar {
+  background-color: var(--color-beige-100);
+  color: var(--color-beige-800);
+}
+
+.myPerson .avatar {
+  background-color: var(--color-olive-100);
+  color: var(--color-olive-700);
+}
+
+/* 이름 + 관계 영역 */
+.textArea {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0; /* 이름이 길어져도 뱃지·핸들을 밀지 않도록 */
+}
+
+/* 이름 (폰트: typoBodyStrong) */
+.name {
+  margin: 0;
+  color: var(--color-gray-900);
+
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* 관계 문구 (폰트: typoBodySmall) */
+.sub {
+  margin: 0;
+  color: var(--color-gray-500);
+}
+
+/* 순위 뱃지 (폰트: typoCaptionMedium, 시안이 굵은 글씨라 굵기만 덮어씀) */
+.rankBadge {
+  flex-shrink: 0;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 700;
+}
+
+.guardian .rankBadge {
+  background-color: var(--color-olive-600);
+  color: var(--color-base-000);
+}
+
+.myPerson .rankBadge {
+  background-color: var(--color-olive-100);
+  color: var(--color-olive-700);
+}
+
+/* 드래그 핸들 */
+.dragHandle {
+  flex-shrink: 0;
+  display: flex;
+  margin-left: 8px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--color-gray-500);
+
+  cursor: grab;
+  touch-action: none; /* 모바일에서 핸들을 끌 때 화면 스크롤이 먼저 일어나지 않도록 */
+}
+
+.dragHandle:active {
+  cursor: grabbing;
+}
+
+/* 저장 중 (드래그 잠금) */
+.dragHandle[aria-disabled="true"] {
+  cursor: default;
+}

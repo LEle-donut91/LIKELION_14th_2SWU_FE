@@ -1,0 +1,22 @@
+/* 탭 버튼 목록: 간격 6 */
+.filterTabs {
+  display: flex;
+  gap: 6px;
+}
+
+/* 탭 버튼(BtnCase): 흰 배경, 테두리 opacity-100, 라디우스 12, 패딩 8 24, olive-900 */
+.tabBtn {
+  padding: 8px 24px;
+  border-radius: 12px;
+  border: 1px solid var(--color-opacity-100);
+  background-color: var(--color-base-000);
+  color: var(--color-olive-900);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+/* 선택된 탭: olive-300 배경, 테두리 없음 */
+.selectedTab {
+  border-color: var(--color-olive-300);
+  background-color: var(--color-olive-300);
+}

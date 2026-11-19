@@ -16,8 +16,11 @@ export function useLocalStorage(key, initialValue) {
     try {
       setStoredValue(value);
       localStorage.setItem(key, JSON.stringify(value));
-    } catch (error) {
-      console.log(error);
+    } catch (error) { // localStorage 5MB 용량 초과 에러
+      console.error("Local Storage Exceed Error", error);
+
+      // 전체 스토리지를 초기화한다면 아래 주석을 해제하여 사용
+      // localStorage.clear();
     }
   };
 

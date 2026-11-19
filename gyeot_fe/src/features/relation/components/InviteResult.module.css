@@ -1,0 +1,119 @@
+/* 결과 화면 전체 (가운데 정렬) */
+.wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 72px 16px 24px;
+}
+
+/* 큰 원 (상태별 색은 아래에서 지정) */
+.circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 108px;
+  height: 108px;
+  border-radius: 50%;
+  background: var(--color-gray-100);
+}
+
+/* 가운데 흰 원 */
+.iconBox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #fff;
+}
+
+/* 안내 카드 */
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  margin-top: 12px;
+  padding: 16px;
+  background: #fff;
+  border: 1px solid #ebe7df;
+  border-radius: 16px;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+/* 작은 상태 배지 */
+.badge {
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 9px;
+  font-weight: 600;
+}
+
+.title {
+  margin: 8px 0 6px;
+  font-size: 15px;
+  font-weight: 700;
+  color: #222;
+}
+
+/* \n 줄바꿈 그대로 보이게 */
+.description {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.6;
+  color: #6f6f6f;
+  white-space: pre-line;
+}
+
+/* 홈으로 (밑줄 글자 버튼) */
+.homeBtn {
+  margin-top: 20px;
+  padding: 0;
+  background: none;
+  border: none;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-olive-700);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+/* ===== 상태별 색 ===== */
+
+/* 취소됨 */
+.canceled .circle {
+  background: var(--color-beige-100);
+}
+.canceled .badge {
+  background: var(--color-beige-100);
+  color: var(--color-beige-600);
+}
+
+/* 만료 */
+.expired .badge {
+  background: #fff;
+  border: 1px solid var(--color-gray-300);
+  color: var(--color-gray-700);
+}
+
+/* 이미 수락 */
+.accepted .circle {
+  background: var(--color-olive-200);
+}
+.accepted .card {
+  background: var(--color-olive-100);
+  border-color: var(--color-olive-200);
+}
+.accepted .badge {
+  background: var(--color-olive-200);
+  color: var(--color-olive-700);
+}
+
+/* 이미 거절 */
+.rejected .badge {
+  background: var(--color-gray-100);
+  color: var(--color-gray-700);
+}

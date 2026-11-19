@@ -1,0 +1,31 @@
+/* 참여자 태그 목록: 간격 6, 시안 너비 362 */
+.participantTagList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  width: 362px;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* 태그(Round): 패딩 4 8, 알약형 */
+.tag {
+  padding: 4px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+/* 보호자: beige-500 배경, 흰 글자 */
+.guardianTag {
+  background-color: var(--color-beige-500);
+  color: var(--color-base-000);
+}
+
+/* 그 외 참여자: 흰 배경, 테두리 0.5px olive-300, 검정 글자 */
+.memberTag {
+  border: 0.5px solid var(--color-olive-300);
+  background-color: var(--color-base-000);
+  color: var(--color-base-999);
+}

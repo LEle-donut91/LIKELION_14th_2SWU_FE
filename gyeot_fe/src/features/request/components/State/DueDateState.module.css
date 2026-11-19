@@ -1,0 +1,25 @@
+.component {
+  border-radius: 16px;
+  display: flex;
+  padding: 12px 16px;
+  background-color: var(--color-olive-200);
+}
+
+.responseComponent {
+  padding: 16px;
+  background-color: var(--color-beige-100);
+}
+
+.title {
+  flex: 1;
+  color: var(--color-gray-900);
+}
+
+.dueDate {
+  margin-left: auto;
+  color: var(--color-gray-900);
+}
+
+.responseDueDate {
+  color: var(--color-beige-600);
+}

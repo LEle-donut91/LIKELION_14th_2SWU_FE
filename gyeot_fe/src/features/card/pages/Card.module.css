@@ -1,0 +1,38 @@
+/* 배경: Home(H-00)과 동일한 선형 그라데이션 */
+.card {
+  position: relative;
+  min-height: 100%;
+  background: linear-gradient(
+    180deg,
+    var(--color-base-000) 0%,
+    var(--color-beige-100) 240%
+  );
+}
+
+/* 메인 콘텐츠 */
+.mainContent {
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+  padding: 16px 16px 240px;
+}
+
+/* 토스트 위치 */
+.toastArea {
+  position: fixed;
+  bottom: 94px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1;
+  width: 402px; 
+  height: 0;
+  pointer-events: none; /* 높이 0이지만 아래 요소 클릭을 막지 않도록 */
+  white-space: pre-line; /* 토스트 문구의 \n을 줄바꿈으로 표시 */
+  word-break: keep-all; /* 한국어도 띄어쓰기 기준으로 줄바꿈 (단어 중간에서 끊기지 않게) */
+}
+
+.toastArea > * {
+  width: max-content;
+  max-width: calc(100% - 32px);
+  box-sizing: border-box;
+}

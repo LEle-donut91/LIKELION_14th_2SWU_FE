@@ -1,0 +1,5 @@
+/* 상태카드 간격 4 */
+.statusCardList {
+  display: flex;
+  gap: 4px;
+}

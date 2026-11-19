@@ -1,0 +1,35 @@
+/* 텍스트 입력 영역 (BirthDateField.module.css 스타일 기준) */
+.cardTextField {
+  display: flex;
+  flex-direction: column;
+}
+
+/* 라벨 (폰트: index.css의 typoBodyStrong 사용) */
+.fieldTitle {
+  padding: 0 0 8px;
+  color: var(--color-gray-900);
+}
+
+/* 입력란 (폰트: index.css의 typoBodyMedium 사용) */
+.fieldInput {
+  padding: 16px;
+  border: 1px solid rgba(36, 36, 34, 0.2);
+  border-radius: 12px;
+  background-color: var(--color-base-000);
+  color: var(--color-gray-900);
+  outline: none;
+}
+
+.fieldInput::placeholder {
+  color: var(--color-gray-500);
+}
+
+/* 여러 줄 입력란 (isMultiline)
+   - 높이는 CardTextField.jsx에서 내용에 맞춰 조절 (한 줄 → 최대 maxRows 줄, 넘으면 스크롤)
+   - 크기 조절 핸들 숨김, 한 줄일 때 스크롤바가 보이지 않도록 기본은 overflow 숨김 */
+.fieldTextarea {
+  display: block;
+  resize: none;
+  overflow-y: hidden;
+  font-family: inherit;
+}

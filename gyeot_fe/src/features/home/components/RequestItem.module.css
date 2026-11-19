@@ -1,0 +1,81 @@
+/* 리스트: 라디우스 16, 패딩 16, 간격 16, cardeffect */
+.requestItem {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  padding: 16px;
+  border: none;
+  border-radius: 16px;
+  background-color: var(--color-base-000);
+  box-shadow: 0 0 4px rgba(192, 192, 192, 0.16);
+  text-align: left;
+  cursor: pointer;
+}
+
+/* 프로필 간격 2 */
+.profile {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+/* 사진 40*40, 라디우스 999 */
+.profileImage {
+  display: block;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  background-color: var(--color-gray-200);
+  object-fit: cover;
+}
+
+.userName {
+  color: var(--color-gray-700);
+}
+
+/* 텍스트 컨테이너 간격 6 */
+.textContainer {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* 컨테이너 타이틀 간격 8 */
+.titleContainer {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.title {
+  color: var(--color-gray-900);
+}
+
+/* 태그: 라디우스 999, 패딩 상하 4 좌우 8 */
+.tag {
+  padding: 4px 8px;
+  border-radius: 999px;
+}
+
+/* 받은 요청 태그: beige-100 */
+.received {
+  background-color: var(--color-beige-100);
+  color: var(--color-gray-700);
+}
+
+/* 보낸 요청 태그: beige-500 */
+.sent {
+  background-color: var(--color-beige-500);
+  color: var(--color-base-000);
+}
+
+/* 데이터: body/small, gray-700 */
+.data {
+  color: var(--color-gray-700);
+}

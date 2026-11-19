@@ -1,0 +1,48 @@
+/* 섹션 간 간격 */
+.section {
+  margin-top: 28px;
+}
+
+.header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #222;
+}
+
+.hint {
+  font-size: 10px;
+  color: #8a8a8a;
+}
+
+/* 빈 상태 점선 박스 */
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border: 1px dashed #d9d3c7;
+  border-radius: 12px;
+}
+
+.emptyText {
+  margin: 0;
+  font-size: 12px;
+  color: #6f6f6f;
+}
+
+/* 흰 카드 */
+.card {
+  padding: 0 12px;
+  background: #fff;
+  border: 1px solid #ebe7df;
+  border-radius: 12px;
+}

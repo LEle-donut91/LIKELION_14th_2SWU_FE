@@ -1,0 +1,24 @@
+/* 56*56, 패딩 상하 8 좌우 16, 간격 2, olive-500, 아이콘 24*24, caption-medium */
+.helpFloatingBtn {
+  position: fixed;
+  /* 모바일 프레임(402px, 화면 가운데 정렬) 오른쪽 기준 16px */
+  right: calc(50% - 201px + 16px);
+  bottom: 116px;
+  z-index: 10;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  width: 56px;
+  height: 56px;
+  padding: 8px 16px;
+  box-sizing: border-box;
+  border: none;
+  border-radius: 999px;
+  background-color: var(--color-olive-500);
+  color: var(--color-base-000);
+  white-space: nowrap;
+  cursor: pointer;
+}

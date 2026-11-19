@@ -1,0 +1,55 @@
+/* 모바일 프레임(402px, 화면 가운데 정렬) 왼쪽 하단, 하단 네비 위 */
+.homeTestSwitcher {
+  position: fixed;
+  left: calc(50% - 201px + 16px);
+  /* 하단 네비 높이(추정 96px) + 16px */
+  bottom: 112px;
+  z-index: 60;
+
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px;
+  border-radius: 12px;
+  border: 1px dashed var(--color-red-500);
+  background-color: var(--color-base-000);
+  box-shadow: 0 2px 8px var(--color-opacity-200);
+}
+
+.chip {
+  padding: 6px 12px;
+  border: 1px solid var(--color-gray-200);
+  border-radius: 999px;
+  background-color: var(--color-base-000);
+  color: var(--color-gray-800);
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.selected {
+  border-color: var(--color-olive-500);
+  background-color: var(--color-olive-100);
+  color: var(--color-olive-700);
+  font-weight: 700;
+}
+
+/* 테스트용임이 드러나도록 점선 + red 계열 */
+.toggleBtn {
+  min-width: 48px;
+  height: 32px;
+  padding: 0 12px;
+  border: 1px dashed var(--color-red-500);
+  border-radius: 999px;
+  background-color: var(--color-base-000);
+  color: var(--color-red-700);
+  font-weight: 700;
+  cursor: pointer;
+}

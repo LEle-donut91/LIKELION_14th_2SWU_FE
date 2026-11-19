@@ -1,0 +1,667 @@
+// 안심카드 화면에서 사용하는 상수 정의
+
+// 안심카드에서 이동하는 화면 경로 (App.jsx 라우트 기준, 주석은 화면 코드)
+export const CARD_NAVIGATION_PATH = {
+  BASIC: "/card/basic", // C-01 기본 정보
+  HEALTH: "/card/health", // C-02 건강 정보
+  CONTACT: "/card/contact", // C-03 연락 선호
+  LIFE: "/card/life", // C-04 생활 정보
+  MESSAGE: "/card/message", // C-05 미리 남기는 말
+  SHARE: "/card/share", // C-06 공유 관리
+};
+
+// 카드 공통
+// '추가하기' 텍스트 버튼 문구 (CardAddButton 기본값)
+export const CARD_ADD_BTN_TEXT = "추가하기";
+
+// 안심카드 분류 (API category 값)
+export const SAFETY_INFO_CATEGORY = {
+  BASIC: "BASIC",
+  HEALTH: "HEALTH",
+  LIFE: "LIFE",
+  ADVANCE_MESSAGE: "ADVANCE_MESSAGE",
+};
+
+// 안심카드 항목 유형 (API informationType 값, 명세 'D 공통 값' 항목 유형 표)
+export const SAFETY_INFO_TYPE = {
+  BIRTH_DATE: "BIRTH_DATE",
+  BLOOD_TYPE: "BLOOD_TYPE",
+  DISEASE: "DISEASE",
+  MEDICATION: "MEDICATION",
+  ALLERGY: "ALLERGY",
+  CAUTION: "CAUTION",
+  ADDRESS: "ADDRESS",
+  ENTRY_METHOD: "ENTRY_METHOD",
+  PET: "PET",
+  PREFERENCE_REQUEST: "PREFERENCE_REQUEST",
+  DOCUMENT_LOCATION: "DOCUMENT_LOCATION",
+};
+
+// 항목 이름(title) / 내용(informationValue) 최대 글자 수 (API 명세 기준)
+export const SAFETY_INFO_TITLE_MAX_LENGTH = 150;
+export const SAFETY_INFO_VALUE_MAX_LENGTH = 1000;
+
+// 분류 → C-00 메뉴 key 매핑 (CARD_MENU_SECTION_LIST의 item.key)
+export const CARD_MENU_KEY_BY_CATEGORY = {
+  [SAFETY_INFO_CATEGORY.BASIC]: "basic",
+  [SAFETY_INFO_CATEGORY.HEALTH]: "health",
+  [SAFETY_INFO_CATEGORY.LIFE]: "life",
+  [SAFETY_INFO_CATEGORY.ADVANCE_MESSAGE]: "message",
+};
+
+// C-00 공유 관리 카드: 공유 중 건수가 0건일 때 문구
+// TODO: 디자인에서 문구가 정해지면 교체
+export const CARD_SHARING_COUNT_EMPTY_TEXT = "공유 중 건수 없음";
+
+// C-00 메뉴 구성 (고정 텍스트)
+// - key: mock/API 데이터에서 해당 항목 값을 찾는 키
+// - description: 카드 설명 (공유 관리는 공유 건수로 동적 생성하므로 없음)
+// - hasUpdatedDate: 설명 뒤에 '갱신 M/D' 노출 여부
+export const CARD_MENU_SECTION_LIST = [
+  {
+    key: "info",
+    title: "정보 관리",
+    items: [
+      {
+        key: "basic",
+        title: "기본 정보",
+        description: "생년월일 / 혈액형",
+        path: CARD_NAVIGATION_PATH.BASIC,
+        hasUpdatedDate: true,
+      },
+      {
+        key: "health",
+        title: "건강 정보",
+        description: "질환 / 복용약 / 알러지 / 주의사항",
+        path: CARD_NAVIGATION_PATH.HEALTH,
+        hasUpdatedDate: true,
+      },
+      {
+        key: "life",
+        title: "생활 정보",
+        description: "주소 / 출입 방법 / 반려동물",
+        path: CARD_NAVIGATION_PATH.LIFE,
+        hasUpdatedDate: true,
+      },
+      {
+        key: "message",
+        title: "미리 남기는 말",
+        description: "선호 / 문서",
+        path: CARD_NAVIGATION_PATH.MESSAGE,
+        hasUpdatedDate: true,
+      },
+    ],
+  },
+  {
+    key: "etc",
+    title: "기타 정보 관리",
+    items: [
+      {
+        key: "contact",
+        title: "연락 선호",
+        description: "비상연락망 / 연락 순서",
+        path: CARD_NAVIGATION_PATH.CONTACT,
+        hasUpdatedDate: false,
+      },
+      {
+        key: "share",
+        title: "공유 관리",
+        path: CARD_NAVIGATION_PATH.SHARE,
+        hasUpdatedDate: false,
+      },
+    ],
+  },
+];
+
+/**
+ * =====================================================================
+ * [C-01] 기본 정보
+ * =====================================================================
+ */
+
+// 기본 정보 항목 키 (mock/API 데이터의 항목 키와 동일)
+export const BASIC_INFO_KEY = {
+  BIRTH_DATE: "birthDate",
+  BLOOD_TYPE: "bloodType",
+};
+
+// 기본 정보 목록 구성 (화면에 그릴 순서대로)
+// - title: 목록 카드 제목 / 편집 화면 헤더 제목 / 입력 영역 라벨에 공용 사용
+// - informationType: API 항목 유형 (작성 요청·조회 응답 매핑에 사용)
+export const BASIC_INFO_ITEM_LIST = [
+  { key: BASIC_INFO_KEY.BIRTH_DATE, title: "생년월일", informationType: SAFETY_INFO_TYPE.BIRTH_DATE },
+  { key: BASIC_INFO_KEY.BLOOD_TYPE, title: "혈액형", informationType: SAFETY_INFO_TYPE.BLOOD_TYPE },
+];
+
+// 값이 없을 때 목록 카드 설명 칸에 보여줄 문구
+export const BASIC_INFO_EMPTY_TEXT = "등록된 정보가 없어요";
+
+// 목록 카드의 수정 버튼 문구
+export const BASIC_INFO_EDIT_BTN_TEXT = "수정하기";
+
+// 편집 화면 하단 버튼 문구
+// - ADD: C-02에서 '추가하기'로 들어온 상태일 때 오른쪽 버튼 문구
+export const BASIC_INFO_FOOTER_TEXT = {
+  DELETE: "삭제",
+  UPDATE: "수정",
+  ADD: "추가",
+};
+
+// 생년월일 입력 설정 (YYYYMMDD 8자리)
+export const BIRTH_DATE_INPUT_LENGTH = 8;
+export const BIRTH_DATE_PLACEHOLDER = "예: 20001230";
+
+// 혈액형: 서버 응답/요청에 쓰는 값(key), 한글 매핑(value)
+export const BLOOD_TYPE_LABELS = {
+  A: "A형",
+  AB: "AB형",
+  B: "B형",
+  O: "O형",
+};
+
+// 라디오 버튼으로 그릴 혈액형 값 목록 (BLOOD_TYPE_LABELS 선언 순서대로)
+// -> ["A", "AB", "B", "O"]
+export const BLOOD_TYPE_OPTIONS = Object.keys(BLOOD_TYPE_LABELS);
+
+// 입력 검증 실패 시 토스트 문구
+export const BASIC_INFO_TOAST_MESSAGE = {
+  BIRTH_DATE_LENGTH: "생년월일 8자리를 입력해 주세요.",
+  BIRTH_DATE_INVALID: "존재하지 않는 날짜예요. 다시 확인해 주세요.",
+  BIRTH_DATE_FUTURE: "오늘 이후 날짜는 입력할 수 없어요.",
+  BLOOD_TYPE_REQUIRED: "혈액형을 선택해 주세요.",
+};
+
+// 삭제 확인 모달 문구 (descriptionLines: 배열의 각 원소 = 한 줄)
+export const BASIC_INFO_DELETE_MODAL = {
+  title: "삭제 요청",
+  descriptionLines: [
+    "요청사항에서 공유 중인 경우,",
+    "상대방의 접근 권한이 모두 회수됩니다.",
+    "또한, 삭제 이전 상태로 돌아올 수 없습니다.",
+  ],
+  cancelText: "취소",
+  confirmText: "삭제",
+};
+
+/**
+ * =====================================================================
+ * [C-02] 건강 정보
+ * - 목록 카드 '수정하기', 하단 [삭제][수정] 버튼, 삭제 확인 모달 문구는
+ *   C-01 상수를 함께 사용 (BASIC_INFO_EDIT_BTN_TEXT / BASIC_INFO_FOOTER_TEXT / BASIC_INFO_DELETE_MODAL)
+ * =====================================================================
+ */
+
+// 페이지(목록 화면) 헤더 제목
+export const HEALTH_INFO_PAGE_TITLE = "건강 정보";
+
+// 민감 항목 태그 문구 (BasicInfoItem에서 isSensitive가 true일 때 표시)
+export const SENSITIVE_TAG_TEXT = "민감";
+
+// 건강 정보 카테고리 키 (mock/API 데이터의 카테고리 키와 동일)
+export const HEALTH_CATEGORY_KEY = {
+  DISEASE: "disease",
+  MEDICINE: "medicine",
+  ALLERGY: "allergy",
+  CAUTION: "caution",
+};
+
+// 질환 진단일 뒤에 붙는 문구 ("2024년" → 저장값·표시 "2024년 진단")
+const DISEASE_DIAGNOSED_SUFFIX = " 진단";
+
+// 건강 정보 카테고리 구성 (화면에 그릴 순서대로)
+// - informationType: API 항목 유형 (조회 응답·작성 요청 매핑에 사용)
+// - title: 섹션 제목 / 편집 화면 헤더 제목
+// - isSensitive: 서비스에서 민감 항목으로 지정된 카테고리인지 (목록 카드에 '민감' 표시)
+// - titleKey: 목록 카드 제목으로 쓸 필드 키 (API title과 매핑)
+// - descriptionKey: 목록 카드 설명으로 쓸 필드 키 (API informationValue와 매핑)
+// - descriptionSuffix: 설명 값 뒤에 붙일 문구
+//   (저장할 때 붙여서 보내고, 조회한 값에서는 떼어 입력칸에 넣음. 목록에서는 다시 붙여 표시)
+// - fields: 편집 화면 입력 필드 (위에서부터 그리는 순서)
+//   - isRequired: true면 비어 있을 때 [수정] 클릭 시 requiredMessage 토스트
+//     (API 기준 title·informationValue 모두 필수 입력)
+//   - maxLength: 입력 가능한 최대 글자 수 (API 기준, 뒤에 붙는 문구 길이 제외)
+export const HEALTH_CATEGORY_LIST = [
+  {
+    key: HEALTH_CATEGORY_KEY.DISEASE,
+    informationType: SAFETY_INFO_TYPE.DISEASE,
+    title: "질환",
+    isSensitive: true,
+    titleKey: "name",
+    descriptionKey: "diagnosedYear",
+    descriptionSuffix: DISEASE_DIAGNOSED_SUFFIX,
+    fields: [
+      {
+        key: "name",
+        label: "질환",
+        placeholder: "질환명",
+        isRequired: true,
+        requiredMessage: "질환명을 입력해 주세요.",
+        maxLength: SAFETY_INFO_TITLE_MAX_LENGTH,
+      },
+      {
+        key: "diagnosedYear",
+        label: "진단일",
+        placeholder: "예: 2025년",
+        isRequired: true,
+        requiredMessage: "진단일을 입력해 주세요.",
+        maxLength: SAFETY_INFO_VALUE_MAX_LENGTH - DISEASE_DIAGNOSED_SUFFIX.length,
+      },
+    ],
+  },
+  {
+    key: HEALTH_CATEGORY_KEY.MEDICINE,
+    informationType: SAFETY_INFO_TYPE.MEDICATION,
+    title: "복용약",
+    isSensitive: true,
+    titleKey: "name",
+    descriptionKey: "dosage",
+    descriptionSuffix: "",
+    fields: [
+      {
+        key: "name",
+        label: "복용약",
+        placeholder: "약 이름",
+        isRequired: true,
+        requiredMessage: "약 이름을 입력해 주세요.",
+        maxLength: SAFETY_INFO_TITLE_MAX_LENGTH,
+      },
+      {
+        key: "dosage",
+        label: "복용법",
+        placeholder: "예: 아침 1정",
+        isRequired: true,
+        requiredMessage: "복용법을 입력해 주세요.",
+        maxLength: SAFETY_INFO_VALUE_MAX_LENGTH,
+      },
+    ],
+  },
+  {
+    key: HEALTH_CATEGORY_KEY.ALLERGY,
+    informationType: SAFETY_INFO_TYPE.ALLERGY,
+    title: "알러지",
+    isSensitive: true,
+    titleKey: "name",
+    descriptionKey: "reaction",
+    descriptionSuffix: "",
+    fields: [
+      {
+        key: "name",
+        label: "알러지",
+        placeholder: "알러지명",
+        isRequired: true,
+        requiredMessage: "알러지명을 입력해 주세요.",
+        maxLength: SAFETY_INFO_TITLE_MAX_LENGTH,
+      },
+      {
+        key: "reaction",
+        label: "반응",
+        placeholder: "예: 두드러기",
+        isRequired: true,
+        requiredMessage: "반응을 입력해 주세요.",
+        maxLength: SAFETY_INFO_VALUE_MAX_LENGTH,
+      },
+    ],
+  },
+  {
+    key: HEALTH_CATEGORY_KEY.CAUTION,
+    informationType: SAFETY_INFO_TYPE.CAUTION,
+    title: "주의사항",
+    isSensitive: false,
+    titleKey: "name",
+    descriptionKey: "instruction",
+    descriptionSuffix: "",
+    fields: [
+      {
+        key: "name",
+        label: "주의사항",
+        placeholder: "증상",
+        isRequired: true,
+        requiredMessage: "증상을 입력해 주세요.",
+        maxLength: SAFETY_INFO_TITLE_MAX_LENGTH,
+      },
+      {
+        key: "instruction",
+        label: "대처법",
+        placeholder: "예: 앉아서 휴식 필요",
+        isRequired: true,
+        requiredMessage: "대처법을 입력해 주세요.",
+        maxLength: SAFETY_INFO_VALUE_MAX_LENGTH,
+      },
+    ],
+  },
+];
+
+/**
+ * =====================================================================
+ * [C-03] 연락 순서
+ * =====================================================================
+ */
+
+// 연락 대상 관계 유형 (비상연락망 조회 API의 relationshipType 값과 동일)
+export const CONTACT_RELATIONSHIP_TYPE = {
+  GUARDIAN: "GUARDIAN",
+  MY_PERSON: "MY_PERSON",
+};
+
+// 관계 유형별 표시 문구 (섹션 제목 / 카드 보조 텍스트에 공용 사용)
+export const CONTACT_RELATIONSHIP_LABELS = {
+  GUARDIAN: "서로의 보호자",
+  MY_PERSON: "나의 사람",
+};
+
+// 헤더 제목
+export const CONTACT_ORDER_TITLE = "연락 순서";
+
+// 순위 뱃지 뒤에 붙는 문구: 1 → "1순위"
+export const CONTACT_ORDER_RANK_SUFFIX = "순위";
+
+// C-03에서 이동하는 화면 경로 (App.jsx 라우트 기준, 주석은 화면 코드 / 기능 번호)
+export const CONTACT_ORDER_NAVIGATION_PATH = {
+  MY_PERSON_INVITE: "/relation/acquaintance-invite", // R-01 나의 사람 초대 (F-01)
+  GUARDIAN_REQUEST: "/relation/guardian-request", // N-02 보호자 요청 (F-26)
+};
+
+// 하단 안내 문구
+// - WITH_GUARDIAN: 줄 단위 배열, 한 줄 안의 항목은 점으로 구분해 표시
+// - WITHOUT_GUARDIAN: 문단 단위 배열, 문단 안의 항목은 줄바꿈으로 표시
+export const CONTACT_ORDER_NOTICE = {
+  WITH_GUARDIAN: [
+    ["보호자는 항상 맨 앞에 와요"], ["길게 눌러 끌면 순서를 바꿀 수 있어요."]
+  ],
+  WITHOUT_GUARDIAN: [
+    ["보호자를 등록하면 항상 맨 앞에 와요."],
+    ["다음 순서로 자동으로 넘어가지 않아요.", "요청자가 직접 정해요."],
+  ],
+};
+
+// 연락할 사람이 아무도 없을 때 빈 상태 화면 문구 (descriptionLines: 배열의 각 원소 = 한 줄)
+export const CONTACT_ORDER_EMPTY = {
+  title: "아직 연락할 사람이 없어요",
+  descriptionLines: [
+    "나의 사람이나 서로의 보호자를 맺으면",
+    "여기서 연락 순서를 정할 수 있어요",
+  ],
+  inviteBtnText: "나의 사람 초대하기",
+  guardianRequestBtnText: "보호자 요청하기",
+};
+
+// 토스트 문구 (FE 고정 문구, 끝 마침표 없음)
+// - 실패 후 FE가 재조회·되돌리기를 하고 그 결과를 안내하는 화면이라 서버 문구 대신 사용 (API_CONVENTIONS 9-3)
+// - SAVE_SUCCESS: 순서 변경 성공 (바뀐 순서 유지)
+// - ORDER_CHANGED: 409 CONTACT_ORDER_CHANGED (연락 대상이 바뀌어 최신 목록으로 갱신)
+// - SAVE_FAILED: 그 외 실패 (마지막으로 저장된 순서로 되돌림)
+export const CONTACT_ORDER_TOAST_MESSAGE = {
+  SAVE_SUCCESS: "순서를 바꿨어요.",
+  ORDER_CHANGED: "연락 대상이 바뀌어 목록을 새로 불러왔어요.",
+  SAVE_FAILED: "순서를 바꾸지 못했어요.\n다시 시도해 주세요.",
+};
+
+// 탈퇴한 연락 대상 이름 (비상연락망 조회의 name이 null일 때 이름 칸에 표시)
+// - M-01 담당자 없음 안내의 서버 문구("탈퇴한 사용자")와 같은 표현 사용
+export const CONTACT_WITHDRAWN_NAME_TEXT = "탈퇴한 사용자";
+
+/**
+ * =====================================================================
+ * [C-04] 생활 정보
+ * - 목록 카드 '수정하기', 하단 [삭제][수정/추가] 버튼, 삭제 확인 모달 문구,
+ *   값이 없을 때 문구는 C-01 상수를 함께 사용
+ *   (BASIC_INFO_EDIT_BTN_TEXT / BASIC_INFO_FOOTER_TEXT / BASIC_INFO_DELETE_MODAL / BASIC_INFO_EMPTY_TEXT)
+ * =====================================================================
+ */
+
+// 페이지(목록 화면) 헤더 제목
+export const LIFE_INFO_PAGE_TITLE = "생활 정보";
+
+// 생활 정보 항목 유형 키 (mock/API 데이터의 유형 키와 동일)
+// - API informationType: ADDRESS / ENTRY_METHOD / PET
+export const LIFE_TYPE_KEY = {
+  ADDRESS: "address",
+  ENTRANCE_METHOD: "entranceMethod",
+  PET: "pet",
+};
+
+// 생활 정보 섹션 구성 (화면에 그릴 순서대로)
+// - 섹션 안에 항목 유형(types)을 묶어서 표시 (집 정보 = 집 주소 + 출입 방법)
+// - types의 각 유형
+//   - informationType: API 항목 유형 (조회 응답·작성 요청 매핑에 사용)
+//   - title: 편집 화면 헤더 제목 / titleKey가 없으면 목록 카드 제목으로도 사용
+//   - isSensitive: 서비스에서 민감 항목으로 지정된 유형인지 (목록 카드에 '민감' 표시)
+//   - isMultiple: 여러 개 등록 가능 여부 (API의 multiple)
+//     - false: '추가하기' 없음, 항목이 없으면 빈 카드(BASIC_INFO_EMPTY_TEXT)를 그리고 '수정하기' 시 추가 모드
+//     - true: 섹션 아래 '추가하기' 표시
+//   - isSingleLine: 목록 카드 값을 한 줄로 표시하고 넘치면 말줄임
+//   - titleKey: 목록 카드 제목으로 쓸 필드 키 (API title과 매핑, 없으면 title 사용·API title은 null)
+//   - descriptionKey: 목록 카드 설명으로 쓸 필드 키 (API informationValue와 매핑)
+//   - fields: 편집 화면 입력 필드 (위에서부터 그리는 순서)
+//     - isRequired: true면 비어 있을 때 [수정/추가] 클릭 시 requiredMessage 토스트
+//     - API 기준 모든 필드가 필수 (title·informationValue 모두 필수 입력)
+//     - maxLength: 입력 가능한 최대 글자 수 (API 기준)
+export const LIFE_SECTION_LIST = [
+  {
+    key: "home",
+    title: "집 정보",
+    types: [
+      {
+        key: LIFE_TYPE_KEY.ADDRESS,
+        informationType: SAFETY_INFO_TYPE.ADDRESS,
+        title: "집 주소",
+        isSensitive: true,
+        isMultiple: false,
+        isSingleLine: true,
+        descriptionKey: "value",
+        fields: [
+          {
+            key: "value",
+            label: "집 주소",
+            // TODO: 디자인 확정 후 문구 교체 (임시 문구)
+            placeholder: "예: 서울특별시 ○○로 00",
+            isRequired: true,
+            requiredMessage: "집 주소를 입력해 주세요.",
+            maxLength: SAFETY_INFO_VALUE_MAX_LENGTH,
+          },
+        ],
+      },
+      {
+        key: LIFE_TYPE_KEY.ENTRANCE_METHOD,
+        informationType: SAFETY_INFO_TYPE.ENTRY_METHOD,
+        title: "출입 방법",
+        isSensitive: true,
+        isMultiple: false,
+        isSingleLine: false,
+        descriptionKey: "value",
+        fields: [
+          {
+            key: "value",
+            label: "출입 방법",
+            // TODO: 디자인 확정 후 문구 교체 (임시 문구)
+            placeholder: "예: 공동현관 비밀번호 0000",
+            isRequired: true,
+            requiredMessage: "출입 방법을 입력해 주세요.",
+            maxLength: SAFETY_INFO_VALUE_MAX_LENGTH,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    key: "pet",
+    title: "반려동물",
+    types: [
+      {
+        key: LIFE_TYPE_KEY.PET,
+        informationType: SAFETY_INFO_TYPE.PET,
+        title: "반려동물",
+        isSensitive: false,
+        isMultiple: true,
+        isSingleLine: false,
+        titleKey: "name",
+        descriptionKey: "care",
+        fields: [
+          {
+            key: "name",
+            label: "반려동물",
+            placeholder: "이름",
+            isRequired: true,
+            requiredMessage: "반려동물 이름을 입력해 주세요.",
+            maxLength: SAFETY_INFO_TITLE_MAX_LENGTH,
+          },
+          {
+            key: "care",
+            label: "돌봄방식",
+            placeholder: "예: 3번 끼니 제공",
+            isRequired: true,
+            requiredMessage: "돌봄방식을 입력해 주세요.",
+            maxLength: SAFETY_INFO_VALUE_MAX_LENGTH,
+          },
+        ],
+      },
+    ],
+  },
+];
+
+/**
+ * =====================================================================
+ * [C-05] 미리 남기는 말
+ * - 목록 카드 '수정하기', 하단 [삭제][수정/추가] 버튼, 삭제 확인 모달 문구는
+ *   C-01 상수를 함께 사용 (BASIC_INFO_EDIT_BTN_TEXT / BASIC_INFO_FOOTER_TEXT / BASIC_INFO_DELETE_MODAL)
+ * - 섹션 1개 = 항목 유형 1개라 C-02(HEALTH_CATEGORY_LIST)와 같은 구조 사용
+ * =====================================================================
+ */
+
+// 페이지(목록 화면) 헤더 제목
+export const MESSAGE_INFO_PAGE_TITLE = "미리 남기는 말";
+
+// 내용 입력란 최대 글자 수 (API informationValue 최대 1000자)
+export const MESSAGE_VALUE_MAX_LENGTH = SAFETY_INFO_VALUE_MAX_LENGTH;
+
+// 미리 남기는 말 카테고리 키 (mock/API 데이터의 카테고리 키와 동일)
+// - API informationType: PREFERENCE_REQUEST / DOCUMENT_LOCATION
+export const MESSAGE_CATEGORY_KEY = {
+  PREFERENCE: "preference",
+  DOCUMENT: "document",
+};
+
+// 미리 남기는 말 카테고리 구성 (화면에 그릴 순서대로)
+// - informationType: API 항목 유형 (조회 응답·작성 요청 매핑에 사용)
+// - title: 섹션 제목 / 편집 화면 헤더 제목
+// - isSensitive: 서비스에서 민감 항목으로 지정된 카테고리인지 (두 카테고리 모두 일반)
+// - isSingleLine: 목록 카드 내용을 한 줄로 표시하고 넘치면 말줄임 (내용이 최대 1000자까지 길어질 수 있어 적용)
+// - titleKey: 목록 카드 제목으로 쓸 필드 키 (API title과 매핑)
+// - descriptionKey: 목록 카드 설명으로 쓸 필드 키 (API informationValue와 매핑)
+// - descriptionSuffix: 설명 값 뒤에 붙일 문구 (없음)
+// - fields: 편집 화면 입력 필드 (위에서부터 그리는 순서)
+//   - isRequired: true면 비어 있을 때 [수정/추가] 클릭 시 requiredMessage 토스트
+//   - API 기준 모든 필드가 필수 (title·informationValue 모두 필수 입력)
+//   - isMultiline: 여러 줄 입력란(textarea)으로 그림
+//   - maxLength: 입력 가능한 최대 글자 수
+export const MESSAGE_CATEGORY_LIST = [
+  {
+    key: MESSAGE_CATEGORY_KEY.PREFERENCE,
+    informationType: SAFETY_INFO_TYPE.PREFERENCE_REQUEST,
+    title: "선호 · 부탁",
+    isSensitive: false,
+    isSingleLine: true,
+    titleKey: "title",
+    descriptionKey: "value",
+    descriptionSuffix: "",
+    fields: [
+      {
+        key: "title",
+        label: "선호 · 부탁",
+        placeholder: "선호 또는 부탁을 입력해주세요.",
+        isRequired: true,
+        requiredMessage: "항목을 입력해 주세요.",
+        maxLength: SAFETY_INFO_TITLE_MAX_LENGTH,
+      },
+      {
+        key: "value",
+        label: "남길 내용",
+        placeholder: "남길 내용을 입력해주세요.",
+        isRequired: true,
+        requiredMessage: "내용을 입력해 주세요.",
+        isMultiline: true,
+        maxLength: MESSAGE_VALUE_MAX_LENGTH,
+      },
+    ],
+  },
+  {
+    key: MESSAGE_CATEGORY_KEY.DOCUMENT,
+    informationType: SAFETY_INFO_TYPE.DOCUMENT_LOCATION,
+    title: "준비 문서 보관 위치",
+    isSensitive: false,
+    isSingleLine: true,
+    titleKey: "title",
+    descriptionKey: "value",
+    descriptionSuffix: "",
+    fields: [
+      {
+        key: "title",
+        label: "준비 문서",
+        placeholder: "보관하는 문서를 입력해주세요.",
+        isRequired: true,
+        requiredMessage: "항목을 입력해 주세요.",
+        maxLength: SAFETY_INFO_TITLE_MAX_LENGTH,
+      },
+      {
+        key: "value",
+        label: "보관 위치",
+        placeholder: "서류 보관 위치를 입력해주세요.",
+        isRequired: true,
+        requiredMessage: "내용을 입력해 주세요.",
+        isMultiline: true,
+        maxLength: MESSAGE_VALUE_MAX_LENGTH,
+      },
+    ],
+  },
+];
+
+/**
+ * =====================================================================
+ * [C-06] 공유 관리
+ * =====================================================================
+ */
+
+// 헤더 제목
+export const SHARE_PAGE_TITLE = "공유 관리";
+
+// 목록 위 제목 (공유 카드가 있을 때만 표시)
+export const SHARE_LIST_TITLE = "내 정보를 볼 수 있어요";
+
+// 공유 카드 상태 (공유 중 목록 조회 API의 status 값과 동일)
+export const SHARING_STATUS = {
+  SHARING: "SHARING", // 공유 중
+  REVOKED: "REVOKED", // 철회됨
+};
+
+// 도움 종류: 서버 응답에 쓰는 값(key), 한글 매핑(value)
+// - API(공유 중 목록 조회 helpType) 기준 값
+//   (request의 HELP_TYPE_LABELS와 key가 달라 C-06에서는 별도로 둠)
+export const SHARE_HELP_TYPE_LABELS = {
+  HOSPITAL: "병원 동행",
+  MEAL: "식사",
+  GROCERY: "장보기",
+  PET_CARE: "반려동물",
+  CHECK_IN: "연락/안부",
+  OTHER: "기타",
+};
+
+// 카드 버튼 문구
+export const SHARE_BTN_TEXT = {
+  REVOKE: "직접 철회",
+  REALLOW: "다시 허용",
+};
+
+// 철회됨 카드 뱃지 문구
+export const SHARE_REVOKED_BADGE_TEXT = "철회됨";
+
+// 공유 중 카드 보조 문구: 자동 회수 시각 뒤에 붙는 문구 ("~ 10/2 18:00 자동 회수")
+export const SHARE_AUTO_REVOKE_TEXT = "자동 회수";
+
+// 철회됨 카드 보조 문구: 시작 시각 뒤에 붙는 문구 ("10/2 14:00 · 내가 대상")
+export const SHARE_REVOKED_SUB_TEXT = "내가 대상";
+
+// 공유 중인 카드가 없을 때 빈 상태 화면 문구
+export const SHARE_EMPTY = {
+  message: "현재 공유 중인 상황이 없어요.",
+  guide: "도움 요청을 수락받으면 여기에 표시돼요",
+};

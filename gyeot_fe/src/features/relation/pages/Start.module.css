@@ -1,0 +1,157 @@
+/* 페이지 전체 (버튼을 맨 아래로 보내기 위한 세로 배치) */
+.page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  background: #fcfbfa; /* 다른 화면과 같은 배경 */
+  font-family: var(--font-gothic); /* 팀 기본 폰트 (index.css) */
+}
+
+/* 버튼·입력 칸도 페이지 폰트 따라가게 */
+.page button,
+.page input {
+  font-family: inherit;
+}
+
+/* 공통 헤더 배경을 페이지 배경과 같게 (이 페이지에서만 적용) */
+.page header {
+  background: transparent;
+}
+
+/* 공통 헤더 제목을 명조체로 (이 페이지에서만 적용) */
+.page header h1 {
+  font-family: var(--font-myungjo);
+}
+
+/* 공통 헤더의 '뒤로' 글자를 < 아이콘으로 바꾸기 (이 페이지에서만 적용) */
+.page header button[aria-label="뒤로 가기"] {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  font-size: 0; /* '뒤로' 글자 숨기기 */
+  background: url("../../../shared/assets/icons/iconLeft.svg") center / 24px no-repeat;
+  cursor: pointer;
+}
+
+/* ===== 시작 화면 ===== */
+.start {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 0 16px 24px;
+}
+
+/* 로고 + 문구 (화면 가운데) */
+.brand {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.logo {
+  width: 96px;
+  height: 96px;
+  object-fit: contain;
+}
+
+/* 명조체 문구 (글꼴·크기·굵기는 typoDisplayMedium 클래스가 담당) */
+.slogan {
+  margin: 0;
+  text-align: center;
+  color: #222;
+}
+
+/* 하단 버튼 묶음 */
+.bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* 연한 올리브 버튼 */
+.primaryBtn {
+  width: 100%;
+  height: 48px;
+  background: var(--color-olive-200);
+  border: 1px solid var(--color-olive-300);
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #222;
+  cursor: pointer;
+}
+
+/* 흰 테두리 버튼 */
+.outlineBtn {
+  width: 100%;
+  height: 48px;
+  background: #fff;
+  border: 1px solid #e2ded6;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #222;
+  cursor: pointer;
+}
+
+/* 초대 안내 카드 */
+.inviteCard {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  background: var(--color-olive-100);
+  border-radius: 12px;
+}
+
+/* 보낸 사람 아바타 */
+.avatar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--color-beige-100);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-beige-800);
+}
+
+.inviteTitle {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: #222;
+}
+
+.inviteDesc {
+  margin: 2px 0 0;
+  font-size: 9px;
+  color: #8a8a8a;
+}
+
+/* 이미 계정이 있어요 · 로그인 */
+.loginText {
+  margin: 4px 0 0;
+  font-size: 10px;
+  text-align: center;
+  color: #6f6f6f;
+}
+
+.loginLink {
+  padding: 0;
+  background: none;
+  border: none;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--color-olive-700);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}

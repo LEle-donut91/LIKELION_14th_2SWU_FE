@@ -1,0 +1,10 @@
+/* 공유 카드 목록 박스 (시안 기준 추정 수치, Figma 확인 필요) */
+.shareCardList {
+  margin: 0;
+  padding: 0 20px;
+  box-sizing: border-box;
+  border: 1px solid var(--color-olive-200);
+  border-radius: 24px;
+  background-color: var(--color-base-000);
+  list-style: none;
+}

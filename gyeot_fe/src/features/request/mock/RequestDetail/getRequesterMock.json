@@ -1,0 +1,97 @@
+{
+  "requestId": 21,
+  "requestType": "GENERAL",
+  "helpType": "HOSPITAL",
+  "description": "병원에 가야하는 일이 생겼는데, 혼자 가기에 부담스러워요. 같이 가면 큰 도움이 될 것 같아요!",
+  "place": "○○병원",
+  "startsAt": "2026-11-10T14:00:00",
+  "endsAt": "2026-11-10T17:00:00",
+  "status": "ACCEPTED",
+  "displayStatus": "ACCEPTED",
+  "cancelReason": null,
+  "viewerRole": "REQUESTER",
+  "requester": {
+    "userId": 2,
+    "name": "지우"
+  },
+  "currentAssignment": {
+    "assignmentId": 34,
+    "target": {
+      "userId": 7,
+      "name": "민재",
+      "isGuardian": true
+    },
+    "responseStatus": "AVAILABLE",
+    "responseDeadline": "2026-11-09T14:00:00",
+    "acceptedAt": "2026-11-08T10:12:00",
+    "closed": false,
+    "closeReason": null
+  },
+  "noAssigneeReason": null,
+  "assignments": [
+    {
+      "order": 1,
+      "target": {
+        "userId": 7,
+        "name": "민재",
+        "isGuardian": true
+      },
+      "responseStatus": "AVAILABLE",
+      "closeReason": null
+    }
+  ],
+  "myAssignment": null,
+  "latestProposal": {
+    "proposalId": 5,
+    "status": "PENDING",
+    "invalidationReason": null,
+    "changedFields": [
+      "STARTS_AT",
+      "ENDS_AT",
+      "INFORMATION_IDS"
+    ],
+    "before": {
+      "startsAt": "2026-11-10T14:00:00",
+      "endsAt": "2026-11-10T17:00:00",
+      "place": "○○병원",
+      "informations": [
+        {
+          "informationId": 12,
+          "name": "생년월일"
+        },
+        {
+          "informationId": 15,
+          "name": "출입 방법"
+        }
+      ]
+    },
+    "after": {
+      "startsAt": "2026-11-10T15:00:00",
+      "endsAt": "2026-11-10T18:00:00",
+      "place": "○○병원",
+      "informations": [
+        {
+          "informationId": 12,
+          "name": "생년월일"
+        },
+        {
+          "informationId": 20,
+          "name": "복용약"
+        }
+      ]
+    },
+    "responseDeadline": "2026-11-09T10:30:00"
+  },
+  "actions": [
+    "EDIT",
+    "CANCEL",
+    "WITHDRAW_PROPOSAL"
+  ],
+  "situation": {
+    "situationId": 1,
+    "startDate": "2026-11-08",
+    "endDate": "2026-11-15",
+    "status": "ACTIVE"
+  },
+  "responseDeadlineHours": 24
+}

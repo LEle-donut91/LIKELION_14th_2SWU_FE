@@ -1,0 +1,19 @@
+.isRequester {
+  border-radius: 12px;
+  background-color: var(--color-red-500);
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  gap: 4px;
+  color: var(--color-base-000);
+}
+
+.isAssignee {
+  border-radius: 12px;
+  background-color: var(--color-olive-500);
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  gap: 4px;
+  color: var(--color-base-000);
+}

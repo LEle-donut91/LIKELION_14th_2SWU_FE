@@ -1,0 +1,17 @@
+/* 메인 div 간격 48 */
+.homeEmpty {
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+}
+
+.onboardingContainer{
+  padding-top: 64px;
+}
+
+/* 버튼 div 간격 12 */
+.btnGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}

@@ -1,0 +1,17 @@
+/* 빈 상태 전체 (시안 기준 추정 수치, Figma 확인 필요) */
+.shareEmpty {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 120px 20px 0;
+}
+
+/* 안내 박스 (폰트: typoBodySmall) */
+.guide {
+  margin: 0;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background-color: var(--color-beige-200);
+  color: var(--color-beige-800);
+  text-align: center;
+}
