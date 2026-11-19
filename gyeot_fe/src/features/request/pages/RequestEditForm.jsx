@@ -19,10 +19,12 @@ import { useInformationOptionsQuery } from "@/features/request/hooks/queries/use
 import { useCancelRequestMutation } from "@/features/request/hooks/mutations/useCancelRequestMutation";
 import { useErrorToast } from "@/features/request/hooks/useErrorToast";
 import { useRequestFormStore } from "@/features/request/stores/useRequestFormStore";
+import { useRequestErrorStore } from "@/features/request/stores/useRequestErrorStore";
 import { useToast } from "@/shared/hooks/useToast";
 
 // Constants
 import { REQUEST_ROUTES } from "@/features/request/constants/routerConstants";
+import { REQUEST_ERROR_TARGET_PAGE } from "@/features/request/constants/requestErrorConstants";
 import {
   REQUEST_FORM_FIELD_KEY,
   REQUEST_SHEET,
@@ -63,8 +65,20 @@ function RequestEditForm() {
   const { toast, showToast, hideToast } = useToast();
 
   // 열려 있는 시트 (한 번에 하나만 열림) - REQUEST_SHEET(START/END) 또는 CHECK_FORM_FIELD_KEY 중 하나
-  const [openSheet, setOpenSheet] = useState(null);
+  const [openSheet, setOpenSheet] = useState(() => {
+    const { error } = useRequestErrorStore.getState();
+    return error?.targetPage === REQUEST_ERROR_TARGET_PAGE.EDIT_FORM && error.requestId === paramId
+      ? error.sheet ?? null
+      : null;
+  });
   const closeSheet = () => setOpenSheet(null);
+
+  useEffect(() => {
+    const { error, setError } = useRequestErrorStore.getState();
+    if (error?.targetPage !== REQUEST_ERROR_TARGET_PAGE.EDIT_FORM || error.requestId !== paramId) return;
+    setError(null);
+    showToast(error.message);
+  }, [paramId, showToast]);
 
   // 모달의 열림/닫힘 상태
   const [isCancelModalOpen, setCancelModalOpen] = useState(false);

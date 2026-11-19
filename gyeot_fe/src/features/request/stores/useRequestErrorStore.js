@@ -24,9 +24,15 @@ import { create } from "zustand";
  * @typedef {Object} HomeError
  * @property {typeof import("../constants/requestErrorConstants").REQUEST_ERROR_TARGET_PAGE.HOME} targetPage 홈 화면에서 처리
  * @property {string} message 토스트 메시지
+ *
+ * @typedef {Object} EditError
+ * @property {typeof import("../constants/requestErrorConstants").REQUEST_ERROR_TARGET_PAGE.EDIT_FORM} targetPage 요청 수정 화면에서 처리
+ * @property {string} requestId 에러가 발생한 요청 ID
+ * @property {string} message 토스트 메시지
+ * @property {"start"} sheet 다시 열 시작 시간 시트
  */
 export const useRequestErrorStore = create((set) => ({
-  error: /** @type {CreationError|ReassignError|RequestDetailError|HomeError|null} */ (null),
-  /** @param {CreationError|ReassignError|RequestDetailError|HomeError|null} error */
+  error: /** @type {CreationError|ReassignError|RequestDetailError|HomeError|EditError|null} */ (null),
+  /** @param {CreationError|ReassignError|RequestDetailError|HomeError|EditError|null} error */
   setError: (error) => set({ error }),
 }));

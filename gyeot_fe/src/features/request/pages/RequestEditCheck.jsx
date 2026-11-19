@@ -47,6 +47,7 @@ function RequestEditCheck() {
     data: informationOptions,
     isPending: isInformationPending,
     error: informationError,
+    refetch: refetchInformation,
   } = useInformationOptionsQuery(
     { helpType: requestForm.helpType, requestId: paramId },
     { enabled: Boolean(requestForm.helpType && paramId) },
@@ -67,6 +68,7 @@ function RequestEditCheck() {
     informationOptions,
     showToast,
     onSuccess: () => handleGoBackTwice(),
+    onRefreshInformation: refetchInformation,
   });
 
   // API 응답 데이터 (정제된 형태)
