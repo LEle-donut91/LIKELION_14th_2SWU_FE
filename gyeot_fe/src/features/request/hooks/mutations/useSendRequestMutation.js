@@ -12,8 +12,9 @@ import { getErrorCode, getErrorMessage } from "@/shared/utils/apiError";
 import { REQUEST_ERROR_CODE, INFO_SHARE_ERROR_CODE } from "@/shared/constants/errorCodeConstants";
 import { REQUEST_SHEET, REQUEST_FORM_FIELD_KEY } from "@/features/request/constants/requestFormConstants";
 import { REQUEST_ROUTES } from "@/features/request/constants/routerConstants";
+import { REQUEST_ERROR_TARGET_PAGE } from "@/features/request/constants/requestErrorConstants";
 import { useRequestNav } from "@/features/request/hooks/useRequestNav";
-import { useRequestFormStore } from "@/features/request/stores/useRequestFormStore";
+import { useRequestErrorStore } from "@/features/request/stores/useRequestErrorStore";
 
 /**
  * [H-03-02-01] 요청 보내기 (새 요청 / 다시 부탁하기)
@@ -30,23 +31,22 @@ export function useSendRequestMutation({
   onSuccess,
   onRefreshInformation,
 }) {
-  const { handleGoBack, handleGoBackTwice, handleGoNextWithState } = useRequestNav();
-  const setCreationError = useRequestFormStore((state) => state.setCreationError);
-  const setReassignError = useRequestFormStore((state) => state.setReassignError);
+  const { handleGoBack, handleGoBackTwice, handleGoNext } = useRequestNav();
+  const setError = useRequestErrorStore((state) => state.setError);
 
   const returnFromCreation = (error, correction) => {
-    setCreationError({ ...correction, message: getErrorMessage(error) });
+    setError({ ...correction, targetPage: REQUEST_ERROR_TARGET_PAGE.REQUEST, message: getErrorMessage(error) });
     handleGoBack();
   };
 
-  const returnFromReassignment = (error, correction, returnToDetail = false) => {
-    setReassignError({
+  const returnFromReassignment = (error, correction, targetPage = REQUEST_ERROR_TARGET_PAGE.ASK_AGAIN) => {
+    setError({
       ...correction,
+      targetPage,
       requestId: String(reassignRequestId),
       message: getErrorMessage(error),
-      returnToDetail,
     });
-    if (returnToDetail) {
+    if (targetPage === REQUEST_ERROR_TARGET_PAGE.REQUEST_DETAIL) {
       handleGoBackTwice();
       return;
     }
@@ -64,16 +64,17 @@ export function useSendRequestMutation({
       if (reassignRequestId) {
         switch (getErrorCode(error)) {
           case REQUEST_ERROR_CODE.REQUEST_NOT_FOUND:
-            handleGoNextWithState(REQUEST_ROUTES.home, { requestErrorMessage: getErrorMessage(error) }, true);
+            setError({ targetPage: REQUEST_ERROR_TARGET_PAGE.HOME, message: getErrorMessage(error) });
+            handleGoNext(REQUEST_ROUTES.home, true);
             break;
           case REQUEST_ERROR_CODE.REQUEST_NOT_REASSIGNABLE:
-            returnFromReassignment(error, {}, true);
+            returnFromReassignment(error, {}, REQUEST_ERROR_TARGET_PAGE.REQUEST_DETAIL);
             break;
           case REQUEST_ERROR_CODE.REQUEST_ALREADY_STARTED:
-            returnFromReassignment(error, {}, true);
+            returnFromReassignment(error, {}, REQUEST_ERROR_TARGET_PAGE.REQUEST_DETAIL);
             break;
           case REQUEST_ERROR_CODE.REQUEST_ALREADY_ENDED:
-            returnFromReassignment(error, {}, true);
+            returnFromReassignment(error, {}, REQUEST_ERROR_TARGET_PAGE.REQUEST_DETAIL);
             break;
           case REQUEST_ERROR_CODE.REQUEST_TARGET_INVALID:
             returnFromReassignment(error, { sheet: REQUEST_SHEET.USER, refreshTargets: true });
@@ -96,7 +97,8 @@ export function useSendRequestMutation({
           returnFromCreation(error, { sheet: REQUEST_SHEET.SITUATION });
           break;
         case REQUEST_ERROR_CODE.REQUEST_SITUATION_ENDED:
-          handleGoNextWithState(REQUEST_ROUTES.home, { requestErrorMessage: getErrorMessage(error) }, true);
+          setError({ targetPage: REQUEST_ERROR_TARGET_PAGE.HOME, message: getErrorMessage(error) });
+          handleGoNext(REQUEST_ROUTES.home, true);
           break;
         case REQUEST_ERROR_CODE.REQUEST_TARGET_INVALID:
           returnFromCreation(error, { sheet: REQUEST_SHEET.USER });

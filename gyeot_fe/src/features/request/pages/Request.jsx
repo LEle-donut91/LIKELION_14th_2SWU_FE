@@ -21,9 +21,12 @@ import { useToast } from "@/shared/hooks/useToast";
 
 // Zustand Store
 import { useRequestFormStore } from "@/features/request/stores/useRequestFormStore";
+import { useRequestErrorStore } from "@/features/request/stores/useRequestErrorStore";
 
 // Constants
 import { REQUEST_ROUTES } from "@/features/request/constants/routerConstants";
+import { REQUEST_ERROR_TARGET_PAGE } from "@/features/request/constants/requestErrorConstants";
+import { REQUEST_ERROR_CODE } from "@/shared/constants/errorCodeConstants";
 import {
   REQUEST_FORM_FIELD_KEY,
   REQUEST_SHEET,
@@ -48,6 +51,7 @@ import {
   getDateTimeText,
   getDueDateText,
 } from "@/features/request/utils/getSelectionInput";
+import { getErrorCode, getErrorMessage } from "@/shared/utils/apiError";
 
 // 일반 Components
 import SubpageHeader from "@/shared/components/subpage-header/SubpageHeader";
@@ -70,9 +74,10 @@ function Request() {
   const { toast, showToast, hideToast } = useToast();
 
   // 열려 있는 시트 (한 번에 하나만 열림)
-  const [openSheet, setOpenSheet] = useState(
-    () => useRequestFormStore.getState().creationError?.sheet ?? null,
-  );
+  const [openSheet, setOpenSheet] = useState(() => {
+    const { error } = useRequestErrorStore.getState();
+    return error?.targetPage === REQUEST_ERROR_TARGET_PAGE.REQUEST ? error.sheet ?? null : null;
+  });
   const locationInputRef = useRef(null);
   const contentInputRef = useRef(null);
   const closeSheet = () => setOpenSheet(null);
@@ -119,16 +124,16 @@ function Request() {
   useErrorToast(showToast, situationsError, targetsError);
 
   useEffect(() => {
-    const { creationError, setCreationError } = useRequestFormStore.getState();
-    if (!creationError) return;
-    showToast(creationError.message);
-    if (creationError.field === REQUEST_FORM_FIELD_KEY.LOCATION) {
+    const { error, setError } = useRequestErrorStore.getState();
+    if (error?.targetPage !== REQUEST_ERROR_TARGET_PAGE.REQUEST) return;
+    setError(null);
+    showToast(error.message);
+    if (error.field === REQUEST_FORM_FIELD_KEY.LOCATION) {
       locationInputRef.current?.querySelector("input")?.focus();
     }
-    if (creationError.field === REQUEST_FORM_FIELD_KEY.CONTENT) {
+    if (error.field === REQUEST_FORM_FIELD_KEY.CONTENT) {
       contentInputRef.current?.querySelector("textarea")?.focus();
     }
-    setCreationError(null);
   }, [showToast]);
 
   // 같은 진입(paramId)으로 돌아온 경우(예: 미리보기에서 뒤로가기) 입력값 유지

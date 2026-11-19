@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useState } from "react";
-import { useRequestFormStore } from "@/features/request/stores/useRequestFormStore";
+import { useRequestErrorStore } from "@/features/request/stores/useRequestErrorStore";
 import { useParams } from "react-router-dom";
 import styles from "./RequestDetail.module.css";
 import { useRequestNav } from "@/features/request/hooks/useRequestNav";
@@ -9,6 +9,7 @@ import { useErrorToast } from "@/features/request/hooks/useErrorToast";
 import { useToast } from "@/shared/hooks/useToast";
 import { getRequestDetailService } from "@/features/request/services/requestDetailService";
 import { REQUEST_ROUTES } from "@/features/request/constants/routerConstants";
+import { REQUEST_ERROR_TARGET_PAGE } from "@/features/request/constants/requestErrorConstants";
 import { RESPONSE_STATUS } from "@/features/request/constants/enumConstants";
 import { REQUEST_FORM_FIELD_KEY } from "@/features/request/constants/requestFormConstants";
 import { REQUESTER_CANCEL_BTN_TITLE } from "@/features/request/constants/requesterViewConstants";
@@ -63,10 +64,10 @@ function RequestDetail() {
   useErrorToast(showToast, error);
 
   useEffect(() => {
-    const { reassignError, setReassignError } = useRequestFormStore.getState();
-    if (reassignError?.requestId !== paramId || !reassignError.returnToDetail) return;
-    setReassignError(null);
-    showToast(reassignError.message);
+    const { error, setError } = useRequestErrorStore.getState();
+    if (error?.targetPage !== REQUEST_ERROR_TARGET_PAGE.REQUEST_DETAIL || error.requestId !== paramId) return;
+    setError(null);
+    showToast(error.message);
     refetchDetail({ cancelRefetch: false });
   }, [paramId, showToast, refetchDetail]);
 

@@ -19,6 +19,7 @@ import { useInformationOptionsQuery } from "@/features/request/hooks/queries/use
 import { useRequestDetailQuery } from "@/features/request/hooks/queries/useRequestDetailQuery";
 import { useErrorToast } from "@/features/request/hooks/useErrorToast";
 import { useRequestFormStore } from "@/features/request/stores/useRequestFormStore";
+import { useRequestErrorStore } from "@/features/request/stores/useRequestErrorStore";
 import { useToast } from "@/shared/hooks/useToast";
 
 // Services
@@ -29,6 +30,9 @@ import {
 
 // Constants
 import { REQUEST_ROUTES } from "@/features/request/constants/routerConstants";
+import { REQUEST_ERROR_TARGET_PAGE } from "@/features/request/constants/requestErrorConstants";
+import { REQUEST_ERROR_CODE } from "@/shared/constants/errorCodeConstants";
+import { getErrorCode, getErrorMessage } from "@/shared/utils/apiError";
 import {
   REQUEST_SHEET,
   ASK_AGAIN_VALIDATE_FIELDS_FLEXIBLE,
@@ -67,8 +71,10 @@ function AskAgain() {
 
   // 열려 있는 시트 (한 번에 하나만 열림)
   const [openSheet, setOpenSheet] = useState(() => {
-    const { reassignError } = useRequestFormStore.getState();
-    return reassignError?.requestId === paramId ? reassignError.sheet ?? null : null;
+    const { error } = useRequestErrorStore.getState();
+    return error?.targetPage === REQUEST_ERROR_TARGET_PAGE.ASK_AGAIN && error.requestId === paramId
+      ? error.sheet ?? null
+      : null;
   });
   const closeSheet = () => setOpenSheet(null);
 
@@ -77,11 +83,12 @@ function AskAgain() {
   const refetchTargets = targetsQuery.refetch;
 
   useEffect(() => {
-    const { reassignError, setReassignError, changeUser } = useRequestFormStore.getState();
-    if (reassignError?.requestId !== paramId || reassignError.returnToDetail) return;
-    setReassignError(null);
-    showToast(reassignError.message);
-    if (reassignError.refreshTargets) {
+    const { error, setError } = useRequestErrorStore.getState();
+    const { changeUser } = useRequestFormStore.getState();
+    if (error?.targetPage !== REQUEST_ERROR_TARGET_PAGE.ASK_AGAIN || error.requestId !== paramId) return;
+    setError(null);
+    showToast(error.message);
+    if (error.refreshTargets) {
       changeUser({ id: null });
       refetchTargets({ cancelRefetch: false });
     }
