@@ -16,7 +16,6 @@ import { useLocation, useParams } from "react-router-dom";
 import { useRequestNav } from "@/features/request/hooks/useRequestNav";
 import { useRequestTargetsQuery } from "@/features/request/hooks/queries/useRequestTargetsQuery";
 import { useSituationsQuery } from "@/features/request/hooks/queries/useSituationsQuery";
-import { useErrorToast } from "@/features/request/hooks/useErrorToast";
 import { useToast } from "@/shared/hooks/useToast";
 
 // Zustand Store
@@ -102,40 +101,35 @@ function Request() {
   const {
     data: situationData,
     isPending: isSituationsPending,
-    error: situationsError,
-  } = useSituationsQuery();
+  } = useSituationsQuery({ showToast });
   const situation = situationData?.situation;
 
   // 2. 대상 후보 조회 API (상황 선택 후 호출, 상황이 바뀌면 자동으로 다시 조회)
   const {
     data: user = [],
     isPending: isTargetsPending,
-    error: targetsError,
   } = useRequestTargetsQuery({
     situationId:
       String(entryId) === paramId && String(form.situationId) === paramId
         ? form.situationId
         : undefined,
   }, {
+    showToast,
     onSituationInvalid: () => setOpenSheet(REQUEST_SHEET.SITUATION),
   });
-
-  // API 호출 에러 처리
-  useErrorToast(showToast, situationsError, targetsError);
 
   // 다른 페이지에서 전달 받은 에러 처리
   useEffect(() => {
     const { error, setError } = useRequestErrorStore.getState();
     if (error?.targetPage !== REQUEST_ERROR_TARGET_PAGE.REQUEST) return;
     setError(null);
-    showToast(error.message);
     if (error.field === REQUEST_FORM_FIELD_KEY.LOCATION) {
       locationInputRef.current?.querySelector("input")?.focus();
     }
     if (error.field === REQUEST_FORM_FIELD_KEY.CONTENT) {
       contentInputRef.current?.querySelector("textarea")?.focus();
     }
-  }, [showToast]);
+  }, []);
 
   // 같은 진입(paramId)으로 돌아온 경우(예: 미리보기에서 뒤로가기) 입력값 유지
   // 다른 진입이면 새로 초기화 (초기값 전달)

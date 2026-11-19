@@ -23,7 +23,7 @@ const toNumberOrUndefined = (value) =>
  */
 export const useRequestTargetsQuery = (
   { situationId, requestId } = {},
-  { onSituationInvalid } = {},
+  { onSituationInvalid, showToast } = {},
 ) => {
   const { pathname } = useLocation();
   const isInfoPreview = Boolean(matchPath(REQUEST_ROUTES.infoPreview(":id"), pathname));
@@ -55,7 +55,7 @@ export const useRequestTargetsQuery = (
     }
 
     // 재조회 중에는 기존 에러로 화면을 이동하지 않는다.
-    if (query.isFetching) return;
+    if (query.isFetching || !showToast) return;
 
     // 기록의 에러 발생 시각과 현재 에러 발생 시각이 같으면 이미 처리한 것 -> 리턴
     if (
@@ -65,6 +65,7 @@ export const useRequestTargetsQuery = (
 
     // 이번 실패를 처리했다고 메모하고, 에러 처리 함수를 실행
     handledError.current = { error: query.error, updatedAt: query.errorUpdatedAt };
+    showToast(getErrorMessage(query.error));
     switch (getErrorCode(query.error)) {
       case REQUEST_ERROR_CODE.REQUEST_SITUATION_INVALID:
         if (isInfoPreview) { // 공개 정보 미리보기 화면인 경우
@@ -95,7 +96,7 @@ export const useRequestTargetsQuery = (
         handleGoBack();
         break;
     }
-  }, [query.error, query.errorUpdatedAt, query.isFetching, isInfoPreview, isRequest, requestId, onSituationInvalid, setError, handleGoNext, handleGoBack]);
+  }, [query.error, query.errorUpdatedAt, query.isFetching, isInfoPreview, isRequest, requestId, onSituationInvalid, showToast, setError, handleGoNext, handleGoBack]);
 
   return query;
 };

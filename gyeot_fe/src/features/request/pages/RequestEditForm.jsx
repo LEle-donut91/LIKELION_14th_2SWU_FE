@@ -17,7 +17,6 @@ import { useRequestNav } from "@/features/request/hooks/useRequestNav";
 import { useRequestDetailQuery } from "@/features/request/hooks/queries/useRequestDetailQuery";
 import { useInformationOptionsQuery } from "@/features/request/hooks/queries/useInformationOptionsQuery";
 import { useCancelRequestMutation } from "@/features/request/hooks/mutations/useCancelRequestMutation";
-import { useErrorToast } from "@/features/request/hooks/useErrorToast";
 import { useRequestFormStore } from "@/features/request/stores/useRequestFormStore";
 import { useRequestErrorStore } from "@/features/request/stores/useRequestErrorStore";
 import { useToast } from "@/shared/hooks/useToast";
@@ -77,8 +76,7 @@ function RequestEditForm() {
     const { error, setError } = useRequestErrorStore.getState();
     if (error?.targetPage !== REQUEST_ERROR_TARGET_PAGE.EDIT_FORM || error.requestId !== paramId) return;
     setError(null);
-    showToast(error.message);
-  }, [paramId, showToast]);
+  }, [paramId]);
 
   // 모달의 열림/닫힘 상태
   const [isCancelModalOpen, setCancelModalOpen] = useState(false);
@@ -99,6 +97,7 @@ function RequestEditForm() {
     isPending: isDetailPending,
     error: detailError,
   } = useRequestDetailQuery(paramId, {
+    showToast,
     select: getEditFormService,
   });
 
@@ -110,6 +109,7 @@ function RequestEditForm() {
   } = useInformationOptionsQuery(
     { helpType: detail?.helpType, requestId: paramId },
     {
+      showToast,
       select: (response) => getInformationOptionsService(response, requestForm),
       enabled: Boolean(detail?.helpType && paramId),
     },
@@ -120,9 +120,6 @@ function RequestEditForm() {
     showToast,
     onSuccess: () => handleGoBack(),
   });
-
-  // API 에러 메시지 출력
-  useErrorToast(showToast, detailError, informationError);
 
   // API 응답 데이터 (정제된 형태)
   const { userName, dueDate, initialRequestForm } = detail ?? {};

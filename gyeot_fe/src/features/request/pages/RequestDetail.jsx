@@ -5,7 +5,6 @@ import styles from "./RequestDetail.module.css";
 import { useRequestNav } from "@/features/request/hooks/useRequestNav";
 import { useRequestDetailQuery } from "@/features/request/hooks/queries/useRequestDetailQuery";
 import { useRequestDetailMutations } from "@/features/request/hooks/mutations/useRequestDetailMutations";
-import { useErrorToast } from "@/features/request/hooks/useErrorToast";
 import { useToast } from "@/shared/hooks/useToast";
 import { getRequestDetailService } from "@/features/request/services/requestDetailService";
 import { REQUEST_ROUTES } from "@/features/request/constants/routerConstants";
@@ -41,9 +40,9 @@ function RequestDetail() {
   const {
     data: detail,
     isPending,
-    error,
     refetch: refetchDetail,
   } = useRequestDetailQuery(paramId, {
+    showToast,
     select: getRequestDetailService,
   });
 
@@ -60,16 +59,12 @@ function RequestDetail() {
     onAcceptanceWithdrawn: () => handleGoNext(REQUEST_ROUTES.home, true),
   });
 
-  // API 에러 메시지 출력
-  useErrorToast(showToast, error);
-
   useEffect(() => {
     const { error, setError } = useRequestErrorStore.getState();
     if (error?.targetPage !== REQUEST_ERROR_TARGET_PAGE.REQUEST_DETAIL || error.requestId !== paramId) return;
     setError(null);
-    showToast(error.message);
     refetchDetail({ cancelRefetch: false });
-  }, [paramId, showToast, refetchDetail]);
+  }, [paramId, refetchDetail]);
 
   // API 응답 데이터 (정제된 형태)
   const {

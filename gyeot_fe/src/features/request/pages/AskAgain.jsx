@@ -17,7 +17,6 @@ import { useRequestNav } from "@/features/request/hooks/useRequestNav";
 import { useRequestTargetsQuery } from "@/features/request/hooks/queries/useRequestTargetsQuery";
 import { useInformationOptionsQuery } from "@/features/request/hooks/queries/useInformationOptionsQuery";
 import { useRequestDetailQuery } from "@/features/request/hooks/queries/useRequestDetailQuery";
-import { useErrorToast } from "@/features/request/hooks/useErrorToast";
 import { useRequestFormStore } from "@/features/request/stores/useRequestFormStore";
 import { useRequestErrorStore } from "@/features/request/stores/useRequestErrorStore";
 import { useToast } from "@/shared/hooks/useToast";
@@ -77,27 +76,20 @@ function AskAgain() {
   const closeSheet = () => setOpenSheet(null);
 
   // 1. 대상 후보 조회 API
-  const targetsQuery = useRequestTargetsQuery({ requestId: paramId });
+  const targetsQuery = useRequestTargetsQuery({ requestId: paramId }, { showToast });
   const refetchTargets = targetsQuery.refetch;
 
   // 2. 공개 정보 선택지 조회 API
   const informationQuery = useInformationOptionsQuery(
     { requestId: paramId },
-    { select: getAskAgainInformationService, enabled: Boolean(paramId) },
+    { select: getAskAgainInformationService, enabled: Boolean(paramId), showToast },
   );
 
   // 3. 요청 상세 조회 API
   const detailQuery = useRequestDetailQuery(paramId, {
+    showToast,
     select: getAskAgainDetailService,
   });
-
-  // API 에러 메시지 출력
-  useErrorToast(
-    showToast,
-    targetsQuery.error,
-    informationQuery.error,
-    detailQuery.error,
-  );
 
   // 다른 페이지에서 전달 받은 에러 처리
   useEffect(() => {
@@ -105,12 +97,11 @@ function AskAgain() {
     const { changeUser } = useRequestFormStore.getState();
     if (error?.targetPage !== REQUEST_ERROR_TARGET_PAGE.ASK_AGAIN || error.requestId !== paramId) return;
     setError(null);
-    showToast(error.message);
     if (error.refreshTargets) {
       changeUser({ id: null });
       refetchTargets({ cancelRefetch: false });
     }
-  }, [paramId, showToast, refetchTargets]);
+  }, [paramId, refetchTargets]);
 
   // API 응답 데이터 (정제된 형태)
   const userList = targetsQuery.data ?? [];

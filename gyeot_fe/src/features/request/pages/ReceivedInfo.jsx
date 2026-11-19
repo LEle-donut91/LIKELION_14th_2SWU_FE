@@ -7,7 +7,6 @@ import { useParams } from "react-router-dom";
 // Custom Hooks
 import { useRequestNav } from "@/features/request/hooks/useRequestNav";
 import { useReceivedInfoQuery } from "@/features/request/hooks/queries/useReceivedInfoQuery";
-import { useErrorToast } from "@/features/request/hooks/useErrorToast";
 import { useToast } from "@/shared/hooks/useToast";
 
 // 일반 Components
@@ -28,9 +27,7 @@ function ReceivedInfo() {
   const {
     data: receivedInfo,
     isPending,
-    error,
-  } = useReceivedInfoQuery(paramId);
-  useErrorToast(showToast, error);
+  } = useReceivedInfoQuery(paramId, { showToast });
 
   // API 응답 데이터 (정제된 형태)
   const {

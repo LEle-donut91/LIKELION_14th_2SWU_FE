@@ -18,7 +18,6 @@ import iconToggle from "@/shared/assets/icons/iconToggle.svg";
 import { useRequestNav } from "@/features/request/hooks/useRequestNav";
 import { useRequestDetailQuery } from "@/features/request/hooks/queries/useRequestDetailQuery";
 import { useReconfirmMutations } from "@/features/request/hooks/mutations/useReconfirmMutations";
-import { useErrorToast } from "@/features/request/hooks/useErrorToast";
 import { useToast } from "@/shared/hooks/useToast";
 
 // Constants
@@ -46,8 +45,8 @@ function AssigneeReconfirm() {
   const {
     data: detail,
     isPending,
-    error,
   } = useRequestDetailQuery(paramId, {
+    showToast,
     select: getAssigneeReconfirmService,
   });
 
@@ -66,9 +65,6 @@ function AssigneeReconfirm() {
       handleGoNext(REQUEST_ROUTES.home, true);
     },
   });
-
-  // API 에러 메시지 출력
-  useErrorToast(showToast, error);
 
   return (
     <div className={styles.page}>

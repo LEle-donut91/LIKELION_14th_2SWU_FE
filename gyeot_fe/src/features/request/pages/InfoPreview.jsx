@@ -17,7 +17,6 @@ import { useRequestNav } from "@/features/request/hooks/useRequestNav";
 import { useRequestTargetsQuery } from "@/features/request/hooks/queries/useRequestTargetsQuery";
 import { useInformationOptionsQuery } from "@/features/request/hooks/queries/useInformationOptionsQuery";
 import { useSendRequestMutation } from "@/features/request/hooks/mutations/useSendRequestMutation";
-import { useErrorToast } from "@/features/request/hooks/useErrorToast";
 import { useRequestFormStore } from "@/features/request/stores/useRequestFormStore";
 import { useToast } from "@/shared/hooks/useToast";
 
@@ -78,6 +77,7 @@ function InfoPreview() {
     reassignRequestId
       ? { requestId: reassignRequestId }
       : { situationId: requestForm.situationId },
+    { showToast },
   );
 
   // 2. 공개 항목 선택지 조회 (도움 종류로 조회하고, 다시 부탁하기에서는 기존 요청 ID도 전달)
@@ -88,7 +88,7 @@ function InfoPreview() {
     refetch: refetchInformation,
   } = useInformationOptionsQuery(
     { helpType: requestForm.helpType, requestId: reassignRequestId },
-    { enabled: Boolean(requestForm.helpType) },
+    { enabled: Boolean(requestForm.helpType), showToast },
   );
 
   // 3. 도움 요청 생성 API
@@ -101,9 +101,6 @@ function InfoPreview() {
       handleGoNext(REQUEST_ROUTES.send(requestId), true);
     },
   });
-
-  // API 에러 메시지 출력
-  useErrorToast(showToast, targetsError, informationError);
 
   // API 응답 데이터 (정제된 형태)
   const {
