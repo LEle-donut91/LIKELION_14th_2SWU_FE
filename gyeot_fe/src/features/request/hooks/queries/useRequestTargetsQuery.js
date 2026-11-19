@@ -4,7 +4,7 @@ import { matchPath, useLocation } from "react-router-dom";
 import { getRequestTargetsApi } from "@/features/request/api/getApi";
 import { getRequestTargetsService } from "@/features/request/services/requestTargetService";
 import { REQUEST_QUERY_KEYS } from "@/features/request/constants/requestQueryKeys";
-import { REQUEST_ERROR_CODE } from "@/shared/constants/errorCodeConstants";
+import { COMMON_ERROR_CODE, REQUEST_ERROR_CODE } from "@/shared/constants/errorCodeConstants";
 import { REQUEST_ERROR_TARGET_PAGE } from "@/features/request/constants/requestErrorConstants";
 import { REQUEST_ROUTES } from "@/features/request/constants/routerConstants";
 import { REQUEST_SHEET } from "@/features/request/constants/requestFormConstants";
@@ -87,6 +87,9 @@ export const useRequestTargetsQuery = (
           message: getErrorMessage(query.error),
         });
         handleGoNext(REQUEST_ROUTES.home, true);
+        break;
+      case COMMON_ERROR_CODE.FORBIDDEN:
+        handleGoBack();
         break;
       case REQUEST_ERROR_CODE.REQUEST_NOT_FOUND:
         handleGoBack();

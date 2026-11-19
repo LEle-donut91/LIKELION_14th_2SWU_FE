@@ -9,7 +9,7 @@ import {
 import { REQUEST_QUERY_KEYS } from "@/features/request/constants/requestQueryKeys";
 import { useCancelRequestMutation } from "@/features/request/hooks/mutations/useCancelRequestMutation";
 import { useRequestNav } from "@/features/request/hooks/useRequestNav";
-import { REQUEST_ERROR_CODE } from "@/shared/constants/errorCodeConstants";
+import { COMMON_ERROR_CODE, REQUEST_ERROR_CODE } from "@/shared/constants/errorCodeConstants";
 import { getErrorCode, getErrorMessage } from "@/shared/utils/apiError";
 
 /**
@@ -43,6 +43,9 @@ export function useRequestDetailMutations(
       onError(error);
 
       switch (getErrorCode(error)) {
+        case COMMON_ERROR_CODE.FORBIDDEN:
+          handleGoBack();
+          break;
         case REQUEST_ERROR_CODE.REQUEST_NOT_FOUND:
           handleGoBack();
           break;
@@ -60,6 +63,9 @@ export function useRequestDetailMutations(
       onError(error);
 
       switch (getErrorCode(error)) {
+        case COMMON_ERROR_CODE.FORBIDDEN:
+          handleGoBack();
+          break;
         case REQUEST_ERROR_CODE.REQUEST_NOT_FOUND:
           handleGoBack();
           break;
@@ -77,6 +83,9 @@ export function useRequestDetailMutations(
       onError(error);
 
       switch (getErrorCode(error)) {
+        case COMMON_ERROR_CODE.FORBIDDEN:
+          handleGoBack();
+          break;
         case REQUEST_ERROR_CODE.REQUEST_NOT_FOUND:
           handleGoBack();
           break;
@@ -94,6 +103,9 @@ export function useRequestDetailMutations(
       onError(error);
 
       switch (getErrorCode(error)) {
+        case COMMON_ERROR_CODE.FORBIDDEN:
+          handleGoBack();
+          break;
         case REQUEST_ERROR_CODE.REQUEST_NOT_FOUND:
           handleGoBack();
           break;
@@ -111,6 +123,9 @@ export function useRequestDetailMutations(
       onError(error);
 
       switch (getErrorCode(error)) {
+        case COMMON_ERROR_CODE.FORBIDDEN:
+          handleGoBack();
+          break;
         case REQUEST_ERROR_CODE.REQUEST_NOT_FOUND:
           handleGoBack();
           break;

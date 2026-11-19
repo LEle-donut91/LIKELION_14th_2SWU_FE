@@ -4,7 +4,7 @@ import {
   postReconfirmRejectApi,
 } from "@/features/request/api/postApi";
 import { getErrorCode, getErrorMessage } from "@/shared/utils/apiError";
-import { REQUEST_ERROR_CODE } from "@/shared/constants/errorCodeConstants";
+import { COMMON_ERROR_CODE, REQUEST_ERROR_CODE } from "@/shared/constants/errorCodeConstants";
 import { useRequestNav } from "@/features/request/hooks/useRequestNav";
 
 /**
@@ -28,6 +28,9 @@ export function useReconfirmMutations({
       onError(error);
 
       switch (getErrorCode(error)) {
+        case COMMON_ERROR_CODE.FORBIDDEN:
+          handleGoBack();
+          break;
         case REQUEST_ERROR_CODE.REQUEST_NOT_FOUND:
           handleGoBack();
           break;
@@ -50,6 +53,9 @@ export function useReconfirmMutations({
       onError(error);
 
       switch (getErrorCode(error)) {
+        case COMMON_ERROR_CODE.FORBIDDEN:
+          handleGoBack();
+          break;
         case REQUEST_ERROR_CODE.REQUEST_NOT_FOUND:
           handleGoBack();
           break;

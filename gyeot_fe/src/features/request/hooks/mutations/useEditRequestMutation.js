@@ -3,7 +3,7 @@ import { patchEditApi } from "@/features/request/api/patchApi";
 import { patchEditService } from "@/features/request/services/editRequestService";
 import { NO_CHANGE_TOAST_MESSAGE } from "@/features/request/constants/messageConstants";
 import { getErrorCode, getErrorMessage } from "@/shared/utils/apiError";
-import { REQUEST_ERROR_CODE, INFO_SHARE_ERROR_CODE } from "@/shared/constants/errorCodeConstants";
+import { COMMON_ERROR_CODE, REQUEST_ERROR_CODE, INFO_SHARE_ERROR_CODE } from "@/shared/constants/errorCodeConstants";
 import { REQUEST_ERROR_TARGET_PAGE } from "@/features/request/constants/requestErrorConstants";
 import { REQUEST_SHEET } from "@/features/request/constants/requestFormConstants";
 import { useRequestErrorStore } from "@/features/request/stores/useRequestErrorStore";
@@ -42,6 +42,9 @@ export function useEditRequestMutation({
       showToast(getErrorMessage(error));
 
       switch (getErrorCode(error)) {
+        case COMMON_ERROR_CODE.FORBIDDEN:
+          handleGoBack();
+          break;
         case REQUEST_ERROR_CODE.REQUEST_NOT_FOUND:
           handleGoBack();
           break;

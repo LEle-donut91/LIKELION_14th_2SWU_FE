@@ -9,7 +9,7 @@ import {
 } from "@/features/request/services/createRequestService";
 import { postAskAgainService } from "@/features/request/services/askAgainService";
 import { getErrorCode, getErrorMessage } from "@/shared/utils/apiError";
-import { REQUEST_ERROR_CODE, INFO_SHARE_ERROR_CODE } from "@/shared/constants/errorCodeConstants";
+import { COMMON_ERROR_CODE, REQUEST_ERROR_CODE, INFO_SHARE_ERROR_CODE } from "@/shared/constants/errorCodeConstants";
 import { REQUEST_SHEET, REQUEST_FORM_FIELD_KEY } from "@/features/request/constants/requestFormConstants";
 import { REQUEST_ROUTES } from "@/features/request/constants/routerConstants";
 import { REQUEST_ERROR_TARGET_PAGE } from "@/features/request/constants/requestErrorConstants";
@@ -63,6 +63,9 @@ export function useSendRequestMutation({
       showToast(getErrorMessage(error));
       if (reassignRequestId) {
         switch (getErrorCode(error)) {
+          case COMMON_ERROR_CODE.FORBIDDEN:
+            handleGoBack();
+            break;
           case REQUEST_ERROR_CODE.REQUEST_NOT_FOUND:
             setError({ targetPage: REQUEST_ERROR_TARGET_PAGE.HOME, message: getErrorMessage(error) });
             handleGoNext(REQUEST_ROUTES.home, true);

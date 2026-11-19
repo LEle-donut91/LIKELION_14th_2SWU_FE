@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { matchPath, useLocation } from "react-router-dom";
 import { postCancelApi } from "@/features/request/api/postApi";
-import { REQUEST_ERROR_CODE } from "@/shared/constants/errorCodeConstants";
+import { COMMON_ERROR_CODE, REQUEST_ERROR_CODE } from "@/shared/constants/errorCodeConstants";
 import { REQUEST_ROUTES } from "@/features/request/constants/routerConstants";
 import { REQUEST_QUERY_KEYS } from "@/features/request/constants/requestQueryKeys";
 import { useRequestNav } from "@/features/request/hooks/useRequestNav";
@@ -20,6 +20,9 @@ export function useCancelRequestMutation(requestId, { showToast, onSuccess }) {
       showToast(getErrorMessage(error));
 
       switch (getErrorCode(error)) {
+        case COMMON_ERROR_CODE.FORBIDDEN:
+          handleGoBack();
+          break;
         case REQUEST_ERROR_CODE.REQUEST_NOT_FOUND:
           handleGoBack();
           break;
