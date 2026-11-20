@@ -90,10 +90,10 @@ function RequestDetail() {
     askAgain: () => handleGoNext(`${REQUEST_ROUTES.askAgain(paramId)}?from=detail`),
     withdraw: () => setWithdrawModalOpen(true),
     withdrawProposal: () => withdrawProposal(proposalId),
-    done: completeCare,
+    done: completeCare, // 돌봄 완료 API 호출
     sameRequest: () => setSameModalOpen(true),
     checkChange: () => handleGoNext(REQUEST_ROUTES.assigneeReconfirm(paramId)),
-    start: startCare,
+    start: startCare, // 돌봄 시작 API 호출
     pastSituation: () =>
       handleGoNextWithState(
         REQUEST_ROUTES.pastSituationDetail,

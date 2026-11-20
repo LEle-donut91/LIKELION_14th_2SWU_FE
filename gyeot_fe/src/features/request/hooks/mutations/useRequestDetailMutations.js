@@ -72,6 +72,8 @@ export function useRequestDetailMutations(
       }
     },
   });
+
+  
   const withdrawProposalMutation = useMutation({
     mutationFn: postEditWithdrawApi,
     onSuccess: refreshDetail,
@@ -92,11 +94,23 @@ export function useRequestDetailMutations(
       }
     },
   });
+
+  // 돌봄 시작 API
   const startMutation = useMutation({
     mutationFn: postStartApi,
-    onSuccess: refreshDetail,
+
+    // API 호출 성공 시
+    onSuccess: (result) => {
+      // null이 아닐 때만 성공 응답 메시지 출력
+      if (result.message) {
+        showToast(result.message);
+      }
+      return refreshDetail();
+    },
+
+    // API 호출 실패 시
     onError: (error) => {
-      onError(error);
+      onError(error); // 에러 메시지를 토스트로 출력
 
       switch (getErrorCode(error)) {
         case COMMON_ERROR_CODE.FORBIDDEN:
@@ -112,11 +126,23 @@ export function useRequestDetailMutations(
       }
     },
   });
+
+  // 돌봄 완료 API
   const doneMutation = useMutation({
     mutationFn: postDoneApi,
-    onSuccess: refreshDetail,
+
+    // API 호출 성공 시
+    onSuccess: (result) => {
+      // null이 아닐 때만 성공 응답 메시지 출력
+      if (result.message) {
+        showToast(result.message);
+      }
+      return refreshDetail();
+    },
+
+    // API 호출 실패 시
     onError: (error) => {
-      onError(error);
+      onError(error); // 에러 메시지를 토스트로 출력
 
       switch (getErrorCode(error)) {
         case COMMON_ERROR_CODE.FORBIDDEN:
@@ -184,13 +210,16 @@ export function useRequestDetailMutations(
     },
 
     // 시작/완료는 서로의 진행 중에도 누를 수 없음
+    // 돌봄 시작
     startCare: () => {
-      if (startMutation.isPending || doneMutation.isPending) return;
-      startMutation.mutate(requestId);
+      if (startMutation.isPending || doneMutation.isPending) return; // 시작/완료 진행 중에는 무시
+      startMutation.mutate(requestId); // 돌봄 시작 API
     },
+
+    // 돌봄 완료
     completeCare: () => {
-      if (startMutation.isPending || doneMutation.isPending) return;
-      doneMutation.mutate(requestId);
+      if (startMutation.isPending || doneMutation.isPending) return; // 시작/완료 진행 중에는 무시
+      doneMutation.mutate(requestId); // 돌봄 완료 API
     },
 
     // 요청 응답 API
