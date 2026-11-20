@@ -9,10 +9,17 @@ import { AUTH_API_URLS } from "@/shared/constants/apiUrlConstants";
 
 // 1. 초대 링크 생성 (POST /api/invitations)
 // - invitationType: "MY_PERSON" 나의 사람 / "GUARDIAN" 보호자
-// - message: 보호자 요청 짧은 편지 (나의 사람 초대는 보내지 않음)
+// - personalLabel: 나의 사람 초대에서만 (선택, 1~50자)
+// - message: 보호자 요청에서만 (선택 편지)
+// - promiseConfirmed: 보호자 요청에서만 (필수, true만 허용)
+// - 값이 없는 칸은 보내지 않음 (유형에 맞지 않는 칸을 보내면 400 INVALID_INPUT)
 // → data: { invitationId, invitationUrl, expiresAt }
-export const postInvitationApi = async ({ invitationType, message }) => {
-  const body = message ? { invitationType, message } : { invitationType };
+export const postInvitationApi = async ({ invitationType, personalLabel, message, promiseConfirmed }) => {
+  const body = { invitationType };
+  if (personalLabel) body.personalLabel = personalLabel;
+  if (message) body.message = message;
+  if (promiseConfirmed) body.promiseConfirmed = promiseConfirmed;
+
   const response = await axiosInstance.post(AUTH_API_URLS.invitations, body);
   return response.data;
 };

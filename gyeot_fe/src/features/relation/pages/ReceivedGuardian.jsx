@@ -1,10 +1,18 @@
 // N-03
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import SubpageHeader from "@/shared/components/subpage-header/SubpageHeader"; // 팀 공통 서브 헤더
+import DefaultToast from "@/shared/components/Toast/DefaultToast"; // 팀 공통 토스트
+import { useToast } from "@/shared/hooks/useToast";
 import ConfirmModal from "@/features/relation/components/ConfirmModal";
-import { MOCK_RECEIVED_INVITE } from "@/features/relation/constants/relation";
+import InviteResult from "@/features/relation/components/InviteResult"; // 대기 중이 아닐 때 결과 화면 (R-03과 공통)
+import { UNAVAILABLE_REASON } from "@/features/relation/services/invitationService";
+import { useInvitationQuery } from "@/features/relation/hooks/queries/useInvitationQuery";
+import {
+  useAcceptInvitationMutation,
+  useRejectInvitationMutation,
+} from "@/features/relation/hooks/mutations/useInvitationMutations";
 import iconShield from "@/shared/assets/icons/iconShield.svg";
 import styles from "./ReceivedGuardian.module.css";
 
@@ -33,30 +41,73 @@ function WarningIcon() {
 function ReceivedGuardian() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const [invite] = useState(MOCK_RECEIVED_INVITE); // TODO: GET /api/invitations/{token} 연결 후 교체
+  const token = searchParams.get("token"); // 보호자 요청 링크 토큰 (초대 링크 진입·로그인 후 ?token=으로 전달됨)
   const [isFullModalOpen, setFullModalOpen] = useState(false); // 보호자 가득 참 모달 열림 여부
+  const { toast, showToast, hideToast } = useToast(); // 실패 안내 토스트
 
-  // 내 보호자가 이미 3명인지 (TODO: POST /api/invitations/{token}/eligibility 결과로 판단, 지금은 ?full 로 확인)
-  const isGuardianFull = searchParams.has("full");
+  // 요청 정보 + 수락 가능 여부 (GET /api/invitations/{token} — 별도 확인 API 없이 canAccept로 판단)
+  const { data: invite, isError } = useInvitationQuery(token);
 
-  // 수락 (TODO: POST /api/invitations/{token}/accept 연결)
+  // 토큰이 없거나 사용할 수 없는 링크면 홈으로
+  useEffect(() => {
+    if (!token || isError) {
+      navigate("/home", { replace: true });
+    }
+  }, [token, isError, navigate]);
+
+  // 수락 → 관계 화면으로
+  const { acceptInvitation, isAccepting } = useAcceptInvitationMutation(token, {
+    showToast,
+    onSuccess: () => navigate("/relation", { replace: true }),
+  });
+
+  // 거절 → 홈으로
+  const { rejectInvitation, isRejecting } = useRejectInvitationMutation(token, {
+    showToast,
+    onSuccess: () => navigate("/home", { replace: true }),
+  });
+
+  const isSubmitting = isAccepting || isRejecting; // 요청 중이면 버튼 잠금
+
+  // 수락 버튼: 수락할 수 없는 이유가 있으면 안내, 없으면 수락
   const handleAccept = () => {
-    if (isGuardianFull) {
+    if (invite.unavailableReason === UNAVAILABLE_REASON.GUARDIAN_LIMIT_REACHED) {
       setFullModalOpen(true); // 보호자 3명이면 수락 대신 안내 모달
       return;
     }
-    navigate("/relation"); // 관계 화면으로 이동
+    if (invite.unavailableReason === UNAVAILABLE_REASON.SELF_INVITATION) {
+      showToast("내가 보낸 보호자 요청은 수락할 수 없어요");
+      return;
+    }
+    acceptInvitation();
   };
 
-  // 거절 / 요청 취소 (TODO: POST /api/invitations/{token}/reject 연결)
+  // 거절 / 요청 취소 (모달의 요청 취소도 거절로 처리)
   const handleReject = () => {
     setFullModalOpen(false);
-    navigate("/home"); // 홈으로 이동
+    rejectInvitation();
   };
+
+  const header = <SubpageHeader title="보호자 요청" />;
+
+  // 요청 정보를 불러오는 동안은 헤더만
+  if (!invite) {
+    return <div className={styles.page}>{header}</div>;
+  }
+
+  // 이미 응답·취소·만료된 요청이면 결과 화면
+  if (invite.status !== "PENDING") {
+    return (
+      <div className={styles.page}>
+        {header}
+        <InviteResult status={invite.status} />
+      </div>
+    );
+  }
 
   return (
     <div className={styles.page}>
-      <SubpageHeader title="보호자 요청" />
+      {header}
 
       <div className={styles.content}>
         {/* 보낸 사람 */}
@@ -70,7 +121,7 @@ function ReceivedGuardian() {
         {/* 기본 멘트 */}
         <div className={styles.messageCard}>
           <span className={styles.messageLabel}>기본 멘트</span>
-          <p className={styles.message}>“{invite.message}”</p>
+          <p className={styles.message}>“{invite.message ?? invite.defaultMessage}”</p> {/* 편지가 없으면 기본 멘트 */}
         </div>
 
         {/* 약속 내용 */}
@@ -94,10 +145,10 @@ function ReceivedGuardian() {
 
         {/* 하단 버튼 */}
         <div className={styles.buttons}>
-          <button type="button" className={styles.acceptBtn} onClick={handleAccept}>
+          <button type="button" className={styles.acceptBtn} onClick={handleAccept} disabled={isSubmitting}>
             수락
           </button>
-          <button type="button" className={styles.rejectBtn} onClick={handleReject}>
+          <button type="button" className={styles.rejectBtn} onClick={handleReject} disabled={isSubmitting}>
             거절
           </button>
         </div>
@@ -114,6 +165,8 @@ function ReceivedGuardian() {
         onCancel={() => setFullModalOpen(false)}
         onConfirm={handleReject}
       />
+
+      {toast && <DefaultToast key={toast.id} message={toast.message} onHide={hideToast} />}
     </div>
   );
 }
