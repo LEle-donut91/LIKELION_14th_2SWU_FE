@@ -10,4 +10,8 @@ export const SITUATION_QUERY_KEYS = {
 
   // 2. 지난 상황 목록 (GET /api/situations/history) — S-00 하단, H-04 지난 상황
   pastList: (params) => ["situation", "pastList", params],
+
+  // 3. 활성 관계 목록 (GET /api/relationships) — H-01 참여할 지인
+  // - relation 영역과 같은 key를 써서 캐시를 함께 사용 (관계 해제·초대 수락 후 함께 갱신)
+  relationships: () => ["relationships"],
 };

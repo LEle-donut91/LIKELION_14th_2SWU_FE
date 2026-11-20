@@ -86,3 +86,32 @@ export const PAST_SITUATION_ITEMS_MOCK = [
     participantCount: 1,
   },
 ];
+
+// 활성 관계 목록 조회 (GET /api/relationships) → data.items
+// - 관계 API 목업 (relationshipApi.js의 USE_MOCK을 켰을 때만 사용)
+export const RELATIONSHIP_ITEMS_MOCK = [
+  {
+    relationshipId: 1,
+    userId: 30,
+    name: "서연",
+    relationshipType: "GUARDIAN",
+    personalLabel: null,
+    guardianPriority: 1,
+  },
+  {
+    relationshipId: 2,
+    userId: 31,
+    name: "민재",
+    relationshipType: "MY_PERSON",
+    personalLabel: "친구",
+    guardianPriority: null,
+  },
+  {
+    relationshipId: 3,
+    userId: 32,
+    name: "하은",
+    relationshipType: "MY_PERSON",
+    personalLabel: "이웃",
+    guardianPriority: null,
+  },
+];
