@@ -28,22 +28,36 @@ const toSituationTags = (requestCounts) => {
 };
 
 // 진행 중 상황 1개 → SituationCard 데이터
-const toSituationCard = (item) => ({
-  id: item.situationId,
-  title: item.name ?? "",
-  startDate: item.startAt,
-  endDate: item.endAt,
-  participantCount: item.participantCount, // 없으면 SituationCard가 메타에서 숨김
-  nextSchedule: item.nextSchedule
-    ? {
-        dateTime: item.nextSchedule.startsAt,
-        assigneeName: item.nextSchedule.assigneeName ?? null,
-        typeName: HELP_TYPE_LABEL[item.nextSchedule.helpType] ?? "",
-      }
-    : null,
-  extraScheduleCount: item.remainingScheduleCount ?? 0,
-  tags: toSituationTags(item.requestCounts),
-});
+// - nextSchedule(가장 가까운 일정)을 카드 박스와 하단 '다음 일정' 줄(upcomingSchedule)에 함께 사용
+const toSituationCard = (item) => {
+  const schedule = item.nextSchedule;
+  const typeName = schedule ? HELP_TYPE_LABEL[schedule.helpType] ?? "" : "";
+
+  return {
+    id: item.situationId,
+    title: item.name ?? "",
+    startDate: item.startAt,
+    endDate: item.endAt,
+    participantCount: item.participantCount, // 없으면 SituationCard가 메타에서 숨김
+    nextSchedule: schedule
+      ? {
+          dateTime: schedule.startsAt,
+          assigneeName: schedule.assigneeName ?? null,
+          typeName,
+        }
+      : null,
+    extraScheduleCount: item.remainingScheduleCount ?? 0,
+    tags: toSituationTags(item.requestCounts),
+    // 하단 '다음 일정' 줄 (일정이 없으면 null → 줄 숨김)
+    upcomingSchedule: schedule
+      ? {
+          dateTime: schedule.startsAt,
+          title: typeName,
+          assigneeName: schedule.assigneeName ?? null,
+        }
+      : null,
+  };
+};
 
 // 지난 상황 1개 → PastSituationItem 데이터
 // - requestCount: 명세에 아직 없는 값이라 없으면 null (화면에서 '요청 N건' 숨김)

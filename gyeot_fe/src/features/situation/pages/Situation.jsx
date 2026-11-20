@@ -104,6 +104,7 @@ function Situation() {
             <SituationCard
               key={situation.id}
               situation={situation}
+              upcomingSchedule={situation.upcomingSchedule}
               onDetailClick={() => handleSituationDetailClick(situation.id)}
             />
           ))}
