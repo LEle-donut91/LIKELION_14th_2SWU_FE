@@ -1,4 +1,5 @@
 // H-03 상황 상세 (H-03-01 정보 주인 뷰 / H-03-02 참여자 뷰)
+import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import styles from "@/features/situation/pages/SituationDetail.module.css";
 import SubpageHeader from "@/shared/components/subpage-header/SubpageHeader"; // 팀 공통 서브 헤더
@@ -8,14 +9,17 @@ import ParticipantTagList from "@/features/situation/components/ParticipantTagLi
 import SituationRequestList from "@/features/situation/components/SituationRequestList";
 import ResponseNeededRequestList from "@/features/situation/components/ResponseNeededRequestList";
 import RequestListEmpty from "@/features/situation/components/RequestListEmpty";
+import DefaultToast from "@/shared/components/Toast/DefaultToast";
+import { useToast } from "@/shared/hooks/useToast";
+import { getErrorCode, getErrorMessage } from "@/shared/utils/apiError";
 import {
   MY_REQUEST_ROLE,
   SITUATION_NAVIGATION_PATH,
+  SITUATION_NOT_FOUND_CODE,
 } from "@/features/situation/constants/situationConstants";
-import {
-  JOINED_SITUATION_DETAIL_MOCK,
-  SITUATION_DETAIL_MOCK,
-} from "@/features/situation/mocks/situationMockData";
+import { SITUATION_MOCK_SCENARIO } from "@/features/situation/api/situationApi";
+import { useSituationDetailQuery } from "@/features/situation/hooks/queries/useSituationDetailQuery";
+import { useSituationParticipantsQuery } from "@/features/situation/hooks/queries/useSituationParticipantsQuery";
 
 // 시점별 요청 영역 문구
 const REQUEST_SECTION_TEXT = {
@@ -35,16 +39,63 @@ function SituationDetail() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  // TODO: 상황 상세 API 연동 전까지 목업 데이터 사용
-  // 화면 확인용: ?role=participant (참여자 시점), ?state=empty (요청이 없는 경우)
-  const isOwner = searchParams.get("role") !== "participant";
-  const isEmptyPreview = searchParams.get("state") === "empty";
-  const situation = isOwner ? SITUATION_DETAIL_MOCK : JOINED_SITUATION_DETAIL_MOCK;
-  const participantList = situation.participants;
-  const requestList = isEmptyPreview ? [] : situation.requests;
+  const { toast, showToast, hideToast } = useToast();
+
+  // 상황 ID: S-00 등에서 /situation/detail?situationId= 로 전달
+  // 목업 확인용: situationId=1 (정보 주인), situationId=21 (참여자)
+  // - &state=empty       : 요청이 하나도 없는 경우
+  // - &state=no-accepted : 응답 대기 요청만 있는 경우 (참여자 뷰 '수락한 요청' 빈 상태)
+  const situationId = searchParams.get("situationId");
+  const mockScenario = Object.values(SITUATION_MOCK_SCENARIO).includes(
+    searchParams.get("state"),
+  )
+    ? searchParams.get("state")
+    : undefined;
+
+  const detailQuery = useSituationDetailQuery(situationId, { mockScenario });
+  const participantsQuery = useSituationParticipantsQuery(situationId);
+
+  // 상황 ID가 없으면 상황 목록으로
+  useEffect(() => {
+    if (!situationId) {
+      navigate(SITUATION_NAVIGATION_PATH.SITUATION_LIST, { replace: true });
+    }
+  }, [situationId, navigate]);
+
+  // 조회 실패: 상황이 없거나 접근 불가(404)면 상황 목록으로, 그 외는 토스트
+  const queryError = detailQuery.error ?? participantsQuery.error;
+  useEffect(() => {
+    if (!queryError) return;
+    if (getErrorCode(queryError) === SITUATION_NOT_FOUND_CODE) {
+      navigate(SITUATION_NAVIGATION_PATH.SITUATION_LIST, { replace: true });
+      return;
+    }
+    showToast(getErrorMessage(queryError));
+  }, [queryError, navigate, showToast]);
+
+  const situation = detailQuery.data;
+  const participantData = participantsQuery.data;
+
+  // 두 조회가 모두 끝나기 전에는 빈 화면 (참여자 수 0명 등이 잠깐 보이지 않도록)
+  if (!situation || !participantData) {
+    return (
+      <div className={styles.page}>
+        {toast && (
+          <DefaultToast key={toast.id} message={toast.message} onHide={hideToast} />
+        )}
+      </div>
+    );
+  }
+
+  const { isOwner, viewerId } = situation;
+  // 참여자 태그: 정보 주인과 나를 뺀 현재 참여자
+  const participantList = participantData.participants.filter(
+    ({ userId }) => userId !== viewerId,
+  );
+  const situationCardData = { ...situation, ownerName: participantData.ownerName };
+  const requestList = isOwner ? situation.requests : situation.assignedRequests;
   // 참여자: 응답이 필요한 요청 (정보 주인은 없음)
-  const responseNeededRequestList =
-    isEmptyPreview || isOwner ? [] : situation.responseNeededRequests;
+  const responseNeededRequestList = situation.responseNeededRequests;
   const sectionText = REQUEST_SECTION_TEXT[isOwner ? "owner" : "participant"];
 
   // 정보 주인은 요청자 상세, 참여자는 내 역할(대상/담당)에 맞는 상세로 이동
@@ -62,8 +113,8 @@ function SituationDetail() {
 
   // '...' : H-03-05 상황 관리 (참여자는 참여자 시점으로)
   const managePath = isOwner
-    ? SITUATION_NAVIGATION_PATH.SITUATION_MANAGE
-    : `${SITUATION_NAVIGATION_PATH.SITUATION_MANAGE}?role=participant`;
+    ? `${SITUATION_NAVIGATION_PATH.SITUATION_MANAGE}?situationId=${situation.id}`
+    : `${SITUATION_NAVIGATION_PATH.SITUATION_MANAGE}?situationId=${situation.id}&role=participant`;
 
   return (
     <div className={styles.page}>
@@ -74,7 +125,7 @@ function SituationDetail() {
       >
         <section className={styles.situationSection}>
           <SituationDetailCard
-            situation={situation}
+            situation={situationCardData}
             isOwner={isOwner}
             participantCount={participantList.length}
           />
@@ -121,6 +172,10 @@ function SituationDetail() {
           type="primary"
           onClick={handleRequestCreateClick}
         />
+      )}
+
+      {toast && (
+        <DefaultToast key={toast.id} message={toast.message} onHide={hideToast} />
       )}
     </div>
   );

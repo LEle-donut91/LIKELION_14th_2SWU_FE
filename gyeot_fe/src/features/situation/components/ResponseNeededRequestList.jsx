@@ -7,7 +7,7 @@ import {
 
 /**
  * H-03-02 참여자뷰 - 응답이 필요한 요청 (도움 종류 · 상태 칩 · 일시 · 응답 기한 · 응답하기)
- * - requests       : [{ id, helpType, startDateTime, responseDeadline, status }]
+ * - requests       : [{ id, helpType, startDateTime, responseDeadline(없으면 null), status }]
  * - onRequestClick : 카드 클릭 시 요청 데이터 전달
  */
 function ResponseNeededRequestList({ requests, onRequestClick }) {
@@ -36,10 +36,16 @@ function ResponseNeededRequestList({ requests, onRequestClick }) {
                 )}
               </span>
               <span className={`${styles.meta} typoCaptionMedium`}>
-                {formatDateWithTime(startDateTime)} ·{" "}
-                <strong className={styles.deadline}>
-                  응답 기한 {formatDateWithTime(responseDeadline)}
-                </strong>
+                {formatDateWithTime(startDateTime)}
+                {/* 응답 기한은 응답에 있을 때만 표시 (상황 상세 조회 명세에 아직 없는 값) */}
+                {responseDeadline && (
+                  <>
+                    {" · "}
+                    <strong className={styles.deadline}>
+                      응답 기한 {formatDateWithTime(responseDeadline)}
+                    </strong>
+                  </>
+                )}
               </span>
               <span className={`${styles.responseLink} typoCaptionMedium`}>
                 응답하기 &gt;
