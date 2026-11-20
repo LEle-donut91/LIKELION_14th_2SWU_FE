@@ -24,3 +24,10 @@ export const paginateMockItems = (items, { page = 0, size = 20 } = {}) => {
     hasNext: start + size < items.length,
   };
 };
+
+// 목업 실패 응답: axios 에러와 같은 형태 (error.response.status, error.response.data)
+export const createMockError = ({ status, code, message }) => {
+  const error = new Error(code);
+  error.response = { status, data: { status: "error", code, message, data: null } };
+  return error;
+};
