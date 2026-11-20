@@ -64,6 +64,7 @@ function AssigneeReconfirm() {
       setModalOpen(false);
       handleGoNext(REQUEST_ROUTES.home, true);
     },
+    onRejectError: () => setModalOpen(false), // 모달을 닫아 에러 토스트 메시지가 가려지지 않도록 처리
   });
 
   return (

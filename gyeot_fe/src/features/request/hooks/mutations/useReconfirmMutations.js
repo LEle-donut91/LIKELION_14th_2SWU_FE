@@ -17,15 +17,27 @@ export function useReconfirmMutations({
   showToast,
   onAccepted,
   onRejected,
+  onRejectError,
 }) {
   const { handleGoBack } = useRequestNav();
-  const onError = (error) => showToast(getErrorMessage(error));
+  const onError = (error) => showToast(getErrorMessage(error)); // 에러 토스트 메시지 출력
 
+  // 재확인 수락 API
   const acceptMutation = useMutation({
     mutationFn: postReconfirmAcceptApi,
-    onSuccess: onAccepted,
+
+    // API 호출 성공 시
+    onSuccess: (result) => {
+      if (result.message) {
+        // null이 아닐 때만 토스트 메시지 출력
+        showToast(result.message);
+      }
+      onAccepted(); // 콜백 실행 (이전 페이지로 이동)
+    },
+
+    // API 호출 실패 시
     onError: (error) => {
-      onError(error);
+      onError(error); // 에러 토스트 메시지 출력
 
       switch (getErrorCode(error)) {
         case COMMON_ERROR_CODE.FORBIDDEN:
@@ -46,11 +58,24 @@ export function useReconfirmMutations({
       }
     },
   });
+
+  // 재확인 거절 API
   const rejectMutation = useMutation({
     mutationFn: postReconfirmRejectApi,
-    onSuccess: onRejected,
+
+    // API 호출 성공 시
+    onSuccess: (result) => {
+      // null이 아닐 때만 토스트 메시지 출력
+      if (result.message) {
+        showToast(result.message);
+      }
+      onRejected(); // 콜백 실행 (모달 닫고 홈으로 이동)
+    },
+
+    // API 호출 실패 시
     onError: (error) => {
-      onError(error);
+      onRejectError?.(); // 콜백 실행 (모달을 닫아 에러 토스트가 가려지지 않도록 처리)
+      onError(error); // 에러 토스트 메시지 출력
 
       switch (getErrorCode(error)) {
         case COMMON_ERROR_CODE.FORBIDDEN:
@@ -72,16 +97,19 @@ export function useReconfirmMutations({
     },
   });
 
-  const isProcessing = acceptMutation.isPending || rejectMutation.isPending;
-
   return {
+    // 재확인 수락
     acceptReconfirmation: () => {
-      if (!proposalId || isProcessing) return;
-      acceptMutation.mutate({ requestId, proposalId });
+      // 이미 처리 중이거나 proposalId가 없으면 무시
+      if (!proposalId || acceptMutation.isPending || rejectMutation.isPending) return;
+      acceptMutation.mutate({ requestId, proposalId }); // 재확인 수락 API
     },
+
+    // 재확인 거절
     rejectReconfirmation: () => {
-      if (!proposalId || isProcessing) return;
-      rejectMutation.mutate({ requestId, proposalId });
+      // 이미 처리 중이거나 proposalId가 없으면 무시
+      if (!proposalId || acceptMutation.isPending || rejectMutation.isPending) return;
+      rejectMutation.mutate({ requestId, proposalId }); // 재확인 거절 API
     },
   };
 }
