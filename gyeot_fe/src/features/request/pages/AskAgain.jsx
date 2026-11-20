@@ -83,17 +83,22 @@ function AskAgain() {
   });
   const closeSheet = () => setOpenSheet(null);
 
-  // 1. 공개 정보 선택지 조회 API
-  const informationQuery = useInformationOptionsQuery(
-    { requestId: paramId },
-    { select: getAskAgainInformationService, enabled: Boolean(paramId), showToast },
-  );
-
-  // 2. 요청 상세 조회 API
+  // 1. 요청 상세 조회 API
   const detailQuery = useRequestDetailQuery(paramId, {
     showToast,
     select: getAskAgainDetailService,
   });
+
+  // 2. 공개 정보 선택지 조회 API (상세 조회의 도움 종류가 준비되면 조회)
+  const helpType = detailQuery.data?.initialForm?.helpType;
+  const informationQuery = useInformationOptionsQuery(
+    { helpType, requestId: paramId },
+    {
+      select: getAskAgainInformationService,
+      enabled: Boolean(helpType && paramId),
+      showToast,
+    },
+  );
 
   // 3. 대상 후보 조회 API (상세 조회로 상황 ID가 준비되면 두 ID를 함께 보냄)
   const targetsQuery = useRequestTargetsQuery(

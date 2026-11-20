@@ -64,6 +64,7 @@ function InfoPreview() {
     form: requestForm,
     setForm,
     resetForm,
+    initInformationSelection,
   } = useRequestFormStore((state) => state);
   const hasForm = Boolean(requestForm.helpType);
   useEffect(() => {
@@ -71,7 +72,7 @@ function InfoPreview() {
     showToast("작성 중인 요청 정보가 없어요.");
   }, [hasForm, showToast]);
 
-  // 1. 공개 항목 선택지 조회 (도움 종류로 조회하고, 다시 부탁하기에서는 기존 요청 ID도 전달)
+  // 1. 공개 항목 선택지 조회 (도움 종류로 조회하고, 다시 부탁하기 흐름에서는 requestId도 전달)
   const {
     data: informationOptions,
     isPending,
@@ -104,15 +105,16 @@ function InfoPreview() {
     [informationOptions, requestForm],
   );
 
-  // 공개 항목 선택지 조회 후, 기본값이 있는 경우 requestForm에 반영
+  // 조회 조건별 최초 기본값만 적용하고 이후 사용자 선택은 스토어에서 유지
   useEffect(() => {
     if (!informationOptions) return;
-    setForm((prev) => ({
-      ...prev,
-      informationIds: getInformationOptionsService(informationOptions, prev)
+    initInformationSelection({
+      helpType: requestForm.helpType,
+      requestId: reassignRequestId,
+      informationIds: getInformationOptionsService(informationOptions, requestForm)
         .defaultIds,
-    }));
-  }, [informationOptions, setForm]);
+    });
+  }, [informationOptions, requestForm, reassignRequestId, initInformationSelection]);
 
   // Zustand Store에 저장한 요청 대상 정보
   const { userName, isGuardian } = requestForm;
