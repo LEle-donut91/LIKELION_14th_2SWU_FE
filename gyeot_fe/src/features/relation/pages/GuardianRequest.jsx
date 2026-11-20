@@ -1,9 +1,14 @@
 // N-02
 
 import { useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import SubpageHeader from "@/shared/components/subpage-header/SubpageHeader"; // 팀 공통 서브 헤더
-import { DEFAULT_INVITE_MESSAGE } from "@/features/relation/constants/relation";
+import DefaultToast from "@/shared/components/Toast/DefaultToast"; // 팀 공통 토스트
+import { useToast } from "@/shared/hooks/useToast";
+import { DEFAULT_INVITE_MESSAGE, MAX_GUARDIANS } from "@/features/relation/constants/relation";
+import { INVITATION_TYPE } from "@/features/relation/services/invitationService";
+import { useRelationshipsQuery } from "@/features/relation/hooks/queries/useRelationshipsQuery";
+import { useCreateInvitationMutation } from "@/features/relation/hooks/mutations/useInvitationMutations";
 import iconLink from "@/shared/assets/icons/iconLink.svg";
 import iconShield from "@/shared/assets/icons/iconShield.svg";
 import iconCheckBoxOn from "@/shared/assets/icons/iconCheckBoxOn.svg"; // 흰색 체크 표시
@@ -14,31 +19,52 @@ const shieldMask = { maskImage: `url("${iconShield}")`, WebkitMaskImage: `url("$
 
 function GuardianRequest() {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const { toast, showToast, hideToast } = useToast(); // 실패 안내 토스트
 
-  // 보호자가 이미 3명인지 (TODO: API 연결 후 실제 보호자 수로 판단, 지금은 ?full 로 확인)
-  const isFull = searchParams.has("full");
+  // 보호자가 이미 3명인지 (관계 목록의 보호자 수로 판단)
+  const { data, isLoading } = useRelationshipsQuery();
+  const isFull = (data?.guardians.length ?? 0) >= MAX_GUARDIANS;
 
   const [message, setMessage] = useState(DEFAULT_INVITE_MESSAGE); // 기본 멘트 (짧은 편지)
   const [isAgreed, setAgreed] = useState(false); // 약속 내용 확인 여부
+  const [invitationUrl, setInvitationUrl] = useState(""); // 만든 링크 (공유창을 닫았다가 다시 눌러도 새로 만들지 않도록 보관)
 
-  const canSend = !isFull && isAgreed; // 보낼 수 있는지
-
-  // 보호자 요청 링크 보내기 (TODO: POST /api/invitations { invitationType: "GUARDIAN", message } 연결)
-  const handleSend = async () => {
-    const invitationUrl = `https://gyeot.app/i/${Math.random().toString(36).slice(2, 10)}`; // 임시 링크
-    const shareText = `${message}\n${invitationUrl}`;
-
+  // 링크 공유하기 (휴대폰 공유창, 없으면 링크 복사) → 관계 화면으로
+  const shareLink = async (url) => {
     try {
       if (navigator.share) {
-        await navigator.share({ text: shareText }); // 휴대폰 기본 공유창
+        await navigator.share({ text: `${message}\n${url}` }); // 휴대폰 기본 공유창
       } else {
-        await navigator.clipboard.writeText(invitationUrl); // 공유창이 없으면 링크 복사
+        await navigator.clipboard.writeText(url); // 공유창이 없으면 링크 복사
       }
       navigate("/relation"); // 관계 화면으로 돌아가기
     } catch {
-      // 사용자가 공유창을 닫은 경우 그대로 머무르기
+      // 사용자가 공유창을 닫은 경우 그대로 머무르기 (다시 누르면 같은 링크로 공유)
     }
+  };
+
+  // 보호자 요청 링크 만들기 (POST /api/invitations { invitationType: "GUARDIAN", message, promiseConfirmed: true })
+  const { createInvitation, isCreating } = useCreateInvitationMutation({
+    showToast,
+    onSuccess: ({ invitationUrl: url }) => {
+      setInvitationUrl(url);
+      shareLink(url);
+    },
+  });
+
+  const canSend = !isLoading && !isFull && isAgreed && !isCreating; // 보낼 수 있는지
+
+  // 보내기 버튼: 이미 만든 링크가 있으면 공유만, 없으면 새로 만들기
+  const handleSend = () => {
+    if (invitationUrl) {
+      shareLink(invitationUrl);
+      return;
+    }
+    createInvitation({
+      invitationType: INVITATION_TYPE.GUARDIAN,
+      message: message.trim(), // 비어 있으면 보내지 않음
+      promiseConfirmed: isAgreed, // 약속 내용 확인 (체크해야 버튼이 켜지므로 항상 true)
+    });
   };
 
   return (
@@ -94,6 +120,7 @@ function GuardianRequest() {
                 className={styles.input}
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
+                disabled={Boolean(invitationUrl)} // 링크를 만든 뒤에는 편지 수정 불가 (이미 서버에 저장됨)
                 maxLength={50}
               />
             </div>
@@ -130,6 +157,8 @@ function GuardianRequest() {
           보호자 요청 링크 보내기
         </button>
       </div>
+
+      {toast && <DefaultToast key={toast.id} message={toast.message} onHide={hideToast} />}
     </div>
   );
 }
