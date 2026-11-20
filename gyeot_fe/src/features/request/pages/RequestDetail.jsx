@@ -115,6 +115,8 @@ function RequestDetail() {
       text: flags.isCancelable ? REQUESTER_CANCEL_BTN_TITLE : undefined,
       onClick: () => setCancelModalOpen(true),
     },
+
+    // 담당자 뷰 - "철회" 버튼 (클릭 시 수락 철회 모달 표시)
     assignee: {
       text: flags.showWithdrawBtn ? "철회" : undefined,
       onClick: flags.showWithdrawBtn
@@ -148,7 +150,7 @@ function RequestDetail() {
   // [수락 철회] 모달의 confirm 버튼 핸들러
   const handleWithdrawConfirm = () => {
     setWithdrawModalOpen(false);
-    withdrawAcceptance();
+    withdrawAcceptance(); // 수락 철회 API
   };
 
   return (

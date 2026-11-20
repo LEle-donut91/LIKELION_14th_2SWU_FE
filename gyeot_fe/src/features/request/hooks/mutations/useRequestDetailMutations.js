@@ -41,11 +41,22 @@ export function useRequestDetailMutations(
     onSuccess: refreshDetail,
   });
 
+  // 수락 철회 API
   const withdrawAcceptanceMutation = useMutation({
     mutationFn: postAcceptWithdrawApi,
-    onSuccess: onAcceptanceWithdrawn,
+
+    // API 호출 성공 시
+    onSuccess: (result) => {
+      // null이 아닐 때만 성공 응답 메시지 출력
+      if (result.message) {
+        showToast(result.message);
+      }
+      onAcceptanceWithdrawn(); // 인자로 받은 함수 실행 (홈으로 이동)
+    },
+
+    // API 호출 실패 시
     onError: (error) => {
-      onError(error);
+      onError(error); // 에러 메시지를 토스트로 출력
 
       switch (getErrorCode(error)) {
         case COMMON_ERROR_CODE.FORBIDDEN:
@@ -161,9 +172,10 @@ export function useRequestDetailMutations(
   return {
     cancelRequest,
 
+    // 수락 철회
     withdrawAcceptance: () => {
-      if (withdrawAcceptanceMutation.isPending) return;
-      withdrawAcceptanceMutation.mutate(requestId);
+      if (withdrawAcceptanceMutation.isPending) return; // 수락 철회 요청 처리 중이면 무시
+      withdrawAcceptanceMutation.mutate(requestId); // 수락 철회 API
     },
 
     withdrawProposal: (proposalId) => {
