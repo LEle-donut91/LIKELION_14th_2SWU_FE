@@ -77,20 +77,26 @@ function AskAgain() {
   });
   const closeSheet = () => setOpenSheet(null);
 
-  // 1. 대상 후보 조회 API
-  const targetsQuery = useRequestTargetsQuery({ requestId: paramId }, { showToast });
-
-  // 2. 공개 정보 선택지 조회 API
+  // 1. 공개 정보 선택지 조회 API
   const informationQuery = useInformationOptionsQuery(
     { requestId: paramId },
     { select: getAskAgainInformationService, enabled: Boolean(paramId), showToast },
   );
 
-  // 3. 요청 상세 조회 API
+  // 2. 요청 상세 조회 API
   const detailQuery = useRequestDetailQuery(paramId, {
     showToast,
     select: getAskAgainDetailService,
   });
+
+  // 3. 대상 후보 조회 API (상세 조회로 상황 ID가 준비되면 두 ID를 함께 보냄)
+  const targetsQuery = useRequestTargetsQuery(
+    {
+      situationId: detailQuery.data?.initialForm?.situationId,
+      requestId: paramId,
+    },
+    { showToast },
+  );
 
   // 다른 페이지에서 전달 받은 에러 처리
   useEffect(() => {

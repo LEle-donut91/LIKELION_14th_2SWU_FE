@@ -5,41 +5,44 @@ import { getRequestTargetsApi } from "@/features/request/api/getApi";
 import { getRequestTargetsService } from "@/features/request/services/requestTargetService";
 import { REQUEST_QUERY_KEYS } from "@/features/request/constants/requestQueryKeys";
 import { COMMON_ERROR_CODE, REQUEST_ERROR_CODE } from "@/shared/constants/errorCodeConstants";
-import { REQUEST_ERROR_TARGET_PAGE } from "@/features/request/constants/requestErrorConstants";
 import { REQUEST_ROUTES } from "@/features/request/constants/routerConstants";
-import { REQUEST_SHEET } from "@/features/request/constants/requestFormConstants";
 import { getErrorCode, getErrorMessage } from "@/shared/utils/apiError";
-import { useRequestErrorStore } from "@/features/request/stores/useRequestErrorStore";
 import { useRequestNav } from "@/features/request/hooks/useRequestNav";
-
-const toNumberOrUndefined = (value) =>
-  value == null ? undefined : Number(value);
 
 /**
  * 대상 후보 조회
- *  - 요청 작성: { situationId } / 다시 부탁하기: { requestId }
- *  - 둘 중 하나라도 있어야 조회하며, 값이 바뀌면 queryKey가 달라져 자동으로 다시 조회
- *  - 현재 경로로 화면을 구분하고, 요청 작성 화면의 시트는 콜백으로 연다.
+ *  - 현재 경로에 따라 요청 작성은 { situationId }, 다시 부탁하기는 { situationId, requestId } 전송
+ *  - 화면에 필요한 ID가 모두 준비되면 조회하며, 전송 값이 바뀌면 자동으로 다시 조회
+ *  - 상황이 유효하지 않으면 전달받은 콜백으로 요청 작성 화면의 시트를 연다.
  */
 export const useRequestTargetsQuery = (
   { situationId, requestId } = {},
   { onSituationInvalid, showToast } = {},
 ) => {
+  // 해당 API를 어디서 호출했는지 구분 (다시 부탁하기 / 요청 작성 )
   const { pathname } = useLocation();
-  const isInfoPreview = Boolean(matchPath(REQUEST_ROUTES.infoPreview(":id"), pathname));
   const isRequest = Boolean(matchPath(REQUEST_ROUTES.request(":id"), pathname));
+  const isAskAgain = Boolean(matchPath(REQUEST_ROUTES.askAgain(":id"), pathname));
+  const params = { // 요청 작성은 situationId만, 다시 부탁하기는 situationId+requestId
+    situationId,
+    ...(isAskAgain && { requestId }),
+  };
+
+  // 에러 처리를 위한 함수 및 객체 선언
   const { handleGoBack, handleGoNext } = useRequestNav();
-  const setError = useRequestErrorStore((state) => state.setError);
   const handledError = useRef(null);
+
+  // API 호출
   const query = useQuery({
-    queryKey: REQUEST_QUERY_KEYS.targets(situationId, requestId),
-    queryFn: () =>
-      getRequestTargetsApi({
-        situationId: toNumberOrUndefined(situationId),
-        requestId: toNumberOrUndefined(requestId),
-      }),
+    // 요청 작성은 requestId에 undefined가 저장됨
+    // (Axios가 URL의 쿼리 문자열을 만들 때 값이 undefined 또는 null인 항목은 생략하므로 API 호출 시 문제는 X)
+    queryKey: REQUEST_QUERY_KEYS.targets(params.situationId, params.requestId),
+    queryFn: () => getRequestTargetsApi(params),
     select: getRequestTargetsService,
-    enabled: Boolean(situationId || requestId),
+    enabled: Boolean(
+      (isRequest && situationId != null) ||
+      (isAskAgain && situationId != null && requestId != null),
+    ),
   });
 
   // React Query v5의 조회 에러는 effect에서 처리하고, 같은 실패의 중복 처리를 막는다.
@@ -68,18 +71,7 @@ export const useRequestTargetsQuery = (
     showToast(getErrorMessage(query.error));
     switch (getErrorCode(query.error)) {
       case REQUEST_ERROR_CODE.REQUEST_SITUATION_INVALID:
-        if (isInfoPreview) { // 공개 정보 미리보기 화면인 경우
-          setError({
-            targetPage: requestId
-              ? REQUEST_ERROR_TARGET_PAGE.ASK_AGAIN // 다시 부탁하기 화면에 에러 전달
-              : REQUEST_ERROR_TARGET_PAGE.REQUEST, // 요청 작성 화면에 에러 전달
-            requestId,
-            ...(!requestId && { sheet: REQUEST_SHEET.SITUATION }), // 새 요청 작성 흐름인 경우 상황 선택 시트가 뜨도록
-          });
-          handleGoBack();
-        } else if (isRequest) { // 요청 작성 화면인 경우
-          onSituationInvalid?.(); // 인자로 받은 함수(상황 선택 시트 열기) 실행
-        }
+        onSituationInvalid?.(); // 인자로 받은 함수(상황 선택 시트 열기) 실행
         break;
       case REQUEST_ERROR_CODE.REQUEST_SITUATION_ENDED:
         handleGoNext(REQUEST_ROUTES.home, true);
@@ -91,7 +83,7 @@ export const useRequestTargetsQuery = (
         handleGoBack();
         break;
     }
-  }, [query.error, query.errorUpdatedAt, query.isFetching, isInfoPreview, isRequest, requestId, onSituationInvalid, showToast, setError, handleGoNext, handleGoBack]);
+  }, [query.error, query.errorUpdatedAt, query.isFetching, onSituationInvalid, showToast, handleGoNext, handleGoBack]);
 
   return query;
 };
