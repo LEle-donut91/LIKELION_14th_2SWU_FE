@@ -52,7 +52,7 @@ function RequestDetail() {
     startCare,
     completeCare,
     respondToRequest,
-  } = useRequestDetailMutations(paramId, {
+  } = useRequestDetailMutations(paramId, { // paramId는 requestId
     showToast,
     onAcceptanceWithdrawn: () => handleGoNext(REQUEST_ROUTES.home, true),
   });
@@ -100,11 +100,13 @@ function RequestDetail() {
         { situationId },
         true,
       ),
-    hold: () => respondToRequest(RESPONSE_STATUS.CHECK_LATER),
-    refuse: () => respondToRequest(RESPONSE_STATUS.UNAVAILABLE),
-    accept: () => respondToRequest(RESPONSE_STATUS.AVAILABLE),
-    changeToRefuse: () => respondToRequest(RESPONSE_STATUS.UNAVAILABLE),
-    changeToAccept: () => respondToRequest(RESPONSE_STATUS.AVAILABLE),
+
+    // 대상자 뷰 (H-03-01-B)의 하단 버튼 (요청 응답)
+    hold: () => respondToRequest(RESPONSE_STATUS.CHECK_LATER), // 보류
+    refuse: () => respondToRequest(RESPONSE_STATUS.UNAVAILABLE), // 거절
+    accept: () => respondToRequest(RESPONSE_STATUS.AVAILABLE), // 수락
+    changeToRefuse: () => respondToRequest(RESPONSE_STATUS.UNAVAILABLE), // 거절로 변경
+    changeToAccept: () => respondToRequest(RESPONSE_STATUS.AVAILABLE), // 수락으로 변경
   };
 
   // Header별 action 연결

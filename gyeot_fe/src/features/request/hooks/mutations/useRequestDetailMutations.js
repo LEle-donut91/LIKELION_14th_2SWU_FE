@@ -25,10 +25,15 @@ export function useRequestDetailMutations(
 ) {
   const queryClient = useQueryClient();
   const { handleGoBack } = useRequestNav();
+
+  // "도움 요청 상세 조회" API 다시 호출
   const refreshDetail = () =>
+    // 캐시된 데이터를 stale(만료된) 상태로 만들고, 데이터를 다시 불러옴(refetch) 
     queryClient.invalidateQueries({
       queryKey: REQUEST_QUERY_KEYS.detail(requestId),
     });
+
+  // 에러 메시지를 토스트로 출력
   const onError = (error) => showToast(getErrorMessage(error));
 
   const { cancelRequest } = useCancelRequestMutation(requestId, {
@@ -116,11 +121,21 @@ export function useRequestDetailMutations(
       }
     },
   });
+
+  // 요청 응답 API
   const respondMutation = useMutation({
     mutationFn: postResponseApi,
-    onSuccess: refreshDetail,
+    // API 호출 성공 시
+    onSuccess: (result) => {
+      if (result.message) {
+        // null이 아닐 때만 토스트 메시지 출력 (어려움·확인 후 답변이면 null로 오기 때문에)
+        showToast(result.message);
+      }
+      return refreshDetail(); // "도움 요청 상세 조회" 다시 호출
+    },
+    // API 호출 에러 발생 시
     onError: (error) => {
-      onError(error);
+      onError(error); // 에러 메시지를 토스트로 출력
 
       switch (getErrorCode(error)) {
         case COMMON_ERROR_CODE.FORBIDDEN:
@@ -166,9 +181,10 @@ export function useRequestDetailMutations(
       doneMutation.mutate(requestId);
     },
 
+    // 요청 응답 API
     // response: RESPONSE_STATUS (보류 / 어려움 / 가능)
     respondToRequest: (response) => {
-      if (respondMutation.isPending) return;
+      if (respondMutation.isPending) return; // 응답 요청이 진행 중이면 추가 호출을 막음
       respondMutation.mutate({ requestId, response });
     },
   };
