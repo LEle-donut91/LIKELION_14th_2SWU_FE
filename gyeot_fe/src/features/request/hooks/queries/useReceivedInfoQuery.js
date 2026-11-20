@@ -16,9 +16,14 @@ export const useReceivedInfoQuery = (requestId, { showToast } = {}) => {
     queryFn: () => getReceivedInfoApi(requestId),
     select: getReceivedInfoService,
     enabled: Boolean(requestId),
-    refetchOnWindowFocus: false, // 다른 탭/창으로 갔다가 돌아와도 자동 재조회 X
-    refetchOnReconnect: false, // 끊겼던 네트워크가 복구됐을 때 자동 재조회 X
-    retry: false, // 요청이 실패해도 자동으로 재시도 X
+    // 재진입 시, 즉, 해당 화면에 들어와 컴포넌트가 새로 마운트될 때 현재 접근 권한을 반드시 다시 조회 O
+    // 이미 접근이 종료된 이전 캐시 정보가 보이는 것을 방지하기 위함
+    refetchOnMount: "always",
+
+    // 다른 탭/창으로 갔다가 돌아와도 자동 재조회 X
+    refetchOnWindowFocus: false, 
+
+    // 인터넷이 끊겼다가 다시 연결될 때, API 요청이 실패했을 때 -> 자동 재조회 O
   });
 
   useEffect(() => {

@@ -26,8 +26,13 @@ function ReceivedInfo() {
   // 전달받은 정보 조회 API
   const {
     data: receivedInfo,
-    isPending, // GET 요청 로딩중 상태
+    isFetchedAfterMount,
+    isFetching,
+    isSuccess,
   } = useReceivedInfoQuery(paramId, { showToast });
+
+  // 이번 진입 후 조회가 성공한 경우에만 표시하고, 재조회 중·실패 시 캐시를 숨김
+  const canShowReceivedInfo = isFetchedAfterMount && isSuccess && !isFetching;
 
   // API 응답 데이터 (정제된 형태)
   const {
@@ -46,7 +51,7 @@ function ReceivedInfo() {
         onCloseClick={handleGoBack}
       />
 
-      {!isPending && (
+      {canShowReceivedInfo && (
 <>
       <main className={styles.content}>
         {receivedInfo && (
