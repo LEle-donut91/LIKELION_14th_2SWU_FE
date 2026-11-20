@@ -1,41 +1,51 @@
 // R-02-01
 
-import { useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import SubpageHeader from "@/shared/components/subpage-header/SubpageHeader"; // 팀 공통 서브 헤더
+import DefaultToast from "@/shared/components/Toast/DefaultToast"; // 팀 공통 토스트
+import { useToast } from "@/shared/hooks/useToast";
 import SharedInfoCard from "@/features/relation/components/SharedInfoCard";
-import { MOCK_RELATION } from "@/features/relation/constants/relation";
-import { MOCK_SHARED_INFO, SHARE_STATUS } from "@/features/relation/constants/sharedInfo";
+import { SHARE_STATUS } from "@/features/relation/constants/sharedInfo";
+import { toSharedInfo } from "@/features/relation/services/sharedInfoService";
+import { useSharingList } from "@/features/card/hooks/useSharingList"; // 안심카드(C-06)와 같은 공유 관리 API 사용
+import { useReceivedSharingsQuery } from "@/features/relation/hooks/queries/useReceivedSharingsQuery";
 import iconDocument from "@/shared/assets/icons/iconDocument.svg";
 import styles from "./AcquaintanceShared.module.css";
 
-// R-02에서 넘겨준 id로 이름 찾기 (TODO: API 연결 후 교체)
-function findName(id) {
-  const people = [...MOCK_RELATION.guardians, ...MOCK_RELATION.myPeople];
-  return (people.find((p) => p.id === id) ?? MOCK_RELATION.myPeople[0]).name;
-}
-
 function AcquaintanceShared() {
+  const navigate = useNavigate();
   const { state } = useLocation(); // R-02에서 넘겨준 { id, userId, name }
-  const name = state?.name ?? findName(state?.id); // R-02에서 받은 이름 우선 (주소로 바로 들어오면 임시 이름)
+  const name = state?.name ?? "";
+  const { toast, showToast, hideToast } = useToast(); // 성공·실패 안내 토스트
 
-  const [sharing, setSharing] = useState(MOCK_SHARED_INFO.sharing); // 내가 공유 중인 정보
-  const received = MOCK_SHARED_INFO.received; // 받은 정보 (조회만)
+  // 주소로 바로 들어와서 누구인지 모르면 관계 화면으로
+  useEffect(() => {
+    if (!state?.userId) {
+      navigate("/relation", { replace: true });
+    }
+  }, [state, navigate]);
+
+  // 이 사람에게 공유 중인 정보 (GET /api/sharings?userId) + 직접 철회 / 다시 허용
+  const { items, isLoading, pendingId, handleRevoke, handleReallow } = useSharingList({
+    userId: state?.userId,
+    onActionSuccess: showToast,
+    onActionError: showToast,
+  });
+  const sharing = items.map(toSharedInfo);
+
+  // 이 사람에게 받은 정보 (GET /api/sharings/received?userId) — 조회만
+  const { data: received = [], isLoading: isReceivedLoading } = useReceivedSharingsQuery(state?.userId);
 
   const hasWithdrawn = sharing.some((info) => info.status === SHARE_STATUS.WITHDRAWN); // 철회한 게 있는지
 
-  // 직접 철회 ↔ 다시 허용 (TODO: 철회 / 다시 허용 API 연결)
-  const handleToggle = (id) => {
-    setSharing((prev) =>
-      prev.map((info) =>
-        info.id === id
-          ? {
-              ...info,
-              status: info.status === SHARE_STATUS.SHARING ? SHARE_STATUS.WITHDRAWN : SHARE_STATUS.SHARING,
-            }
-          : info
-      )
-    );
+  // 공유 중이면 직접 철회, 철회됨이면 다시 허용
+  const handleToggle = (info) => {
+    if (info.status === SHARE_STATUS.SHARING) {
+      handleRevoke(info.id);
+    } else {
+      handleReallow(info.id);
+    }
   };
 
   return (
@@ -46,11 +56,19 @@ function AcquaintanceShared() {
         {/* ===== 공유 중 정보 ===== */}
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>공유 중 정보</h2>
-          <div className={styles.list}>
-            {sharing.map((info) => (
-              <SharedInfoCard key={info.id} info={info} variant="sharing" onToggle={handleToggle} />
-            ))}
-          </div>
+          {!isLoading && (
+            <div className={styles.list}>
+              {sharing.map((info) => (
+                <SharedInfoCard
+                  key={info.id}
+                  info={info}
+                  variant="sharing"
+                  onToggle={handleToggle}
+                  disabled={pendingId !== null} // 처리 중이면 모든 버튼 잠금
+                />
+              ))}
+            </div>
+          )}
           {hasWithdrawn && <p className={styles.notice}>철회는 즉시 반영돼요. 같은 요청 안에서는 다시 허용할 수 있어요</p>}
         </section>
 
@@ -61,7 +79,7 @@ function AcquaintanceShared() {
             <span className={styles.hint}>조회만</span>
           </div>
 
-          {received.length === 0 ? (
+          {isReceivedLoading ? null : received.length === 0 ? (
             /* 받은 정보 없을 때 */
             <>
               <div className={styles.empty}>
@@ -73,12 +91,19 @@ function AcquaintanceShared() {
           ) : (
             <div className={styles.list}>
               {received.map((info) => (
-                <SharedInfoCard key={info.id} info={info} variant="received" />
+                <SharedInfoCard
+                  key={info.id}
+                  info={info}
+                  variant="received"
+                  onClick={() => navigate(`/request/detail/${info.requestId}`)} // 선택하면 H-03-01 요청 상세로
+                />
               ))}
             </div>
           )}
         </section>
       </div>
+
+      {toast && <DefaultToast key={toast.id} message={toast.message} onHide={hideToast} />}
     </div>
   );
 }

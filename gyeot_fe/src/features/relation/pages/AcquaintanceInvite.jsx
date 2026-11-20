@@ -21,10 +21,10 @@ import styles from "./AcquaintanceInvite.module.css";
 function AcquaintanceInvite() {
   const navigate = useNavigate();
 
-  // ※ 명세상 나의 사람 초대 문구는 고정이고 관계 형태는 초대 때 저장하지 않음 (BE 답변)
-  //   → 두 입력 칸은 디자인 수정 전까지 화면에만 남겨두고 서버로 보내지 않음
+  // ※ 명세상 나의 사람 초대 문구는 고정이라 서버로 보내지 않음 (공유 문구에만 사용)
+  //   관계 형태는 초대 생성 때 personalLabel로 보냄 → 상대가 수락하면 내 쪽 관계 라벨로 저장 (상대에게는 안 보임)
   const [message, setMessage] = useState(DEFAULT_INVITE_MESSAGE); // 기본 멘트 (공유 문구에만 사용)
-  const [relationType, setRelationType] = useState(""); // 관계 형태 (서버로 보내지 않음)
+  const [relationType, setRelationType] = useState(""); // 관계 형태 (personalLabel로 전송)
   const [invitation, setInvitation] = useState(null); // 만들어진 초대 { invitationId, invitationUrl } (있으면 링크 화면)
   const [isCancelOpen, setCancelOpen] = useState(false); // 초대 취소 모달 열림 여부
   const { toast, showToast, hideToast } = useToast(); // 실패 안내 토스트
@@ -44,9 +44,12 @@ function AcquaintanceInvite() {
     onSuccess: () => navigate("/relation", { replace: true }),
   });
 
-  // 초대 링크 만들기
+  // 초대 링크 만들기 (관계 형태는 입력했을 때만 같이 보냄)
   const handleCreateLink = () => {
-    createInvitation({ invitationType: INVITATION_TYPE.MY_PERSON });
+    createInvitation({
+      invitationType: INVITATION_TYPE.MY_PERSON,
+      personalLabel: relationType.trim(), // 비어 있으면 보내지 않음 (명세: 전달 시 1~50자)
+    });
   };
 
   // 문자로 보내기
