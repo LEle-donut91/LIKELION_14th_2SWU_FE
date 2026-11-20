@@ -34,4 +34,4 @@ export const deleteRelationshipApi = async (relationshipId) => {
 
   const response = await axiosInstance.delete(AUTH_API_URLS.relationship(relationshipId));
   return response.data;
-};
+};

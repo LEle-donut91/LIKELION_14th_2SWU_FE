@@ -12,7 +12,7 @@ import { RELATIONSHIP_ITEMS_MOCK } from "@/features/situation/mocks/situationApi
 
 // A 영역은 서버 배포 완료라 실제 서버로 요청 (로그인 필요)
 // - 로그인 없이 화면만 확인하고 싶을 때만 로컬에서 true로 바꿔서 확인 (커밋은 false로)
-const USE_MOCK = true;
+const USE_MOCK = false;
 
 // 1. 활성 관계 목록 조회 (GET /api/relationships)
 // → data: { items: [{ relationshipId, userId, name, relationshipType, personalLabel, guardianPriority }] }
