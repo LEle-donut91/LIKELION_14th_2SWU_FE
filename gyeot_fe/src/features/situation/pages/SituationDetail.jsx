@@ -1,6 +1,6 @@
 // H-03 상황 상세 (H-03-01 정보 주인 뷰 / H-03-02 참여자 뷰)
 import { useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import styles from "@/features/situation/pages/SituationDetail.module.css";
 import SubpageHeader from "@/shared/components/subpage-header/SubpageHeader"; // 팀 공통 서브 헤더
 import LargeFooter from "@/shared/components/LargeFooter/LargeFooter";
@@ -37,15 +37,17 @@ const REQUEST_SECTION_TEXT = {
 
 function SituationDetail() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
 
   const { toast, showToast, hideToast } = useToast();
 
-  // 상황 ID: S-00 등에서 /situation/detail?situationId= 로 전달
+  // 상황 ID: 주소의 ?situationId= (S-00) 또는 이동 state의 situationId (H-00 홈)
   // 목업 확인용: situationId=1 (정보 주인), situationId=21 (참여자)
   // - &state=empty       : 요청이 하나도 없는 경우
   // - &state=no-accepted : 응답 대기 요청만 있는 경우 (참여자 뷰 '수락한 요청' 빈 상태)
-  const situationId = searchParams.get("situationId");
+  const situationId =
+    searchParams.get("situationId") ?? location.state?.situationId ?? null;
   const mockScenario = Object.values(SITUATION_MOCK_SCENARIO).includes(
     searchParams.get("state"),
   )
