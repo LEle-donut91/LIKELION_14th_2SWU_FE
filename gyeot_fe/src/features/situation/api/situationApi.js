@@ -65,3 +65,16 @@ export const getPastSituationsApi = async ({
   });
   return response.data;
 };
+
+// 3. 상황 생성 (POST /api/situations)
+// - body: { situationType, customSituationType, name, participantIds, startAt, endAt }
+// → data: { situationId, creatorId, status }
+export const createSituationApi = async (body) => {
+  if (USE_MOCK) {
+    await wait();
+    return createMockResponse({ situationId: 100, creatorId: 10, status: "ACTIVE" });
+  }
+
+  const response = await axiosInstance.post(SITUATION_API_URLS.create, body);
+  return response.data;
+};

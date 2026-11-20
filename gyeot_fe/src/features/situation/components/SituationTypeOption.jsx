@@ -2,6 +2,7 @@ import styles from "@/features/situation/components/SituationTypeOption.module.c
 import iconRadioOff from "@/shared/assets/icons/iconRadioOff.svg";
 import iconRadioOn from "@/shared/assets/icons/iconRadioOn.svg";
 import {
+  SITUATION_TYPE,
   SITUATION_TYPE_ETC_MAX_LENGTH,
   SITUATION_TYPE_OPTIONS,
 } from "@/features/situation/constants/situationConstants";
@@ -27,7 +28,7 @@ function SituationTypeOption({ value, onChange }) {
     <div className={styles.optionList}>
       {SITUATION_TYPE_OPTIONS.map(({ key, label, description }) => {
         const isSelected = type === key;
-        const isEtcOpen = isSelected && key === "ETC";
+        const isEtcOpen = isSelected && key === SITUATION_TYPE.OTHER;
 
         return (
           <div

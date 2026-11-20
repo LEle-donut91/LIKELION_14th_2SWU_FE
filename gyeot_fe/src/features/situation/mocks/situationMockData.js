@@ -155,13 +155,6 @@ export const JOINED_PAST_SITUATION_DETAIL_MOCK = {
   ],
 };
 
-// H-01 참여할 지인 목록 (내 사람으로 등록한 지인)
-export const ACQUAINTANCE_LIST_MOCK = [
-  { id: 1, name: "서연", relation: "", isGuardian: true },
-  { id: 2, name: "민재", relation: "친구", isGuardian: false },
-  { id: 3, name: "하은", relation: "이웃", isGuardian: false },
-];
-
 // H-03-05 상황 관리 - 정보 주인 시점 참여자 목록
 // relationLabel: 이름 아래 보조 문구 (보호자만 표시)
 export const MANAGE_PARTICIPANT_LIST_MOCK = [
