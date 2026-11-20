@@ -117,7 +117,7 @@ export const PAST_SITUATION_DETAIL_MOCK = {
     },
     {
       id: 403,
-      helpType: "SHOPPING",
+      helpType: "GROCERY",
       assigneeName: null,
       startDateTime: "2026-09-05T10:00:00",
       endDateTime: "2026-09-05T12:00:00",
@@ -147,7 +147,7 @@ export const JOINED_PAST_SITUATION_DETAIL_MOCK = {
     },
     {
       id: 502,
-      helpType: "SHOPPING",
+      helpType: "GROCERY",
       startDateTime: "2026-09-03T10:00:00",
       endDateTime: "2026-09-03T12:00:00",
       status: "CANCELLED",
@@ -233,7 +233,7 @@ export const SITUATION_DETAIL_MOCK = {
     },
     {
       id: 103,
-      helpType: "SHOPPING",
+      helpType: "GROCERY",
       targetName: "민재",
       startDateTime: "2026-11-21T11:00:00",
       endDateTime: "2026-11-21T12:00:00",
@@ -249,7 +249,7 @@ export const SITUATION_DETAIL_MOCK = {
     },
     {
       id: 105,
-      helpType: "CONTACT",
+      helpType: "CHECK_IN",
       targetName: "하은",
       startDateTime: "2026-11-10T20:00:00",
       endDateTime: "2026-11-10T20:30:00",
@@ -257,7 +257,7 @@ export const SITUATION_DETAIL_MOCK = {
     },
     {
       id: 106,
-      helpType: "SHOPPING",
+      helpType: "GROCERY",
       targetName: "서연",
       startDateTime: "2026-11-09T16:00:00",
       endDateTime: "2026-11-09T17:00:00",
@@ -283,7 +283,7 @@ export const JOINED_SITUATION_DETAIL_MOCK = {
   responseNeededRequests: [
     {
       id: 201,
-      helpType: "SHOPPING",
+      helpType: "GROCERY",
       startDateTime: "2026-11-21T11:00:00",
       responseDeadline: "2026-11-20T18:00:00",
       status: "WAITING",
@@ -309,7 +309,7 @@ export const JOINED_SITUATION_DETAIL_MOCK = {
     },
     {
       id: 204,
-      helpType: "CONTACT",
+      helpType: "CHECK_IN",
       startDateTime: "2026-11-10T20:00:00",
       endDateTime: "2026-11-10T20:30:00",
       status: "COMPLETED",

@@ -1,4 +1,5 @@
 // S-00 상황 목록 (진행 중 · 지난)
+import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import styles from "@/features/situation/pages/Situation.module.css";
 import MainHeader from "@/shared/components/main-header/MainHeader";
@@ -8,29 +9,52 @@ import MaskIcon from "@/shared/components/MaskIcon/MaskIcon";
 import PastSituationList from "@/features/situation/components/PastSituationList";
 import SituationListEmpty from "@/features/situation/components/SituationListEmpty";
 import iconRight from "@/shared/assets/icons/iconRight.svg";
-import { SITUATION_NAVIGATION_PATH } from "@/features/situation/constants/situationConstants";
+import DefaultToast from "@/shared/components/Toast/DefaultToast";
+import { useToast } from "@/shared/hooks/useToast";
+import { getErrorMessage } from "@/shared/utils/apiError";
 import {
-  ONGOING_SITUATION_MOCK,
-  PAST_SITUATION_LIST_MOCK,
-  UPCOMING_SCHEDULE_MOCK,
-} from "@/features/situation/mocks/situationMockData";
+  PAST_SITUATION_PREVIEW_SIZE,
+  SITUATION_NAVIGATION_PATH,
+} from "@/features/situation/constants/situationConstants";
+import { useMySituationsQuery } from "@/features/situation/hooks/queries/useMySituationsQuery";
+import { usePastSituationsQuery } from "@/features/situation/hooks/queries/usePastSituationsQuery";
+import { SITUATION_MOCK_SCENARIO } from "@/features/situation/api/situationApi";
 
 function Situation() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  // TODO: API 연동 전까지 목업 데이터 사용
-  // 빈 상태(S-00-2) 확인용: /situation?state=empty
-  const isEmptyPreview = searchParams.get("state") === "empty";
-  const ongoingSituation = isEmptyPreview ? null : ONGOING_SITUATION_MOCK;
-  const upcomingSchedule = UPCOMING_SCHEDULE_MOCK;
-  const pastSituationList = isEmptyPreview ? [] : PAST_SITUATION_LIST_MOCK;
+  const { toast, showToast, hideToast } = useToast();
 
-  const hasOngoingSituation = Boolean(ongoingSituation);
+  // 빈 상태(S-00-2) 확인용: /situation?state=empty (목업 사용 중일 때만 적용)
+  const mockScenario =
+    searchParams.get("state") === "empty" ? SITUATION_MOCK_SCENARIO.EMPTY : undefined;
+
+  const mySituationsQuery = useMySituationsQuery({ mockScenario });
+  const pastSituationsQuery = usePastSituationsQuery({
+    page: 0,
+    size: PAST_SITUATION_PREVIEW_SIZE,
+    mockScenario,
+  });
+
+  const mySituations = mySituationsQuery.data?.mySituations ?? [];
+  const pastSituationList = pastSituationsQuery.data?.pastSituations ?? [];
+
+  // 조회 실패 시 안내 토스트
+  const queryError = mySituationsQuery.error ?? pastSituationsQuery.error;
+  useEffect(() => {
+    if (queryError) showToast(getErrorMessage(queryError));
+  }, [queryError, showToast]);
+
+  const hasOngoingSituation = mySituations.length > 0;
+  // 조회가 끝나고 진행 중인 상황이 없을 때만 빈 상태 표시 (로딩·실패 중에는 표시하지 않음)
+  const isOngoingEmpty = mySituationsQuery.isSuccess && !hasOngoingSituation;
   const hasPastSituation = pastSituationList.length > 0;
 
-  const handleSituationDetailClick = () => {
-    navigate(SITUATION_NAVIGATION_PATH.SITUATION_DETAIL);
+  const handleSituationDetailClick = (situationId) => {
+    navigate(
+      `${SITUATION_NAVIGATION_PATH.SITUATION_DETAIL}?situationId=${situationId}`,
+    );
   };
 
   const handleSituationCreateClick = () => {
@@ -41,8 +65,10 @@ function Situation() {
     navigate(SITUATION_NAVIGATION_PATH.PAST_SITUATION);
   };
 
-  const handlePastSituationClick = () => {
-    navigate(SITUATION_NAVIGATION_PATH.PAST_SITUATION_DETAIL);
+  const handlePastSituationClick = (situationId) => {
+    navigate(
+      `${SITUATION_NAVIGATION_PATH.PAST_SITUATION_DETAIL}?situationId=${situationId}`,
+    );
   };
 
   const handleAlarmClick = () => {
@@ -56,7 +82,7 @@ function Situation() {
   return (
     <div
       className={`${styles.page} ${
-        hasOngoingSituation ? "" : styles.pageEmpty
+        isOngoingEmpty ? styles.pageEmpty : ""
       }`}
     >
       <MainHeader
@@ -71,18 +97,17 @@ function Situation() {
         {/* 진행 중인 상황 (없으면 S-00-2 빈 상태) */}
         <section
           className={
-            hasOngoingSituation ? styles.ongoingSection : styles.emptySection
+            isOngoingEmpty ? styles.emptySection : styles.ongoingSection
           }
         >
-          {hasOngoingSituation ? (
+          {mySituations.map((situation) => (
             <SituationCard
-              situation={ongoingSituation}
-              upcomingSchedule={upcomingSchedule}
-              onDetailClick={handleSituationDetailClick}
+              key={situation.id}
+              situation={situation}
+              onDetailClick={() => handleSituationDetailClick(situation.id)}
             />
-          ) : (
-            <SituationListEmpty />
-          )}
+          ))}
+          {isOngoingEmpty && <SituationListEmpty />}
           <button
             type="button"
             className={`${styles.createBtn} typoBodyStrong`}
@@ -120,6 +145,10 @@ function Situation() {
       </main>
 
       <BottomNav />
+
+      {toast && (
+        <DefaultToast key={toast.id} message={toast.message} onHide={hideToast} />
+      )}
     </div>
   );
 }
