@@ -59,4 +59,5 @@ export const INFO_SHARE_API_URLS = {
   sharings: "/api/sharings", // 공유 중 목록 조회 (GET ?userId)
   revoke: (assignmentId) => `/api/sharings/${assignmentId}/revoke`, // 공유 직접 철회 (POST)
   reallow: (assignmentId) => `/api/sharings/${assignmentId}/reallow`, // 공유 다시 허용 (POST)
+    receivedSharings: "/api/sharings/received", // 받은 정보 조회 (GET ?userId) — R-02-01
 }
