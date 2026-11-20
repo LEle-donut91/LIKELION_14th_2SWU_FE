@@ -1,5 +1,5 @@
 // N-04 지난 상황 상세 (요청자 / 담당자)
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import styles from "@/features/situation/pages/PastSituationDetail.module.css";
 import SubpageHeader from "@/shared/components/subpage-header/SubpageHeader"; // 팀 공통 서브 헤더
 import PastSituationCard from "@/features/situation/components/PastSituationCard";
@@ -13,6 +13,7 @@ import {
 
 function PastSituationDetail() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
 
   // TODO: 지난 상황 상세 API 연동 전까지 목업 데이터 사용
@@ -22,9 +23,14 @@ function PastSituationDetail() {
     ? PAST_SITUATION_DETAIL_MOCK
     : JOINED_PAST_SITUATION_DETAIL_MOCK;
 
-  // 'X' : 지난 상황 목록(H-04)으로
+  // 'X' : 들어온 화면(S-00 상황 목록 또는 H-04 지난 상황)으로 돌아감
+  // - 주소로 바로 들어와 이전 화면이 없을 때(location.key === "default")만 H-04로 이동
   const handleCloseClick = () => {
-    navigate(SITUATION_NAVIGATION_PATH.PAST_SITUATION);
+    if (location.key === "default") {
+      navigate(SITUATION_NAVIGATION_PATH.PAST_SITUATION, { replace: true });
+      return;
+    }
+    navigate(-1);
   };
 
   const handleThanksMessageClick = () => {

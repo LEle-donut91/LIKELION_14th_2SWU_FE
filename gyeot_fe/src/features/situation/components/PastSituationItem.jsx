@@ -21,7 +21,8 @@ function PastSituationItem({ situation, onClick }) {
             className={`${styles.meta} typoBodySmall`}
             items={[
               formatMonthDayRange(startDate, endDate),
-              `요청 ${requestCount}건`,
+              // 요청 수는 응답에 있을 때만 표시
+              typeof requestCount === "number" && `요청 ${requestCount}건`,
             ]}
           />
         </span>

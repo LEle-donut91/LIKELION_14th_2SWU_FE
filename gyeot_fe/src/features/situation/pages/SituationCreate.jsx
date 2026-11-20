@@ -1,5 +1,5 @@
 // H-01 상황 만들기
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "@/features/situation/pages/SituationCreate.module.css";
 import SubpageHeader from "@/shared/components/subpage-header/SubpageHeader"; // 팀 공통 서브 헤더
@@ -11,13 +11,25 @@ import TimeSheet from "@/shared/components/TimeSheet/TimeSheet";
 import DateTimeOption from "@/shared/components/DateTimeOption/DateTimeOption";
 import SituationTypeOption from "@/features/situation/components/SituationTypeOption";
 import ParticipantCheckList from "@/features/situation/components/ParticipantCheckList";
+import DefaultToast from "@/shared/components/Toast/DefaultToast";
+import { useToast } from "@/shared/hooks/useToast";
+import { getErrorMessage } from "@/shared/utils/apiError";
 import {
+  SITUATION_CREATE_VALIDATION_MESSAGE,
+  SITUATION_NAME_MAX_LENGTH,
   SITUATION_NAVIGATION_PATH,
   SITUATION_SELECT_PLACEHOLDER,
+  SITUATION_TYPE,
   SITUATION_TYPE_OPTIONS,
 } from "@/features/situation/constants/situationConstants";
-import { ACQUAINTANCE_LIST_MOCK } from "@/features/situation/mocks/situationMockData";
 import { formatDateFieldText } from "@/features/situation/utils/situationFormat";
+import {
+  isDateTimeFilled,
+  toApiDateTime,
+} from "@/features/situation/utils/situationDateTime";
+import { toCreateSituationBody } from "@/features/situation/services/situationCreateService";
+import { useParticipantCandidatesQuery } from "@/features/situation/hooks/queries/useParticipantCandidatesQuery";
+import { useCreateSituationMutation } from "@/features/situation/hooks/mutations/useCreateSituationMutation";
 
 // 날짜 시트에 보여줄 입력 그룹 (H-01-02)
 const DATE_TIME_SECTIONS = [
@@ -28,13 +40,33 @@ const DATE_TIME_SECTIONS = [
 // 종류 선택값 → 화면 표시 문구 ('기타'는 직접 입력한 내용)
 const getSituationTypeText = (situationType) => {
   if (!situationType?.type) return SITUATION_SELECT_PLACEHOLDER;
-  if (situationType.type === "ETC") {
+  if (situationType.type === SITUATION_TYPE.OTHER) {
     return situationType.etcText.trim() || "기타";
   }
   return (
     SITUATION_TYPE_OPTIONS.find(({ key }) => key === situationType.type)
       ?.label ?? SITUATION_SELECT_PLACEHOLDER
   );
+};
+
+// 입력값 확인 → 문제가 있으면 안내 문구, 없으면 null
+const getValidationMessage = ({ situationType, name, startDateTime, endDateTime }) => {
+  if (!situationType?.type) return SITUATION_CREATE_VALIDATION_MESSAGE.TYPE;
+  if (
+    situationType.type === SITUATION_TYPE.OTHER &&
+    !situationType.etcText.trim()
+  ) {
+    return SITUATION_CREATE_VALIDATION_MESSAGE.CUSTOM_TYPE;
+  }
+  if (!name.trim()) return SITUATION_CREATE_VALIDATION_MESSAGE.NAME;
+  if (!isDateTimeFilled(startDateTime) || !isDateTimeFilled(endDateTime)) {
+    return SITUATION_CREATE_VALIDATION_MESSAGE.PERIOD;
+  }
+  // 같은 형식(YYYY-MM-DDTHH:mm:ss) 문자열이라 문자열 비교로 순서 확인
+  if (toApiDateTime(startDateTime) >= toApiDateTime(endDateTime)) {
+    return SITUATION_CREATE_VALIDATION_MESSAGE.PERIOD_ORDER;
+  }
+  return null;
 };
 
 function SituationCreate() {
@@ -50,16 +82,46 @@ function SituationCreate() {
   // 열려 있는 시트 ("type" | "start" | "end" | null)
   const [openSheet, setOpenSheet] = useState(null);
 
-  // TODO: API 연동 전까지 목업 데이터 사용
-  const acquaintanceList = ACQUAINTANCE_LIST_MOCK;
+  const { toast, showToast, hideToast } = useToast();
+
+  // 참여할 지인 후보 (활성 관계 목록)
+  const { data: candidateData, error: candidateError } =
+    useParticipantCandidatesQuery();
+  const acquaintanceList = candidateData?.people ?? [];
+
+  useEffect(() => {
+    if (candidateError) showToast(getErrorMessage(candidateError));
+  }, [candidateError, showToast]);
+
+  // 생성 성공 → S-00 상황 목록 (뒤로가기로 입력 화면에 돌아오지 않도록 replace)
+  const { createSituation, isCreating } = useCreateSituationMutation({
+    showToast,
+    onSuccess: () => {
+      navigate(SITUATION_NAVIGATION_PATH.SITUATION_LIST, { replace: true });
+    },
+  });
 
   const handleSheetClose = () => {
     setOpenSheet(null);
   };
 
   const handleSituationCreateClick = () => {
-    // TODO: 상황 생성 API 연동 후 결과에 따라 이동
-    navigate(SITUATION_NAVIGATION_PATH.SITUATION_LIST);
+    if (isCreating) return;
+
+    const form = {
+      situationType,
+      name: situationName,
+      startDateTime,
+      endDateTime,
+      participantIds: participantIdList,
+    };
+    const validationMessage = getValidationMessage(form);
+    if (validationMessage) {
+      showToast(validationMessage);
+      return;
+    }
+
+    createSituation(toCreateSituationBody(form));
   };
 
   return (
@@ -80,6 +142,7 @@ function SituationCreate() {
           isRequired
           placeholder="예) 무릎 수술 회복"
           value={situationName}
+          maxLength={SITUATION_NAME_MAX_LENGTH}
           onChange={(e) => setSituationName(e.target.value)}
         />
 
@@ -154,6 +217,10 @@ function SituationCreate() {
           />
         )}
       </TimeSheet>
+
+      {toast && (
+        <DefaultToast key={toast.id} message={toast.message} onHide={hideToast} />
+      )}
     </div>
   );
 }
