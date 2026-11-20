@@ -36,9 +36,10 @@ export function useRequestDetailMutations(
   // 에러 메시지를 토스트로 출력
   const onError = (error) => showToast(getErrorMessage(error));
 
-  const { cancelRequest } = useCancelRequestMutation(requestId, {
+  // 요청 취소 API
+  const cancelMutation = useCancelRequestMutation(requestId, {
     showToast,
-    onSuccess: refreshDetail,
+    onSuccess: refreshDetail, // 요청 상세 화면에서 호출하므로, 성공 시 요청 상세 재조회
   });
 
   // 수락 철회 API
@@ -196,7 +197,11 @@ export function useRequestDetailMutations(
   });
 
   return {
-    cancelRequest,
+    // 요청 취소
+    cancelRequest: () => {
+      if (cancelMutation.isPending) return;
+      cancelMutation.mutate(requestId);
+    },
 
     // 수락 철회
     withdrawAcceptance: () => {

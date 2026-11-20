@@ -13,11 +13,23 @@ export function useCancelRequestMutation(requestId, { showToast, onSuccess }) {
   const { handleGoBack } = useRequestNav();
   const queryClient = useQueryClient();
 
-  const { mutate, isPending } = useMutation({
+  return useMutation({
     mutationFn: postCancelApi,
-    onSuccess,
+
+    // API 호출 성공 시
+    onSuccess: (result, ...args) => {
+      if (result.message) {
+        // null이 아닐 때만 성공 토스트 메시지 출력
+        showToast(result.message);
+      }
+
+      // 성공 콜백이 있다면 실행 (요청 상세는 요청 상세 재조회, 요청 수정은 뒤로 가기)
+      return onSuccess?.(result, ...args);
+    },
+
+    // API 호출 실패 시
     onError: (error) => {
-      showToast(getErrorMessage(error));
+      showToast(getErrorMessage(error)); // 토스트 에러 메시지 출력
 
       switch (getErrorCode(error)) {
         case COMMON_ERROR_CODE.FORBIDDEN:
@@ -38,11 +50,4 @@ export function useCancelRequestMutation(requestId, { showToast, onSuccess }) {
       }
     },
   });
-
-  const cancelRequest = () => {
-    if (isPending) return;
-    mutate(requestId);
-  };
-
-  return { cancelRequest, isCanceling: isPending };
 }

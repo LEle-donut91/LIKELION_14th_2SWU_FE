@@ -116,9 +116,9 @@ function RequestEditForm() {
   );
 
   // 3. 요청 취소 API
-  const { cancelRequest } = useCancelRequestMutation(paramId, {
+  const cancelMutation = useCancelRequestMutation(paramId, {
     showToast,
-    onSuccess: () => handleGoBack(),
+    onSuccess: () => handleGoBack(), // 성공 시 뒤로 가기
   });
 
   // API 응답 데이터 (정제된 형태)
@@ -198,8 +198,9 @@ function RequestEditForm() {
 
   // [요청 취소] 모달의 confirm 버튼 handler
   const handleCancelConfirm = () => {
+    if (cancelMutation.isPending) return;
     setCancelModalOpen(false);
-    cancelRequest();
+    cancelMutation.mutate(paramId);
   };
 
   return (
