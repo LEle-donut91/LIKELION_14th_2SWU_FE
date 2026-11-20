@@ -89,7 +89,7 @@ function RequestDetail() {
     edit: () => handleGoNext(REQUEST_ROUTES.editForm(paramId)),
     askAgain: () => handleGoNext(`${REQUEST_ROUTES.askAgain(paramId)}?from=detail`),
     withdraw: () => setWithdrawModalOpen(true),
-    withdrawProposal: () => withdrawProposal(proposalId),
+    withdrawProposal: () => withdrawProposal(proposalId), // 수정안 철회 API 호출
     done: completeCare, // 돌봄 완료 API 호출
     sameRequest: () => setSameModalOpen(true),
     checkChange: () => handleGoNext(REQUEST_ROUTES.assigneeReconfirm(paramId)),
