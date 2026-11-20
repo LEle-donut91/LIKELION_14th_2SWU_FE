@@ -28,6 +28,15 @@ export const SITUATION_API_URLS = {
   // 여기에 상황 관련 API URL 상수를 정의합니다.
   inProgressList: "/api/situations", // 진행 중 상황 목록 조회 (GET)
   home: "/api/home", // 홈 통합 조회 (GET)
+  create: "/api/situations", // 상황 생성 (POST)
+  detail: (situationId) => `/api/situations/${situationId}`, // 상황 상세 조회 (GET)
+  end: (situationId) => `/api/situations/${situationId}/end`, // 상황 직접 종료 (POST)
+  leave: (situationId) => `/api/situations/${situationId}/leave`, // 상황 나가기 (POST)
+  participants: (situationId) => `/api/situations/${situationId}/participants`, // 참여자 목록 조회 (GET) / 참여자 추가 (POST)
+  participant: (situationId, participantId) =>
+    `/api/situations/${situationId}/participants/${participantId}`, // 참여자 제외 (DELETE)
+  pastList: "/api/situations/history", // 지난 상황 목록 조회 (GET)
+  pastDetail: (situationId) => `/api/situations/${situationId}/history`, // 지난 상황 상세 조회 (GET)
 }
 
 // C. 도움 요청

@@ -65,15 +65,15 @@ export const SITUATION_TYPE_ETC_MAX_LENGTH = 15;
 // 선택 전 표시 문구
 export const SITUATION_SELECT_PLACEHOLDER = "선택";
 
-// H-03 요청 목록 - 도움 종류 라벨
-// key: 서버 helpType 값 (API 명세 확정 후 맞춰서 수정)
+// 도움 종류 라벨 (H-03 요청 목록, S-00 상황 카드 다음 일정 등)
+// key: 서버 helpType 값 (C 도움 요청 명세 기준)
 export const HELP_TYPE_LABEL = {
   HOSPITAL: "병원 동행",
   MEAL: "식사",
-  SHOPPING: "장보기",
+  GROCERY: "장보기",
   PET_CARE: "반려동물 돌봄",
-  CONTACT: "연락/안부",
-  ETC: "기타",
+  CHECK_IN: "연락/안부",
+  OTHER: "기타",
 };
 
 // H-03 요청 목록 - 상태 칩 (문구 + 스타일 이름)
@@ -97,3 +97,23 @@ export const MY_REQUEST_ROLE = {
   TARGET: { label: "내가 대상", path: SITUATION_NAVIGATION_PATH.REQUEST_TARGET_DETAIL },
   ASSIGNEE: { label: "내가 담당", path: SITUATION_NAVIGATION_PATH.REQUEST_ASSIGNEE_DETAIL },
 };
+
+// 상황 참여 역할 (진행 중 상황 목록 items[].role)
+export const SITUATION_ROLE = {
+  OWNER: "OWNER",
+  PARTICIPANT: "PARTICIPANT",
+};
+
+// S-00 상황 카드 하단 태그: 진행 중 상황 목록 requestCounts의 key → 공통 태그 type
+// (공통 태그 문구·스타일은 shared/constants/situationCardConstants.js의 SITUATION_TAG)
+export const SITUATION_REQUEST_COUNT_TAGS = [
+  { countKey: "acceptedCount", tagType: "ACCEPTED" }, // 수락
+  { countKey: "waitingCount", tagType: "WAITING" }, // 응답대기
+  { countKey: "noAssigneeCount", tagType: "UNASSIGNED" }, // 담당없음
+];
+
+// 목록 API 한 번에 받아올 개수
+export const SITUATION_LIST_PAGE_SIZE = 20;
+
+// S-00 하단 '지난 상황'에 미리 보여줄 개수 (나머지는 '전체 보기' → H-04)
+export const PAST_SITUATION_PREVIEW_SIZE = 3;
