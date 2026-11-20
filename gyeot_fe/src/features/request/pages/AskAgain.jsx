@@ -35,13 +35,18 @@ import {
   ASK_AGAIN_VALIDATE_FIELDS_FLEXIBLE,
 } from "@/features/request/constants/requestFormConstants";
 import { DUE_DATE_SECTIONS } from "@/features/request/constants/dateTimeInputConstants";
+import { INITIAL_FORM } from "@/features/request/constants/initialFormConstants";
+import { FIXED_DUE_DATE_TOAST_MESSAGE } from "@/features/request/constants/messageConstants";
 
 // Utils
 import {
   isPrerequisiteEnsured,
   validateInput,
 } from "@/features/request/utils/validateInput";
-import { normalizeResponseDeadline } from "@/features/request/utils/dueDateUtils";
+import {
+  getInitialDueDate,
+  normalizeResponseDeadline,
+} from "@/features/request/utils/dueDateUtils";
 import {
   getSelectedUser,
   getSelectedUserText,
@@ -67,6 +72,7 @@ function AskAgain() {
   const [searchParams] = useSearchParams();
   const fromDetail = searchParams.get("from") === "detail";
   const { toast, showToast, hideToast } = useToast();
+  const [enteredAt] = useState(() => new Date());
 
   // 열려 있는 시트 (한 번에 하나만 열림)
   const [openSheet, setOpenSheet] = useState(() => {
@@ -140,11 +146,25 @@ function AskAgain() {
     useRequestFormStore((state) => state);
   useEffect(() => {
     if (!initialForm || entryId === formEntryId) return;
-    initForm(formEntryId, initialForm);
-  }, [initialForm, entryId, formEntryId, initForm]);
+    initForm(formEntryId, {
+      ...initialForm,
+      dueDate: getInitialDueDate(
+        initialForm.startDateTime,
+        INITIAL_FORM.dueDate,
+        enteredAt,
+      ),
+    });
+  }, [initialForm, entryId, formEntryId, initForm, enteredAt]);
+
+  const isDeadlineFixed =
+    getInitialDueDate(form.startDateTime, false, enteredAt) === null;
 
   // 항목 버튼 핸들러 (동작: 선택 시트 열기)
   const handleSubItemOpenSheet = (sheet) => {
+    if (sheet === REQUEST_SHEET.DUE_DATE && isDeadlineFixed) {
+      showToast(FIXED_DUE_DATE_TOAST_MESSAGE);
+      return;
+    }
     if (isPrerequisiteEnsured(form, showToast)) setOpenSheet(sheet);
   };
 
@@ -246,12 +266,12 @@ function AskAgain() {
         <SelectSection
           title="응답 기한"
           isRequired
-          text={getDueDateText(form.dueDate)}
+          text={getDueDateText(form.dueDate, isDeadlineFixed)}
           width="large"
           onClick={() => handleSubItemOpenSheet(REQUEST_SHEET.DUE_DATE)}
         />
         <TimeSheet
-          isOpen={openSheet === REQUEST_SHEET.DUE_DATE}
+          isOpen={!isDeadlineFixed && openSheet === REQUEST_SHEET.DUE_DATE}
           onClose={closeSheet}
           value={form.dueDate}
           onConfirm={(v) => setForm({ ...form, dueDate: v })}

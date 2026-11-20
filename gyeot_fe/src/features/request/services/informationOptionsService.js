@@ -1,9 +1,10 @@
 import { MS_PER_MINUTE } from "@/features/request/constants/timeConstants";
 import { formatMonthDay, formatShortDateTime } from "@/shared/utils/dateFormat";
 import { toMinutes } from "@/features/request/utils/dueDateUtils";
-import { getSafetyCardInfoTitle } from "@/features/request/utils/getSafetyCardInfo";
 import {
   getCategoryDescription,
+  getSafetyCardInfoTitle,
+  getSafetyCardInfoValue,
   getInformationSelectionFlags,
 } from "@/features/request/utils/getSafetyCardInfo";
 
@@ -16,7 +17,7 @@ const toInformationItem = (item) => {
     id: item.informationId,
     label: item.typeName,
     title: getSafetyCardInfoTitle(item),
-    description: `${item.informationValue}${updatedText}`,
+    description: `${getSafetyCardInfoValue(item.informationValue)}${updatedText}`,
     isSensitive: item.sensitive,
     isDefault: item.selected,
   };

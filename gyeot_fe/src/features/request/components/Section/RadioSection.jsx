@@ -6,9 +6,12 @@ import {
 
 function RadioSection({ value, onChange }) {
   return (
-    <section>
+    <section className={styles.sectionContainer}>
       {/* section 타이틀 */}
-      <span className={`${styles.sectionTitle} typoBodyStrong`}>도움 종류</span>
+      <span className={`${styles.sectionTitle} typoBodyStrong`}>
+        도움 종류{" "}
+        <span className={styles.requiredMark}>*</span>
+      </span>
 
       {/* 라디오 버튼 container */}
       <div className={styles.radioContainer}>

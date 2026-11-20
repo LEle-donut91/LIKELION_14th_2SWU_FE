@@ -150,7 +150,7 @@ function RequestEditCheck() {
 
       {/* 하단 Footer */}
       <LargeFooter
-        title={isConfirmRequired ? "재확인 요청" : "요청 수정"}
+        title={isConfirmRequired ? "재확인 요청" : "재요청"}
         type="primary"
         onClick={handleReconfirmBtnClick}
       />

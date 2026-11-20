@@ -213,7 +213,8 @@ function Request() {
       <main className={styles.content}>
         {/* 상황 */}
         <SelectSection
-          title="상황 *"
+          title="상황"
+          isRequired
           text={getSelectedSituationText(situation, form.situationId)}
           width="large"
           onClick={() => setOpenSheet(REQUEST_SHEET.SITUATION)}
@@ -244,13 +245,15 @@ function Request() {
         {/* 시작 - 종료 */}
         <div className={styles.timeSectionContainer}>
           <SelectSection
-            title="시작 *"
+            title="시작"
+            isRequired
             text={getDateTimeText(form.startDateTime)}
             width="small"
             onClick={() => handleSubItemOpenSheet(REQUEST_SHEET.START)}
           />
           <SelectSection
-            title="종료 *"
+            title="종료"
+            isRequired
             text={getDateTimeText(form.endDateTime)}
             width="small"
             onClick={() => handleSubItemOpenSheet(REQUEST_SHEET.END)}
@@ -290,7 +293,8 @@ function Request() {
         {/* 선행 조건(상황/도움 종류를 모두 선택)을 만족했을 때만 입력 가능 (onFocus) */}
         <div ref={locationInputRef}>
           <InputSection
-            title="장소 *"
+            title="장소"
+            isRequired
             size="small"
             value={form.location}
             readOnly={isReadOnly(form)}
@@ -319,7 +323,8 @@ function Request() {
 
         {/* 요청 대상 */}
         <SelectSection
-          title="요청 대상 *"
+          title="요청 대상"
+          isRequired
           text={getSelectedUserText(user, form.userId)}
           width="large"
           onClick={() => handleSubItemOpenSheet(REQUEST_SHEET.USER)}
@@ -342,7 +347,8 @@ function Request() {
 
         {/* 응답 기한 */}
         <SelectSection
-          title="응답 기한 *"
+          title="응답 기한"
+          isRequired
           text={getDueDateText(form.dueDate)}
           width="large"
           onClick={() => handleSubItemOpenSheet(REQUEST_SHEET.DUE_DATE)}
