@@ -41,11 +41,12 @@ import { FIXED_DUE_DATE_TOAST_MESSAGE } from "@/features/request/constants/messa
 import {
   isPrerequisiteEnsured,
   askAgainValidateInput,
+  isDueDateEntered,
 } from "@/features/request/utils/validateInput";
 import {
-  getInitialDueDate,
+  getDueDateForStart,
   isDueDateFixed,
-} from "@/features/request/utils/askAgainDueDate";
+} from "@/features/request/utils/dueDateFormat";
 import {
   getSelectedUser,
   getSelectedUserText,
@@ -152,13 +153,22 @@ function AskAgain() {
     if (!initialForm || entryId === formEntryId) return;
     initForm(formEntryId, {
       ...initialForm,
-      dueDate: getInitialDueDate(
+      dueDate: getDueDateForStart(
         initialForm.startDateTime,
         INITIAL_FORM.dueDate,
         enteredAt,
       ),
     });
   }, [initialForm, entryId, formEntryId, initForm, enteredAt]);
+
+  // 같은 요청으로 재진입한 경우에도 시작까지 24시간 미만이면 null로 표시·저장한다.
+  useEffect(() => {
+    if (entryId !== formEntryId) return;
+    setForm((current) => {
+      const dueDate = getDueDateForStart(current.startDateTime, current.dueDate, enteredAt);
+      return dueDate === current.dueDate ? current : { ...current, dueDate };
+    });
+  }, [entryId, formEntryId, form.startDateTime, enteredAt, setForm]);
 
 
   // 항목 버튼 핸들러 (동작: 선택 시트 열기)
@@ -276,7 +286,11 @@ function AskAgain() {
           isOpen={!isDueDateFixed(form.startDateTime, enteredAt) && openSheet === REQUEST_SHEET.DUE_DATE}
           onClose={closeSheet}
           value={form.dueDate}
-          onConfirm={(v) => setForm({ ...form, dueDate: v })}
+          onConfirm={(v) => setForm({
+            ...form,
+            // 전부 빈 값으로 확인하면 기본 응답 기한인 24시간을 저장한다.
+            dueDate: isDueDateEntered(v) ? v : { ...INITIAL_FORM.dueDate },
+          })}
         >
           {(temp, setTemp) => (
             <DateTimeOption

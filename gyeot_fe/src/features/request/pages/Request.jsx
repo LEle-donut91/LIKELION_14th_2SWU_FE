@@ -24,6 +24,7 @@ import { useRequestErrorStore } from "@/features/request/stores/useRequestErrorS
 
 // Constants
 import { REQUEST_ROUTES } from "@/features/request/constants/routerConstants";
+import { INITIAL_FORM } from "@/features/request/constants/initialFormConstants";
 import { REQUEST_ERROR_TARGET_PAGE } from "@/features/request/constants/requestErrorConstants";
 import {
   REQUEST_FORM_FIELD_KEY,
@@ -35,11 +36,12 @@ import {
 } from "@/features/request/constants/dateTimeInputConstants";
 
 // Utils
-import { getRequestDueDate } from "@/features/request/utils/requestDueDate";
+import { getDueDateForStart } from "@/features/request/utils/dueDateFormat";
 import {
   isReadOnly,
   isPrerequisiteEnsured,
   requestValidateInput,
+  isDueDateEntered,
 } from "@/features/request/utils/validateInput";
 import {
   getSelectedUser,
@@ -69,6 +71,7 @@ function Request() {
   const paramId = useParams().id;
   const initializedParamId = useRef(null);
   const { toast, showToast, hideToast } = useToast();
+  const [enteredAt] = useState(() => new Date());
 
   // 열려 있는 시트 (한 번에 하나만 열림)
   const [openSheet, setOpenSheet] = useState(() => {
@@ -149,13 +152,14 @@ function Request() {
 
   // 진입 또는 시작 일시 변경 시에만 확인
   // - 시작까지 24시간 미만이면 응답 기한 값을 null로 설정 (화면엔 "시작 시간까지"로 표시)
+  // 같은 요청으로 재진입한 경우에도 진입 시각 기준으로 확인한다.
   useEffect(() => {
     if (String(entryId) !== paramId) return;
     setForm((current) => {
-      const dueDate = getRequestDueDate(current.startDateTime, current.dueDate);
+      const dueDate = getDueDateForStart(current.startDateTime, current.dueDate, enteredAt);
       return dueDate === current.dueDate ? current : { ...current, dueDate };
     });
-  }, [entryId, paramId, form.startDateTime, setForm]);
+  }, [entryId, paramId, form.startDateTime, enteredAt, setForm]);
 
   useEffect(() => {
     const selectedSituation = getSelectedSituation(situation, form.situationId);
@@ -370,7 +374,11 @@ function Request() {
           isOpen={openSheet === REQUEST_SHEET.DUE_DATE}
           onClose={closeSheet}
           value={form.dueDate}
-          onConfirm={(v) => setForm({ ...form, dueDate: v })}
+          onConfirm={(v) => setForm({
+            ...form,
+            // 전부 빈 값으로 확인하면 기본 응답 기한인 24시간을 저장한다.
+            dueDate: isDueDateEntered(v) ? v : { ...INITIAL_FORM.dueDate },
+          })}
         >
           {(temp, setTemp) => (
             <DateTimeOption

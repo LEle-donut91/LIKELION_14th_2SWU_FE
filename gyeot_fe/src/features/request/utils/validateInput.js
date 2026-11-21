@@ -94,7 +94,6 @@ export const isPrerequisiteEnsured = (form, showToast) => {
  * - 미선택 시: "요청 대상을 선택해 주세요."
  *
  * 7. 응답 기한
- * - 0) 미입력 시 null 저장 (토스트 메시지를 띄우지 않으며, 바로 다음 페이지로 이동. 서버에서 24시간으로 처리함 -> 24시간이 시작 시간을 넘으면 서버에서 시작 시간까지로 줄임.)
  * - 1) 최소 기한 미달 (< 1시간): "응답 기한은 최소 1시간 이상이어야 해요."
  * - 2) 최대 기한 초과 (> 3일): "응답 기한은 최대 3일까지 설정할 수 있어요."
  * - 3) 시작 시간을 초과할 때 (현재+기한 > 시작시간): "응답 기한은 시작 시간을 넘을 수 없어요."
@@ -144,11 +143,6 @@ export const requestValidateInput = (form, now) => {
 
   // 7. 응답 기한
   let nextForm = form;
-  // 0) 미입력 시 : 일·시·분을 모두 지운 미입력 값은 null로 저장한다.
-  if (form.dueDate !== null && !isDueDateEntered(form.dueDate)) {
-    nextForm = { ...form, dueDate: null };
-  }
-
   // 사용자가 실제로 응답 기한에 값을 입력한 경우
   if (form.dueDate !== null && isDueDateEntered(form.dueDate)) {
     const minutes = toMinutes(form.dueDate);
