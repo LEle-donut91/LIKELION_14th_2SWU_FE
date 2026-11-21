@@ -157,7 +157,7 @@ function AskAgain() {
   }, [initialForm, entryId, formEntryId, initForm]);
 
   useInitialResponseDeadline(formEntryId, showToast);
-  const dueDateFixed = useLiveDueDateFixed(formEntryId);
+  const dueDateFixed = useLiveDueDateFixed(formEntryId, showToast);
 
 
   // 항목 버튼 핸들러 (동작: 선택 시트 열기)
