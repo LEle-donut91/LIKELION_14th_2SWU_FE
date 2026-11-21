@@ -35,6 +35,7 @@ import {
 } from "@/features/request/constants/dateTimeInputConstants";
 
 // Utils
+import { getRequestDueDate } from "@/features/request/utils/requestDueDate";
 import {
   isReadOnly,
   isPrerequisiteEnsured,
@@ -145,6 +146,16 @@ function Request() {
       });
     }
   }, [entryId, paramId, initForm, situation]);
+
+  // 진입 또는 시작 일시 변경 시에만 확인
+  // - 시작까지 24시간 미만이면 응답 기한 값을 null로 설정 (화면엔 "시작 시간까지"로 표시)
+  useEffect(() => {
+    if (String(entryId) !== paramId) return;
+    setForm((current) => {
+      const dueDate = getRequestDueDate(current.startDateTime, current.dueDate);
+      return dueDate === current.dueDate ? current : { ...current, dueDate };
+    });
+  }, [entryId, paramId, form.startDateTime, setForm]);
 
   useEffect(() => {
     const selectedSituation = getSelectedSituation(situation, form.situationId);
