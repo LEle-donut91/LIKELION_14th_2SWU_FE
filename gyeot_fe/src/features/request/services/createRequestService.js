@@ -4,24 +4,29 @@ import {
   formatLocalDateTime,
   toDateFromInput,
 } from "@/features/request/utils/dateTimeFormat";
-import { toMinutes } from "@/features/request/utils/dueDateUtils";
+import { toMinutes } from "@/features/request/utils/dueDateFormat";
 
 // [H-03-02] 요청 작성 - 도움 요청 생성 API 요청 body 가공
 export const postCareRequestService = (requestForm, now = new Date()) => {
-  const { form } = normalizeResponseDeadline(requestForm, now);
+  // 요청 작성 API 호출 직전에, 응답 기한이 시작 시간을 초과하는지 검사 후, 값을 null로 보정
+  // - 토스트로 응답 기한이 시작 시간까지로 고정됨을 안내
+  const { form, message } = normalizeResponseDeadline(requestForm, now);
   const start = toDateFromInput(form.startDateTime);
   const end = toDateFromInput(form.endDateTime);
   return {
-    situationId: Number(form.situationId),
-    helpType: form.helpType,
-    startsAt: start ? formatLocalDateTime(start) : null,
-    endsAt: end ? formatLocalDateTime(end) : null,
-    place: form.location,
-    description: form.content ?? "",
-    targetUserId: Number(form.userId),
-    responseDeadlineHours:
-      form.dueDate === null ? null : toMinutes(form.dueDate) / 60,
-    informationIds: toUniqueNumberIds(form.informationIds),
+    message,
+    payload: {
+      situationId: Number(form.situationId),
+      helpType: form.helpType,
+      startsAt: start ? formatLocalDateTime(start) : null,
+      endsAt: end ? formatLocalDateTime(end) : null,
+      place: form.location,
+      description: form.content ?? "",
+      targetUserId: Number(form.userId),
+      responseDeadlineHours:
+        form.dueDate === null ? null : toMinutes(form.dueDate) / 60,
+      informationIds: toUniqueNumberIds(form.informationIds),
+    },
   };
 };
 

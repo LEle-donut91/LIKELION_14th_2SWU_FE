@@ -1,6 +1,6 @@
 import { MS_PER_MINUTE } from "@/features/request/constants/timeConstants";
 import { formatMonthDay, formatShortDateTime } from "@/shared/utils/dateFormat";
-import { toMinutes } from "@/features/request/utils/dueDateUtils";
+import { toMinutes } from "@/features/request/utils/dueDateFormat";
 import {
   getCategoryDescription,
   getSafetyCardInfoTitle,

@@ -5,7 +5,7 @@ import { formatShortDateTimeRange } from "@/shared/utils/dateFormat";
 import { toDateTimeInput } from "@/features/request/utils/dateTimeFormat";
 import {
   toMinutes,
-} from "@/features/request/utils/dueDateUtils";
+} from "@/features/request/utils/dueDateFormat";
 import {
   flattenInformationItems,
   toUniqueNumberIds,
@@ -73,8 +73,11 @@ export const postAskAgainService = (
   requestForm,
   now = new Date(),
 ) => {
-  const { form } = normalizeResponseDeadline(requestForm, now);
+  // 다시 부탁하기 API 호출 직전에, 응답 기한이 시작 시간을 초과하는지 검사 후, 값을 null로 보정
+  // - 토스트로 응답 기한이 시작 시간까지로 고정됨을 안내
+  const { form, message } = normalizeResponseDeadline(requestForm, now);
   return {
+    message,
     requestId,
     payload: {
       targetUserId: Number(form.userId),

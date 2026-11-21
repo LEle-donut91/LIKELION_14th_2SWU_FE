@@ -49,10 +49,16 @@ export function useSendRequestMutation({
   };
 
   return useMutation({
-    mutationFn: (form) =>
-      reassignRequestId
-        ? postAskAgainApi(postAskAgainService(Number(reassignRequestId), form))
-        : postCareRequestApi(postCareRequestService(form)),
+    mutationFn: (form) => {
+      if (reassignRequestId) {
+        const { message, ...request } = postAskAgainService(Number(reassignRequestId), form);
+        if (message) showToast(message);
+        return postAskAgainApi(request);
+      }
+      const { payload, message } = postCareRequestService(form);
+      if (message) showToast(message);
+      return postCareRequestApi(payload);
+    },
     onSuccess: (data) => onSuccess(postCareRequestResultService(data)),
     onError: (error) => {
       showToast(getErrorMessage(error));

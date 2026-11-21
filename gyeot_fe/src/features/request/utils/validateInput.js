@@ -6,13 +6,12 @@ import {
   START_MIN_LEAD_MINUTES,
 } from "@/features/request/constants/timeConstants";
 import { REQUEST_FORM_FIELD_KEY } from "@/features/request/constants/requestFormConstants";
-import { toMinutes } from "@/features/request/utils/dueDateUtils";
+import { toMinutes } from "@/features/request/utils/dueDateFormat";
 import {
   formatDateToLocalDayBoundary,
   toDateFromInput,
 } from "@/features/request/utils/dateTimeFormat";
 import {
-  DATE_TIME_KEYS,
   DUE_DATE_KEYS,
   DATE_TIME_MAX_LIMITS,
   DATE_TIME_MIN_LIMITS,
@@ -22,6 +21,7 @@ import {
 import {
   REQUEST_PREREQUISITE_TOAST_MESSAGE,
   DEADLINE_NOTICE,
+  START_PASSED_TOAST_MESSAGE,
 } from "@/features/request/constants/messageConstants";
 
 // 시작/종료 Section에 입력된 시간, 날짜 값에서 숫자만 남기고, 필드(key)별 최대값/유효성에 맞게 값을 보정
@@ -38,10 +38,6 @@ export const getValidatedNumericValue = (key, rawValue) => {
 
   return String(num);
 };
-
-// 시간/날짜 입력 칸의 5개 필드가 전부 채워졌는지 체크 (null / undefined / "" 은 모두 미입력으로 취급)
-export const isDateTimeComplete = (v) =>
-  !!v && DATE_TIME_KEYS.every((k) => v[k] != null && v[k] !== "");
 
 // 응답 기한 입력 칸의 3개 필드 중 1개 이상 입력했는지 체크 (null / undefined / "" 은 모두 미입력으로 취급)
 export const isDueDateEntered = (d) =>
@@ -180,39 +176,7 @@ export const requestValidateInput = (form, now) => {
   return { errors, form: normalized.form, message: normalized.message };
 };
 
-/**
- * [N-06] 다시 부탁하기 - "다음" 버튼을 눌렀을 때 유효성 검사
- * 1. 상황
- * - 미입력 시: "상황을 선택해 주세요."
- *
- * 2. 도움 종류
- * - 미입력 시: "도움 종류를 선택해 주세요."
- *
- * 3. 시작 일시
- * - 미입력 시: "시작 일시를 모두 입력해 주세요."
- * - 과거 시간 설정 시: "이미 지난 시간은 시작 시간으로 설정할 수 없어요."
- * - 여유 시간 부족 시 (< 1시간): "시작 시간은 지금으로부터 최소 1시간 이후여야 해요."
- *
- * 4. 종료 일시
- * - 미입력 시: "종료 일시를 모두 입력해 주세요."
- * - 시작 시간보다 빠른 경우: "종료 시간은 시작 시간 이후로 정해 주세요."
- *
- * 5. 장소
- * - 미입력 또는 공백 시: "장소를 입력해 주세요."
- *
- * 6. 요청 대상
- * - 미선택 시: "요청 대상을 선택해 주세요."
- *
- * 7. 응답 기한 (1, 4는 normalizeResponseDeadline에서 처리)
- * - 1) 미입력 시: "응답 기한은 24시간으로 고정됩니다." (이때 실제 값은 24시간으로 세팅되며, 토스트 메시지를 출력하긴 하지만 다음 페이지로 이동함)
- * - 2) 최소 기한 미달 (< 1시간): "응답 기한은 최소 1시간 이상이어야 해요."
- * - 3) 최대 기한 초과 (> 3일): "응답 기한은 최대 3일까지 설정할 수 있어요."
- * - 4) 시작 시간을 초과할 때 (현재+기한 > 시작시간): "응답 기한은 시작 시간까지로 고정됩니다." (이때 실제 값은 null로 세팅되며, 화면에는 "시작 시간까지"로 표시됨. 토스트 메시지를 출력하긴 하지만 다음 페이지로 이동함)
- *
- * 8. 시작 & 종료 일시
- * - 상황 기간 밖: "시작·종료 일시는 상황 기간 안에 있어야 해요."
- *
- */
+// 요청 수정
 export const editValidateInput = (form, now) => {
   const errors = {};
   const start = toDateFromInput(form.startDateTime);
@@ -259,21 +223,62 @@ export const editValidateInput = (form, now) => {
   return errors;
 };
 
-// 다시 부탁하기
-export const askAgainValidateInput = (form) => {
+/**
+ * [N-06] 다시 부탁하기 - "다음" 버튼을 눌렀을 때 유효성 검사
+ * 
+1. 기타
+- 시작 시간이 이미 지났으면 토스트 출력하며 전송 차단: "시작 시간이 지나서 다시 부탁하기를 보낼 수 없어요.”
+
+2. 새 요청 대상
+- 미선택 시: "요청 대상을 선택해 주세요."
+
+3. 응답 기한
+- 시작까지 남은 시간이 1시간 미만인 경우
+    → 응답 기한 항목 클릭 시 토스트: "시작까지 1시간 미만이라 응답 기한은 시작 시간까지로 고정돼요"
+    → 사용자가 값을 조정할 수 없고, "시작 시간까지"로 표기되며 실제 저장값은 null
+
+- 시작까지 남은 시간이 1시간 이상인 경우
+    → 1) 미입력 시: "응답 기한은 24시간으로 고정됩니다." (이때 실제 값은 24시간으로 세팅되며, 토스트 메시지를 출력하긴 하지만 다음 페이지로 이동함)
+    → 2) 최소 기한 미달 (< 1시간): "응답 기한은 최소 1시간 이상이어야 해요."
+    → 3) 최대 기한 초과 (> 3일): "응답 기한은 최대 3일까지 설정할 수 있어요."
+    → 4) 시작 시간을 초과할 때 (현재+기한 > 시작시간): "응답 기한은 시작 시간까지로 고정됩니다." (이때 실제 값은 null로 세팅되며, 화면에는 "시작 시간까지"로 표시됨. 토스트 메시지를 출력하긴 하지만 다음 페이지로 이동함)
+ *
+ */
+export const askAgainValidateInput = (form, isDueDateFixed, now = new Date()) => {
   const errors = {};
-  if (!form.userId) errors.userId = "요청 대상을 선택해 주세요.";
-  if (form.dueDate !== null && isDueDateEntered(form.dueDate)) {
-    const minutes = toMinutes(form.dueDate);
-    if (minutes < DUE_DATE_MIN_MINUTES) {
-      errors.dueDate = "응답 기한은 최소 1시간 이상이어야 해요.";
-    } else if (minutes > DUE_DATE_MAX_MINUTES) {
-      errors.dueDate = "응답 기한은 최대 3일까지 설정할 수 있어요.";
-    }
+  const start = toDateFromInput(form.startDateTime);
+
+  // 1. 기타
+  if (start && start <= now) {
+    errors.startDateTime = START_PASSED_TOAST_MESSAGE;
+    return { errors, form, message: null };
   }
-  return errors;
+  // 2. 새 요청 대상
+  if (!form.userId) errors.userId = "요청 대상을 선택해 주세요.";
+
+  // 3. 응답 기한 - 시작까지 남은 시간이 1시간 이상인 경우
+  if (!isDueDateFixed) {
+    if (form.dueDate !== null && isDueDateEntered(form.dueDate)) {
+      const minutes = toMinutes(form.dueDate);
+      if (minutes < DUE_DATE_MIN_MINUTES) { // 2) 최소 기한 미달
+        errors.dueDate = "응답 기한은 최소 1시간 이상이어야 해요.";
+      } else if (minutes > DUE_DATE_MAX_MINUTES) { // 3) 최대 기한 초과
+        errors.dueDate = "응답 기한은 최대 3일까지 설정할 수 있어요.";
+      }
+    }
+
+    // 응답 기한 - 1) 미입력 시, 4) 시작 시간을 초과할 때
+    const normalized = normalizeResponseDeadline(form, now);
+    return { errors, form: normalized.form, message: normalized.message };
+  }
+
+  // 3. 응답 기한 - 시작까지 남은 시간이 1시간 미만인 경우 (시작 시간까지로 고정되며 값은 null)
+  return { errors, form: { ...form, dueDate: null }, message: null };
 };
 
+// 응답 기한 "1) 미입력, 4) 시작 시간을 초과할 때" 처리
+// 1) 미입력 시: "응답 기한은 24시간으로 고정됩니다." (이때 실제 값은 24시간으로 세팅되며, 토스트 메시지를 출력하긴 하지만 다음 페이지로 이동함)
+// 4) 시작 시간을 초과할 때 (현재+기한 > 시작시간): "응답 기한은 시작 시간까지로 고정됩니다." (이때 실제 값은 null로 세팅되며, 화면에는 "시작 시간까지"로 표시됨. 토스트 메시지를 출력하긴 하지만 다음 페이지로 이동함)
 export const normalizeResponseDeadline = (form, now = new Date()) => {
   // 이미 '시작 시간까지'로 설정되어 있는 경우는 그대로 유지 (추가 보정 및 안내 없이 그대로 반환)
   if (form.dueDate === null) return { form, message: null };
