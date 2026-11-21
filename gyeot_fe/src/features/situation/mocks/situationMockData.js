@@ -1,31 +1,5 @@
-// S-00 상황 목록 목업 데이터 (API 연동 전 화면 확인용)
-// 진행 중 상황은 홈(H-00)과 같은 형태를 사용해 공통 SituationCard에 그대로 넘긴다.
 
-export const ONGOING_SITUATION_MOCK = {
-  id: 1,
-  title: "출장 부재",
-  startDate: "2026-10-01",
-  endDate: "2026-11-14",
-  participantCount: 4,
-  nextSchedule: {
-    dateTime: "2026-10-03T15:00:00",
-    assigneeName: "하음",
-    typeName: "장보기",
-  },
-  extraScheduleCount: 1,
-  tags: [
-    { type: "ACCEPTED", count: 0 },
-    { type: "WAITING", count: 0 },
-    { type: "UNASSIGNED", count: 0 },
-  ],
-};
 
-// 카드 하단 '다음 일정' 줄
-export const UPCOMING_SCHEDULE_MOCK = {
-  dateTime: "2026-10-02T14:00:00",
-  title: "병원 동행",
-  assigneeName: "서연",
-};
 
 // 지난 상황 목록 (S-00 하단, H-04 지난 상황)
 // - isOwner          : 내가 정보 주인(도움받은)인지, 아니면 참여자(도와준)인지
@@ -154,43 +128,3 @@ export const JOINED_PAST_SITUATION_DETAIL_MOCK = {
     },
   ],
 };
-
-// H-03-05 상황 관리 - 정보 주인 시점 참여자 목록
-// relationLabel: 이름 아래 보조 문구 (보호자만 표시)
-export const MANAGE_PARTICIPANT_LIST_MOCK = [
-  { id: 1, name: "서연", relationLabel: "보호자", isGuardian: true },
-  { id: 2, name: "민재", relationLabel: "", isGuardian: false },
-  { id: 3, name: "하은", relationLabel: "", isGuardian: false },
-];
-
-// H-03-05 참여자 추가 시트 - 활성 관계 지인 전체 (이미 참여 중인 사람은 시트에서 '참여 중'으로 표시)
-export const INVITE_CANDIDATE_LIST_MOCK = [
-  { id: 1, name: "서연", relationText: "서로의 보호자", isGuardian: true },
-  { id: 2, name: "민재", relationText: "나의 사람", isGuardian: false },
-  { id: 3, name: "하은", relationText: "나의 사람", isGuardian: false },
-  // 아직 참여하지 않은 지인 (체크해서 추가할 수 있음)
-  { id: 4, name: "지우", relationText: "나의 사람", isGuardian: false },
-  { id: 5, name: "도윤", relationText: "나의 사람", isGuardian: false },
-];
-
-// H-03-05 상황 관리 - 참여자 시점에서 보는 상황
-export const JOINED_SITUATION_MOCK = {
-  id: 21,
-  title: "무릎 수술 회복",
-  startDate: "2026-10-28",
-  endDate: "2026-11-20",
-  ownerName: "지우",
-};
-
-// H-03-05 상황 종료 시트 - 진행 중인 요청 수
-export const ACTIVE_REQUEST_COUNT_MOCK = 2;
-
-// N-09 상황 나가기 시트 - 이 상황에서 내가 담당 중인 요청
-export const MY_ASSIGNED_REQUEST_LIST_MOCK = [
-  {
-    id: 301,
-    helpType: "HOSPITAL",
-    startDateTime: "2026-11-20T14:00:00",
-    status: "ACCEPTED",
-  },
-];
