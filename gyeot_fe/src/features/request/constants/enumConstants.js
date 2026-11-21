@@ -26,6 +26,11 @@ export const REQUEST_STATE = {
   EXPIRED: "EXPIRED",
 };
 
+// 요청 수정 API 필드명
+export const REQUEST_EDIT_FIELD_KEY = {
+  STARTS_AT: "startsAt",
+};
+
 // 수정안 상태 (latestProposal.status)
 export const PROPOSAL_STATUS = {
   PENDING: "PENDING",

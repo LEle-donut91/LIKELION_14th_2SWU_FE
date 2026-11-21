@@ -170,7 +170,15 @@ function RequestEditForm() {
   // 다음 버튼 클릭 handler
   const handleNextBtnClick = () => {
     // 입력값 유효성 검사 (첫 번째 에러 문구 하나만 토스트로)
-    const errors = editValidateInput(requestForm, new Date());
+    // 세 번째 인자는 현재 입력값과 비교할 기준값이다.
+    // initialRequestForm은 service에서 최근 수정안의 after 값으로 만들며,
+    // 수정안이 없으면 원래 요청의 startsAt·endsAt·place로 만든다.
+    // defaultIds는 공개 항목 API가 selected로 내려준 기존 선택 ID 목록이다.
+    // 현재 선택(requestForm.informationIds)과 비교해 공개 항목만 바꾼 경우도 구분한다.
+    const errors = editValidateInput(requestForm, new Date(), {
+      ...initialRequestForm,
+      informationIds: informationOptions.defaultIds,
+    });
     const [firstError] = Object.values(errors);
     if (firstError) {
       showToast(firstError);

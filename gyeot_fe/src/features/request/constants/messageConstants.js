@@ -23,4 +23,4 @@ export const START_PASSED_TOAST_MESSAGE =
   "시작 시간이 지나서 다시 부탁하기를 보낼 수 없어요.";
 
 // 수정 요청 시 변경된 필드가 하나도 없는 경우 문구
-export const NO_CHANGE_TOAST_MESSAGE = "변경된 내용이 없어요.";
+export const NO_CHANGE_TOAST_MESSAGE = "바뀐 내용이 없습니다.";

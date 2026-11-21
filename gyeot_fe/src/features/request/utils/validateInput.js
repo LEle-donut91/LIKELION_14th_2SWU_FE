@@ -6,7 +6,9 @@ import {
   START_MIN_LEAD_MINUTES,
 } from "@/features/request/constants/timeConstants";
 import { REQUEST_FORM_FIELD_KEY } from "@/features/request/constants/requestFormConstants";
+import { REQUEST_EDIT_FIELD_KEY } from "@/features/request/constants/enumConstants";
 import { toMinutes } from "@/features/request/utils/dueDateFormat";
+import { getEditChanges } from "@/features/request/utils/getEditChanges";
 import {
   formatDateToLocalDayBoundary,
   toDateFromInput,
@@ -22,6 +24,7 @@ import {
   REQUEST_PREREQUISITE_TOAST_MESSAGE,
   DEADLINE_NOTICE,
   START_PASSED_TOAST_MESSAGE,
+  NO_CHANGE_TOAST_MESSAGE,
 } from "@/features/request/constants/messageConstants";
 
 // 시작/종료 Section에 입력된 시간, 날짜 값에서 숫자만 남기고, 필드(key)별 최대값/유효성에 맞게 값을 보정
@@ -176,14 +179,40 @@ export const requestValidateInput = (form, now) => {
   return { errors, form: normalized.form, message: normalized.message };
 };
 
-// 요청 수정
-export const editValidateInput = (form, now) => {
+/**
+ * [H-03-01-02] 요청 수정 - "다음" 버튼을 눌렀을 때 유효성 검사
+ * - 시작 일시의 "과거 시간 설정 시"와 "여유 시간 부족 시"는 사용자가 시작 일시를 입력해서 바뀌었을 때만 검사
+ *
+ * 1. 시작 일시
+ * - 미입력 시: "시작 일시를 모두 입력해 주세요."
+ * - 과거 시간 설정 시: "이미 지난 시간은 시작 시간으로 설정할 수 없어요."
+ * - 여유 시간 부족 시 (< 1시간): "시작 시간은 지금으로부터 최소 1시간 이후여야 해요."
+ *
+ * 2. 종료 일시
+ * - 미입력 시: "종료 일시를 모두 입력해 주세요."
+ * - 시작 시간보다 빠른 경우: "종료 시간은 시작 시간 이후로 정해 주세요."
+ *
+ * 3. 장소
+ * - 미입력 또는 공백 시: "장소를 입력해 주세요."
+ *
+ * 4. 시작 & 종료 일시
+ * - 상황 기간 밖: "시작·종료 일시는 상황 기간 안에 있어야 해요."
+ *
+ * 5. 기타
+ * - 바뀐 내용 없음: "바뀐 내용이 없습니다."
+ */
+export const editValidateInput = (form, now, before) => {
   const errors = {};
+  // before는 최근 수정안의 after 값, 수정안이 없으면 원래 요청 값이다.
+  // 현재 입력값과 비교해 실제로 달라진 필드만 가져온다.
+  const changes = getEditChanges(form, before);
   const start = toDateFromInput(form.startDateTime);
   const end = toDateFromInput(form.endDateTime);
   if (!start) {
     errors.startDateTime = "시작 일시를 모두 입력해 주세요.";
-  } else {
+  } else if (Object.hasOwn(changes, REQUEST_EDIT_FIELD_KEY.STARTS_AT)) {
+    // changes에 startsAt 키가 있다는 것은 시작 일시를 변경했다는 뜻이다.
+    // 시작 일시가 그대로면 과거 시간·최소 1시간 검사는 하지 않는다.
     const leadMinutes = (start - now) / MS_PER_MINUTE;
     if (leadMinutes <= 0) {
       errors.startDateTime = "이미 지난 시간은 시작 시간으로 설정할 수 없어요.";
@@ -219,6 +248,11 @@ export const editValidateInput = (form, now) => {
     ) {
       errors[field] = "시작·종료 일시는 상황 기간 안에 있어야 해요.";
     }
+  }
+  // 다른 입력 오류가 없고, 일정·장소·공개 항목 모두 변경하지 않았으면 이동을 막는다.
+  // 공개 항목만 변경해도 changes에 informationIds가 있으므로 이 조건에 해당하지 않는다.
+  if (Object.keys(errors).length === 0 && Object.keys(changes).length === 0) {
+    errors.noChanges = NO_CHANGE_TOAST_MESSAGE;
   }
   return errors;
 };
