@@ -3,10 +3,7 @@
  * 화면에 보여줄 알림 문구는 여기서만 수정
  */
 
-export const DEADLINE_NOTICE = {
-  DEFAULT: "응답 기한은 24시간으로 고정됩니다.",
-  FIXED: "응답 기한은 시작 시간까지로 고정됩니다.",
-};
+export const DUEDATE_FIXED_MESSAGE = "응답 기한은 시작 시간까지입니다.";
 
 export const REQUEST_DEADLINE_MESSAGE = {
   EXCEEDS_START: "응답 기한은 시작 시간을 넘을 수 없어요.",

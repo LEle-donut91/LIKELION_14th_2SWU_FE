@@ -8,7 +8,6 @@ import {
   MS_PER_MINUTE,
   DUE_DATE_MAX_MINUTES,
   DUE_DATE_MIN_MINUTES,
-  DUE_DATE_DEFAULT_MINUTES,
   START_MIN_LEAD_MINUTES,
 } from "@/features/request/constants/timeConstants";
 import { REQUEST_FORM_FIELD_KEY } from "@/features/request/constants/requestFormConstants";
@@ -28,8 +27,6 @@ import {
 } from "@/features/request/constants/dateTimeInputConstants";
 import {
   REQUEST_PREREQUISITE_TOAST_MESSAGE,
-  DEADLINE_NOTICE,
-  REQUEST_DEADLINE_MESSAGE,
   START_PASSED_TOAST_MESSAGE,
   NO_CHANGE_TOAST_MESSAGE,
 } from "@/features/request/constants/messageConstants";
@@ -138,11 +135,8 @@ export const requestValidateInput = (form, now) => {
   // 8. 응답 기한 - 1) 최소 기한 미달, 2) 최대 기한 초과
   validateDueDateRange(form.dueDate, errors);
 
-  // 8. 응답 기한 - 3) 시작 시간을 초과할 때 (현재+기한 > 시작시간)
-  const nextForm = normalizeExceededDeadline(form, start, now, errors);
-
   // errors: 이동 차단용 문구 / form: 저장할 값 / message: 이동을 허용하는 안내 문구.
-  return { errors, form: nextForm, message: null };
+  return { errors, form, message: null };
 };
 
 /**
@@ -227,59 +221,13 @@ export const askAgainValidateInput = (form, isDueDateFixed, now = new Date()) =>
     // 1) 최소 기한 미달, 2) 최대 기한 초과
     validateDueDateRange(form.dueDate, errors);
 
-    // 3) 시작 시간을 초과할 때
-    const nextForm = normalizeExceededDeadline(form, start, now, errors);
     
     // errors: 이동 차단용 문구 / form: 저장할 값 / message: 이동을 허용하는 안내 문구.
-    return { errors, form: nextForm, message: null };
+    return { errors, form, message: null };
   }
   // 3.2 시작까지 남은 시간이 1시간 미만인 경우
   return { errors, form: { ...form, dueDate: null }, message: null };
 };
-
-/**
- * API 전송 시점에 응답 기한을 보정한다. '다음' 버튼의 이동 차단 검증과는 별개다.
- * - 이미 null이면 그대로 유지한다.
- * - 미입력이면 24시간을 채우고 기본값 안내를 반환한다.
- * - 보정된 기한이 1시간~3일 범위이며 시작 시간을 넘으면 null과 고정 안내를 반환한다.
- * 토스트 호출과 API 전송은 호출부가 처리하며, 이 함수는 전송을 차단하지 않는다.
- * @param {Object} form - 전송할 요청 폼.
- * @param {Date} [now] - 전송 기준 시각. 생략하면 현재 시각.
- * @returns {{form: Object, message: string|null}} 보정된 폼과 안내 문구.
- */
-export const normalizeResponseDeadline = (form, now = new Date()) => {
-  // 이미 '시작 시간까지'로 설정되어 있는 경우는 그대로 유지 (추가 보정 및 안내 없이 그대로 반환)
-  if (form.dueDate === null) return { form, message: null };
-
-  let nextForm = form;
-  let message = null;
-  if (!isDueDateEntered(form.dueDate)) { // 1) 미입력 시
-    nextForm = {
-      ...form,
-      dueDate: { days: String(DUE_DATE_DEFAULT_MINUTES / (24 * 60)) },
-    };
-    message = DEADLINE_NOTICE.DEFAULT;
-  }
-
-  // 응답 기한이 시작 시간을 넘는지 계산
-  const start = toDateFromInput(form.startDateTime);
-  const minutes = toMinutes(nextForm.dueDate);
-  const exceedsStart =
-    start && now.getTime() + minutes * MS_PER_MINUTE > start.getTime();
-
-  // 응답 기한이 시작 시간을 넘고, 허용된 기한(1시간 ~ 3일)이면 null로 보정 ('시작 시간까지'로)
-  if (
-  exceedsStart &&
-  minutes >= DUE_DATE_MIN_MINUTES &&
-  minutes <= DUE_DATE_MAX_MINUTES
-) { // 4) 시작 시간을 초과할 때
-    return { form: { ...nextForm, dueDate: null }, message: DEADLINE_NOTICE.FIXED };
-  }
-
-  // 위 조건에 해당하지 않으면 그대로 반환
-  return { form: nextForm, message };
-};
-
 
 /**
  * 시작 일시 검사
@@ -379,29 +327,3 @@ const validateSituationPeriod = (form, errors) => {
   }
 };
 
-/**
- * 응답 기한 검사
- * - 시작 시간을 초과할 때 (현재+기한 > 시작시간): "응답 기한은 시작 시간을 넘을 수 없어요."
-
- * 다른 오류가 있거나 기한이 이미 null이면 생략한다.
- * 초과하면 errors.dueDate에 차단 문구를 기록하고 dueDate가 null인 새 폼을 반환한다.
- * 호출부는 이동을 막아도 반환된 null을 저장한다. 재클릭 시에는 null이므로 통과한다.
- * 
- * @param {Object} form - 현재 요청 폼.
- * @param {Date|null} start - 입력한 시작 일시.
- * @param {Date} now - 검증 기준 시각.
- * @param {Object} errors - 오류를 기록할 객체.
- * @returns {Object} 초과 시 보정된 새 폼, 그 외에는 기존 폼.
- */
-const normalizeExceededDeadline = (form, start, now, errors) => {
-  if (form.dueDate !== null && Object.keys(errors).length === 0) {
-    // 입력한 기한을 분으로 계산한다.
-    const minutes = toMinutes(form.dueDate);
-    if (start && now.getTime() + minutes * MS_PER_MINUTE > start.getTime()) {
-      // 시작 시각을 넘으면 null로 보정하고, errors에 안내를 넣어 이번 이동을 막는다.
-      errors.dueDate = REQUEST_DEADLINE_MESSAGE.EXCEEDS_START;
-      return { ...form, dueDate: null };
-    }
-  }
-  return form;
-};
