@@ -3,13 +3,14 @@ import DotSeparatedText from "@/shared/components/DotSeparatedText/DotSeparatedT
 import { formatDateTime } from "@/shared/utils/dateFormat";
 
 // 다가오는 일정 (스케줄 리스트)
+// - 일시가 없으면(null) 일시를 비워 둠 (잘못된 날짜 표시 방지)
 function ScheduleItem({ schedule }) {
   const { dateTime, typeName, assigneeName } = schedule;
 
   return (
     <li className={styles.scheduleItem}>
       <strong className={`${styles.title} typoBodyStrong`}>
-        {formatDateTime(dateTime)}
+        {dateTime ? formatDateTime(dateTime) : null}
       </strong>
       <DotSeparatedText
         className={`${styles.data} typoBodySmall`}

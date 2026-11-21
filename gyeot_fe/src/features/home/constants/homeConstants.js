@@ -57,6 +57,41 @@ export const HOME_HELP_TYPE_LABELS = {
   OTHER: "기타",
 };
 
+// 응답이 필요한 요청의 종류 (홈 통합 조회 responseNeededItems.type)
+// - RESPONSE: 새로 받은 요청(대상이 바뀌어 받은 요청 포함), deadline은 응답 기한
+// - RECONFIRMATION: 수정 후 재확인이 필요한 요청, deadline은 재확인 기한
+export const RESPONSE_NEEDED_TYPE = {
+  RESPONSE: "RESPONSE",
+  RECONFIRMATION: "RECONFIRMATION",
+};
+
+// 보낸 요청의 화면 상태 (홈 통합 조회 sentOpenItems.displayStatus)
+// - 서버는 끝나지 않은 요청(응답 대기 · 담당자 없음 · 수락됨 · 진행 중)을 모두 내려준다
+export const REQUEST_DISPLAY_STATUS = {
+  WAITING: "WAITING", // 응답 대기
+  NO_ASSIGNEE: "NO_ASSIGNEE", // 담당자 없음
+  ACCEPTED: "ACCEPTED", // 수락됨
+  IN_PROGRESS: "IN_PROGRESS", // 진행 중
+};
+
+// 홈 '보낸 요청'에 표시할 상태 (디자인 합의)
+// - 수락됨 · 진행 중은 '다가오는 일정'에서 확인하므로 보낸 요청에서는 숨긴다 (중복 방지)
+export const SENT_REQUEST_VISIBLE_STATUS_LIST = [
+  REQUEST_DISPLAY_STATUS.WAITING,
+  REQUEST_DISPLAY_STATUS.NO_ASSIGNEE,
+];
+
+// 요청 리스트 태그 문구
+export const REQUEST_TAG_TEXT = {
+  RECONFIRMATION: "재확인", // 받은 요청: 재확인 요청 (기한 태그 뒤)
+  DEADLINE_PASSED: "기한 지남", // 받은 요청: 응답 기한이 지났지만 시작 전이라 아직 응답 가능
+  NO_ASSIGNEE: "담당자 없음", // 보낸 요청: 담당자 없음 (남은 시간 대신)
+};
+
+// 보낸 요청 "To. 이름"에서 이름 대신 표시할 문구
+// - 담당자 없음이거나, 이름이 없을 때(서버 이름 필드 반영 전 · 표시할 이름 없음) 사용
+export const EMPTY_NAME_TEXT = "-";
+
 // M-01 담당자 없음 모달: 사유(reason)별 태그 · 안내 문구 (키는 담당자 없음 안내 목록의 reason 값과 동일)
 // - 이름 뒤 조사/위치가 사유마다 달라서 message는 이름을 받아 문장을 만드는 함수로 둠
 // - 여기에 없는 사유는 noAssigneeNoticeService에서 제외 (모달을 그리지 못해 다음 안내가 막히지 않도록)
