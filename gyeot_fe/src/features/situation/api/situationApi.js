@@ -9,6 +9,7 @@ import {
 import {
   IN_PROGRESS_SITUATION_ITEMS_MOCK,
   PAST_SITUATION_ITEMS_MOCK,
+  PAST_SITUATION_PERSON_IDS_MOCK,
   RELATIONSHIP_ITEMS_MOCK,
   SITUATION_DETAIL_MOCK_BY_ID,
   SITUATION_PARTICIPANTS_MOCK_BY_ID,
@@ -65,7 +66,17 @@ export const getPastSituationsApi = async ({
   if (USE_MOCK) {
     await wait();
     const items =
-      mockScenario === SITUATION_MOCK_SCENARIO.EMPTY ? [] : PAST_SITUATION_ITEMS_MOCK;
+      mockScenario === SITUATION_MOCK_SCENARIO.EMPTY
+        ? []
+        : PAST_SITUATION_ITEMS_MOCK.filter((item) => {
+            // filter: 도와준(HELPED) = 내가 참여자, 도움받은(RECEIVED) = 내가 정보 주인
+            if (filter === "HELPED" && item.isOwner) return false;
+            if (filter === "RECEIVED" && !item.isOwner) return false;
+            if (personId == null) return true;
+            return (PAST_SITUATION_PERSON_IDS_MOCK[item.situationId] ?? []).includes(
+              Number(personId),
+            );
+          });
     return createMockResponse(structuredClone(paginateMockItems(items, { page, size })));
   }
 

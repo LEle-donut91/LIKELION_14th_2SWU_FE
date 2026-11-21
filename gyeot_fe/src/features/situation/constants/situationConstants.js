@@ -24,6 +24,9 @@ export const PAST_SITUATION_FILTER_TABS = [
   { key: "RECEIVED", label: "도움받은" },
 ];
 
+// H-04 탭 기본값 (지난 상황 목록 조회 filter, 기본 ALL)
+export const PAST_SITUATION_DEFAULT_FILTER = "ALL";
+
 // H-04 사람 별 보기 - 아무도 선택하지 않았을 때 문구
 export const PAST_SITUATION_ALL_PERSON_TEXT = "전체";
 

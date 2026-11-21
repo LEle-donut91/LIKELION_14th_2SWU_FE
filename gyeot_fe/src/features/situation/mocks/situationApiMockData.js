@@ -40,6 +40,7 @@ export const IN_PROGRESS_SITUATION_ITEMS_MOCK = [
 
 // 지난 상황 목록 조회 (GET /api/situations/history) → data.items
 // - requestCount(요청 수)는 명세에 아직 없는 값 (BE 확인 필요)
+// - 사람별 보기(personId) 목업 필터는 PAST_SITUATION_PERSON_IDS_MOCK 사용
 export const PAST_SITUATION_ITEMS_MOCK = [
   {
     situationId: 11,
@@ -132,6 +133,15 @@ export const RELATIONSHIP_ITEMS_MOCK = [
     guardianPriority: null,
   },
 ];
+
+// 지난 상황별 함께한 사람 userId (목업 전용: 사람별 보기 personId 필터 확인용, 응답 필드 아님)
+// - 30: 서연, 31: 민재, 32: 하은 (RELATIONSHIP_ITEMS_MOCK 기준)
+export const PAST_SITUATION_PERSON_IDS_MOCK = {
+  11: [32],
+  12: [],
+  13: [30],
+  14: [30, 31],
+};
 
 // 상황 상세 조회 (GET /api/situations/{situationId}) → data
 // - key: situationId (1: 내가 정보 주인인 상황, 21: 내가 참여 중인 상황)
