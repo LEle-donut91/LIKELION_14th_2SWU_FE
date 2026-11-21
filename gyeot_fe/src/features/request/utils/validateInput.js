@@ -297,7 +297,7 @@ const validateDueDateRange = (dueDate, errors) => {
  * - 상황 기간 밖: "시작·종료 일시는 상황 기간 안에 있어야 해요."
  * 
  * 기존 필드 오류는 유지한다.
- * 날짜·시각 형식의 종료 경계는 제외하고, 날짜만 있으면 종료일 전체를 포함한다.
+ * 날짜·시각 형식의 종료 경계를 포함하고, 날짜만 있으면 종료일 전체를 포함한다.
  * 제공되지 않은 기간 경계는 검사하지 않는다.
  * @param {Object} form - 입력 일시와 상황 시작·종료 기간을 가진 폼.
  * @param {Object} errors - 오류를 기록할 객체(startDateTime·endDateTime).
@@ -317,10 +317,7 @@ const validateSituationPeriod = (form, errors) => {
       !errors[field] &&
       date &&
       ((situationStart && date < situationStart) ||
-        (situationEnd &&
-          (hasTime(form.situationEndDate)
-            ? date >= situationEnd
-            : date > situationEnd)))
+        (situationEnd && date > situationEnd))
     ) {
       errors[field] = "시작·종료 일시는 상황 기간 안에 있어야 해요.";
     }
