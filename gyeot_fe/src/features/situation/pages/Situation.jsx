@@ -65,9 +65,12 @@ function Situation() {
     navigate(SITUATION_NAVIGATION_PATH.PAST_SITUATION);
   };
 
+  // 지난 상황 상세(N-04)로 이동 — 상세 응답에 아직 없는 주인 이름은 state로 함께 전달
   const handlePastSituationClick = (situationId) => {
+    const pastSituation = pastSituationList.find(({ id }) => id === situationId);
     navigate(
       `${SITUATION_NAVIGATION_PATH.PAST_SITUATION_DETAIL}?situationId=${situationId}`,
+      { state: { ownerName: pastSituation?.ownerName ?? null } },
     );
   };
 
