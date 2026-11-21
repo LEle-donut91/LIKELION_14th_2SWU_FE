@@ -9,10 +9,10 @@ import IconHealthy from "../../assets/icons/iconHealthy.svg";
 
 // 탭 목록 (이름, 이동할 주소, 아이콘)
 const tabs = [
-  { path: "/", label: "홈", icon: IconHome },
+  { path: "/home", label: "홈", icon: IconHome },
   { path: "/situation", label: "상황", icon: IconSituation },
   { path: "/relation", label: "관계", icon: IconPeople },
-  { path: "/safecard", label: "안심카드", icon: IconHealthy },
+  { path: "/card", label: "안심카드", icon: IconHealthy },
 ];
 
 export default function BottomNav() {
