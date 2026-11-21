@@ -20,6 +20,8 @@ import { useRequestDetailQuery } from "@/features/request/hooks/queries/useReque
 import { useRequestFormStore } from "@/features/request/stores/useRequestFormStore";
 import { useRequestErrorStore } from "@/features/request/stores/useRequestErrorStore";
 import { useToast } from "@/shared/hooks/useToast";
+import { useInitialResponseDeadline } from "@/features/request/hooks/useInitialResponseDeadline";
+import { useLiveDueDateFixed } from "@/features/request/hooks/useLiveDueDateFixed";
 
 // Services
 import {
@@ -73,7 +75,6 @@ function AskAgain() {
   const [searchParams] = useSearchParams();
   const fromDetail = searchParams.get("from") === "detail";
   const { toast, showToast, hideToast } = useToast();
-  const [enteredAt] = useState(() => new Date());
 
   // 열려 있는 시트 (한 번에 하나만 열림)
   const [openSheet, setOpenSheet] = useState(() => {
@@ -152,39 +153,16 @@ function AskAgain() {
     useRequestFormStore((state) => state);
   useEffect(() => {
     if (!initialForm || entryId === formEntryId) return;
-    initForm(formEntryId, {
-      ...initialForm,
-      // 최초 초기화는 진입 시각 기준으로 계산한 기한만 저장하고 안내는 출력하지 않는다.
-      dueDate: getDueDateForStart(
-        initialForm.startDateTime,
-        INITIAL_FORM.dueDate,
-        enteredAt,
-      ).dueDate,
-    });
-  }, [initialForm, entryId, formEntryId, initForm, enteredAt]);
+    initForm(formEntryId, initialForm);
+  }, [initialForm, entryId, formEntryId, initForm]);
 
-  // 진입 또는 시작 일시 변경 시에만 확인 (조건: 시작까지 24시간 미만/응답 기한이 시작 시간 초과)
-  // -  조건 만족 시, 응답 기한 값을 null로 설정 (화면엔 "시작 시간까지"로 표시)
-  useEffect(() => {
-    if (entryId !== formEntryId) return;
-
-    // store의 최신 값 읽기
-    const current = useRequestFormStore.getState().form;
-
-    // 시작 일시를 변경한 현재 시각으로 계산
-    const result = getDueDateForStart(current.startDateTime, current.dueDate);
-    
-    // 보정값이 실제로 바뀐 경우에만 저장한다. null은 "시작 시간까지"로 표시된다.
-    if (result.dueDate !== current.dueDate) setForm({ ...current, dueDate: result.dueDate });
-    
-    // 안내 메시지가 반환된 경우에만 토스트 메시지 출력
-    if (result.message) showToast(result.message);
-  }, [entryId, formEntryId, form.startDateTime, setForm, showToast]);
+  useInitialResponseDeadline(formEntryId, showToast);
+  const dueDateFixed = useLiveDueDateFixed(formEntryId);
 
 
   // 항목 버튼 핸들러 (동작: 선택 시트 열기)
   const handleSubItemOpenSheet = (sheet) => {
-    if (sheet === REQUEST_SHEET.DUE_DATE && isDueDateFixed(form.startDateTime, enteredAt)) {
+    if (sheet === REQUEST_SHEET.DUE_DATE && isDueDateFixed(form.startDateTime)) {
       showToast(FIXED_DUE_DATE_TOAST_MESSAGE);
       return;
     }
@@ -201,7 +179,7 @@ function AskAgain() {
   const handleNextBtnClick = () => {
     // 입력값 유효성 검사 (첫 번째 에러 문구 하나만 토스트로)
     const now = new Date();
-    const result = askAgainValidateInput(form, isDueDateFixed(form.startDateTime, enteredAt), now);
+    const result = askAgainValidateInput(form, isDueDateFixed(form.startDateTime, now), now);
     const [firstError] = Object.values(result.errors);
     if (firstError) {
       // 기한 초과로 이동을 막는 경우에도 null은 저장해 "시작 시간까지"로 표시한다.
@@ -291,21 +269,24 @@ function AskAgain() {
         <SelectSection
           title="응답 기한"
           isRequired
-          text={getDueDateText(form.dueDate, isDueDateFixed(form.startDateTime, enteredAt))}
+          text={getDueDateText(form.dueDate, dueDateFixed)}
           width="large"
           onClick={() => handleSubItemOpenSheet(REQUEST_SHEET.DUE_DATE)}
         />
         <TimeSheet
-          isOpen={!isDueDateFixed(form.startDateTime, enteredAt) && openSheet === REQUEST_SHEET.DUE_DATE}
+          isOpen={!dueDateFixed && openSheet === REQUEST_SHEET.DUE_DATE}
           onClose={closeSheet}
           value={form.dueDate}
           onConfirm={(v) => {
+            if (isDueDateFixed(form.startDateTime)) {
+              setForm({ ...form, dueDate: null });
+              showToast(FIXED_DUE_DATE_TOAST_MESSAGE);
+              return;
+            }
             // 1. 미입력·0분은 먼저 24시간으로 보정
             const dueDate = !isDueDateEntered(v) || toMinutes(v) === 0 ? { ...INITIAL_FORM.dueDate } : v;
             
-            // 2. 사용자가 입력한 값 / 24시간 보정값 -> 아래 두 조건 중 하나라도 해당되는지 체크
-            // - 1) 시작 시간을 초과 (현재+응답기한 > 시작시간)
-            // - 2) 시작까지 남은 시간이 24시간 미만
+            // 2. 현재 시각 + 입력 기한이 시작 시간을 초과하는지만 확인
             const result = getDueDateForStart(form.startDateTime, dueDate);
             
             // 조건 충족 시 null을 저장하고 토스트 출력. 아니면 입력된 기한을 그대로 저장하고 토스트 출력 X

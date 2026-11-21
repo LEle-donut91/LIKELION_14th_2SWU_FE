@@ -53,7 +53,7 @@ export const getDateTimeText = (dateTimeObj) => {
 export const getDueDateText = (dueDate, isFixed = false) => {
   // 응답 기한이 고정된 경우 "시작 시간까지" 출력
   // 1. 다시 부탁하기에서 시작까지 1시간 미만이라 응답 기한에 null 값이 저장되며 "시작 시간까지"로 표시 (이땐 응답 기한 값 임의 조정 불가)
-  // 2. 요청 작성/다시 부탁하기 - 시작까지 남은 시간이 24시간 미만이면 응답 기한에 null 값이 저장되며 "시작 시간까지"로 표시
+  // 2. 요청 작성/다시 부탁하기 - 초기화 또는 시작 시간 초과로 null이 저장되면 "시작 시간까지"로 표시
   if (isFixed || dueDate === null) return "시작 시간까지";
 
   // 없으면 "선택" 출력

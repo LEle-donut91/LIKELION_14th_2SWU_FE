@@ -7,9 +7,19 @@ import {
 } from "@/features/request/constants/timeConstants";
 import { toDateFromInput } from "@/features/request/utils/dateTimeFormat";
 import { DUEDATE_FIXED_MESSAGE } from "@/features/request/constants/messageConstants";
+import { INITIAL_FORM } from "@/features/request/constants/initialFormConstants";
+
+// 화면 진입·시작 일시 변경 때만 기본 24시간을 시작 일시에 맞춰 초기화한다.
+export const getInitialDueDateForStart = (startDateTime, now = new Date()) => {
+  const start = toDateFromInput(startDateTime);
+  if (start && start - now < DUE_DATE_DEFAULT_MINUTES * MS_PER_MINUTE) {
+    return { dueDate: null, message: DUEDATE_FIXED_MESSAGE };
+  }
+  return { dueDate: { ...INITIAL_FORM.dueDate }, message: null };
+};
 
 /**
- * 진입·시작 일시 변경·응답 기한 확인 시 저장할 기한을 계산한다.
+ * 사용자가 시트에서 확인한 응답 기한이 시작 시간을 초과하는지 계산한다.
  * - dueDate는 실제 저장값이며, null이면 화면에서 "시작 시간까지"로 표시한다.
  * - message는 호출부에서 띄울 토스트 문구다. 이 함수가 직접 토스트를 띄우지는 않는다.
  * - now를 생략하면 함수를 호출한 순간의 현재 시각으로 계산한다.
@@ -27,17 +37,15 @@ export const getDueDateForStart = (startDateTime, dueDate, now = new Date()) => 
     return { dueDate, message: null };
   }
 
-  // 1) 시작 시간을 초과할 때 (현재+응답기한 > 시작시간)
-  // 2) 시작까지 남은 시간이 24시간 미만일 때
+  // 시작까지 24시간 미만이어도 사용자가 입력한 유효한 기한은 유지한다.
   if (
-    start - now < DUE_DATE_DEFAULT_MINUTES * MS_PER_MINUTE ||
     now.getTime() + minutes * MS_PER_MINUTE > start.getTime()
   ) {
     // 값을 null로 설정, "응답 기한은 시작 시간까지입니다." 토스트 메시지
     return { dueDate: null, message: DUEDATE_FIXED_MESSAGE };
   }
 
-  // 두 조건 어디에도 해당되지 않는 경우 기존 응답 기한을 유지, 토스트 출력 X
+  // 시작 시간을 초과하지 않으면 입력한 응답 기한을 유지한다.
   return { dueDate, message: null };
 };
 
