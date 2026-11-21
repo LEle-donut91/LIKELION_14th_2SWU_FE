@@ -114,6 +114,23 @@ export const RELATIONSHIP_ITEMS_MOCK = [
     personalLabel: "이웃",
     guardianPriority: null,
   },
+  // 아직 상황(situationId 1)에 참여하지 않은 지인 (H-03-05 참여자 추가 확인용)
+  {
+    relationshipId: 4,
+    userId: 33,
+    name: "지민",
+    relationshipType: "MY_PERSON",
+    personalLabel: "동료",
+    guardianPriority: null,
+  },
+  {
+    relationshipId: 5,
+    userId: 34,
+    name: "도윤",
+    relationshipType: "MY_PERSON",
+    personalLabel: null,
+    guardianPriority: null,
+  },
 ];
 
 // 상황 상세 조회 (GET /api/situations/{situationId}) → data
