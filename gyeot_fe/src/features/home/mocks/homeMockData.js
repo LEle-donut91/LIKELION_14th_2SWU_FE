@@ -1,9 +1,13 @@
 // 홈 화면 테스트용 데이터 (홈 통합 조회 F-34 응답의 data와 같은 형태)
 // - homeApi.js의 USE_MOCK 분기에서 공통 응답으로 감싸 사용한다.
-// - 명세 초안(임시 계약): 현행 예시 JSON에 없는 필드는 "// 추가 제안 · 미확정" 주석으로 표시
-//   (API_CONVENTIONS 7-1). 필드명이 바뀌면 homeService.js만 수정한다.
+// - 요청 · 일정 목록은 BE PR #133 실제 필드 · enum · 정렬 기준으로 작성한다.
+//   PR #133에 없는 필드는 주석으로 표시한다 (API_CONVENTIONS 7-1).
+//   · "서버 반영 대기": BE에서 추가 예정이라고 답변받은 필드 (requesterName · targetUserName · counterpartName)
+//   · "추가 제안 · 미확정": 아직 제공 여부가 정해지지 않은 필드 (situationCards · isNewUser · 보낸 요청 responseDeadline)
+//   필드명이 바뀌면 homeService.js만 수정한다.
 // - 날짜는 항상 유효한 D-day/남은 시간이 나오도록 "오늘" 기준 상대값으로 생성한다.
 //   형식은 "YYYY-MM-DDTHH:mm:ss" 로컬 시각 (toISOString 사용 금지, API 공통 규칙 7)
+// - 로그인 사용자 ID는 10으로 가정한다.
 
 const padTwo = (number) => String(number).padStart(2, "0");
 
@@ -20,9 +24,12 @@ const getRelativeDate = (dayOffset, hour = 0, minute = 0) => {
   return toLocalDateTimeString(date);
 };
 
-// 현재 시각 기준 minuteOffset분 뒤
+// 현재 시각 기준 minuteOffset분 뒤 (음수면 지난 시각)
 const getRelativeTime = (minuteOffset) =>
   toLocalDateTimeString(new Date(Date.now() + minuteOffset * 60000));
+
+// 로그인 사용자 ID (요청자 · 담당자 ID 표시용)
+const MY_USER_ID = 10;
 
 /**
  * =====================================================================
@@ -114,74 +121,131 @@ const PARTICIPATING_SITUATION_CARD_LIST = [
 ];
 
 // 응답이 필요한 요청 (responseNeededItems)
+// - 서버 정렬: 기한(deadline)이 빠른 순
+// - type: RESPONSE(새 요청 · 대상 변경으로 받은 요청) / RECONFIRMATION(수정 후 재확인)
+// - 일반 요청은 응답 기한이 지나도 시작 전이면 목록에 남음 ('기한 지남' 확인용)
+// - 급한 요청(URGENT, 일시 · 장소 null 가능)은 1차 추가 기능이라 목업에 넣지 않음 (null 처리 코드는 유지)
 const RESPONSE_NEEDED_ITEM_LIST = [
   {
-    requestId: 101,
-    title: "병원 동행", // 현행 초안 (helpType으로 변경 검토)
-    status: "REQUESTED", // C 저장 상태 (enum 미확정)
-    requester: { userId: 21, name: "서연", profileImageUrl: null }, // 추가 제안 · 미확정
-    helpType: "HOSPITAL", // 추가 제안 · 미확정
-    startsAt: getRelativeDate(1, 22, 0), // 추가 제안 · 미확정
-    place: "슈슈 병원", // 추가 제안 · 미확정
-    responseDeadline: getRelativeTime(60 * 24 * 3 + 120), // 추가 제안 · 미확정
-    displayStatus: "WAITING", // 추가 제안 · 미확정
+    requestId: 103,
+    type: "RESPONSE",
+    requestType: "GENERAL",
+    helpType: "MEAL",
+    startsAt: getRelativeDate(2, 12, 0),
+    place: "자택",
+    requesterId: 23,
+    deadline: getRelativeTime(-120), // 기한 지남 (시작 전이라 응답 가능)
+    requesterName: "민재", // 서버 반영 대기
+  },
+  {
+    requestId: 104,
+    type: "RESPONSE",
+    requestType: "GENERAL",
+    helpType: "CHECK_IN",
+    startsAt: getRelativeDate(1, 19, 0),
+    place: "자택",
+    requesterId: 24,
+    deadline: getRelativeTime(30),
+    requesterName: null, // 서버 반영 대기 (표시할 이름이 없으면 null, 프로필 이름 빈칸 확인용)
   },
   {
     requestId: 102,
-    title: "반려동물 돌봄",
-    status: "REQUESTED",
-    requester: { userId: 22, name: "지훈", profileImageUrl: null },
+    type: "RECONFIRMATION",
+    requestType: "GENERAL",
     helpType: "PET_CARE",
     startsAt: getRelativeDate(2, 10, 0),
     place: "자택",
-    responseDeadline: getRelativeTime(4 * 60 + 3),
-    displayStatus: "WAITING",
+    requesterId: 22,
+    deadline: getRelativeTime(4 * 60 + 3), // 재확인 기한
+    requesterName: "지훈", // 서버 반영 대기
+  },
+  {
+    requestId: 101,
+    type: "RESPONSE",
+    requestType: "GENERAL",
+    helpType: "HOSPITAL",
+    startsAt: getRelativeDate(4, 22, 0),
+    place: "슈슈 병원",
+    requesterId: 21,
+    deadline: getRelativeTime(60 * 24 * 3 + 120),
+    requesterName: "서연", // 서버 반영 대기
   },
 ];
 
-// 내가 보낸 진행 중 요청 (sentOpenItems)
+// 내가 보낸 끝나지 않은 요청 (sentOpenItems)
+// - 서버 정렬: 시작 시각 순. 응답 대기 · 담당자 없음 · 수락됨 · 진행 중이 모두 내려옴
+// - 화면에는 응답 대기 · 담당자 없음만 표시 (수락됨은 service에서 제외되는지 확인용)
 const SENT_OPEN_ITEM_LIST = [
   {
     requestId: 201,
-    title: "장보기", // 현행 초안 (helpType으로 변경 검토)
-    status: "REQUESTED",
-    target: { userId: 23, name: "하음" }, // 추가 제안 · 미확정 (요청 대상. 실제 담당자와 구분)
-    helpType: "GROCERY", // 추가 제안 · 미확정
-    startsAt: getRelativeDate(1, 22, 0), // 추가 제안 · 미확정
-    responseDeadline: getRelativeTime(60 * 25), // 추가 제안 · 미확정
-    hasAssignee: false, // 추가 제안 · 미확정 (실제 담당자 배정 여부)
-    displayStatus: "WAITING", // 추가 제안 · 미확정
+    requestType: "GENERAL",
+    helpType: "GROCERY",
+    startsAt: getRelativeDate(1, 22, 0),
+    endsAt: getRelativeDate(1, 23, 0),
+    requesterId: MY_USER_ID,
+    targetUserId: 23,
+    displayStatus: "WAITING",
+    targetUserName: "하음", // 서버 반영 대기
+    responseDeadline: getRelativeTime(60 * 20), // 추가 제안 · 미확정
+  },
+  {
+    requestId: 203,
+    requestType: "GENERAL",
+    helpType: "GROCERY",
+    startsAt: getRelativeDate(3, 15, 0),
+    endsAt: getRelativeDate(3, 17, 0),
+    requesterId: MY_USER_ID,
+    targetUserId: 23,
+    displayStatus: "ACCEPTED", // 화면에서 제외 (다가오는 일정 203과 같은 요청)
+    targetUserName: "하음", // 서버 반영 대기
+    responseDeadline: null, // 추가 제안 · 미확정 (응답 대기일 때만 값 있음)
   },
   {
     requestId: 202,
-    title: "식사",
-    status: "REQUESTED",
-    target: { userId: 24, name: "나예" },
+    requestType: "GENERAL",
     helpType: "MEAL",
     startsAt: getRelativeDate(5, 12, 0),
-    responseDeadline: getRelativeTime(4 * 60),
-    hasAssignee: false,
+    endsAt: getRelativeDate(5, 13, 0),
+    requesterId: MY_USER_ID,
+    targetUserId: 24,
     displayStatus: "WAITING",
+    targetUserName: null, // 서버 반영 대기 (이름이 없을 때 "To. -" 확인용)
+    responseDeadline: getRelativeTime(4 * 60), // 추가 제안 · 미확정
+  },
+  {
+    requestId: 204,
+    requestType: "GENERAL",
+    helpType: "HOSPITAL",
+    startsAt: getRelativeDate(6, 10, 0),
+    endsAt: getRelativeDate(6, 12, 0),
+    requesterId: MY_USER_ID,
+    targetUserId: 25, // 마지막 지정 대상 (거절 · 기한 경과 등)
+    displayStatus: "NO_ASSIGNEE",
+    targetUserName: null, // 서버 반영 대기 (담당자 없음이면 서버가 null로 내려줌)
+    responseDeadline: null, // 추가 제안 · 미확정
   },
 ];
 
-// 예정 일정 (upcomingSchedules, 최대 2개 / 가까운 순)
+// 다가오는 일정 (upcomingSchedules)
+// - 내가 부탁했거나 맡은 수락됨 · 진행 중 요청, 시작이 빠른 순 최대 2개 (전체 수는 counts.upcomingSchedules)
 const UPCOMING_SCHEDULE_LIST = [
   {
     requestId: 301,
-    title: "장보기", // 현행 초안 (helpType으로 대체 검토)
-    scheduledAt: getRelativeDate(1, 22, 0), // 현행 초안 (startsAt으로 변경 제안)
-    startsAt: getRelativeDate(1, 22, 0), // 추가 제안 · 미확정
-    helpType: "GROCERY", // 추가 제안 · 미확정
-    counterpartName: "서연", // 추가 제안 · 미확정 (일정에 표시할 상대 이름)
+    helpType: "GROCERY",
+    startsAt: getRelativeDate(1, 22, 0),
+    place: "마트",
+    requesterId: 21, // 내가 맡은 일정
+    assigneeId: MY_USER_ID,
+    counterpartName: "서연", // 서버 반영 대기 (내가 맡았으면 요청자 이름)
   },
   {
-    requestId: 302,
-    title: "장보기",
-    scheduledAt: getRelativeDate(3, 15, 0),
-    startsAt: getRelativeDate(3, 15, 0),
+    requestId: 203,
     helpType: "GROCERY",
-    counterpartName: "하음",
+    startsAt: getRelativeDate(3, 15, 0),
+    place: "마트",
+    requesterId: MY_USER_ID, // 내가 부탁한 일정 (보낸 요청 203)
+    assigneeId: 23,
+    counterpartName: "하음", // 서버 반영 대기 (내가 부탁했으면 담당자 이름)
   },
 ];
 
@@ -208,10 +272,11 @@ const NO_SITUATION = {
 };
 
 // 3) 상황·요청 있음 (H-00 홈-나의상황 / 홈-참여상황)
+// - counts는 목록과 같은 기준: 응답 필요 = 목록 전체 수, 담당자 없음 = 보낸 요청 중 NO_ASSIGNEE 수
 const WITH_SITUATION = {
   counts: {
-    responseNeeded: 2,
-    unassigned: 2,
+    responseNeeded: RESPONSE_NEEDED_ITEM_LIST.length,
+    unassigned: 1,
     upcomingSchedules: 4, // 전체 건수 (목록은 최대 2개)
     activeSharings: 3, // homeApi.js에서 공유 목업 저장소의 공유 중 건수로 바꿔서 반환
   },
@@ -219,13 +284,14 @@ const WITH_SITUATION = {
     my: MY_SITUATION_CARD_LIST,
     participating: PARTICIPATING_SITUATION_CARD_LIST,
   },
-  isNewUser: false,
+  isNewUser: false, // 추가 제안 · 미확정
   responseNeededItems: RESPONSE_NEEDED_ITEM_LIST,
   sentOpenItems: SENT_OPEN_ITEM_LIST,
   upcomingSchedules: UPCOMING_SCHEDULE_LIST,
 };
 
 // 4) 진행 중인 나의 상황 1개 (도움 요청 → 시트 없이 바로 요청 작성)
+// - 담당자 없음 0건이므로 보낸 요청에서도 담당자 없음 요청을 뺌
 const SINGLE_SITUATION = {
   ...WITH_SITUATION,
   counts: { ...WITH_SITUATION.counts, unassigned: 0, upcomingSchedules: 2 },
@@ -233,6 +299,9 @@ const SINGLE_SITUATION = {
     ...WITH_SITUATION.situationCards,
     my: MY_SITUATION_CARD_LIST.slice(0, 1),
   },
+  sentOpenItems: SENT_OPEN_ITEM_LIST.filter(
+    (item) => item.displayStatus !== "NO_ASSIGNEE",
+  ),
 };
 
 // 테스트 시나리오를 지정하는 URL 쿼리 키 (예: /home?mock=empty)

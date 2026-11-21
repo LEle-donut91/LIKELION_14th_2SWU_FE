@@ -1,17 +1,21 @@
 import {
   HOME_HELP_TYPE_LABELS,
+  REQUEST_DISPLAY_STATUS,
+  RESPONSE_NEEDED_TYPE,
+  SENT_REQUEST_VISIBLE_STATUS_LIST,
   SITUATION_REQUEST_COUNT_TAG_LIST,
   SITUATION_TAB,
 } from "@/features/home/constants/homeConstants";
 
 // 홈 API 응답 → 화면용 데이터 변환 (부수효과 없는 순수 함수)
 // - raw: API 함수가 반환한 공통 응답 전체 { status, code, message, data }
-// - 명세 초안(임시 계약)이라 응답 필드명이 바뀌면 이 파일만 수정한다 (API_CONVENTIONS 7-1)
+// - 응답 필드는 BE PR #133(홈 통합 조회) 기준. 필드명이 바뀌면 이 파일만 수정한다 (API_CONVENTIONS 7-1)
 //   화면 컴포넌트는 이 파일이 만든 값만 사용한다.
+// - 서버 반영 대기 필드(requesterName · targetUserName · counterpartName · 보낸 요청 responseDeadline)는
+//   응답에 없으면 null로 받는다 (필드 없음과 null을 같은 값으로 처리)
 
-// 도움 종류 표시 문구: helpType 라벨 → 없으면 현행 초안의 title
-const toTypeName = (helpType, title) =>
-  HOME_HELP_TYPE_LABELS[helpType] ?? title ?? "";
+// 도움 종류 표시 문구 (helpType 라벨)
+const toTypeName = (helpType) => HOME_HELP_TYPE_LABELS[helpType] ?? "";
 
 // requestCounts → 상황 카드 태그 [{ type, count }]
 // - 응답에 있는 key만 태그로 그림 (requestCounts가 없으면 태그 없음)
@@ -48,39 +52,39 @@ const toSituation = (card, tabKey) => ({
 });
 
 // 응답이 필요한 요청 1개 → ReceivedRequestItem 데이터
+// - isReconfirmation: 수정 후 재확인 요청 (deadline은 재확인 기한)
+// - dateTime · location: 급한 요청 등은 null일 수 있음 (화면에서 숨김)
+// - requesterName: 서버 반영 대기 (탈퇴 시 "탈퇴한 사용자", 표시할 이름이 없으면 null)
 const toReceivedRequest = (item) => ({
   id: item.requestId,
-  requester: {
-    name: item.requester?.name ?? "",
-    profileImageUrl: item.requester?.profileImageUrl ?? null,
-  },
-  typeName: toTypeName(item.helpType, item.title),
-  dateTime: item.startsAt,
+  isReconfirmation: item.type === RESPONSE_NEEDED_TYPE.RECONFIRMATION,
+  requesterName: item.requesterName ?? null,
+  typeName: toTypeName(item.helpType),
+  dateTime: item.startsAt ?? null,
   location: item.place ?? null,
-  deadline: item.responseDeadline ?? null,
-  displayStatus: item.displayStatus ?? null, // 화면 표시 상태 (지금 화면에서는 미사용)
+  deadline: item.deadline ?? null,
 });
 
 // 보낸 요청 1개 → SentRequestItem 데이터
-// - receiverName: 요청 대상(target) 이름. "To. 이름"으로 표시하며 실제 담당자와 구분됨
-// - hasAssignee: 실제 담당자 배정 여부 (지금 화면에서는 미사용)
+// - isNoAssignee: 담당자 없음 여부. 이름이 null인지가 아니라 displayStatus로 판단한다
+// - receiverName: 요청 대상 이름 (서버 반영 대기. 담당자 없음이면 서버가 null로 내려줌)
+// - deadline: 응답 대기일 때의 응답 기한 (서버 제공 여부 미확정, 없으면 남은 시간 태그 숨김)
 const toSentRequest = (item) => ({
   id: item.requestId,
-  receiverName: item.target?.name ?? "",
-  typeName: toTypeName(item.helpType, item.title),
-  dateTime: item.startsAt,
+  isNoAssignee: item.displayStatus === REQUEST_DISPLAY_STATUS.NO_ASSIGNEE,
+  receiverName: item.targetUserName ?? null,
+  typeName: toTypeName(item.helpType),
+  dateTime: item.startsAt ?? null,
   deadline: item.responseDeadline ?? null,
-  hasAssignee: item.hasAssignee ?? false,
-  displayStatus: item.displayStatus ?? null,
 });
 
 // 예정 일정 1개 → ScheduleItem 데이터
-// - 일시: startsAt(변경 제안) → 없으면 scheduledAt(현행 초안)
-// - assigneeName: counterpartName(일정에 표시할 상대 이름). 없으면 화면에서 "담당자 없음"
+// - assigneeName: counterpartName(내가 부탁했으면 담당자, 내가 맡았으면 요청자 이름. 서버 반영 대기)
+//   없으면 화면에서 "담당자 없음"
 const toUpcomingSchedule = (item) => ({
   id: item.requestId,
-  dateTime: item.startsAt ?? item.scheduledAt,
-  typeName: toTypeName(item.helpType, item.title),
+  dateTime: item.startsAt ?? null,
+  typeName: toTypeName(item.helpType),
   assigneeName: item.counterpartName ?? null,
 });
 
@@ -92,6 +96,8 @@ const toUpcomingSchedule = (item) => ({
 //     receivedRequests, sentRequests, upcomingSchedules,                        // 탭 밖 공통 영역
 //   }
 //   - 빈 배열은 에러가 아니라 빈 상태 화면
+//   - 목록 순서는 서버 정렬을 그대로 사용 (응답 필요: 기한 빠른 순, 보낸 요청·일정: 시작 시각 순)
+//   - 보낸 요청은 응답 대기 · 담당자 없음만 남김 (수락됨 · 진행 중은 다가오는 일정에서 확인, 디자인 합의)
 export const getHomeService = (raw) => {
   const data = raw?.data;
   const counts = data?.counts;
@@ -117,7 +123,11 @@ export const getHomeService = (raw) => {
       ),
     },
     receivedRequests: (data?.responseNeededItems ?? []).map(toReceivedRequest),
-    sentRequests: (data?.sentOpenItems ?? []).map(toSentRequest),
+    sentRequests: (data?.sentOpenItems ?? [])
+      .filter((item) =>
+        SENT_REQUEST_VISIBLE_STATUS_LIST.includes(item.displayStatus),
+      )
+      .map(toSentRequest),
     upcomingSchedules: (data?.upcomingSchedules ?? []).map(toUpcomingSchedule),
   };
 };
