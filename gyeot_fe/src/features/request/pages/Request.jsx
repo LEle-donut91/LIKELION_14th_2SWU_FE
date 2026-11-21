@@ -38,9 +38,8 @@ import {
 import {
   isReadOnly,
   isPrerequisiteEnsured,
-  validateInput,
+  requestValidateInput,
 } from "@/features/request/utils/validateInput";
-import { normalizeResponseDeadline } from "@/features/request/utils/dueDateUtils";
 import {
   getSelectedUser,
   getSelectedSituation,
@@ -187,16 +186,16 @@ function Request() {
   const handleFooterBtnClick = () => {
     // 입력값 유효성 검사 (첫 번째 에러 문구 하나만 토스트로)
     const now = new Date();
-    const errors = validateInput(form, now);
-    const [firstError] = Object.values(errors);
+    const result = requestValidateInput(form, now);
+    const [firstError] = Object.values(result.errors);
     if (firstError) {
       showToast(firstError);
       return;
     }
     // [공개 정보 미리보기] 페이지로 이동
-    const normalized = normalizeResponseDeadline(form, now);
-    setForm(normalized.form);
-    handleGoNext(REQUEST_ROUTES.infoPreview(form.situationId));
+    setForm(result.form);
+    if (result.message) showToast(result.message);
+    handleGoNext(REQUEST_ROUTES.infoPreview(result.form.situationId));
   };
 
   return (

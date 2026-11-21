@@ -27,7 +27,6 @@ import { REQUEST_ERROR_TARGET_PAGE } from "@/features/request/constants/requestE
 import {
   REQUEST_FORM_FIELD_KEY,
   REQUEST_SHEET,
-  EDIT_FORM_VALIDATE_FIELDS,
 } from "@/features/request/constants/requestFormConstants";
 import { DATE_TIME_SECTIONS } from "@/features/request/constants/dateTimeInputConstants";
 
@@ -38,7 +37,7 @@ import {
   getCategoryInformationIds,
   replaceCategoryInformationIds,
 } from "@/features/request/utils/getSafetyCardInfo";
-import { validateInput } from "@/features/request/utils/validateInput";
+import { editValidateInput } from "@/features/request/utils/validateInput";
 
 // Services
 import { getEditFormService } from "@/features/request/services/editRequestService";
@@ -171,11 +170,7 @@ function RequestEditForm() {
   // 다음 버튼 클릭 handler
   const handleNextBtnClick = () => {
     // 입력값 유효성 검사 (첫 번째 에러 문구 하나만 토스트로)
-    const errors = validateInput(
-      requestForm,
-      new Date(),
-      EDIT_FORM_VALIDATE_FIELDS,
-    );
+    const errors = editValidateInput(requestForm, new Date());
     const [firstError] = Object.values(errors);
     if (firstError) {
       showToast(firstError);

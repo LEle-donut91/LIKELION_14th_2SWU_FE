@@ -1,4 +1,4 @@
-import { normalizeResponseDeadline } from "@/features/request/utils/dueDateUtils";
+import { normalizeResponseDeadline } from "@/features/request/utils/validateInput";
 import { toUniqueNumberIds } from "@/features/request/utils/getSafetyCardInfo";
 import {
   formatLocalDateTime,

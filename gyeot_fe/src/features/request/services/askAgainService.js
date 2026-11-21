@@ -1,9 +1,9 @@
+import { normalizeResponseDeadline } from "@/features/request/utils/validateInput";
 import { HELP_TYPE_LABELS } from "@/features/request/constants/requestFormConstants";
 import { USER_ORDER_STATE_TEXT } from "@/features/request/constants/requestDetailConstants";
 import { formatShortDateTimeRange } from "@/shared/utils/dateFormat";
 import { toDateTimeInput } from "@/features/request/utils/dateTimeFormat";
 import {
-  normalizeResponseDeadline,
   toMinutes,
 } from "@/features/request/utils/dueDateUtils";
 import {

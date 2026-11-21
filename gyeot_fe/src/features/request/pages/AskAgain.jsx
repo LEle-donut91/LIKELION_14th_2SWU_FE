@@ -32,7 +32,6 @@ import { REQUEST_ROUTES } from "@/features/request/constants/routerConstants";
 import { REQUEST_ERROR_TARGET_PAGE } from "@/features/request/constants/requestErrorConstants";
 import {
   REQUEST_SHEET,
-  ASK_AGAIN_VALIDATE_FIELDS_FLEXIBLE,
 } from "@/features/request/constants/requestFormConstants";
 import { DUE_DATE_SECTIONS } from "@/features/request/constants/dateTimeInputConstants";
 import { INITIAL_FORM } from "@/features/request/constants/initialFormConstants";
@@ -41,11 +40,11 @@ import { FIXED_DUE_DATE_TOAST_MESSAGE } from "@/features/request/constants/messa
 // Utils
 import {
   isPrerequisiteEnsured,
-  validateInput,
+  askAgainValidateInput,
+  normalizeResponseDeadline,
 } from "@/features/request/utils/validateInput";
 import {
   getInitialDueDate,
-  normalizeResponseDeadline,
 } from "@/features/request/utils/dueDateUtils";
 import {
   getSelectedUser,
@@ -183,7 +182,7 @@ function AskAgain() {
   const handleNextBtnClick = () => {
     // 입력값 유효성 검사 (첫 번째 에러 문구 하나만 토스트로)
     const now = new Date();
-    const errors = validateInput(form, now, ASK_AGAIN_VALIDATE_FIELDS_FLEXIBLE);
+    const errors = askAgainValidateInput(form);
     const [firstError] = Object.values(errors);
     if (firstError) {
       showToast(firstError);

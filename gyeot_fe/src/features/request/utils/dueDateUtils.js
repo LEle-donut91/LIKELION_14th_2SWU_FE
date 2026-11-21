@@ -1,17 +1,12 @@
 import {
   MS_PER_MINUTE,
-  DUE_DATE_DEFAULT_MINUTES,
-  DUE_DATE_MIN_MINUTES,
-  DUE_DATE_MAX_MINUTES,
   START_MIN_LEAD_MINUTES,
 } from "@/features/request/constants/timeConstants";
 import {
-  DEADLINE_NOTICE,
   FIXED_DUE_DATE_TOAST_MESSAGE,
   START_PASSED_TOAST_MESSAGE,
 } from "@/features/request/constants/messageConstants";
 import { toDateFromInput } from "@/features/request/utils/dateTimeFormat";
-import { isDueDateEntered } from "@/features/request/utils/validateInput";
 
 /**
  * [H-03-02] 요청 작성 / [N-06] 다시 부탁하기
@@ -65,39 +60,6 @@ export const isStartTimeEnsured = (
     return false;
   }
   return true;
-};
-
-// 응답 기한이 허용 범위(1시간~3일) 안의 "정시간 단위"인지 체크
-const isAllowedDeadlineMinutes = (minutes) =>
-  minutes >= DUE_DATE_MIN_MINUTES &&
-  minutes <= DUE_DATE_MAX_MINUTES &&
-  minutes % 60 === 0;
-
-// 다음 버튼을 누른 시점에 미입력 및 시작 시간을 넘는 응답 기한을 보정한다.
-export const normalizeResponseDeadline = (form, now = new Date()) => {
-  if (form.dueDate === null) return { form, message: null };
-
-  // 미입력: 기본값(24시간)으로 채움
-  if (!isDueDateEntered(form.dueDate)) {
-    return {
-      form: {
-        ...form,
-        dueDate: { days: String(DUE_DATE_DEFAULT_MINUTES / (24 * 60)) },
-      },
-      message: DEADLINE_NOTICE.DEFAULT,
-    };
-  }
-
-  // 응답 기한이 시작 시간을 넘어가면 "시작 시간까지"로 고정(null)
-  const start = toDateFromInput(form.startDateTime);
-  const minutes = toMinutes(form.dueDate);
-  const exceedsStart =
-    start && now.getTime() + minutes * MS_PER_MINUTE > start.getTime();
-
-  if (exceedsStart && isAllowedDeadlineMinutes(minutes)) {
-    return { form: { ...form, dueDate: null }, message: DEADLINE_NOTICE.FIXED };
-  }
-  return { form, message: null };
 };
 
 // 응답 기한 입력값 객체 (DueDateValue)를 분 단위 총합으로 환산 (없는 키/null은 0으로 취급)
