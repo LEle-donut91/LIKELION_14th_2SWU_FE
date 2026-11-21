@@ -1,6 +1,7 @@
 import { MS_PER_MINUTE } from "@/features/request/constants/timeConstants";
 import { formatMonthDay, formatShortDateTime } from "@/shared/utils/dateFormat";
 import { toMinutes } from "@/features/request/utils/dueDateFormat";
+import { toDateFromInput } from "@/features/request/utils/dateTimeFormat";
 import {
   getCategoryDescription,
   getSafetyCardInfoTitle,
@@ -69,6 +70,13 @@ export const getInformationOptionsService = (raw, requestForm) => {
   // []는 "아무것도 선택하지 않음"이므로 기본값으로 바꾸면 안 된다.
   const selectedIds = requestForm.informationIds;
 
+  // 입력된 응답 기한 값이 null이면 "시작 시간까지"라는 의미이므로
+  // 1) 조건 충족 시 -> 접근 기한에 "시작 시간" 값 표시
+  // 2) 조건 불충족 시 -> 접근 기한에 "현재 시간 + 응답 기한" 값 표시
+  const deadline = requestForm.dueDate === null
+    ? toDateFromInput(requestForm.startDateTime)
+    : new Date(Date.now() + toMinutes(requestForm.dueDate) * MS_PER_MINUTE);
+
   return {
     ...informationOptions, // ...은 객체 안의 속성들을 여기로 펼쳐 넣는다.
     selectedIds,
@@ -81,11 +89,6 @@ export const getInformationOptionsService = (raw, requestForm) => {
     ),
 
     // 6. 접근 기한
-    // toMinutes: 분으로 변환 → MS_PER_MINUTE를 곱해 밀리초로 변환
-    // → 현재 시각에 더함 → Date 객체 생성 → 화면에 보여 줄 날짜 문자열로 변환.
-    // 이 값은 서버 응답에 들어 있는 값이 아니라 프론트에서 계산하는 표시용 값이다.
-    dueDate: formatShortDateTime(
-      new Date(Date.now() + toMinutes(requestForm.dueDate) * MS_PER_MINUTE),
-    ),
+    dueDate: deadline ? formatShortDateTime(deadline) : "",
   };
 };

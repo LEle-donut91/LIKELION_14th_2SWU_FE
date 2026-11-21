@@ -25,6 +25,3 @@ export const postCareRequestService = (form) => {
   };
 };
 
-// 도움 요청 생성 응답에서 생성된 요청 정보를 추출한다.
-export const postCareRequestResultService = (raw) => raw.data;
-

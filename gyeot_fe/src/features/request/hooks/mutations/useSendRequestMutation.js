@@ -5,7 +5,6 @@ import {
 } from "@/features/request/api/postApi";
 import {
   postCareRequestService,
-  postCareRequestResultService,
 } from "@/features/request/services/createRequestService";
 import { postAskAgainService } from "@/features/request/services/askAgainService";
 import { getErrorCode, getErrorMessage } from "@/shared/utils/apiError";
@@ -57,9 +56,17 @@ export function useSendRequestMutation({
       const { payload } = postCareRequestService(form);
       return postCareRequestApi(payload);
     },
-    onSuccess: (data) => onSuccess(postCareRequestResultService(data)),
+    onSuccess: (data) => {
+      if (data.message) {
+        showToast(data.message);
+      }
+      onSuccess(data.data);
+    },
     onError: (error) => {
+      // 에러 토스트 메시지 출력
       showToast(getErrorMessage(error));
+
+      // 다시 부탁하기 API 호출인 경우
       if (reassignRequestId) {
         switch (getErrorCode(error)) {
           case COMMON_ERROR_CODE.FORBIDDEN:
@@ -93,6 +100,7 @@ export function useSendRequestMutation({
         return;
       }
 
+      // 도움 요청 생성 API 호출인 경우
       switch (getErrorCode(error)) {
         case REQUEST_ERROR_CODE.REQUEST_SITUATION_INVALID:
           returnFromCreation({ sheet: REQUEST_SHEET.SITUATION });
