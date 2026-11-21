@@ -189,6 +189,9 @@ function Request() {
     const result = requestValidateInput(form, now);
     const [firstError] = Object.values(result.errors);
     if (firstError) {
+      // 시작 시간 초과 시 응답 기한에 null을 저장하기 위해 setForm 실행
+      // 다른 입력 오류처럼 폼이 그대로면 저장하지 않는다.
+      if (result.form !== form) setForm(result.form);
       showToast(firstError);
       return;
     }

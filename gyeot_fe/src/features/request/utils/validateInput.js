@@ -23,6 +23,7 @@ import {
 import {
   REQUEST_PREREQUISITE_TOAST_MESSAGE,
   DEADLINE_NOTICE,
+  REQUEST_DEADLINE_MESSAGE,
   START_PASSED_TOAST_MESSAGE,
   NO_CHANGE_TOAST_MESSAGE,
 } from "@/features/request/constants/messageConstants";
@@ -92,12 +93,12 @@ export const isPrerequisiteEnsured = (form, showToast) => {
  * 6. 요청 대상
  * - 미선택 시: "요청 대상을 선택해 주세요."
  *
- * 7. 응답 기한 (1, 4는 normalizeResponseDeadline에서 처리)
- * - 1) 미입력 시: "응답 기한은 24시간으로 고정됩니다." (이때 실제 값은 24시간으로 세팅되며, 토스트 메시지를 출력하긴 하지만 다음 페이지로 이동함)
- * - 2) 최소 기한 미달 (< 1시간): "응답 기한은 최소 1시간 이상이어야 해요."
- * - 3) 최대 기한 초과 (> 3일): "응답 기한은 최대 3일까지 설정할 수 있어요."
- * - 4) 시작 시간을 초과할 때 (현재+기한 > 시작시간): "응답 기한은 시작 시간까지로 고정됩니다." (이때 실제 값은 null로 세팅되며, 화면에는 "시작 시간까지"로 표시됨. 토스트 메시지를 출력하긴 하지만 다음 페이지로 이동함)
- *
+ * 7. 응답 기한 (미입력 시 null이므로 서버에서 24시간으로 처리함 -> 24시간이 시작 시간을 넘으면 서버에서 시작 시간까지로 줄임.)
+ * - 1) 최소 기한 미달 (< 1시간): "응답 기한은 최소 1시간 이상이어야 해요."
+ * - 2) 최대 기한 초과 (> 3일): "응답 기한은 최대 3일까지 설정할 수 있어요."
+ * - 3) 시작 시간을 초과할 때 (현재+기한 > 시작시간): "응답 기한은 시작 시간을 넘을 수 없어요."
+ *     (이때 실제 값은 null로 세팅되며, 화면에는 "시작 시간까지"로 표시됨. 다음 페이지로 이동하지 않아 사용자의 재입력을 유도하지만, 실제 값은 null이 저장되므로 재입력 없이 바로 "다음" 버튼을 눌러도 됨 -> 이때 서버에서는 null로 받으므로 24시간을 적용. 서버에서 24시간을 적용했는데 시간 시간을 초과하면 자동으로 시작 시간까지로 맞추게 됨)
+ * 
  * 8. 시작 & 종료 일시
  * - 상황 기간 밖: "시작·종료 일시는 상황 기간 안에 있어야 해요."
  *
@@ -143,9 +144,9 @@ export const requestValidateInput = (form, now) => {
   // 7. 응답 기한
   if (form.dueDate !== null && isDueDateEntered(form.dueDate)) {
     const minutes = toMinutes(form.dueDate);
-    if (minutes < DUE_DATE_MIN_MINUTES) { // 2) 최소 기한 미달
+    if (minutes < DUE_DATE_MIN_MINUTES) { // 1) 최소 기한 미달
       errors.dueDate = "응답 기한은 최소 1시간 이상이어야 해요.";
-    } else if (minutes > DUE_DATE_MAX_MINUTES) { // 3) 최대 기한 초과
+    } else if (minutes > DUE_DATE_MAX_MINUTES) { // 2) 최대 기한 초과
       errors.dueDate = "응답 기한은 최대 3일까지 설정할 수 있어요.";
     }
   }
@@ -174,9 +175,20 @@ export const requestValidateInput = (form, now) => {
     }
   }
 
-  // 7. 응답 기한 - 1) 미입력 시, 4) 시작 시간을 초과할 때
-  const normalized = normalizeResponseDeadline(form, now);
-  return { errors, form: normalized.form, message: normalized.message };
+  // 응답 기한 - 3) 시작 시간을 초과할 때 (현재+기한 > 시작시간)
+  let nextForm = form;
+  // null이 아니고 다른 검증 오류가 없을 때만 (미입력 시 null이 저장되는데 이 경우엔 서버에서 24시간으로 처리하므로)
+  if (nextForm.dueDate !== null && Object.keys(errors).length === 0) {
+    // 입력한 기한을 분으로 계산한다.
+    const minutes = toMinutes(nextForm.dueDate);
+    if (start && now.getTime() + minutes * MS_PER_MINUTE > start.getTime()) {
+      // 시작 시각을 넘으면 null로 보정하고, errors에 안내를 넣어 이번 이동을 막는다.
+      nextForm = { ...form, dueDate: null };
+      errors.dueDate = REQUEST_DEADLINE_MESSAGE.EXCEEDS_START;
+    }
+  }
+  // errors: 이동 차단용 문구 / form: 저장할 값 / message: 이동을 허용하는 안내 문구.
+  return { errors, form: nextForm, message: null };
 };
 
 /**

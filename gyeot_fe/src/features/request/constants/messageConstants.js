@@ -8,6 +8,10 @@ export const DEADLINE_NOTICE = {
   FIXED: "응답 기한은 시작 시간까지로 고정됩니다.",
 };
 
+export const REQUEST_DEADLINE_MESSAGE = {
+  EXCEEDS_START: "응답 기한은 시작 시간을 넘을 수 없어요.",
+};
+
 // 요청 폼 입력 시 - 선행 조건 관련 토스트 메시지
 export const REQUEST_PREREQUISITE_TOAST_MESSAGE = {
   SITUATION_REQUIRED: "상황을 먼저 선택해 주세요.",
