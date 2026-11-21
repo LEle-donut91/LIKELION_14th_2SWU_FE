@@ -32,9 +32,10 @@ export const PAST_SITUATION_ALL_PERSON_TEXT = "전체";
 
 // N-04 지난 상황 상세 - 요청 기록 상태 태그 (완료 / 취소 / 만료, F-22)
 // 만료는 시안에 없어 취소와 같은 모양으로 임시 지정
+// - key: 지난 상황 상세 조회 requests[].status 값
 export const PAST_REQUEST_STATUS_TAG = {
   COMPLETED: { label: "완료", variant: "completed" },
-  CANCELLED: { label: "취소", variant: "cancelled" },
+  CANCELED: { label: "취소", variant: "cancelled" },
   EXPIRED: { label: "만료", variant: "cancelled" },
 };
 

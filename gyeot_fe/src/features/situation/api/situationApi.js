@@ -8,6 +8,7 @@ import {
 } from "@/features/situation/mocks/situationMockUtils";
 import {
   IN_PROGRESS_SITUATION_ITEMS_MOCK,
+  PAST_SITUATION_DETAIL_MOCK_BY_ID,
   PAST_SITUATION_ITEMS_MOCK,
   PAST_SITUATION_PERSON_IDS_MOCK,
   RELATIONSHIP_ITEMS_MOCK,
@@ -282,5 +283,22 @@ export const leaveSituationApi = async (situationId) => {
   }
 
   const response = await axiosInstance.post(SITUATION_API_URLS.leave(situationId));
+  return response.data;
+};
+
+// 10. 지난 상황 상세 조회 (GET /api/situations/{situationId}/history)
+// → data: { situation: { situationId, name, status, startAt, endAt, endedAt, isOwner, participantCount },
+//           requests: [{ requestId, helpType, status, startsAt, assigneeId, assigneeName,
+//                        assigneeWithdrawn, hasThankYouMessage }] }
+// - 참여자에게는 본인이 담당했던 요청만 내려옴
+export const getPastSituationDetailApi = async (situationId) => {
+  if (USE_MOCK) {
+    await wait();
+    const data = PAST_SITUATION_DETAIL_MOCK_BY_ID[situationId];
+    if (!data) throw createMockError(SITUATION_NOT_FOUND_MOCK_ERROR);
+    return createMockResponse(structuredClone(data));
+  }
+
+  const response = await axiosInstance.get(SITUATION_API_URLS.pastDetail(situationId));
   return response.data;
 };

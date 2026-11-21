@@ -68,9 +68,11 @@ function PastSituation() {
     anyPastSituationQuery.isSuccess &&
     anyPastSituationQuery.data.pastSituations.length === 0;
 
-  const handleSituationClick = (situationId) => {
+  // 지난 상황 상세(N-04)로 이동 — 상세 응답에 아직 없는 주인 이름은 state로 함께 전달
+  const handleSituationClick = ({ id, ownerName }) => {
     navigate(
-      `${SITUATION_NAVIGATION_PATH.PAST_SITUATION_DETAIL}?situationId=${situationId}`,
+      `${SITUATION_NAVIGATION_PATH.PAST_SITUATION_DETAIL}?situationId=${id}`,
+      { state: { ownerName } },
     );
   };
 
@@ -101,7 +103,7 @@ function PastSituation() {
               <li key={situation.id}>
                 <PastSituationCard
                   situation={situation}
-                  onClick={() => handleSituationClick(situation.id)}
+                  onClick={() => handleSituationClick(situation)}
                 />
               </li>
             ))}
