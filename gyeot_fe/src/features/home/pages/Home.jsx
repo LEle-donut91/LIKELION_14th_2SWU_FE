@@ -89,19 +89,16 @@ function Home() {
   const handleRequestCreate = (situationId) =>
     navigate(HOME_NAVIGATION_PATH.REQUEST_CREATE(situationId)); // H-03-02
 
-  // TODO: 와이어프레임 화면 코드와 App.jsx 라우트가 일치하지 않아 연결 보류
-  // - 받은 요청 → 요청 상세(대상자 뷰) "H-03-01-tgt": App.jsx에 해당 코드 없음
-  // - 보낸 요청 → 요청 상세(요청자 뷰) "H-03-01-B": App.jsx의 H-03-01-B는 RequestTarget(대상자)
   const handleReceivedRequestClick = (requestId) =>
-    console.log("[TODO] 받은 요청 상세(H-03-01-tgt)", requestId);
+    navigate(HOME_NAVIGATION_PATH.REQUEST_DETAIL(requestId)); // H-03-01
   const handleSentRequestClick = (requestId) =>
-    console.log("[TODO] 보낸 요청 상세(H-03-01-B)", requestId);
+    navigate(HOME_NAVIGATION_PATH.REQUEST_DETAIL(requestId)); // H-03-01
 
   // TODO: 알림은 MVP 제외(주석 1), 설정은 와이어프레임에 이동 화면 없음
   const handleAlarmClick = () => console.log("[TODO] 알림");
   const handleSettingClick = () => console.log("[TODO] 설정");
 
-  // TODO: 공통 로딩·에러 UI 확정 후 교체
+  // 공통 로딩·에러 UI
   if (isLoading) return null;
   if (hasError || !homeData) {
     return (

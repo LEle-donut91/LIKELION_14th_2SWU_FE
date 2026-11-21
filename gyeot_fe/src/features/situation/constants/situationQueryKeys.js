@@ -14,4 +14,10 @@ export const SITUATION_QUERY_KEYS = {
   // 3. 활성 관계 목록 (GET /api/relationships) — H-01 참여할 지인
   // - relation 영역과 같은 key를 써서 캐시를 함께 사용 (관계 해제·초대 수락 후 함께 갱신)
   relationships: () => ["relationships"],
+
+  // 4. 상황 상세 (GET /api/situations/{situationId}) — H-03 상황 상세
+  detail: (situationId, params) => ["situation", "detail", String(situationId), params],
+
+  // 5. 참여자 목록 (GET /api/situations/{situationId}/participants) — H-03 상황 상세, H-03-05 상황 관리
+  participants: (situationId) => ["situation", "participants", String(situationId)],
 };

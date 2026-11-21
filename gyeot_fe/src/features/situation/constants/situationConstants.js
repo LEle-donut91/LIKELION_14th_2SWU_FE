@@ -99,16 +99,40 @@ export const HELP_TYPE_LABEL = {
 // H-03 요청 목록 - 상태 칩 (문구 + 스타일 이름)
 // - isEnded: 끝난 요청(완료·취소·만료)은 카드 글자를 흐리게 표시
 // - 만료는 시안에 없어 취소와 같은 모양으로 임시 지정
+// - key: 상황 상세 조회 requests[].displayStatus 값 ('요청됨'은 '응답 대기'로 통합, F-14)
 export const REQUEST_STATUS_TAG = {
-  REQUESTED: { label: "요청됨", variant: "requested" },
   WAITING: { label: "응답 대기", variant: "waiting" },
-  UNASSIGNED: { label: "담당자 없음", variant: "unassigned" },
+  NO_ASSIGNEE: { label: "담당자 없음", variant: "unassigned" },
   ACCEPTED: { label: "수락됨", variant: "accepted" },
   IN_PROGRESS: { label: "진행 중", variant: "inProgress" },
   COMPLETED: { label: "완료", variant: "completed", isEnded: true },
-  CANCELLED: { label: "취소", variant: "cancelled", isEnded: true },
+  CANCELED: { label: "취소", variant: "cancelled", isEnded: true },
   EXPIRED: { label: "만료", variant: "cancelled", isEnded: true },
 };
+
+// 요청 화면 표시 상태 (상황 상세 조회 requests[].displayStatus)
+export const REQUEST_DISPLAY_STATUS = {
+  WAITING: "WAITING", // 응답 대기
+  NO_ASSIGNEE: "NO_ASSIGNEE", // 담당자 없음
+  ACCEPTED: "ACCEPTED", // 수락됨
+  IN_PROGRESS: "IN_PROGRESS", // 진행 중
+  COMPLETED: "COMPLETED", // 완료
+  CANCELED: "CANCELED", // 취소
+  EXPIRED: "EXPIRED", // 만료
+};
+
+// 참여 상태 (참여자 목록 조회 items[].status)
+export const PARTICIPANT_STATUS = {
+  ACTIVE: "ACTIVE",
+  LEFT: "LEFT",
+  REMOVED: "REMOVED",
+};
+
+// 참여자 목록 relationshipLabel 중 보호자 표시값 (보호자 태그 구분용)
+export const GUARDIAN_RELATIONSHIP_LABEL = "보호자";
+
+// 상황 상세 조회 실패 코드: 상황이 없거나 접근 불가 → 상황 목록으로 이동
+export const SITUATION_NOT_FOUND_CODE = "SITUATION_NOT_FOUND";
 
 // H-03-02 참여자뷰 - 이 요청에서 나의 역할 (요청 카드를 눌렀을 때 이동할 상세)
 // - TARGET   : 응답이 필요한 요청 (대상자)
