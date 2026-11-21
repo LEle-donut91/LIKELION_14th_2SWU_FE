@@ -18,6 +18,7 @@ export const HOME_NAVIGATION_PATH = {
   SITUATION_CREATE: "/situation/create", // H-01 상황 만들기
   REQUEST_CREATE: (situationId) => `/request/${situationId}`, // H-03-02 요청 작성
   ASK_AGAIN: (requestId) => `/request/ask-again/${requestId}`, // N-06 다시 부탁하기 (M-01 '다른 사람')
+  REQUEST_DETAIL: (requestId) => `/request/detail/${requestId}`, // H-03-01 요청 상세 (요청자·대상자·담당자 통합)
   ACQUAINTANCE_INVITE: "/relation/acquaintance-invite", // R-01 나의 사람 초대
   CARD: "/card", // C-00 안심카드
   CARD_SHARE: "/card/share", // C-06 공유 관리
