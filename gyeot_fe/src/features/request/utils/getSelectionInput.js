@@ -52,6 +52,8 @@ export const getDateTimeText = (dateTimeObj) => {
 // 입력된 응답 기한 객체를 화면 표시용 문자열 (N일 N시간 N분)으로 가공
 export const getDueDateText = (dueDate, isFixed = false) => {
   // 응답 기한이 고정된 경우 "시작 시간까지" 출력
+  // 1. 다시 부탁하기에서 시작까지 1시간 미만이라 응답 기한에 null 값이 저장되며 "시작 시간까지"로 표시 (이땐 응답 기한 값 임의 조정 불가)
+  // 2. 요청 작성/다시 부탁하기 - 시작까지 남은 시간이 24시간 미만이면 응답 기한에 null 값이 저장되며 "시작 시간까지"로 표시
   if (isFixed || dueDate === null) return "시작 시간까지";
 
   // 없으면 "선택" 출력
@@ -59,11 +61,6 @@ export const getDueDateText = (dueDate, isFixed = false) => {
   const days = parseInt(dueDate.days, 10) || 0;
   const hours = parseInt(dueDate.hours, 10) || 0;
   const minutes = parseInt(dueDate.minutes, 10) || 0;
-
-  // 아무것도 입력하지 않았거나, 0일 0시간 0분으로 입력했을 때 -> "선택" 출력
-  if (days === 0 && hours === 0 && minutes === 0) {
-    return "선택";
-  }
 
   // 정확히 1일 0시간 0분일 때만 "24시간 (기본)" 출력
   if (days === 1 && hours === 0 && minutes === 0) {

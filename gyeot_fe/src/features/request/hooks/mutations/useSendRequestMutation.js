@@ -51,12 +51,10 @@ export function useSendRequestMutation({
   return useMutation({
     mutationFn: (form) => {
       if (reassignRequestId) {
-        const { message, ...request } = postAskAgainService(Number(reassignRequestId), form);
-        if (message) showToast(message);
+        const request = postAskAgainService(Number(reassignRequestId), form);
         return postAskAgainApi(request);
       }
-      const { payload, message } = postCareRequestService(form);
-      if (message) showToast(message);
+      const { payload } = postCareRequestService(form);
       return postCareRequestApi(payload);
     },
     onSuccess: (data) => onSuccess(postCareRequestResultService(data)),

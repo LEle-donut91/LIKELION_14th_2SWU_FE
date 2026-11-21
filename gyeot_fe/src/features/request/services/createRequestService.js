@@ -1,4 +1,3 @@
-import { normalizeResponseDeadline } from "@/features/request/utils/validateInput";
 import { toUniqueNumberIds } from "@/features/request/utils/getSafetyCardInfo";
 import {
   formatLocalDateTime,
@@ -7,14 +6,10 @@ import {
 import { toMinutes } from "@/features/request/utils/dueDateFormat";
 
 // [H-03-02] 요청 작성 - 도움 요청 생성 API 요청 body 가공
-export const postCareRequestService = (requestForm, now = new Date()) => {
-  // 요청 작성 API 호출 직전에, 응답 기한이 시작 시간을 초과하는지 검사 후, 값을 null로 보정
-  // - 토스트로 응답 기한이 시작 시간까지로 고정됨을 안내
-  const { form, message } = normalizeResponseDeadline(requestForm, now);
+export const postCareRequestService = (form) => {
   const start = toDateFromInput(form.startDateTime);
   const end = toDateFromInput(form.endDateTime);
   return {
-    message,
     payload: {
       situationId: Number(form.situationId),
       helpType: form.helpType,

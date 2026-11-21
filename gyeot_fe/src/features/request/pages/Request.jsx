@@ -36,7 +36,7 @@ import {
 } from "@/features/request/constants/dateTimeInputConstants";
 
 // Utils
-import { getDueDateForStart } from "@/features/request/utils/dueDateFormat";
+import { getDueDateForStart, toMinutes } from "@/features/request/utils/dueDateFormat";
 import {
   isReadOnly,
   isPrerequisiteEnsured,
@@ -376,8 +376,10 @@ function Request() {
           value={form.dueDate}
           onConfirm={(v) => setForm({
             ...form,
-            // 전부 빈 값으로 확인하면 기본 응답 기한인 24시간을 저장한다.
-            dueDate: isDueDateEntered(v) ? v : { ...INITIAL_FORM.dueDate },
+            // 전부 빈 값이거나 합계가 0분이면 기본 응답 기한인 24시간을 저장한다.
+            dueDate: !isDueDateEntered(v) || toMinutes(v) === 0
+              ? { ...INITIAL_FORM.dueDate }
+              : v,
           })}
         >
           {(temp, setTemp) => (

@@ -1,4 +1,3 @@
-import { normalizeResponseDeadline } from "@/features/request/utils/validateInput";
 import { HELP_TYPE_LABELS } from "@/features/request/constants/requestFormConstants";
 import { USER_ORDER_STATE_TEXT } from "@/features/request/constants/requestDetailConstants";
 import { formatShortDateTimeRange } from "@/shared/utils/dateFormat";
@@ -70,14 +69,9 @@ export const getAskAgainDetailService = (response) => {
 // [N-06] 다시 부탁하기 - 요청 API 요청 body 가공
 export const postAskAgainService = (
   requestId,
-  requestForm,
-  now = new Date(),
+  form,
 ) => {
-  // 다시 부탁하기 API 호출 직전에, 응답 기한이 시작 시간을 초과하는지 검사 후, 값을 null로 보정
-  // - 토스트로 응답 기한이 시작 시간까지로 고정됨을 안내
-  const { form, message } = normalizeResponseDeadline(requestForm, now);
   return {
-    message,
     requestId,
     payload: {
       targetUserId: Number(form.userId),

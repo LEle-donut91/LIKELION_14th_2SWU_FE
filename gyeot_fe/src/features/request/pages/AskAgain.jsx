@@ -46,6 +46,7 @@ import {
 import {
   getDueDateForStart,
   isDueDateFixed,
+  toMinutes,
 } from "@/features/request/utils/dueDateFormat";
 import {
   getSelectedUser,
@@ -193,6 +194,8 @@ function AskAgain() {
     const result = askAgainValidateInput(form, isDueDateFixed(form.startDateTime, enteredAt), now);
     const [firstError] = Object.values(result.errors);
     if (firstError) {
+      // 기한 초과로 이동을 막는 경우에도 null은 저장해 "시작 시간까지"로 표시한다.
+      if (result.form !== form) setForm(result.form);
       showToast(firstError);
       return;
     }
@@ -288,8 +291,10 @@ function AskAgain() {
           value={form.dueDate}
           onConfirm={(v) => setForm({
             ...form,
-            // 전부 빈 값으로 확인하면 기본 응답 기한인 24시간을 저장한다.
-            dueDate: isDueDateEntered(v) ? v : { ...INITIAL_FORM.dueDate },
+            // 전부 빈 값이거나 합계가 0분이면 기본 응답 기한인 24시간을 저장한다.
+            dueDate: !isDueDateEntered(v) || toMinutes(v) === 0
+              ? { ...INITIAL_FORM.dueDate }
+              : v,
           })}
         >
           {(temp, setTemp) => (
