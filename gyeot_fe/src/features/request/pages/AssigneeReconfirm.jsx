@@ -18,7 +18,7 @@ import iconToggle from "@/shared/assets/icons/iconToggle.svg";
 import { useRequestNav } from "@/features/request/hooks/useRequestNav";
 import { useRequestDetailQuery } from "@/features/request/hooks/queries/useRequestDetailQuery";
 import { useReconfirmMutations } from "@/features/request/hooks/mutations/useReconfirmMutations";
-import { useToast } from "@/shared/hooks/useToast";
+import { useToastStore } from "@/shared/stores/useToastStore";
 
 // Constants
 import { REQUEST_ROUTES } from "@/features/request/constants/routerConstants";
@@ -31,12 +31,12 @@ import SubpageHeader from "@/shared/components/subpage-header/SubpageHeader";
 import SmallFooter from "@/shared/components/SmallFooter/SmallFooter";
 import RequestSummary from "@/features/request/components/Request/RequestSummary";
 import DefaultModal from "@/shared/components/DefaultModal/DefaultModal";
-import DefaultToast from "@/shared/components/Toast/DefaultToast";
+import Toast from "@/shared/components/Toast/Toast";
 
 function AssigneeReconfirm() {
   const paramId = useParams().id;
   const { handleGoBack, handleGoNext } = useRequestNav();
-  const { toast, showToast, hideToast } = useToast();
+  const showToast = useToastStore((state) => state.showToast);
 
   // [변경 내용 거절] 모달
   const [isModalOpen, setModalOpen] = useState(false);
@@ -145,13 +145,7 @@ function AssigneeReconfirm() {
           />
         </>
       )}
-      {toast && (
-        <DefaultToast
-          key={toast.id}
-          message={toast.message}
-          onHide={hideToast}
-        />
-      )}
+      <Toast />
     </div>
   );
 }

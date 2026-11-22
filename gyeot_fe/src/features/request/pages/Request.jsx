@@ -16,7 +16,7 @@ import { useParams } from "react-router-dom";
 import { useRequestNav } from "@/features/request/hooks/useRequestNav";
 import { useRequestTargetsQuery } from "@/features/request/hooks/queries/useRequestTargetsQuery";
 import { useSituationsQuery } from "@/features/request/hooks/queries/useSituationsQuery";
-import { useToast } from "@/shared/hooks/useToast";
+import { useToastStore } from "@/shared/stores/useToastStore";
 import { useInitialResponseDeadline } from "@/features/request/hooks/useInitialResponseDeadline";
 
 // Zustand Store
@@ -64,14 +64,14 @@ import TimeSheet from "@/shared/components/TimeSheet/TimeSheet";
 import SituationOption from "@/features/request/components/Option/SituationOption";
 import UserOption from "@/features/request/components/Option/UserOption";
 import DateTimeOption from "@/features/request/components/Option/DateTimeOption";
-import DefaultToast from "@/shared/components/Toast/DefaultToast";
+import Toast from "@/shared/components/Toast/Toast";
 
 // 페이지 컴포넌트
 function Request() {
   const { handleGoBack, handleGoNext } = useRequestNav();
   const paramId = useParams().id;
   const initializedParamId = useRef(null);
-  const { toast, showToast, hideToast } = useToast();
+  const showToast = useToastStore((state) => state.showToast);
 
   // 열려 있는 시트 (한 번에 하나만 열림)
   const [openSheet, setOpenSheet] = useState(() => {
@@ -403,13 +403,7 @@ function Request() {
 </>
       )}
       {/* 토스트 (key 가 바뀌면 새로 마운트되어 타이머가 다시 시작됨) */}
-      {toast && (
-        <DefaultToast
-          key={toast.id}
-          message={toast.message}
-          onHide={hideToast}
-        />
-      )}
+      <Toast />
     </div>
   );
 }
