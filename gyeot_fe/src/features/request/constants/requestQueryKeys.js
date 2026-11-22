@@ -1,6 +1,6 @@
 export const REQUEST_QUERY_KEYS = {
-  // 진행 중 상황 목록 조회 (GET)
-  situations: (size = 20) => ["requestSituations", { size }],
+  // 홈 통합 조회 API (GET)
+  home: () => ["requestHome"],
 
   // 대상 후보 조회 (GET)
   targets: (situationId = null, requestId = null) => [

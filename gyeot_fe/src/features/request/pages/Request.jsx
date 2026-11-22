@@ -15,7 +15,7 @@ import { useParams } from "react-router-dom";
 // Custom Hooks
 import { useRequestNav } from "@/features/request/hooks/useRequestNav";
 import { useRequestTargetsQuery } from "@/features/request/hooks/queries/useRequestTargetsQuery";
-import { useSituationsQuery } from "@/features/request/hooks/queries/useSituationsQuery";
+import { useHomeQuery } from "@/features/request/hooks/queries/useHomeQuery";
 import { useToast } from "@/shared/hooks/useToast";
 import { useInitialResponseDeadline } from "@/features/request/hooks/useInitialResponseDeadline";
 
@@ -99,11 +99,11 @@ function Request() {
     resetForm,
   } = useRequestFormStore((state) => state);
 
-  // 1. 진행 중 상황 목록 조회
+  // 1. 홈 통합 조회 API (요청 작성 시 상황 목록을 가져오기 위함)
   const {
     data: situationData,
     isPending: isSituationsPending,
-  } = useSituationsQuery({ showToast });
+  } = useHomeQuery({ showToast });
   const situation = situationData?.situation;
 
   // 2. 대상 후보 조회 API (상황 선택 후 호출, 상황이 바뀌면 자동으로 다시 조회)
