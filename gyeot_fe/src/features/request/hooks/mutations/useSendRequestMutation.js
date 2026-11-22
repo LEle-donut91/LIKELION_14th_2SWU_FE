@@ -1,11 +1,11 @@
 import { useMutation } from "@tanstack/react-query";
+import { useRefreshInformationSelection } from "@/features/request/hooks/useRefreshInformationSelection";
 import {
   postCareRequestApi,
   postAskAgainApi,
 } from "@/features/request/api/postApi";
 import {
   postCareRequestService,
-  postCareRequestResultService,
 } from "@/features/request/services/createRequestService";
 import { postAskAgainService } from "@/features/request/services/askAgainService";
 import { getErrorCode, getErrorMessage } from "@/shared/utils/apiError";
@@ -32,6 +32,7 @@ export function useSendRequestMutation({
   onRefreshInformation,
 }) {
   const { handleGoBack, handleGoNext } = useRequestNav();
+  const refreshInformationSelection = useRefreshInformationSelection(onRefreshInformation);
   const setError = useRequestErrorStore((state) => state.setError);
 
   const returnFromCreation = (correction) => {
@@ -49,13 +50,25 @@ export function useSendRequestMutation({
   };
 
   return useMutation({
-    mutationFn: (form) =>
-      reassignRequestId
-        ? postAskAgainApi(postAskAgainService(Number(reassignRequestId), form))
-        : postCareRequestApi(postCareRequestService(form)),
-    onSuccess: (data) => onSuccess(postCareRequestResultService(data)),
+    mutationFn: (form) => {
+      if (reassignRequestId) {
+        const request = postAskAgainService(Number(reassignRequestId), form);
+        return postAskAgainApi(request);
+      }
+      const { payload } = postCareRequestService(form);
+      return postCareRequestApi(payload);
+    },
+    onSuccess: (data) => {
+      if (data.message) {
+        showToast(data.message);
+      }
+      onSuccess(data.data);
+    },
     onError: (error) => {
+      // 에러 토스트 메시지 출력
       showToast(getErrorMessage(error));
+
+      // 다시 부탁하기 API 호출인 경우
       if (reassignRequestId) {
         switch (getErrorCode(error)) {
           case COMMON_ERROR_CODE.FORBIDDEN:
@@ -83,12 +96,12 @@ export function useSendRequestMutation({
             returnFromReassignment({ sheet: REQUEST_SHEET.DUE_DATE });
             break;
           case INFO_SHARE_ERROR_CODE.SAFETY_INFO_INVALID_SELECTION:
-            onRefreshInformation();
-            break;
+            return refreshInformationSelection();
         }
         return;
       }
 
+      // 도움 요청 생성 API 호출인 경우
       switch (getErrorCode(error)) {
         case REQUEST_ERROR_CODE.REQUEST_SITUATION_INVALID:
           returnFromCreation({ sheet: REQUEST_SHEET.SITUATION });
@@ -109,8 +122,7 @@ export function useSendRequestMutation({
           returnFromCreation({ sheet: REQUEST_SHEET.DUE_DATE });
           break;
         case INFO_SHARE_ERROR_CODE.SAFETY_INFO_INVALID_SELECTION:
-          onRefreshInformation();
-          break;
+          return refreshInformationSelection();
         case REQUEST_ERROR_CODE.REQUEST_PLACE_TOO_LONG:
           returnFromCreation({ field: REQUEST_FORM_FIELD_KEY.LOCATION });
           break;

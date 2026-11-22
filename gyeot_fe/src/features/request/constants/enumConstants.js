@@ -10,12 +10,6 @@ export const SITUATION_STATUS = {
   ENDED: "ENDED",
 };
 
-// 상황 참여 역할 (items[].role)
-export const SITUATION_ROLE = {
-  OWNER: "OWNER",
-  PARTICIPANT: "PARTICIPANT",
-};
-
 // 요청 진행 상태 (status)
 export const REQUEST_STATE = {
   REQUESTED: "REQUESTED",
@@ -26,12 +20,27 @@ export const REQUEST_STATE = {
   EXPIRED: "EXPIRED",
 };
 
+// 요청 수정 API 필드명
+export const REQUEST_EDIT_FIELD_KEY = {
+  STARTS_AT: "startsAt",
+};
+
 // 수정안 상태 (latestProposal.status)
 export const PROPOSAL_STATUS = {
   PENDING: "PENDING",
   ACCEPTED: "ACCEPTED",
   REJECTED: "REJECTED",
   INVALIDATED: "INVALIDATED",
+};
+
+// 수정안 무효 사유 (latestProposal.invalidationReason)
+export const PROPOSAL_INVALIDATION_REASON = {
+  DEADLINE_PASSED: "DEADLINE_PASSED",
+  REQUEST_STARTED: "REQUEST_STARTED",
+  ASSIGNMENT_CLOSED: "ASSIGNMENT_CLOSED",
+  REQUEST_ENDED: "REQUEST_ENDED",
+  REPLACED_BY_NEW_PROPOSAL: "REPLACED_BY_NEW_PROPOSAL",
+  REQUESTER_WITHDRAWN: "REQUESTER_WITHDRAWN",
 };
 
 // 내 응답 (myAssignment.responseStatus, 미응답이면 null)

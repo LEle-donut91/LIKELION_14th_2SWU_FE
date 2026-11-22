@@ -1,6 +1,7 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { patchEditApi } from "@/features/request/api/patchApi";
 import { patchEditService } from "@/features/request/services/editRequestService";
+import { useRefreshInformationSelection } from "@/features/request/hooks/useRefreshInformationSelection";
 import { NO_CHANGE_TOAST_MESSAGE } from "@/features/request/constants/messageConstants";
 import { getErrorCode, getErrorMessage } from "@/shared/utils/apiError";
 import { COMMON_ERROR_CODE, REQUEST_ERROR_CODE, INFO_SHARE_ERROR_CODE } from "@/shared/constants/errorCodeConstants";
@@ -8,6 +9,8 @@ import { REQUEST_ERROR_TARGET_PAGE } from "@/features/request/constants/requestE
 import { REQUEST_SHEET } from "@/features/request/constants/requestFormConstants";
 import { useRequestErrorStore } from "@/features/request/stores/useRequestErrorStore";
 import { useRequestNav } from "@/features/request/hooks/useRequestNav";
+import { useRequestFormStore } from "@/features/request/stores/useRequestFormStore";
+import { REQUEST_QUERY_KEYS } from "@/features/request/constants/requestQueryKeys";
 
 /**
  * [H-03-01-02] 요청 수정 - 변경된 필드만 PATCH
@@ -23,7 +26,11 @@ export function useEditRequestMutation({
   onRefreshInformation,
 }) {
   const { handleGoBack, handleGoBackTwice } = useRequestNav();
+  const refreshInformationSelection = useRefreshInformationSelection(onRefreshInformation);
   const setError = useRequestErrorStore((state) => state.setError);
+  const resetForm = useRequestFormStore((state) => state.resetForm);
+  // main.jsx의 QueryClientProvider에 등록된 같은 클라이언트를 가져온다.
+  const queryClient = useQueryClient();
 
   const returnToStartTimeSheet = () => {
     setError({
@@ -36,7 +43,23 @@ export function useEditRequestMutation({
 
   const { mutate, isPending } = useMutation({
     mutationFn: patchEditApi,
-    onSuccess,
+    onSuccess: async (response) => {
+      showToast(response.message);
+      // 수정 전 캐시가 다음 수정 폼의 초기값으로 쓰이지 않도록 재조회한다.
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: REQUEST_QUERY_KEYS.detail(requestId),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: REQUEST_QUERY_KEYS.informationOptions(
+            requestDetail?.data?.helpType,
+            requestId,
+          ),
+        }),
+      ]);
+      resetForm();
+      onSuccess?.(response);
+    },
     onError: (error) => {
       showToast(getErrorMessage(error));
 
@@ -66,7 +89,7 @@ export function useEditRequestMutation({
           returnToStartTimeSheet();
           break;
         case INFO_SHARE_ERROR_CODE.SAFETY_INFO_INVALID_SELECTION:
-          return onRefreshInformation();
+          return refreshInformationSelection();
       }
     },
   });

@@ -4,11 +4,12 @@ import { useParams } from "react-router-dom";
 import styles from "./RequestDetail.module.css";
 import { useRequestNav } from "@/features/request/hooks/useRequestNav";
 import { useRequestDetailQuery } from "@/features/request/hooks/queries/useRequestDetailQuery";
+import { useRequestTargetsQuery } from "@/features/request/hooks/queries/useRequestTargetsQuery";
 import { useRequestDetailMutations } from "@/features/request/hooks/mutations/useRequestDetailMutations";
 import { useToast } from "@/shared/hooks/useToast";
 import { getRequestDetailService } from "@/features/request/services/requestDetailService";
 import { REQUEST_ROUTES } from "@/features/request/constants/routerConstants";
-import { RESPONSE_STATUS } from "@/features/request/constants/enumConstants";
+import { RESPONSE_STATUS, SITUATION_STATUS } from "@/features/request/constants/enumConstants";
 import { REQUESTER_CANCEL_BTN_TITLE } from "@/features/request/constants/requesterViewConstants";
 
 import SubpageHeader from "@/shared/components/subpage-header/SubpageHeader";
@@ -32,6 +33,7 @@ function RequestDetail() {
   const [isCancelModalOpen, setCancelModalOpen] = useState(false);
   const [isSameModalOpen, setSameModalOpen] = useState(false);
   const [isWithdrawModalOpen, setWithdrawModalOpen] = useState(false);
+  const [isDuplicating, setDuplicating] = useState(false);
   const { toast, showToast, hideToast } = useToast();
   const initForm = useRequestFormStore((state) => state.initForm);
 
@@ -52,7 +54,7 @@ function RequestDetail() {
     startCare,
     completeCare,
     respondToRequest,
-  } = useRequestDetailMutations(paramId, {
+  } = useRequestDetailMutations(paramId, { // paramId는 requestId
     showToast,
     onAcceptanceWithdrawn: () => handleGoNext(REQUEST_ROUTES.home, true),
   });
@@ -60,6 +62,7 @@ function RequestDetail() {
   // API 응답 데이터 (정제된 형태)
   const {
     situationId,
+    situation,
     proposalId,
     stepState,
     userName,
@@ -84,27 +87,38 @@ function RequestDetail() {
     guideLines = [],
   } = detail ?? {};
 
+  const activeSituationId = situation?.status === SITUATION_STATUS.ACTIVE
+    ? situationId
+    : null;
+  const { refetch: refetchTargets } = useRequestTargetsQuery(
+    { situationId: activeSituationId },
+    { showToast, enabled: false },
+  );
+
   // Footer별 action 연결
   const footerActions = {
+    confirm: () => handleGoBack(),
     edit: () => handleGoNext(REQUEST_ROUTES.editForm(paramId)),
     askAgain: () => handleGoNext(`${REQUEST_ROUTES.askAgain(paramId)}?from=detail`),
     withdraw: () => setWithdrawModalOpen(true),
-    withdrawProposal: () => withdrawProposal(proposalId),
-    done: completeCare,
+    withdrawProposal: () => withdrawProposal(proposalId), // 수정안 철회 API 호출
+    done: completeCare, // 돌봄 완료 API 호출
     sameRequest: () => setSameModalOpen(true),
     checkChange: () => handleGoNext(REQUEST_ROUTES.assigneeReconfirm(paramId)),
-    start: startCare,
+    start: startCare, // 돌봄 시작 API 호출
     pastSituation: () =>
       handleGoNextWithState(
         REQUEST_ROUTES.pastSituationDetail,
         { situationId },
         true,
       ),
-    hold: () => respondToRequest(RESPONSE_STATUS.CHECK_LATER),
-    refuse: () => respondToRequest(RESPONSE_STATUS.UNAVAILABLE),
-    accept: () => respondToRequest(RESPONSE_STATUS.AVAILABLE),
-    changeToRefuse: () => respondToRequest(RESPONSE_STATUS.UNAVAILABLE),
-    changeToAccept: () => respondToRequest(RESPONSE_STATUS.AVAILABLE),
+
+    // 대상자 뷰 (H-03-01-B)의 하단 버튼 (요청 응답)
+    hold: () => respondToRequest(RESPONSE_STATUS.CHECK_LATER), // 보류
+    refuse: () => respondToRequest(RESPONSE_STATUS.UNAVAILABLE), // 거절
+    accept: () => respondToRequest(RESPONSE_STATUS.AVAILABLE), // 수락
+    changeToRefuse: () => respondToRequest(RESPONSE_STATUS.UNAVAILABLE), // 거절로 변경
+    changeToAccept: () => respondToRequest(RESPONSE_STATUS.AVAILABLE), // 수락으로 변경
   };
 
   // Header별 action 연결
@@ -113,6 +127,8 @@ function RequestDetail() {
       text: flags.isCancelable ? REQUESTER_CANCEL_BTN_TITLE : undefined,
       onClick: () => setCancelModalOpen(true),
     },
+
+    // 담당자 뷰 - "철회" 버튼 (클릭 시 수락 철회 모달 표시)
     assignee: {
       text: flags.showWithdrawBtn ? "철회" : undefined,
       onClick: flags.showWithdrawBtn
@@ -133,20 +149,41 @@ function RequestDetail() {
   };
 
   // "같은 내용 요청" 버튼 핸들러
-  const handleSameConfirm = () => {
-    setSameModalOpen(false);
-    initForm(situationId, {
-      situationId,
-      userId,
-      dueDate: initialDueDate,
-    });
-    handleGoNext(REQUEST_ROUTES.request(situationId));
+  const handleSameConfirm = async () => {
+    if (isDuplicating) return;
+    setDuplicating(true);
+    try {
+      let targets = [];
+      if (activeSituationId) {
+        const result = await refetchTargets();
+        if (!result.isSuccess) {
+          setSameModalOpen(false);
+          return;
+        }
+        targets = result.data;
+      }
+      const target = targets.find((item) => String(item.id) === String(userId));
+      const entryId = activeSituationId ?? "new";
+      initForm(entryId, {
+        situationId: activeSituationId,
+        situationStartDate: activeSituationId ? situation.startAt : null,
+        situationEndDate: activeSituationId ? situation.endAt : null,
+        userId: target?.id ?? null,
+        userName: target?.userName ?? null,
+        isGuardian: target?.isGuardian ?? null,
+        dueDate: initialDueDate,
+      });
+      setSameModalOpen(false);
+      handleGoNext(REQUEST_ROUTES.request(entryId));
+    } finally {
+      setDuplicating(false);
+    }
   };
 
   // [수락 철회] 모달의 confirm 버튼 핸들러
   const handleWithdrawConfirm = () => {
     setWithdrawModalOpen(false);
-    withdrawAcceptance();
+    withdrawAcceptance(); // 수락 철회 API
   };
 
   return (

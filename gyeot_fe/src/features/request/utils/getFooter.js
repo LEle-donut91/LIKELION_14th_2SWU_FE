@@ -38,7 +38,7 @@ export const getRequesterFooter = (actions) => {
   return getAllowedFooter(REQUESTER_FOOTER_CONFIG[key], actions);
 };
 
-export const getAssigneeFooter = (actions) => {
+export const getAssigneeFooter = (actions, isEnded = false) => {
   const key = [
     ASSIGNEE_FOOTER_KEY.CHECK_CHANGE,
     ASSIGNEE_FOOTER_KEY.START,
@@ -47,5 +47,7 @@ export const getAssigneeFooter = (actions) => {
   ].find((key) =>
     actions.includes(FOOTER_ACTIONS[ASSIGNEE_FOOTER_CONFIG[key].action]),
   );
-  return ASSIGNEE_FOOTER_CONFIG[key] ?? null;
+  return ASSIGNEE_FOOTER_CONFIG[key] ?? (isEnded
+    ? ASSIGNEE_FOOTER_CONFIG[ASSIGNEE_FOOTER_KEY.CONFIRM]
+    : null);
 };

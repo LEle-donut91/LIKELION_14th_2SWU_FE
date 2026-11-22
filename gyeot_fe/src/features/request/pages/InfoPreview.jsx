@@ -14,7 +14,6 @@ import { useSearchParams } from "react-router-dom";
 
 // Custom Hooks
 import { useRequestNav } from "@/features/request/hooks/useRequestNav";
-import { useRequestTargetsQuery } from "@/features/request/hooks/queries/useRequestTargetsQuery";
 import { useInformationOptionsQuery } from "@/features/request/hooks/queries/useInformationOptionsQuery";
 import { useSendRequestMutation } from "@/features/request/hooks/mutations/useSendRequestMutation";
 import { useRequestFormStore } from "@/features/request/stores/useRequestFormStore";
@@ -24,7 +23,6 @@ import { useToast } from "@/shared/hooks/useToast";
 import { REQUEST_ROUTES } from "@/features/request/constants/routerConstants";
 
 // Utils
-import { getSelectedUserInfo } from "@/features/request/utils/getSelectionInput";
 import {
   getSelectedTitles,
   getCategoryInformationIds,
@@ -66,6 +64,7 @@ function InfoPreview() {
     form: requestForm,
     setForm,
     resetForm,
+    initInformationSelection,
   } = useRequestFormStore((state) => state);
   const hasForm = Boolean(requestForm.helpType);
   useEffect(() => {
@@ -73,28 +72,17 @@ function InfoPreview() {
     showToast("작성 중인 요청 정보가 없어요.");
   }, [hasForm, showToast]);
 
-  // 1. 대상 후보 조회 API
-  const {
-    data: users = [],
-    isPending: isTargetPending,
-  } = useRequestTargetsQuery(
-    reassignRequestId
-      ? { requestId: reassignRequestId }
-      : { situationId: requestForm.situationId },
-    { showToast },
-  );
-
-  // 2. 공개 항목 선택지 조회 (도움 종류로 조회하고, 다시 부탁하기에서는 기존 요청 ID도 전달)
+  // 1. 공개 항목 선택지 조회 (도움 종류로 조회하고, 다시 부탁하기 흐름에서는 requestId도 전달)
   const {
     data: informationOptions,
-    isPending: isInfoPending,
+    isPending,
     refetch: refetchInformation,
   } = useInformationOptionsQuery(
     { helpType: requestForm.helpType, requestId: reassignRequestId },
     { enabled: Boolean(requestForm.helpType), showToast },
   );
 
-  // 3. 도움 요청 생성 API
+  // 2. 도움 요청 생성 API
   const { mutate: sendRequest } = useSendRequestMutation({
     reassignRequestId,
     showToast,
@@ -104,11 +92,6 @@ function InfoPreview() {
       handleGoNext(REQUEST_ROUTES.send(requestId), true);
     },
   });
-
-  // GET 요청 로딩중 상태
-  const isLoading =
-  isTargetPending ||
-  isInfoPending
 
   // API 응답 데이터 (정제된 형태)
   const {
@@ -122,18 +105,19 @@ function InfoPreview() {
     [informationOptions, requestForm],
   );
 
-  // 공개 항목 선택지 조회 후, 기본값이 있는 경우 requestForm에 반영
+  // 조회 조건별 최초 기본값만 적용하고 이후 사용자 선택은 스토어에서 유지
   useEffect(() => {
     if (!informationOptions) return;
-    setForm((prev) => ({
-      ...prev,
-      informationIds: getInformationOptionsService(informationOptions, prev)
+    initInformationSelection({
+      helpType: requestForm.helpType,
+      requestId: reassignRequestId,
+      informationIds: getInformationOptionsService(informationOptions, requestForm)
         .defaultIds,
-    }));
-  }, [informationOptions, setForm]);
+    });
+  }, [informationOptions, requestForm, reassignRequestId, initInformationSelection]);
 
-  // 선택한 대상의 이름과 보호자 여부를 가져옴
-  const { userName, userPart } = getSelectedUserInfo(users, requestForm.userId);
+  // Zustand Store에 저장한 요청 대상 정보
+  const { userName, isGuardian } = requestForm;
 
   // 선택한 공개 항목을 카테고리별로 교체하는 함수
   const setCategorySelection = (categoryItems, ids) => {
@@ -170,7 +154,7 @@ function InfoPreview() {
         rightText="2 / 2"
         onBackClick={handleGoBack}
       />
-      {!isLoading && (
+      {!isPending && (
 <>
 
       {/* 메인 컨텐츠 */}
@@ -179,7 +163,7 @@ function InfoPreview() {
           isAgain={false}
           state="받는 사람"
           userName={userName}
-          part={userPart}
+          part={isGuardian ? "보호자" : "나의 사람"}
         />
 
         <DueDateState

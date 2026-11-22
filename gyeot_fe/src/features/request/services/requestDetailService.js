@@ -6,6 +6,7 @@ import {
   REQUEST_STATE,
   DISPLAY_STATUS,
   PROPOSAL_STATUS,
+  PROPOSAL_INVALIDATION_REASON,
   RESPONSE_STATUS,
   VIEWER_ROLE,
   REQUEST_ACTION,
@@ -68,7 +69,9 @@ const getViewerContext = (raw) => {
     isDoneState: raw.status === REQUEST_STATE.COMPLETED,
     isProgressState: raw.status === REQUEST_STATE.IN_PROGRESS,
     isAssignedNoti: raw.displayStatus === DISPLAY_STATUS.NO_ASSIGNEE,
-    isEditPending: raw.latestProposal?.status === PROPOSAL_STATUS.PENDING,
+    isEditPending:
+      raw.displayStatus === DISPLAY_STATUS.ACCEPTED &&
+      raw.latestProposal?.status === PROPOSAL_STATUS.PENDING,
     canRespond:
       isTarget &&
       actions.includes(REQUEST_ACTION.RESPOND) &&
@@ -91,7 +94,14 @@ const getFlags = (raw, ctx) => {
   return {
     isAssignedNoti: ctx.isAssignedNoti,
     isEditPending,
-    isEditInvalid: raw.latestProposal?.status === PROPOSAL_STATUS.INVALIDATED,
+    isEditInvalid:
+      isRequester &&
+      [DISPLAY_STATUS.ACCEPTED, DISPLAY_STATUS.IN_PROGRESS].includes(raw.displayStatus) &&
+      raw.latestProposal?.status === PROPOSAL_STATUS.INVALIDATED &&
+      [
+        PROPOSAL_INVALIDATION_REASON.DEADLINE_PASSED,
+        PROPOSAL_INVALIDATION_REASON.REQUEST_STARTED,
+      ].includes(raw.latestProposal?.invalidationReason),
     isCancelable: isRequester && actions.includes(REQUEST_ACTION.CANCEL),
     showWithdrawBtn: isAssignee && actions.includes(REQUEST_ACTION.WITHDRAW),
     showChangedNotice: isAssignee && isEditPending,
@@ -127,7 +137,7 @@ const getGuideLines = (raw, { isTarget, responseStatus }, notice) => {
 // 역할별 푸터 설정
 const getFooterConfig = (ctx) => {
   if (ctx.isRequester) return getRequesterFooter(ctx.actions);
-  if (ctx.isAssignee) return getAssigneeFooter(ctx.actions);
+  if (ctx.isAssignee) return getAssigneeFooter(ctx.actions, ctx.isEnded || ctx.isDoneState);
   if (!ctx.canRespond) return null;
   const footerKey =
     TARGET_FOOTER_KEY_BY_RESPONSE[ctx.responseStatus] ??
@@ -179,7 +189,7 @@ export const getRequestDetailService = (response = {}) => {
       (isRequester
         ? raw.currentAssignment?.target?.name
         : raw.requester?.name) ?? "",
-    userId: raw.currentAssignment?.target?.userId ?? "",
+    userId: assignments.at(-1)?.target?.userId ?? "",
     message: raw.description ?? "",
     dueDate:
       (isRequester

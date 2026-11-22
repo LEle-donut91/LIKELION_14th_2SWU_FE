@@ -27,7 +27,6 @@ import { REQUEST_ERROR_TARGET_PAGE } from "@/features/request/constants/requestE
 import {
   REQUEST_FORM_FIELD_KEY,
   REQUEST_SHEET,
-  EDIT_FORM_VALIDATE_FIELDS,
 } from "@/features/request/constants/requestFormConstants";
 import { DATE_TIME_SECTIONS } from "@/features/request/constants/dateTimeInputConstants";
 
@@ -38,7 +37,7 @@ import {
   getCategoryInformationIds,
   replaceCategoryInformationIds,
 } from "@/features/request/utils/getSafetyCardInfo";
-import { validateInput } from "@/features/request/utils/validateInput";
+import { editValidateInput } from "@/features/request/utils/validateInput";
 
 // Services
 import { getEditFormService } from "@/features/request/services/editRequestService";
@@ -116,9 +115,9 @@ function RequestEditForm() {
   );
 
   // 3. 요청 취소 API
-  const { cancelRequest } = useCancelRequestMutation(paramId, {
+  const cancelMutation = useCancelRequestMutation(paramId, {
     showToast,
-    onSuccess: () => handleGoBack(),
+    onSuccess: () => handleGoBack(), // 성공 시 뒤로 가기
   });
 
   // API 응답 데이터 (정제된 형태)
@@ -142,7 +141,7 @@ function RequestEditForm() {
       ...initialRequestForm,
       situationId: detail.situationId,
       helpType: detail.helpType,
-      informationIds: informationOptions.defaultIds,
+      informationIds: detail.initialInformationIds ?? informationOptions.defaultIds,
     });
   }, [
     initialRequestForm,
@@ -171,11 +170,15 @@ function RequestEditForm() {
   // 다음 버튼 클릭 handler
   const handleNextBtnClick = () => {
     // 입력값 유효성 검사 (첫 번째 에러 문구 하나만 토스트로)
-    const errors = validateInput(
-      requestForm,
-      new Date(),
-      EDIT_FORM_VALIDATE_FIELDS,
-    );
+    // 세 번째 인자는 현재 입력값과 비교할 기준값이다.
+    // initialRequestForm은 service에서 최근 수정안의 after 값으로 만들며,
+    // 수정안이 없으면 원래 요청의 startsAt·endsAt·place로 만든다.
+    // defaultIds는 공개 항목 API가 selected로 내려준 기존 선택 ID 목록이다.
+    // 현재 선택(requestForm.informationIds)과 비교해 공개 항목만 바꾼 경우도 구분한다.
+    const errors = editValidateInput(requestForm, new Date(), {
+      ...initialRequestForm,
+      informationIds: detail.initialInformationIds ?? informationOptions.defaultIds,
+    });
     const [firstError] = Object.values(errors);
     if (firstError) {
       showToast(firstError);
@@ -198,8 +201,9 @@ function RequestEditForm() {
 
   // [요청 취소] 모달의 confirm 버튼 handler
   const handleCancelConfirm = () => {
+    if (cancelMutation.isPending) return;
     setCancelModalOpen(false);
-    cancelRequest();
+    cancelMutation.mutate(paramId);
   };
 
   return (

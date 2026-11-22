@@ -1,37 +1,41 @@
-import { REQUEST_STATE } from "@/features/request/constants/enumConstants";
+import { REQUEST_STATE, PROPOSAL_STATUS } from "@/features/request/constants/enumConstants";
 import {
   formatShortDateTime,
   formatShortDateTimeRange,
 } from "@/shared/utils/dateFormat";
 import {
-  formatLocalDateTime,
   toDateFromInput,
   toDateTimeInput,
 } from "@/features/request/utils/dateTimeFormat";
 import {
   flattenInformationItems,
-  toUniqueNumberIds,
 } from "@/features/request/utils/getSafetyCardInfo";
 import {
   buildInformationItem,
   buildPlaceItem,
   buildScheduleItem,
 } from "@/features/request/utils/infoListBuilders";
+import { getEditChanges } from "@/features/request/utils/getEditChanges";
 
 // [H-03-01-02] 요청 수정 - 수정 폼 초기값 가공 (수정안이 있으면 수정안 기준)
 export const getEditFormService = (response = {}) => {
   const raw = response?.data ?? response ?? {};
-  const isEditing = raw.latestProposal != null;
+  const isEditing = raw.latestProposal?.status === PROPOSAL_STATUS.PENDING;
   const draft = isEditing ? raw.latestProposal.after : raw;
 
   return {
     situationId: raw.situation?.situationId ?? "",
     requestId: raw?.requestId ?? "",
     isEditing,
+    initialInformationIds: isEditing
+      ? (draft?.informations ?? []).map((item) => item.informationId)
+      : undefined,
     userName: raw.currentAssignment?.target?.name ?? "",
     dueDate: draft?.endsAt ? formatShortDateTime(draft.endsAt) : "",
     helpType: raw.helpType,
     initialRequestForm: {
+      situationStartDate: raw.situation?.startAt ?? null,
+      situationEndDate: raw.situation?.endAt ?? null,
       startDateTime: toDateTimeInput(draft?.startsAt),
       endDateTime: toDateTimeInput(draft?.endsAt),
       location: draft?.place ?? null,
@@ -81,25 +85,6 @@ export const getEditCheckService = (
   };
 };
 
-// 공개 항목이 기존 선택(selected)과 달라졌는지 비교
-const hasInformationChanged = (informationIds, informationOptions) => {
-  const beforeIds = new Set(
-    flattenInformationItems(informationOptions)
-      .filter((item) => item.selected)
-      .map((item) => Number(item.informationId)),
-  );
-  return (
-    informationIds.length !== beforeIds.size ||
-    informationIds.some((id) => !beforeIds.has(id))
-  );
-};
-
-// 폼 필드 키 -> API 필드 키 (일시)
-const DATE_FIELD_MAP = [
-  ["startDateTime", "startsAt"],
-  ["endDateTime", "endsAt"],
-];
-
 // 기존 수정안 또는 요청과 비교해 변경된 필드만 전송
 export const patchEditService = (
   requestId,
@@ -107,24 +92,21 @@ export const patchEditService = (
   response,
   informationOptions,
 ) => {
-  const raw = response?.data ?? {};
-  const before = raw.latestProposal?.after ?? raw;
-  const payload = {};
+  // 수정 전 비교 기준을 폼과 같은 형태(startDateTime·endDateTime·location)로 가져온다.
+  // before는 기존 일정·장소를 의미
+  // 최근 수정안이 있으면 latestProposal.after, 없으면 원래 요청 값을 사용한다.
+  const before = getEditFormService(response).initialRequestForm;
 
-  for (const [formKey, apiKey] of DATE_FIELD_MAP) {
-    const date = toDateFromInput(requestForm[formKey]);
-    if (date && date.getTime() !== new Date(before[apiKey]).getTime()) {
-      payload[apiKey] = formatLocalDateTime(date);
-    }
-  }
+  // 여기의 informationIds는 PATCH 전송 시 변경 여부를 판단하는 비교 기준
+  // 서버가 selected로 표시한 기존에 선택된 항목만 남긴 뒤(filter), ID만 추출(map).
+  const informationIds = getEditFormService(response).initialInformationIds ?? flattenInformationItems(informationOptions)
+    .filter((item) => item.selected)
+    .map((item) => item.informationId);
 
-  if (requestForm.location !== before.place)
-    payload.place = requestForm.location;
-
-  const informationIds = toUniqueNumberIds(requestForm.informationIds);
-  if (hasInformationChanged(informationIds, informationOptions)) {
-    payload.informationIds = informationIds;
-  }
+  // 일정·장소 기준값(before)에 기존 공개 항목 ID를 합쳐 비교 기준 객체를 만든다.
+  // 현재 입력값(requestForm)과 비교해 바뀐 필드만 PATCH 요청 데이터로 만든다.
+  // 예: 장소만 바뀌면 { place: "새 장소" }, 공개 항목을 모두 해제하면 { informationIds: [] }.
+  const payload = getEditChanges(requestForm, { ...before, informationIds });
 
   return { requestId: Number(requestId), payload };
 };

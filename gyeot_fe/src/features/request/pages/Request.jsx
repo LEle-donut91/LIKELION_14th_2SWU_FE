@@ -17,6 +17,7 @@ import { useRequestNav } from "@/features/request/hooks/useRequestNav";
 import { useRequestTargetsQuery } from "@/features/request/hooks/queries/useRequestTargetsQuery";
 import { useSituationsQuery } from "@/features/request/hooks/queries/useSituationsQuery";
 import { useToast } from "@/shared/hooks/useToast";
+import { useInitialResponseDeadline } from "@/features/request/hooks/useInitialResponseDeadline";
 
 // Zustand Store
 import { useRequestFormStore } from "@/features/request/stores/useRequestFormStore";
@@ -24,6 +25,7 @@ import { useRequestErrorStore } from "@/features/request/stores/useRequestErrorS
 
 // Constants
 import { REQUEST_ROUTES } from "@/features/request/constants/routerConstants";
+import { INITIAL_FORM } from "@/features/request/constants/initialFormConstants";
 import { REQUEST_ERROR_TARGET_PAGE } from "@/features/request/constants/requestErrorConstants";
 import {
   REQUEST_FORM_FIELD_KEY,
@@ -35,12 +37,13 @@ import {
 } from "@/features/request/constants/dateTimeInputConstants";
 
 // Utils
+import { getDueDateForStart, toMinutes } from "@/features/request/utils/dueDateFormat";
 import {
   isReadOnly,
   isPrerequisiteEnsured,
-  validateInput,
+  requestValidateInput,
+  isDueDateEntered,
 } from "@/features/request/utils/validateInput";
-import { normalizeResponseDeadline } from "@/features/request/utils/dueDateUtils";
 import {
   getSelectedUser,
   getSelectedSituation,
@@ -74,24 +77,15 @@ function Request() {
   const [openSheet, setOpenSheet] = useState(() => {
     // 다른 페이지에서 전달 받은 에러 처리
     const { error } = useRequestErrorStore.getState();
-    return error?.targetPage === REQUEST_ERROR_TARGET_PAGE.REQUEST ? error.sheet ?? null : null;
+    if (error?.targetPage === REQUEST_ERROR_TARGET_PAGE.REQUEST) return error.sheet ?? null;
+    const state = useRequestFormStore.getState();
+    return String(state.entryId) === paramId && !state.form.situationId
+      ? REQUEST_SHEET.SITUATION
+      : null;
   });
   const locationInputRef = useRef(null);
   const contentInputRef = useRef(null);
   const closeSheet = () => setOpenSheet(null);
-
-  // 다른 페이지에서 전달 받은 에러 처리
-  useEffect(() => {
-    const { error, setError } = useRequestErrorStore.getState();
-    if (error?.targetPage !== REQUEST_ERROR_TARGET_PAGE.REQUEST) return;
-    setError(null);
-    if (error.field === REQUEST_FORM_FIELD_KEY.LOCATION) {
-      locationInputRef.current?.querySelector("input")?.focus();
-    }
-    if (error.field === REQUEST_FORM_FIELD_KEY.CONTENT) {
-      contentInputRef.current?.querySelector("textarea")?.focus();
-    }
-  }, []);
 
   // Zustand Store
   // 입력값 전체는 Zustand store의 form 하나
@@ -129,7 +123,27 @@ function Request() {
   // GET 요청 로딩중 상태
   const isLoading =
     isSituationsPending ||
-    isTargetsPending;
+    (Boolean(form.situationId) && isTargetsPending);
+
+  // 다른 페이지에서 전달 받은 에러 처리
+  useEffect(() => {
+    // 로딩중이면 무시
+    if (isLoading) return;
+
+    // 로딩 끝난 후 에러 처리
+    const { error, setError } = useRequestErrorStore.getState();
+    if (error?.targetPage !== REQUEST_ERROR_TARGET_PAGE.REQUEST) return;
+
+    if (error.field === REQUEST_FORM_FIELD_KEY.LOCATION) {
+      locationInputRef.current?.querySelector("input")?.focus();
+    }
+
+    if (error.field === REQUEST_FORM_FIELD_KEY.CONTENT) {
+      contentInputRef.current?.querySelector("textarea")?.focus();
+    }
+
+    setError(null);
+  }, [isLoading]);
 
   // 같은 진입(paramId)으로 돌아온 경우(예: 미리보기에서 뒤로가기) 입력값 유지
   // 다른 진입이면 새로 초기화 (초기값 전달)
@@ -146,6 +160,8 @@ function Request() {
       });
     }
   }, [entryId, paramId, initForm, situation]);
+
+  useInitialResponseDeadline(paramId, showToast, { preserveInitial: true });
 
   useEffect(() => {
     const selectedSituation = getSelectedSituation(situation, form.situationId);
@@ -187,16 +203,19 @@ function Request() {
   const handleFooterBtnClick = () => {
     // 입력값 유효성 검사 (첫 번째 에러 문구 하나만 토스트로)
     const now = new Date();
-    const errors = validateInput(form, now);
-    const [firstError] = Object.values(errors);
+    const result = requestValidateInput(form, now);
+    const [firstError] = Object.values(result.errors);
     if (firstError) {
+      // 시작 시간 초과 시 응답 기한에 null을 저장하기 위해 setForm 실행
+      // 다른 입력 오류처럼 폼이 그대로면 저장하지 않는다.
+      if (result.form !== form) setForm(result.form);
       showToast(firstError);
       return;
     }
     // [공개 정보 미리보기] 페이지로 이동
-    const normalized = normalizeResponseDeadline(form, now);
-    setForm(normalized.form);
-    handleGoNext(REQUEST_ROUTES.infoPreview(form.situationId));
+    setForm(result.form);
+    if (result.message) showToast(result.message);
+    handleGoNext(REQUEST_ROUTES.infoPreview(result.form.situationId));
   };
 
   return (
@@ -213,7 +232,8 @@ function Request() {
       <main className={styles.content}>
         {/* 상황 */}
         <SelectSection
-          title="상황 *"
+          title="상황"
+          isRequired
           text={getSelectedSituationText(situation, form.situationId)}
           width="large"
           onClick={() => setOpenSheet(REQUEST_SHEET.SITUATION)}
@@ -244,13 +264,15 @@ function Request() {
         {/* 시작 - 종료 */}
         <div className={styles.timeSectionContainer}>
           <SelectSection
-            title="시작 *"
+            title="시작"
+            isRequired
             text={getDateTimeText(form.startDateTime)}
             width="small"
             onClick={() => handleSubItemOpenSheet(REQUEST_SHEET.START)}
           />
           <SelectSection
-            title="종료 *"
+            title="종료"
+            isRequired
             text={getDateTimeText(form.endDateTime)}
             width="small"
             onClick={() => handleSubItemOpenSheet(REQUEST_SHEET.END)}
@@ -290,7 +312,8 @@ function Request() {
         {/* 선행 조건(상황/도움 종류를 모두 선택)을 만족했을 때만 입력 가능 (onFocus) */}
         <div ref={locationInputRef}>
           <InputSection
-            title="장소 *"
+            title="장소"
+            isRequired
             size="small"
             value={form.location}
             readOnly={isReadOnly(form)}
@@ -319,7 +342,8 @@ function Request() {
 
         {/* 요청 대상 */}
         <SelectSection
-          title="요청 대상 *"
+          title="요청 대상"
+          isRequired
           text={getSelectedUserText(user, form.userId)}
           width="large"
           onClick={() => handleSubItemOpenSheet(REQUEST_SHEET.USER)}
@@ -342,7 +366,8 @@ function Request() {
 
         {/* 응답 기한 */}
         <SelectSection
-          title="응답 기한 *"
+          title="응답 기한"
+          isRequired
           text={getDueDateText(form.dueDate)}
           width="large"
           onClick={() => handleSubItemOpenSheet(REQUEST_SHEET.DUE_DATE)}
@@ -351,7 +376,17 @@ function Request() {
           isOpen={openSheet === REQUEST_SHEET.DUE_DATE}
           onClose={closeSheet}
           value={form.dueDate}
-          onConfirm={(v) => setForm({ ...form, dueDate: v })}
+          onConfirm={(v) => {
+            // 1. 미입력·0분은 먼저 24시간으로 보정
+            const dueDate = !isDueDateEntered(v) || toMinutes(v) === 0 ? { ...INITIAL_FORM.dueDate } : v;
+
+            // 2. 현재 시각 + 입력 기한이 시작 시간을 초과하는지만 확인
+            const result = getDueDateForStart(form.startDateTime, dueDate);
+
+            // 조건 충족 시 null을 저장하고 토스트 출력. 아니면 입력된 기한을 그대로 저장하고 토스트 출력 X
+            setForm({ ...form, dueDate: result.dueDate });
+            if (result.message) showToast(result.message);
+          }}
         >
           {(temp, setTemp) => (
             <DateTimeOption

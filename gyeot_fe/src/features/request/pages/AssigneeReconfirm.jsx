@@ -51,7 +51,7 @@ function AssigneeReconfirm() {
   });
 
   // API 응답 데이터 (정제된 형태)
-  const { proposalId, userName, requestType, beforeInfoList, afterInfoList } =
+  const { proposalId, canReconfirm, userName, requestType, beforeInfoList, afterInfoList } =
     detail ?? {};
 
   // 2. 재확인 수락 / 재확인 거절 API
@@ -64,6 +64,7 @@ function AssigneeReconfirm() {
       setModalOpen(false);
       handleGoNext(REQUEST_ROUTES.home, true);
     },
+    onRejectError: () => setModalOpen(false), // 모달을 닫아 에러 토스트 메시지가 가려지지 않도록 처리
   });
 
   return (
@@ -116,7 +117,7 @@ function AssigneeReconfirm() {
           </main>
 
           {/* 하단 Footer */}
-          {proposalId && (
+          {proposalId && canReconfirm && (
             <SmallFooter
               leftType="tertiary"
               leftTitle="거절"
@@ -140,7 +141,7 @@ function AssigneeReconfirm() {
             }
             cancelTxt="돌아가기"
             confirmTxt="거절"
-            onConfirmClick={rejectReconfirmation}
+            onConfirmClick={() => canReconfirm && rejectReconfirmation()}
           />
         </>
       )}

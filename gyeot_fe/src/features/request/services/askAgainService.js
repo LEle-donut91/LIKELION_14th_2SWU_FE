@@ -3,9 +3,8 @@ import { USER_ORDER_STATE_TEXT } from "@/features/request/constants/requestDetai
 import { formatShortDateTimeRange } from "@/shared/utils/dateFormat";
 import { toDateTimeInput } from "@/features/request/utils/dateTimeFormat";
 import {
-  normalizeResponseDeadline,
   toMinutes,
-} from "@/features/request/utils/dueDateUtils";
+} from "@/features/request/utils/dueDateFormat";
 import {
   flattenInformationItems,
   toUniqueNumberIds,
@@ -39,8 +38,8 @@ export const getAskAgainDetailService = (response) => {
         raw.situation?.situationId != null
           ? String(raw.situation.situationId)
           : null,
-      situationStartDate: raw.situation?.startDate ?? null,
-      situationEndDate: raw.situation?.endDate ?? null,
+      situationStartDate: raw.situation?.startAt ?? null,
+      situationEndDate: raw.situation?.endAt ?? null,
       helpType: raw.helpType ?? null,
       startDateTime: toDateTimeInput(raw.startsAt),
       endDateTime: toDateTimeInput(raw.endsAt),
@@ -70,10 +69,8 @@ export const getAskAgainDetailService = (response) => {
 // [N-06] 다시 부탁하기 - 요청 API 요청 body 가공
 export const postAskAgainService = (
   requestId,
-  requestForm,
-  now = new Date(),
+  form,
 ) => {
-  const { form } = normalizeResponseDeadline(requestForm, now);
   return {
     requestId,
     payload: {

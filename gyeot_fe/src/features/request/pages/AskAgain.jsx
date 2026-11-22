@@ -20,6 +20,8 @@ import { useRequestDetailQuery } from "@/features/request/hooks/queries/useReque
 import { useRequestFormStore } from "@/features/request/stores/useRequestFormStore";
 import { useRequestErrorStore } from "@/features/request/stores/useRequestErrorStore";
 import { useToast } from "@/shared/hooks/useToast";
+import { useInitialResponseDeadline } from "@/features/request/hooks/useInitialResponseDeadline";
+import { useLiveDueDateFixed } from "@/features/request/hooks/useLiveDueDateFixed";
 
 // Services
 import {
@@ -32,16 +34,22 @@ import { REQUEST_ROUTES } from "@/features/request/constants/routerConstants";
 import { REQUEST_ERROR_TARGET_PAGE } from "@/features/request/constants/requestErrorConstants";
 import {
   REQUEST_SHEET,
-  ASK_AGAIN_VALIDATE_FIELDS_FLEXIBLE,
 } from "@/features/request/constants/requestFormConstants";
 import { DUE_DATE_SECTIONS } from "@/features/request/constants/dateTimeInputConstants";
+import { INITIAL_FORM } from "@/features/request/constants/initialFormConstants";
+import { FIXED_DUE_DATE_TOAST_MESSAGE } from "@/features/request/constants/messageConstants";
 
 // Utils
 import {
   isPrerequisiteEnsured,
-  validateInput,
+  askAgainValidateInput,
+  isDueDateEntered,
 } from "@/features/request/utils/validateInput";
-import { normalizeResponseDeadline } from "@/features/request/utils/dueDateUtils";
+import {
+  getDueDateForStart,
+  isDueDateFixed,
+  toMinutes,
+} from "@/features/request/utils/dueDateFormat";
 import {
   getSelectedUser,
   getSelectedUserText,
@@ -77,20 +85,31 @@ function AskAgain() {
   });
   const closeSheet = () => setOpenSheet(null);
 
-  // 1. 대상 후보 조회 API
-  const targetsQuery = useRequestTargetsQuery({ requestId: paramId }, { showToast });
-
-  // 2. 공개 정보 선택지 조회 API
-  const informationQuery = useInformationOptionsQuery(
-    { requestId: paramId },
-    { select: getAskAgainInformationService, enabled: Boolean(paramId), showToast },
-  );
-
-  // 3. 요청 상세 조회 API
+  // 1. 요청 상세 조회 API
   const detailQuery = useRequestDetailQuery(paramId, {
     showToast,
     select: getAskAgainDetailService,
   });
+
+  // 2. 공개 정보 선택지 조회 API (상세 조회의 도움 종류가 준비되면 조회)
+  const helpType = detailQuery.data?.initialForm?.helpType;
+  const informationQuery = useInformationOptionsQuery(
+    { helpType, requestId: paramId },
+    {
+      select: getAskAgainInformationService,
+      enabled: Boolean(helpType && paramId),
+      showToast,
+    },
+  );
+
+  // 3. 대상 후보 조회 API (상세 조회로 상황 ID가 준비되면 두 ID를 함께 보냄)
+  const targetsQuery = useRequestTargetsQuery(
+    {
+      situationId: detailQuery.data?.initialForm?.situationId,
+      requestId: paramId,
+    },
+    { showToast },
+  );
 
   // 다른 페이지에서 전달 받은 에러 처리
   useEffect(() => {
@@ -137,8 +156,16 @@ function AskAgain() {
     initForm(formEntryId, initialForm);
   }, [initialForm, entryId, formEntryId, initForm]);
 
+  useInitialResponseDeadline(formEntryId, showToast);
+  const dueDateFixed = useLiveDueDateFixed(formEntryId, showToast);
+
+
   // 항목 버튼 핸들러 (동작: 선택 시트 열기)
   const handleSubItemOpenSheet = (sheet) => {
+    if (sheet === REQUEST_SHEET.DUE_DATE && isDueDateFixed(form.startDateTime)) {
+      showToast(FIXED_DUE_DATE_TOAST_MESSAGE);
+      return;
+    }
     if (isPrerequisiteEnsured(form, showToast)) setOpenSheet(sheet);
   };
 
@@ -152,20 +179,22 @@ function AskAgain() {
   const handleNextBtnClick = () => {
     // 입력값 유효성 검사 (첫 번째 에러 문구 하나만 토스트로)
     const now = new Date();
-    const errors = validateInput(form, now, ASK_AGAIN_VALIDATE_FIELDS_FLEXIBLE);
-    const [firstError] = Object.values(errors);
+    const result = askAgainValidateInput(form, isDueDateFixed(form.startDateTime, now), now);
+    const [firstError] = Object.values(result.errors);
     if (firstError) {
+      // 기한 초과로 이동을 막는 경우에도 null은 저장해 "시작 시간까지"로 표시한다.
+      if (result.form !== form) setForm(result.form);
       showToast(firstError);
       return;
     }
 
-    const normalized = normalizeResponseDeadline(form, now);
-    setForm(normalized.form);
+    setForm(result.form);
+    if (result.message) showToast(result.message);
 
     // [공개 정보 미리보기] 페이지로 이동
     const searchParams = new URLSearchParams({ askAgain: paramId });
     handleGoNext(
-      `${REQUEST_ROUTES.infoPreview(normalized.form.situationId)}?${searchParams}`,
+      `${REQUEST_ROUTES.infoPreview(result.form.situationId)}?${searchParams}`,
     );
   };
 
@@ -240,15 +269,30 @@ function AskAgain() {
         <SelectSection
           title="응답 기한"
           isRequired
-          text={getDueDateText(form.dueDate)}
+          text={getDueDateText(form.dueDate, dueDateFixed)}
           width="large"
           onClick={() => handleSubItemOpenSheet(REQUEST_SHEET.DUE_DATE)}
         />
         <TimeSheet
-          isOpen={openSheet === REQUEST_SHEET.DUE_DATE}
+          isOpen={!dueDateFixed && openSheet === REQUEST_SHEET.DUE_DATE}
           onClose={closeSheet}
           value={form.dueDate}
-          onConfirm={(v) => setForm({ ...form, dueDate: v })}
+          onConfirm={(v) => {
+            if (isDueDateFixed(form.startDateTime)) {
+              setForm({ ...form, dueDate: null });
+              showToast(FIXED_DUE_DATE_TOAST_MESSAGE);
+              return;
+            }
+            // 1. 미입력·0분은 먼저 24시간으로 보정
+            const dueDate = !isDueDateEntered(v) || toMinutes(v) === 0 ? { ...INITIAL_FORM.dueDate } : v;
+            
+            // 2. 현재 시각 + 입력 기한이 시작 시간을 초과하는지만 확인
+            const result = getDueDateForStart(form.startDateTime, dueDate);
+            
+            // 조건 충족 시 null을 저장하고 토스트 출력. 아니면 입력된 기한을 그대로 저장하고 토스트 출력 X
+            setForm({ ...form, dueDate: result.dueDate });
+            if (result.message) showToast(result.message);
+          }}
         >
           {(temp, setTemp) => (
             <DateTimeOption
