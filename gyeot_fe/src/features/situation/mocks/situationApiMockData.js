@@ -40,6 +40,7 @@ export const IN_PROGRESS_SITUATION_ITEMS_MOCK = [
 
 // 지난 상황 목록 조회 (GET /api/situations/history) → data.items
 // - requestCount(요청 수)는 명세에 아직 없는 값 (BE 확인 필요)
+// - 사람별 보기(personId) 목업 필터는 PAST_SITUATION_PERSON_IDS_MOCK 사용
 export const PAST_SITUATION_ITEMS_MOCK = [
   {
     situationId: 11,
@@ -114,7 +115,33 @@ export const RELATIONSHIP_ITEMS_MOCK = [
     personalLabel: "이웃",
     guardianPriority: null,
   },
+  // 아직 상황(situationId 1)에 참여하지 않은 지인 (H-03-05 참여자 추가 확인용)
+  {
+    relationshipId: 4,
+    userId: 33,
+    name: "지민",
+    relationshipType: "MY_PERSON",
+    personalLabel: "동료",
+    guardianPriority: null,
+  },
+  {
+    relationshipId: 5,
+    userId: 34,
+    name: "도윤",
+    relationshipType: "MY_PERSON",
+    personalLabel: null,
+    guardianPriority: null,
+  },
 ];
+
+// 지난 상황별 함께한 사람 userId (목업 전용: 사람별 보기 personId 필터 확인용, 응답 필드 아님)
+// - 30: 서연, 31: 민재, 32: 하은 (RELATIONSHIP_ITEMS_MOCK 기준)
+export const PAST_SITUATION_PERSON_IDS_MOCK = {
+  11: [32],
+  12: [],
+  13: [30],
+  14: [30, 31],
+};
 
 // 상황 상세 조회 (GET /api/situations/{situationId}) → data
 // - key: situationId (1: 내가 정보 주인인 상황, 21: 내가 참여 중인 상황)
@@ -269,15 +296,227 @@ export const SITUATION_DETAIL_MOCK_BY_ID = {
 // - displayName, relationshipLabel은 명세 제안 필드
 export const SITUATION_PARTICIPANTS_MOCK_BY_ID = {
   1: [
-    { participantId: 1, userId: 10, role: "OWNER", status: "ACTIVE", joinedAt: "2026-11-10T09:00:00", leftAt: null, displayName: "나", relationshipLabel: null },
-    { participantId: 2, userId: 30, role: "PARTICIPANT", status: "ACTIVE", joinedAt: "2026-11-10T09:00:00", leftAt: null, displayName: "서연", relationshipLabel: "보호자" },
-    { participantId: 3, userId: 31, role: "PARTICIPANT", status: "ACTIVE", joinedAt: "2026-11-10T09:00:00", leftAt: null, displayName: "민재", relationshipLabel: null },
-    { participantId: 4, userId: 32, role: "PARTICIPANT", status: "ACTIVE", joinedAt: "2026-11-10T09:00:00", leftAt: null, displayName: "하은", relationshipLabel: null },
+    {
+      participantId: 1,
+      userId: 10,
+      role: "OWNER",
+      status: "ACTIVE",
+      joinedAt: "2026-11-10T09:00:00",
+      leftAt: null,
+      displayName: "나",
+      relationshipLabel: null,
+    },
+    {
+      participantId: 2,
+      userId: 30,
+      role: "PARTICIPANT",
+      status: "ACTIVE",
+      joinedAt: "2026-11-10T09:00:00",
+      leftAt: null,
+      displayName: "서연",
+      relationshipLabel: "보호자",
+    },
+    {
+      participantId: 3,
+      userId: 31,
+      role: "PARTICIPANT",
+      status: "ACTIVE",
+      joinedAt: "2026-11-10T09:00:00",
+      leftAt: null,
+      displayName: "민재",
+      relationshipLabel: null,
+    },
+    {
+      participantId: 4,
+      userId: 32,
+      role: "PARTICIPANT",
+      status: "ACTIVE",
+      joinedAt: "2026-11-10T09:00:00",
+      leftAt: null,
+      displayName: "하은",
+      relationshipLabel: null,
+    },
   ],
   21: [
-    { participantId: 11, userId: 40, role: "OWNER", status: "ACTIVE", joinedAt: "2026-11-01T09:00:00", leftAt: null, displayName: "지우", relationshipLabel: null },
-    { participantId: 12, userId: 30, role: "PARTICIPANT", status: "ACTIVE", joinedAt: "2026-11-01T09:00:00", leftAt: null, displayName: "서연", relationshipLabel: "보호자" },
-    { participantId: 13, userId: 20, role: "PARTICIPANT", status: "ACTIVE", joinedAt: "2026-11-01T09:00:00", leftAt: null, displayName: "나", relationshipLabel: null },
-    { participantId: 14, userId: 32, role: "PARTICIPANT", status: "ACTIVE", joinedAt: "2026-11-01T09:00:00", leftAt: null, displayName: "하은", relationshipLabel: null },
+    {
+      participantId: 11,
+      userId: 40,
+      role: "OWNER",
+      status: "ACTIVE",
+      joinedAt: "2026-11-01T09:00:00",
+      leftAt: null,
+      displayName: "지우",
+      relationshipLabel: null,
+    },
+    {
+      participantId: 12,
+      userId: 30,
+      role: "PARTICIPANT",
+      status: "ACTIVE",
+      joinedAt: "2026-11-01T09:00:00",
+      leftAt: null,
+      displayName: "서연",
+      relationshipLabel: "보호자",
+    },
+    {
+      participantId: 13,
+      userId: 20,
+      role: "PARTICIPANT",
+      status: "ACTIVE",
+      joinedAt: "2026-11-01T09:00:00",
+      leftAt: null,
+      displayName: "나",
+      relationshipLabel: null,
+    },
+    {
+      participantId: 14,
+      userId: 32,
+      role: "PARTICIPANT",
+      status: "ACTIVE",
+      joinedAt: "2026-11-01T09:00:00",
+      leftAt: null,
+      displayName: "하은",
+      relationshipLabel: null,
+    },
   ],
+};
+
+// 지난 상황 상세 조회 (GET /api/situations/{situationId}/history) → data
+// - key: situationId (지난 상황 목록 목업과 같은 ID)
+//   13, 12: 내가 정보 주인인 상황 / 11, 14: 내가 참여자로 도운 상황 (내가 담당했던 요청만)
+// - assigneeName: 미배정이면 null, 탈퇴한 담당자는 assigneeWithdrawn: true
+// - endsAt(요청 종료 시각)은 명세에 아직 없는 값 (BE 확인 중)
+export const PAST_SITUATION_DETAIL_MOCK_BY_ID = {
+  13: {
+    situation: {
+      situationId: 13,
+      name: "무릎 수술 회복",
+      status: "ENDED",
+      startAt: "2026-06-01T09:00:00",
+      endAt: "2026-06-20T18:00:00",
+      endedAt: "2026-06-18T10:30:00",
+      isOwner: true,
+      participantCount: 3,
+    },
+    requests: [
+      {
+        requestId: 401,
+        helpType: "HOSPITAL",
+        status: "COMPLETED",
+        startsAt: "2026-06-03T11:00:00",
+        endsAt: "2026-06-03T20:00:00",
+        assigneeId: 31,
+        assigneeName: "민재",
+        assigneeWithdrawn: false,
+        hasThankYouMessage: false,
+      },
+      {
+        requestId: 402,
+        helpType: "MEAL",
+        status: "COMPLETED",
+        startsAt: "2026-06-05T12:00:00",
+        endsAt: "2026-06-05T13:00:00",
+        assigneeId: 32,
+        assigneeName: "하은",
+        assigneeWithdrawn: false,
+        hasThankYouMessage: true,
+      },
+      {
+        requestId: 403,
+        helpType: "GROCERY",
+        status: "CANCELED",
+        startsAt: "2026-06-05T10:00:00",
+        endsAt: "2026-06-05T12:00:00",
+        assigneeId: 35,
+        assigneeName: "탈퇴한 사용자",
+        assigneeWithdrawn: true,
+        hasThankYouMessage: false,
+      },
+      {
+        requestId: 404,
+        helpType: "PET_CARE",
+        status: "EXPIRED",
+        startsAt: "2026-06-10T09:00:00",
+        endsAt: "2026-06-10T18:00:00",
+        assigneeId: null,
+        assigneeName: null,
+        assigneeWithdrawn: false,
+        hasThankYouMessage: false,
+      },
+    ],
+  },
+  12: {
+    situation: {
+      situationId: 12,
+      name: "출장 부재",
+      status: "ENDED",
+      startAt: "2026-07-01T09:00:00",
+      endAt: "2026-07-08T18:00:00",
+      endedAt: "2026-07-08T18:00:00",
+      isOwner: true,
+      participantCount: 0,
+    },
+    requests: [],
+  },
+  11: {
+    situation: {
+      situationId: 11,
+      name: "감기 회복",
+      status: "ENDED",
+      startAt: "2026-08-10T09:00:00",
+      endAt: "2026-08-17T18:00:00",
+      endedAt: "2026-08-17T18:00:00",
+      isOwner: false,
+      participantCount: 2,
+    },
+    requests: [
+      {
+        requestId: 501,
+        helpType: "HOSPITAL",
+        status: "COMPLETED",
+        startsAt: "2026-08-11T11:00:00",
+        endsAt: "2026-08-11T15:00:00",
+        assigneeId: 20,
+        assigneeName: "나",
+        assigneeWithdrawn: false,
+        hasThankYouMessage: true,
+      },
+      {
+        requestId: 502,
+        helpType: "GROCERY",
+        status: "CANCELED",
+        startsAt: "2026-08-13T10:00:00",
+        endsAt: "2026-08-13T12:00:00",
+        assigneeId: 20,
+        assigneeName: "나",
+        assigneeWithdrawn: false,
+        hasThankYouMessage: false,
+      },
+    ],
+  },
+  14: {
+    situation: {
+      situationId: 14,
+      name: "병원 검사",
+      status: "ENDED",
+      startAt: "2026-05-03T09:00:00",
+      endAt: "2026-05-04T18:00:00",
+      endedAt: "2026-05-04T18:00:00",
+      isOwner: false,
+      participantCount: 1,
+    },
+    requests: [
+      {
+        requestId: 601,
+        helpType: "HOSPITAL",
+        status: "COMPLETED",
+        startsAt: "2026-05-03T13:00:00",
+        endsAt: null,
+        assigneeId: 20,
+        assigneeName: "나",
+        assigneeWithdrawn: false,
+        hasThankYouMessage: false,
+      },
+    ],
+  },
 };

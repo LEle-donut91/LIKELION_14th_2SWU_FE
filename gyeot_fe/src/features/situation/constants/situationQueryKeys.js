@@ -19,5 +19,13 @@ export const SITUATION_QUERY_KEYS = {
   detail: (situationId, params) => ["situation", "detail", String(situationId), params],
 
   // 5. 참여자 목록 (GET /api/situations/{situationId}/participants) — H-03 상황 상세, H-03-05 상황 관리
-  participants: (situationId) => ["situation", "participants", String(situationId)],
+  // 6. 지난 상황 상세 (GET /api/situations/{situationId}/history) — N-04 지난 상황 상세
+  pastDetail: (situationId) => ["situation", "pastDetail", String(situationId)],
+
+  participants: (situationId, params) => [
+    "situation",
+    "participants",
+    String(situationId),
+    params,
+  ],
 };

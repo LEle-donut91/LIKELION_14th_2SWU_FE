@@ -29,7 +29,11 @@ function PastSituationCard({ situation, onClick }) {
           className={`${styles.meta} typoCaptionMedium`}
           items={[
             formatMonthDayDashRange(startDate, endDate),
-            isOwner ? `참여자 ${participantCount}명` : `${ownerName}님의 상황`,
+            // 값이 없으면 해당 문구 숨김 (지난 상황 상세는 주인 이름이 아직 응답에 없음)
+            isOwner
+              ? typeof participantCount === "number" &&
+                `참여자 ${participantCount}명`
+              : ownerName && `${ownerName}님의 상황`,
           ]}
         />
       </span>

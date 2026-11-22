@@ -1,5 +1,5 @@
 // H-04 지난 상황
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import styles from "@/features/situation/pages/PastSituation.module.css";
 import SubpageHeader from "@/shared/components/subpage-header/SubpageHeader"; // 팀 공통 서브 헤더
@@ -10,47 +10,70 @@ import PastSituationFilterTabs from "@/features/situation/components/PastSituati
 import PastSituationCard from "@/features/situation/components/PastSituationCard";
 import PersonRadioOption from "@/features/situation/components/PersonRadioOption";
 import resImgNew from "@/shared/assets/images/resImgNew.png";
+import DefaultToast from "@/shared/components/Toast/DefaultToast";
+import { useToast } from "@/shared/hooks/useToast";
+import { getErrorMessage } from "@/shared/utils/apiError";
 import {
   PAST_SITUATION_ALL_PERSON_TEXT,
+  PAST_SITUATION_DEFAULT_FILTER,
   SITUATION_NAVIGATION_PATH,
 } from "@/features/situation/constants/situationConstants";
-import {
-  PAST_SITUATION_LIST_MOCK,
-  PAST_SITUATION_PERSON_LIST_MOCK,
-} from "@/features/situation/mocks/situationMockData";
-
-// 탭별로 보여줄 상황 (도와준: 내가 참여자, 도움받은: 내가 정보 주인)
-const isMatchedTab = (situation, tabKey) => {
-  if (tabKey === "HELPED") return !situation.isOwner;
-  if (tabKey === "RECEIVED") return situation.isOwner;
-  return true;
-};
+import { SITUATION_MOCK_SCENARIO } from "@/features/situation/api/situationApi";
+import { useAllPastSituationsQuery } from "@/features/situation/hooks/queries/useAllPastSituationsQuery";
+import { usePastSituationsQuery } from "@/features/situation/hooks/queries/usePastSituationsQuery";
+import { usePastSituationPeopleQuery } from "@/features/situation/hooks/queries/usePastSituationPeopleQuery";
 
 function PastSituation() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  // TODO: 지난 상황 목록 API 연동 전까지 목업 데이터 사용 (필터도 API 파라미터로 대체)
-  // 화면 확인용: ?state=empty (종료된 상황이 없는 경우)
-  const isEmptyPreview = searchParams.get("state") === "empty";
-  const pastSituationList = isEmptyPreview ? [] : PAST_SITUATION_LIST_MOCK;
-  const personList = PAST_SITUATION_PERSON_LIST_MOCK;
+  const { toast, showToast, hideToast } = useToast();
 
-  const [selectedTabKey, setSelectedTabKey] = useState("ALL");
+  // 빈 상태 확인용: ?state=empty (종료된 상황이 없는 경우, 목업 사용 중일 때만 적용)
+  const mockScenario =
+    searchParams.get("state") === "empty" ? SITUATION_MOCK_SCENARIO.EMPTY : undefined;
+
+  const [selectedTabKey, setSelectedTabKey] = useState(PAST_SITUATION_DEFAULT_FILTER);
   const [selectedPersonId, setSelectedPersonId] = useState(null);
   const [isPersonSheetOpen, setIsPersonSheetOpen] = useState(false);
 
-  const selectedPerson = personList.find(({ id }) => id === selectedPersonId);
-  const filteredSituationList = pastSituationList.filter(
-    (situation) =>
-      isMatchedTab(situation, selectedTabKey) &&
-      (selectedPersonId === null ||
-        situation.personIds.includes(selectedPersonId)),
-  );
+  // 탭(filter) · 사람(personId) 조건은 서버에서 걸러서 받음
+  const pastSituationsQuery = useAllPastSituationsQuery({
+    filter: selectedTabKey,
+    personId: selectedPersonId,
+    mockScenario,
+  });
+  const peopleQuery = usePastSituationPeopleQuery();
+  // 종료된 상황이 하나라도 있는지 (탭 · 사람 조건과 상관없이 1건만 확인)
+  const anyPastSituationQuery = usePastSituationsQuery({
+    page: 0,
+    size: 1,
+    mockScenario,
+  });
 
-  const handleSituationClick = () => {
-    // TODO: 상황 id를 담아 지난 상황 상세(N-04)로 이동
-    navigate(SITUATION_NAVIGATION_PATH.PAST_SITUATION_DETAIL);
+  const pastSituationList = pastSituationsQuery.data?.pastSituations ?? [];
+  const personList = peopleQuery.data?.people ?? [];
+  const selectedPerson = personList.find(({ id }) => id === selectedPersonId);
+
+  // 조회 실패 시 안내 토스트
+  const queryError = pastSituationsQuery.error ?? peopleQuery.error;
+  useEffect(() => {
+    if (queryError) showToast(getErrorMessage(queryError));
+  }, [queryError, showToast]);
+
+  // 조회가 끝나고 결과가 없을 때만 빈 상태 (로딩 중에는 표시하지 않음)
+  const isListEmpty = pastSituationsQuery.isSuccess && pastSituationList.length === 0;
+  // 종료된 상황이 하나도 없으면 어느 탭에서든 사람 별 보기 없이 안내만 (H-04 빈상태)
+  const hasNoPastSituation =
+    anyPastSituationQuery.isSuccess &&
+    anyPastSituationQuery.data.pastSituations.length === 0;
+
+  // 지난 상황 상세(N-04)로 이동 — 상세 응답에 아직 없는 주인 이름은 state로 함께 전달
+  const handleSituationClick = ({ id, ownerName }) => {
+    navigate(
+      `${SITUATION_NAVIGATION_PATH.PAST_SITUATION_DETAIL}?situationId=${id}`,
+      { state: { ownerName } },
+    );
   };
 
   return (
@@ -64,7 +87,7 @@ function PastSituation() {
         />
 
         {/* 종료된 상황이 하나도 없으면 사람 별 보기 없이 안내만 (H-04 빈상태) */}
-        {pastSituationList.length > 0 && (
+        {!hasNoPastSituation && (
           <SelectSection
             title="사람 별 보기"
             text={selectedPerson?.name ?? PAST_SITUATION_ALL_PERSON_TEXT}
@@ -74,18 +97,19 @@ function PastSituation() {
           />
         )}
 
-        {filteredSituationList.length > 0 ? (
+        {pastSituationList.length > 0 && (
           <ul className={styles.situationList}>
-            {filteredSituationList.map((situation) => (
+            {pastSituationList.map((situation) => (
               <li key={situation.id}>
                 <PastSituationCard
                   situation={situation}
-                  onClick={handleSituationClick}
+                  onClick={() => handleSituationClick(situation)}
                 />
               </li>
             ))}
           </ul>
-        ) : (
+        )}
+        {isListEmpty && (
           <div className={styles.emptyState}>
             <IllustrationMessage
               imageSrc={resImgNew}
@@ -111,6 +135,10 @@ function PastSituation() {
           />
         )}
       </DefaultSheet>
+
+      {toast && (
+        <DefaultToast key={toast.id} message={toast.message} onHide={hideToast} />
+      )}
     </div>
   );
 }

@@ -74,7 +74,7 @@ export const getSituationDetailService = (raw) => {
 // 2. 참여자 목록 조회 → 상단 카드 · 참여자 태그 데이터
 // - OWNER는 태그에서 빼고 이름만 ownerName으로 (참여자 시점 "OO님의 상황")
 // - 현재 참여 중(ACTIVE)인 사람만 표시
-// → { ownerName, participants: [{ id, userId, name, isGuardian }] }
+// → { ownerName, participants: [{ id(participantId), userId, name, relationLabel, isGuardian }] }
 export const getSituationParticipantsService = (raw) => {
   const items = (raw?.data?.items ?? []).filter(
     (item) => item.status === PARTICIPANT_STATUS.ACTIVE,
@@ -89,6 +89,7 @@ export const getSituationParticipantsService = (raw) => {
         id: item.participantId,
         userId: item.userId,
         name: item.displayName ?? "",
+        relationLabel: item.relationshipLabel ?? "", // 로그인 사용자 기준 관계 (예: 보호자)
         isGuardian: item.relationshipLabel === GUARDIAN_RELATIONSHIP_LABEL,
       })),
   };
