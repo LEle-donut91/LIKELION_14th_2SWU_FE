@@ -1,11 +1,9 @@
 import { REQUEST_API_URLS, INFO_SHARE_API_URLS, SITUATION_API_URLS } from "@/shared/constants/apiUrlConstants";
 import { axiosInstance } from "@/shared/api/axiosInstance";
 
-// 진행 중 상황 목록 조회
-export const getSituationApi = async ({ page = 0, size = 20 } = {}) => {
-  const response = await axiosInstance.get(SITUATION_API_URLS.inProgressList, {
-    params: { page, size },
-  });
+// 홈 통합 조회 API (요청 작성 시 상황 목록을 가져오기 위함)
+export const getHomeApi = async () => {
+  const response = await axiosInstance.get(SITUATION_API_URLS.home);
   return response.data;
 };
 
