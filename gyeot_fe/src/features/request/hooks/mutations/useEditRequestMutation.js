@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { patchEditApi } from "@/features/request/api/patchApi";
 import { patchEditService } from "@/features/request/services/editRequestService";
+import { useRefreshInformationSelection } from "@/features/request/hooks/useRefreshInformationSelection";
 import { NO_CHANGE_TOAST_MESSAGE } from "@/features/request/constants/messageConstants";
 import { getErrorCode, getErrorMessage } from "@/shared/utils/apiError";
 import { COMMON_ERROR_CODE, REQUEST_ERROR_CODE, INFO_SHARE_ERROR_CODE } from "@/shared/constants/errorCodeConstants";
@@ -25,6 +26,7 @@ export function useEditRequestMutation({
   onRefreshInformation,
 }) {
   const { handleGoBack, handleGoBackTwice } = useRequestNav();
+  const refreshInformationSelection = useRefreshInformationSelection(onRefreshInformation);
   const setError = useRequestErrorStore((state) => state.setError);
   const resetForm = useRequestFormStore((state) => state.resetForm);
   // main.jsx의 QueryClientProvider에 등록된 같은 클라이언트를 가져온다.
@@ -87,7 +89,7 @@ export function useEditRequestMutation({
           returnToStartTimeSheet();
           break;
         case INFO_SHARE_ERROR_CODE.SAFETY_INFO_INVALID_SELECTION:
-          return onRefreshInformation();
+          return refreshInformationSelection();
       }
     },
   });

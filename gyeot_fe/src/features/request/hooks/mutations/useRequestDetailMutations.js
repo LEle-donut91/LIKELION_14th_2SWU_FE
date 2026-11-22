@@ -6,7 +6,7 @@ import {
   postEditWithdrawApi,
   postResponseApi,
 } from "@/features/request/api/postApi";
-import { REQUEST_QUERY_KEYS } from "@/features/request/constants/requestQueryKeys";
+import { invalidateRequestQueries } from "@/features/request/hooks/queries/invalidateRequestQueries";
 import { useCancelRequestMutation } from "@/features/request/hooks/mutations/useCancelRequestMutation";
 import { useRequestNav } from "@/features/request/hooks/useRequestNav";
 import { COMMON_ERROR_CODE, REQUEST_ERROR_CODE } from "@/shared/constants/errorCodeConstants";
@@ -26,12 +26,8 @@ export function useRequestDetailMutations(
   const queryClient = useQueryClient();
   const { handleGoBack } = useRequestNav();
 
-  // "도움 요청 상세 조회" API 다시 호출
-  const refreshDetail = () =>
-    // 캐시된 데이터를 stale(만료된) 상태로 만들고, 데이터를 다시 불러옴(refetch) 
-    queryClient.invalidateQueries({
-      queryKey: REQUEST_QUERY_KEYS.detail(requestId),
-    });
+  // 상세와 해당 요청의 공개 항목 선택지를 함께 갱신한다.
+  const refreshDetail = () => invalidateRequestQueries(queryClient, requestId);
 
   // 에러 메시지를 토스트로 출력
   const onError = (error) => showToast(getErrorMessage(error));
@@ -47,11 +43,12 @@ export function useRequestDetailMutations(
     mutationFn: postAcceptWithdrawApi,
 
     // API 호출 성공 시
-    onSuccess: (result) => {
+    onSuccess: async (result) => {
       // null이 아닐 때만 성공 응답 메시지 출력
       if (result.message) {
         showToast(result.message);
       }
+      await refreshDetail();
       onAcceptanceWithdrawn(); // 인자로 받은 함수 실행 (홈으로 이동)
     },
 

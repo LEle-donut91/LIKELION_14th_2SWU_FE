@@ -1,4 +1,5 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { invalidateRequestQueries } from "@/features/request/hooks/queries/invalidateRequestQueries";
 import {
   postReconfirmAcceptApi,
   postReconfirmRejectApi,
@@ -20,6 +21,7 @@ export function useReconfirmMutations({
   onRejectError,
 }) {
   const { handleGoBack } = useRequestNav();
+  const queryClient = useQueryClient();
   const onError = (error) => showToast(getErrorMessage(error)); // 에러 토스트 메시지 출력
 
   // 재확인 수락 API
@@ -27,11 +29,12 @@ export function useReconfirmMutations({
     mutationFn: postReconfirmAcceptApi,
 
     // API 호출 성공 시
-    onSuccess: (result) => {
+    onSuccess: async (result) => {
       if (result.message) {
         // null이 아닐 때만 토스트 메시지 출력
         showToast(result.message);
       }
+      await invalidateRequestQueries(queryClient, requestId);
       onAccepted(); // 콜백 실행 (이전 페이지로 이동)
     },
 
@@ -64,11 +67,12 @@ export function useReconfirmMutations({
     mutationFn: postReconfirmRejectApi,
 
     // API 호출 성공 시
-    onSuccess: (result) => {
+    onSuccess: async (result) => {
       // null이 아닐 때만 토스트 메시지 출력
       if (result.message) {
         showToast(result.message);
       }
+      await invalidateRequestQueries(queryClient, requestId);
       onRejected(); // 콜백 실행 (모달 닫고 홈으로 이동)
     },
 

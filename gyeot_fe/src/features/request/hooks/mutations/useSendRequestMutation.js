@@ -1,4 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
+import { useRefreshInformationSelection } from "@/features/request/hooks/useRefreshInformationSelection";
 import {
   postCareRequestApi,
   postAskAgainApi,
@@ -31,6 +32,7 @@ export function useSendRequestMutation({
   onRefreshInformation,
 }) {
   const { handleGoBack, handleGoNext } = useRequestNav();
+  const refreshInformationSelection = useRefreshInformationSelection(onRefreshInformation);
   const setError = useRequestErrorStore((state) => state.setError);
 
   const returnFromCreation = (correction) => {
@@ -94,8 +96,7 @@ export function useSendRequestMutation({
             returnFromReassignment({ sheet: REQUEST_SHEET.DUE_DATE });
             break;
           case INFO_SHARE_ERROR_CODE.SAFETY_INFO_INVALID_SELECTION:
-            onRefreshInformation();
-            break;
+            return refreshInformationSelection();
         }
         return;
       }
@@ -121,8 +122,7 @@ export function useSendRequestMutation({
           returnFromCreation({ sheet: REQUEST_SHEET.DUE_DATE });
           break;
         case INFO_SHARE_ERROR_CODE.SAFETY_INFO_INVALID_SELECTION:
-          onRefreshInformation();
-          break;
+          return refreshInformationSelection();
         case REQUEST_ERROR_CODE.REQUEST_PLACE_TOO_LONG:
           returnFromCreation({ field: REQUEST_FORM_FIELD_KEY.LOCATION });
           break;
