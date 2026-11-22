@@ -1,5 +1,7 @@
 .requestToast {
   position: absolute;
+  width: max-content;
+  max-width: calc(100% - 32px);
   left: 50%;
   bottom: 0px;
   margin: 46px 0 44px;
