@@ -1,11 +1,8 @@
 import { formatDateRange } from "@/shared/utils/dateFormat";
-import { SITUATION_STATUS } from "@/features/request/constants/enumConstants";
 
-
-// 진행 중 상황 목록 조회 - 응답 데이터 가공
+// 홈 통합 조회 API 관련 (요청 작성 시 상황 목록을 가져오기 위함)
 export const getSituationService = (raw) => ({
-  situation: (raw?.data?.items ?? [])
-    .filter((item) => item.status === SITUATION_STATUS.ACTIVE)
+  situation: (raw?.data?.situationCards?.my ?? [])
     .map((item) => ({
       id: String(item.situationId),
       title: item.name,
