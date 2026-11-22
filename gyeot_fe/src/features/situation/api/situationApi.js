@@ -11,6 +11,7 @@ import {
   PAST_SITUATION_DETAIL_MOCK_BY_ID,
   PAST_SITUATION_ITEMS_MOCK,
   PAST_SITUATION_PERSON_IDS_MOCK,
+  PAST_SITUATION_PERSON_NAME_MOCK,
   RELATIONSHIP_ITEMS_MOCK,
   SITUATION_DETAIL_MOCK_BY_ID,
   SITUATION_PARTICIPANTS_MOCK_BY_ID,
@@ -39,18 +40,34 @@ export const SITUATION_MOCK_SCENARIO = {
 // → data: { items: [{ situationId, name, situationType, startAt, endAt, status,
 //                     participantCount, isOwner, role, requestCounts, nextSchedule, remainingScheduleCount }],
 //           page, size, hasNext }
-export const getInProgressSituationsApi = async ({ page = 0, size = 20, mockScenario } = {}) => {
+export const getInProgressSituationsApi = async ({
+  page = 0,
+  size = 20,
+  mockScenario,
+} = {}) => {
   if (USE_MOCK) {
     await wait();
     const items =
-      mockScenario === SITUATION_MOCK_SCENARIO.EMPTY ? [] : IN_PROGRESS_SITUATION_ITEMS_MOCK;
-    return createMockResponse(structuredClone(paginateMockItems(items, { page, size })));
+      mockScenario === SITUATION_MOCK_SCENARIO.EMPTY
+        ? []
+        : IN_PROGRESS_SITUATION_ITEMS_MOCK;
+    return createMockResponse(
+      structuredClone(paginateMockItems(items, { page, size })),
+    );
   }
 
   const response = await axiosInstance.get(SITUATION_API_URLS.inProgressList, {
     params: { page, size },
   });
   return response.data;
+};
+
+// 목업 전용: 탭 필터 (실제 서버는 C 완료 요청에서 내가 담당자면 HELPED, 요청자면 RECEIVED)
+// - 목업은 간단히 도와준 = 내가 참여자, 도움받은 = 내가 정보 주인으로 나눔
+const isMatchedPastFilterMock = (item, filter) => {
+  if (filter === "HELPED") return !item.isOwner;
+  if (filter === "RECEIVED") return item.isOwner;
+  return true;
 };
 
 // 2. 지난 상황 목록 조회 (GET /api/situations/history?page&size&filter&personId)
@@ -70,15 +87,15 @@ export const getPastSituationsApi = async ({
       mockScenario === SITUATION_MOCK_SCENARIO.EMPTY
         ? []
         : PAST_SITUATION_ITEMS_MOCK.filter((item) => {
-            // filter: 도와준(HELPED) = 내가 참여자, 도움받은(RECEIVED) = 내가 정보 주인
-            if (filter === "HELPED" && item.isOwner) return false;
-            if (filter === "RECEIVED" && !item.isOwner) return false;
+            if (!isMatchedPastFilterMock(item, filter)) return false;
             if (personId == null) return true;
-            return (PAST_SITUATION_PERSON_IDS_MOCK[item.situationId] ?? []).includes(
-              Number(personId),
-            );
+            return (
+              PAST_SITUATION_PERSON_IDS_MOCK[item.situationId] ?? []
+            ).includes(Number(personId));
           });
-    return createMockResponse(structuredClone(paginateMockItems(items, { page, size })));
+    return createMockResponse(
+      structuredClone(paginateMockItems(items, { page, size })),
+    );
   }
 
   const response = await axiosInstance.get(SITUATION_API_URLS.pastList, {
@@ -93,7 +110,11 @@ export const getPastSituationsApi = async ({
 export const createSituationApi = async (body) => {
   if (USE_MOCK) {
     await wait();
-    return createMockResponse({ situationId: 100, creatorId: 10, status: "ACTIVE" });
+    return createMockResponse({
+      situationId: 100,
+      creatorId: 10,
+      status: "ACTIVE",
+    });
   }
 
   const response = await axiosInstance.post(SITUATION_API_URLS.create, body);
@@ -112,7 +133,10 @@ const SITUATION_NOT_FOUND_MOCK_ERROR = {
 //           startAt, endAt, status, endedAt, activeRequestCount,
 //           requests: [{ requestId, requestType, helpType, startsAt, endsAt,
 //                        requesterId, targetUserId, displayStatus, targetUserName }] }
-export const getSituationDetailApi = async (situationId, { mockScenario } = {}) => {
+export const getSituationDetailApi = async (
+  situationId,
+  { mockScenario } = {},
+) => {
   if (USE_MOCK) {
     await wait();
     const data = SITUATION_DETAIL_MOCK_BY_ID[situationId];
@@ -132,7 +156,9 @@ export const getSituationDetailApi = async (situationId, { mockScenario } = {}) 
     return createMockResponse(responseData);
   }
 
-  const response = await axiosInstance.get(SITUATION_API_URLS.detail(situationId));
+  const response = await axiosInstance.get(
+    SITUATION_API_URLS.detail(situationId),
+  );
   return response.data;
 };
 
@@ -149,7 +175,10 @@ const INITIAL_MOCK_PARTICIPANT_IDS = new Set(
 // 5. 참여자 목록 조회 (GET /api/situations/{situationId}/participants)
 // → data: { items: [{ participantId, userId, role, status, joinedAt, leftAt,
 //                     displayName, relationshipLabel }] }
-export const getSituationParticipantsApi = async (situationId, { mockScenario } = {}) => {
+export const getSituationParticipantsApi = async (
+  situationId,
+  { mockScenario } = {},
+) => {
   if (USE_MOCK) {
     await wait();
     const items = mockParticipantsById[situationId];
@@ -172,7 +201,9 @@ export const getSituationParticipantsApi = async (situationId, { mockScenario } 
     return createMockResponse(structuredClone({ items: responseItems }));
   }
 
-  const response = await axiosInstance.get(SITUATION_API_URLS.participants(situationId));
+  const response = await axiosInstance.get(
+    SITUATION_API_URLS.participants(situationId),
+  );
   return response.data;
 };
 
@@ -234,7 +265,10 @@ export const addSituationParticipantApi = async (situationId, { userId }) => {
 
 // 7. 참여자 제외 (DELETE /api/situations/{situationId}/participants/{participantId})
 // - 정보 주인만 가능, 정보 주인(OWNER)은 제외 불가
-export const removeSituationParticipantApi = async (situationId, participantId) => {
+export const removeSituationParticipantApi = async (
+  situationId,
+  participantId,
+) => {
   if (USE_MOCK) {
     await wait();
     const items = mockParticipantsById[situationId];
@@ -270,7 +304,9 @@ export const endSituationApi = async (situationId) => {
     });
   }
 
-  const response = await axiosInstance.post(SITUATION_API_URLS.end(situationId));
+  const response = await axiosInstance.post(
+    SITUATION_API_URLS.end(situationId),
+  );
   return response.data;
 };
 
@@ -282,7 +318,9 @@ export const leaveSituationApi = async (situationId) => {
     return createMockResponse(null);
   }
 
-  const response = await axiosInstance.post(SITUATION_API_URLS.leave(situationId));
+  const response = await axiosInstance.post(
+    SITUATION_API_URLS.leave(situationId),
+  );
   return response.data;
 };
 
@@ -299,6 +337,44 @@ export const getPastSituationDetailApi = async (situationId) => {
     return createMockResponse(structuredClone(data));
   }
 
-  const response = await axiosInstance.get(SITUATION_API_URLS.pastDetail(situationId));
+  const response = await axiosInstance.get(
+    SITUATION_API_URLS.pastDetail(situationId),
+  );
+  return response.data;
+};
+
+// 11. 지난 상황 사람 목록 조회 (GET /api/situations/history/people?filter)
+// - H-04 사람 별 보기 시트의 선택지. 지난 요청 이력에 등장한 상대 기준 (관계가 끝난 사람도 포함)
+// - filter: 지난 상황 목록과 같은 탭 값 (ALL / HELPED / RECEIVED)
+// → data: { items: [{ userId, name }] }
+export const getPastSituationPeopleApi = async ({
+  filter,
+  mockScenario,
+} = {}) => {
+  if (USE_MOCK) {
+    await wait();
+    const userIdSet = new Set(
+      mockScenario === SITUATION_MOCK_SCENARIO.EMPTY
+        ? []
+        : PAST_SITUATION_ITEMS_MOCK.filter((item) =>
+            isMatchedPastFilterMock(item, filter),
+          ).flatMap(
+            (item) => PAST_SITUATION_PERSON_IDS_MOCK[item.situationId] ?? [],
+          ),
+    );
+    const items = [...userIdSet].map((userId) => ({
+      userId,
+      name: PAST_SITUATION_PERSON_NAME_MOCK[userId] ?? "",
+    }));
+    return createMockResponse({ items });
+  }
+
+  // 지난 상황 목록 주소(/api/situations/history) 아래 /people
+  const response = await axiosInstance.get(
+    `${SITUATION_API_URLS.pastList}/people`,
+    {
+      params: { filter },
+    },
+  );
   return response.data;
 };

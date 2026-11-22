@@ -1,4 +1,3 @@
-import { getParticipantCandidatesService } from "@/features/situation/services/situationCreateService";
 import {
   HELP_TYPE_LABEL,
   SITUATION_REQUEST_COUNT_TAGS,
@@ -89,13 +88,14 @@ export const getPastSituationsService = (raw) => ({
   hasNext: raw?.data?.hasNext ?? false,
 });
 
-// 3. 활성 관계 목록 → H-04 사람 선택 시트 (PersonRadioOption)
+// 3. 지난 상황 사람 목록 → H-04 사람 선택 시트 (PersonRadioOption)
 // - id: 지난 상황 목록 조회 personId로 보낼 사용자 ID(userId)
-// - 사람 목록을 어디서 받을지는 명세에서 아직 미정이라 현재 활성 관계 목록을 임시로 사용
-//   (해제된 과거 관계는 목록에 없을 수 있음)
+// - 지난 요청 이력 기준 목록이라 보호자 구분 값이 없어 보호자 표시는 하지 않음
 // → { people: [{ id, name, isGuardian }] }
 export const getPastSituationPeopleService = (raw) => ({
-  people: getParticipantCandidatesService(raw).people.map(
-    ({ id, name, isGuardian }) => ({ id, name, isGuardian }),
-  ),
+  people: (raw?.data?.items ?? []).map(({ userId, name }) => ({
+    id: userId,
+    name: name ?? "",
+    isGuardian: false,
+  })),
 });
