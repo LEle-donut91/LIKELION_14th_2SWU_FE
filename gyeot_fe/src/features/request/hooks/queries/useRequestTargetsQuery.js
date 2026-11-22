@@ -11,18 +11,20 @@ import { useRequestNav } from "@/features/request/hooks/useRequestNav";
 
 /**
  * 대상 후보 조회
- *  - 현재 경로에 따라 요청 작성은 { situationId }, 다시 부탁하기는 { situationId, requestId } 전송
+ *  - 요청 작성·상세 복제는 { situationId }, 다시 부탁하기는 { situationId, requestId } 전송
  *  - 화면에 필요한 ID가 모두 준비되면 조회하며, 전송 값이 바뀌면 자동으로 다시 조회
  *  - 상황이 유효하지 않으면 전달받은 콜백으로 요청 작성 화면의 시트를 연다.
+ *  - 상세 복제는 enabled: false로 등록하고 확인 버튼에서 refetch()로 조회한다.
  */
 export const useRequestTargetsQuery = (
   { situationId, requestId } = {},
-  { onSituationInvalid, showToast } = {},
+  { onSituationInvalid, showToast, enabled = true } = {},
 ) => {
   // 해당 API를 어디서 호출했는지 구분 (다시 부탁하기 / 요청 작성 )
   const { pathname } = useLocation();
   const isRequest = Boolean(matchPath(REQUEST_ROUTES.request(":id"), pathname));
   const isAskAgain = Boolean(matchPath(REQUEST_ROUTES.askAgain(":id"), pathname));
+  const isDetail = Boolean(matchPath(REQUEST_ROUTES.detail(":id"), pathname));
   const params = { // 요청 작성은 situationId만, 다시 부탁하기는 situationId+requestId
     situationId,
     ...(isAskAgain && { requestId }),
@@ -39,8 +41,8 @@ export const useRequestTargetsQuery = (
     queryKey: REQUEST_QUERY_KEYS.targets(params.situationId, params.requestId),
     queryFn: () => getRequestTargetsApi(params),
     select: getRequestTargetsService,
-    enabled: Boolean(
-      (isRequest && situationId != null) ||
+    enabled: enabled && Boolean(
+      ((isRequest || isDetail) && situationId != null) ||
       (isAskAgain && situationId != null && requestId != null),
     ),
   });

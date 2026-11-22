@@ -77,7 +77,11 @@ function Request() {
   const [openSheet, setOpenSheet] = useState(() => {
     // 다른 페이지에서 전달 받은 에러 처리
     const { error } = useRequestErrorStore.getState();
-    return error?.targetPage === REQUEST_ERROR_TARGET_PAGE.REQUEST ? error.sheet ?? null : null;
+    if (error?.targetPage === REQUEST_ERROR_TARGET_PAGE.REQUEST) return error.sheet ?? null;
+    const state = useRequestFormStore.getState();
+    return String(state.entryId) === paramId && !state.form.situationId
+      ? REQUEST_SHEET.SITUATION
+      : null;
   });
   const locationInputRef = useRef(null);
   const contentInputRef = useRef(null);
@@ -119,7 +123,7 @@ function Request() {
   // GET 요청 로딩중 상태
   const isLoading =
     isSituationsPending ||
-    isTargetsPending;
+    (Boolean(form.situationId) && isTargetsPending);
 
   // 다른 페이지에서 전달 받은 에러 처리
   useEffect(() => {
@@ -157,7 +161,7 @@ function Request() {
     }
   }, [entryId, paramId, initForm, situation]);
 
-  useInitialResponseDeadline(paramId, showToast);
+  useInitialResponseDeadline(paramId, showToast, { preserveInitial: true });
 
   useEffect(() => {
     const selectedSituation = getSelectedSituation(situation, form.situationId);

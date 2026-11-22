@@ -1,4 +1,4 @@
-import { REQUEST_STATE } from "@/features/request/constants/enumConstants";
+import { REQUEST_STATE, PROPOSAL_STATUS } from "@/features/request/constants/enumConstants";
 import {
   formatShortDateTime,
   formatShortDateTimeRange,
@@ -20,13 +20,16 @@ import { getEditChanges } from "@/features/request/utils/getEditChanges";
 // [H-03-01-02] 요청 수정 - 수정 폼 초기값 가공 (수정안이 있으면 수정안 기준)
 export const getEditFormService = (response = {}) => {
   const raw = response?.data ?? response ?? {};
-  const isEditing = raw.latestProposal != null;
+  const isEditing = raw.latestProposal?.status === PROPOSAL_STATUS.PENDING;
   const draft = isEditing ? raw.latestProposal.after : raw;
 
   return {
     situationId: raw.situation?.situationId ?? "",
     requestId: raw?.requestId ?? "",
     isEditing,
+    initialInformationIds: isEditing
+      ? (draft?.informations ?? []).map((item) => item.informationId)
+      : undefined,
     userName: raw.currentAssignment?.target?.name ?? "",
     dueDate: draft?.endsAt ? formatShortDateTime(draft.endsAt) : "",
     helpType: raw.helpType,
@@ -94,10 +97,9 @@ export const patchEditService = (
   // 최근 수정안이 있으면 latestProposal.after, 없으면 원래 요청 값을 사용한다.
   const before = getEditFormService(response).initialRequestForm;
 
-  // 공개 항목 API의 카테고리별 항목을 한 배열로 펼치고(flattenInformationItems),
+  // 여기의 informationIds는 PATCH 전송 시 변경 여부를 판단하는 비교 기준
   // 서버가 selected로 표시한 기존에 선택된 항목만 남긴 뒤(filter), ID만 추출(map).
-  // 현재 사용자가 고른 ID는 requestForm.informationIds에 별도로 들어 있다.
-  const informationIds = flattenInformationItems(informationOptions)
+  const informationIds = getEditFormService(response).initialInformationIds ?? flattenInformationItems(informationOptions)
     .filter((item) => item.selected)
     .map((item) => item.informationId);
 

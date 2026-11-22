@@ -1,4 +1,5 @@
 import { HELP_TYPE_LABELS } from "@/features/request/constants/requestFormConstants";
+import { REQUEST_ACTION } from "@/features/request/constants/enumConstants";
 import { formatShortDateTimeRange } from "@/shared/utils/dateFormat";
 import {
   buildInformationItem,
@@ -26,6 +27,7 @@ export const getAssigneeReconfirmService = (response = {}) => {
     situationId: raw?.situation?.situationId ?? raw?.situationId ?? "",
     requestId: raw?.requestId ?? "",
     proposalId: raw?.latestProposal?.proposalId ?? "",
+    canReconfirm: (raw.actions ?? []).includes(REQUEST_ACTION.ACCEPT_PROPOSAL),
     userName: raw?.requester?.name ?? "",
     requestType: HELP_TYPE_LABELS[raw?.helpType] ?? "",
     beforeInfoList: toProposalInfoList(raw?.latestProposal?.before),

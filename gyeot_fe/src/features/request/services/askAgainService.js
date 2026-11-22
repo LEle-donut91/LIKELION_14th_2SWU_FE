@@ -38,8 +38,8 @@ export const getAskAgainDetailService = (response) => {
         raw.situation?.situationId != null
           ? String(raw.situation.situationId)
           : null,
-      situationStartDate: raw.situation?.startDate ?? null,
-      situationEndDate: raw.situation?.endDate ?? null,
+      situationStartDate: raw.situation?.startAt ?? null,
+      situationEndDate: raw.situation?.endAt ?? null,
       helpType: raw.helpType ?? null,
       startDateTime: toDateTimeInput(raw.startsAt),
       endDateTime: toDateTimeInput(raw.endsAt),

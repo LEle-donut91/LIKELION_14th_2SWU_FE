@@ -96,6 +96,7 @@ export const TARGET_FOOTER_CONFIG = {
 
 // 푸터 종류
 export const ASSIGNEE_FOOTER_KEY = {
+  CONFIRM: "confirm",
   CHECK_CHANGE: "checkChange",
   START: "start",
   DONE: "done",
@@ -104,6 +105,11 @@ export const ASSIGNEE_FOOTER_KEY = {
 
 // 푸터 설정 - action 값은 페이지의 footerActions 키와 연결
 export const ASSIGNEE_FOOTER_CONFIG = {
+  [ASSIGNEE_FOOTER_KEY.CONFIRM]: {
+    title: "확인",
+    type: "primary",
+    action: "confirm",
+  },
   [ASSIGNEE_FOOTER_KEY.CHECK_CHANGE]: {
     title: "변경 내용 확인",
     type: "primary",
