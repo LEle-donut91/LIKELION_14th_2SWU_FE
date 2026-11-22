@@ -154,10 +154,11 @@ export const SITUATION_ROLE = {
 
 // S-00 상황 카드 하단 태그: 진행 중 상황 목록 requestCounts의 key → 공통 태그 type
 // (공통 태그 문구·스타일은 shared/constants/situationCardConstants.js의 SITUATION_TAG)
+// - key 이름은 홈 API와 같은 기준 (accepted / inProgress / waiting / noAssignee / responseNeeded 중 S-00 시안에 있는 3개)
 export const SITUATION_REQUEST_COUNT_TAGS = [
-  { countKey: "acceptedCount", tagType: "ACCEPTED" }, // 수락
-  { countKey: "waitingCount", tagType: "WAITING" }, // 응답대기
-  { countKey: "noAssigneeCount", tagType: "UNASSIGNED" }, // 담당없음
+  { countKey: "accepted", tagType: "ACCEPTED" }, // 수락
+  { countKey: "waiting", tagType: "WAITING" }, // 응답대기
+  { countKey: "noAssignee", tagType: "UNASSIGNED" }, // 담당없음
 ];
 
 // 목록 API 한 번에 받아올 개수

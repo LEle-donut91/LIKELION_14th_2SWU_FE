@@ -34,7 +34,9 @@ function PastSituation() {
     searchParams.get("state") === "empty" ? SITUATION_MOCK_SCENARIO.EMPTY : undefined;
 
   const [selectedTabKey, setSelectedTabKey] = useState(PAST_SITUATION_DEFAULT_FILTER);
-  const [selectedPersonId, setSelectedPersonId] = useState(null);
+  // 선택한 사람 { id(userId), name } — 탭을 바꿔 목록에서 빠져도 이름을 유지하려고 객체로 저장
+  const [selectedPerson, setSelectedPerson] = useState(null);
+  const selectedPersonId = selectedPerson?.id ?? null;
   const [isPersonSheetOpen, setIsPersonSheetOpen] = useState(false);
 
   // 탭(filter) · 사람(personId) 조건은 서버에서 걸러서 받음
@@ -43,7 +45,10 @@ function PastSituation() {
     personId: selectedPersonId,
     mockScenario,
   });
-  const peopleQuery = usePastSituationPeopleQuery();
+  const peopleQuery = usePastSituationPeopleQuery({
+    filter: selectedTabKey,
+    mockScenario,
+  });
   // 종료된 상황이 하나라도 있는지 (탭 · 사람 조건과 상관없이 1건만 확인)
   const anyPastSituationQuery = usePastSituationsQuery({
     page: 0,
@@ -53,7 +58,11 @@ function PastSituation() {
 
   const pastSituationList = pastSituationsQuery.data?.pastSituations ?? [];
   const personList = peopleQuery.data?.people ?? [];
-  const selectedPerson = personList.find(({ id }) => id === selectedPersonId);
+
+  // 사람 선택 시트 확인: '전체'(null)면 선택 해제
+  const handlePersonConfirm = (personId) => {
+    setSelectedPerson(personList.find(({ id }) => id === personId) ?? null);
+  };
 
   // 조회 실패 시 안내 토스트
   const queryError = pastSituationsQuery.error ?? peopleQuery.error;
@@ -125,7 +134,7 @@ function PastSituation() {
         onClose={() => setIsPersonSheetOpen(false)}
         title="사람 선택"
         value={selectedPersonId}
-        onConfirm={setSelectedPersonId}
+        onConfirm={handlePersonConfirm}
       >
         {(tempValue, setTempValue) => (
           <PersonRadioOption
