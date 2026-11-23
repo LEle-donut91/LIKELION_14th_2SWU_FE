@@ -20,7 +20,7 @@
 /* 토스트 위치 */
 .toastArea {
   position: fixed;
-  bottom: 94px;
+  bottom: 68px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 1;
