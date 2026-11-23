@@ -1,12 +1,12 @@
 // C-00
 
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "@/features/card/pages/Card.module.css";
 import MainHeader from "@/shared/components/main-header/MainHeader";
 import BottomNav from "@/shared/components/BottomNav/BottomNav";
-import DefaultToast from "@/shared/components/Toast/DefaultToast";
-import { useToast } from "@/shared/hooks/useToast";
+import Toast from "@/shared/components/Toast/Toast";
+import { useToastStore } from "@/shared/stores/useToastStore";
 import { getErrorMessage } from "@/shared/utils/apiError";
 import CardMenuSection from "@/features/card/components/CardMenuSection";
 import CardMenuItem from "@/features/card/components/CardMenuItem";
@@ -21,7 +21,13 @@ import {
 // 안심카드 (C-00)
 function Card() {
   const navigate = useNavigate();
-  const { toast, showToast, hideToast } = useToast();
+  // 토스트 (공통 스토어: 페이지를 이동해도 3초 동안 유지)
+  // - Toast는 props가 없어 문장 줄바꿈(formatToastMessage)은 띄울 때 적용 (useCallback으로 참조 유지)
+  const showStoreToast = useToastStore((state) => state.showToast);
+  const showToast = useCallback(
+    (message) => showStoreToast(formatToastMessage(message)),
+    [showStoreToast],
+  );
 
   // 안심카드 메인 조회 (조회 전·실패 시 cardSummary는 undefined)
   const { cardSummary, error } = useCardSummary();
@@ -80,15 +86,9 @@ function Card() {
       {/* 조회 실패 토스트
           - toastArea: 하단 내비(fixed) 위 경계에 고정해 내비에 가려지지 않도록 위치 조정
           - 문장이 여러 개면 문장마다 줄바꿈 (toastArea의 white-space: pre-line으로 표시) */}
-      {toast && (
-        <div className={styles.toastArea}>
-          <DefaultToast
-            key={toast.id}
-            message={formatToastMessage(toast.message)}
-            onHide={hideToast}
-          />
-        </div>
-      )}
+      <div className={styles.toastArea}>
+        <Toast />
+      </div>
 
       <BottomNav />
     </div>

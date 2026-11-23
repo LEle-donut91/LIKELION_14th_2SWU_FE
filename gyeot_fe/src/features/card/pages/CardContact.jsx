@@ -1,10 +1,11 @@
 // C-03 연락 순서
 
+import { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "@/features/card/pages/CardContact.module.css";
 import SubpageHeader from "@/shared/components/subpage-header/SubpageHeader";
-import DefaultToast from "@/shared/components/Toast/DefaultToast";
-import { useToast } from "@/shared/hooks/useToast";
+import Toast from "@/shared/components/Toast/Toast";
+import { useToastStore } from "@/shared/stores/useToastStore";
 import ContactOrderList from "@/features/card/components/ContactOrderList";
 import ContactOrderEmpty from "@/features/card/components/ContactOrderEmpty";
 import CardAddButton from "@/features/card/components/CardAddButton";
@@ -23,7 +24,13 @@ const { GUARDIAN, MY_PERSON } = CONTACT_RELATIONSHIP_TYPE;
 
 function CardContact() {
   const navigate = useNavigate();
-  const { toast, showToast, hideToast } = useToast();
+  // 토스트 (공통 스토어: 페이지를 이동해도 3초 동안 유지)
+  // - Toast는 props가 없어 문장 줄바꿈(formatToastMessage)은 띄울 때 적용 (useCallback으로 참조 유지)
+  const showStoreToast = useToastStore((state) => state.showToast);
+  const showToast = useCallback(
+    (message) => showStoreToast(formatToastMessage(message)),
+    [showStoreToast],
+  );
 
   // 연락 순서 조회·저장 (저장 성공 / 목록 변경(409) / 실패 안내는 토스트로, showToast는 참조가 유지됨)
   const {
@@ -134,16 +141,10 @@ function CardContact() {
 
       <main className={styles.main}>{renderContent()}</main>
 
-      {/* 토스트 (DefaultToast 기본 위치: 페이지 하단 기준) */}
-      {toast && (
-        <div className={styles.toastArea}>
-          <DefaultToast
-            key={toast.id}
-            message={formatToastMessage(toast.message)}
-            onHide={hideToast}
-          />
-        </div>
-      )}
+      {/* 토스트 (Toast 기본 위치: 페이지 하단 기준) */}
+      <div className={styles.toastArea}>
+        <Toast />
+      </div>
     </div>
   );
 }

@@ -1,10 +1,10 @@
 // C-06 공유 관리
 
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import styles from "@/features/card/pages/CardShare.module.css";
 import SubpageHeader from "@/shared/components/subpage-header/SubpageHeader";
-import DefaultToast from "@/shared/components/Toast/DefaultToast";
-import { useToast } from "@/shared/hooks/useToast";
+import Toast from "@/shared/components/Toast/Toast";
+import { useToastStore } from "@/shared/stores/useToastStore";
 import { getErrorMessage } from "@/shared/utils/apiError";
 import ShareCardList from "@/features/card/components/ShareCardList";
 import ShareEmpty from "@/features/card/components/ShareEmpty";
@@ -16,7 +16,13 @@ import {
 import { formatToastMessage } from "@/features/card/utils/cardFormat";
 
 function CardShare() {
-  const { toast, showToast, hideToast } = useToast();
+  // 토스트 (공통 스토어: 페이지를 이동해도 3초 동안 유지)
+  // - Toast는 props가 없어 문장 줄바꿈(formatToastMessage)은 띄울 때 적용 (useCallback으로 참조 유지)
+  const showStoreToast = useToastStore((state) => state.showToast);
+  const showToast = useCallback(
+    (message) => showStoreToast(formatToastMessage(message)),
+    [showStoreToast],
+  );
 
   // 철회 / 다시 허용 성공·실패 모두 토스트로 안내 (showToast는 참조가 유지됨)
   const { items, isLoading, hasError, error, pendingId, handleRevoke, handleReallow } =
@@ -57,18 +63,12 @@ function CardShare() {
         {/* TODO: 접근 이력 (SHOULD 1차, 이번 범위에서 제외) */}
       </main>
 
-      {/* 토스트 (DefaultToast 기본 위치: 페이지 하단 기준)
+      {/* 토스트 (Toast 기본 위치: 페이지 하단 기준)
           - toastArea: 토스트 너비를 글자 길이에 맞춤 (위치 기준점은 그대로 .page)
           - 문장이 여러 개면 문장마다 줄바꿈 (toastArea의 white-space: pre-line으로 표시) */}
-      {toast && (
-        <div className={styles.toastArea}>
-          <DefaultToast
-            key={toast.id}
-            message={formatToastMessage(toast.message)}
-            onHide={hideToast}
-          />
-        </div>
-      )}
+      <div className={styles.toastArea}>
+        <Toast />
+      </div>
     </div>
   );
 }

@@ -12,10 +12,10 @@
 import styles from "@/features/card/pages/CardHealth.module.css";
 
 // 일반 라이브러리
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 // Custom Hooks
-import { useToast } from "@/shared/hooks/useToast";
+import { useToastStore } from "@/shared/stores/useToastStore";
 import { useSafetyInfoItems } from "@/features/card/hooks/useSafetyInfoItems";
 
 // Constants
@@ -39,7 +39,7 @@ import {
 import SubpageHeader from "@/shared/components/subpage-header/SubpageHeader";
 import SmallFooter from "@/shared/components/SmallFooter/SmallFooter";
 import DefaultModal from "@/shared/components/DefaultModal/DefaultModal";
-import DefaultToast from "@/shared/components/Toast/DefaultToast";
+import Toast from "@/shared/components/Toast/Toast";
 import BasicInfoItem from "@/features/card/components/BasicInfoItem";
 import HealthInfoSection from "@/features/card/components/HealthInfoSection";
 import CardTextField from "@/features/card/components/CardTextField";
@@ -79,8 +79,13 @@ function CardHealth() {
   // 삭제 확인 모달의 열림/닫힘 상태
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
 
-  // 토스트 메시지
-  const { toast, showToast, hideToast } = useToast();
+  // 토스트 (공통 스토어: 페이지를 이동해도 3초 동안 유지)
+  // - Toast는 props가 없어 문장 줄바꿈(formatToastMessage)은 띄울 때 적용 (useCallback으로 참조 유지)
+  const showStoreToast = useToastStore((state) => state.showToast);
+  const showToast = useCallback(
+    (message) => showStoreToast(formatToastMessage(message)),
+    [showStoreToast],
+  );
 
   // 건강 정보 조회·저장·삭제 (성공·실패 안내는 토스트로)
   // - healthInfo: { disease: [항목...], medicine: [...], allergy: [...], caution: [...] }
@@ -264,17 +269,11 @@ function CardHealth() {
         </>
       )}
 
-      {/* 토스트 (DefaultToast는 absolute 배치라 하단 푸터와 겹치지 않도록 감싸서 위치 조정)
+      {/* 토스트 (Toast는 absolute 배치라 하단 푸터와 겹치지 않도록 감싸서 위치 조정)
           - 문장이 여러 개면 문장마다 줄바꿈 (toastArea의 white-space: pre-line으로 표시) */}
-      {toast && (
-        <div className={styles.toastArea}>
-          <DefaultToast
-            key={toast.id}
-            message={formatToastMessage(toast.message)}
-            onHide={hideToast}
-          />
-        </div>
-      )}
+      <div className={styles.toastArea}>
+        <Toast />
+      </div>
     </div>
   );
 }

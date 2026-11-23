@@ -14,7 +14,7 @@ import styles from "@/features/card/pages/CardBasic.module.css";
 import { useEffect, useState } from "react";
 
 // Custom Hooks
-import { useToast } from "@/shared/hooks/useToast";
+import { useToastStore } from "@/shared/stores/useToastStore";
 import { useBasicInfo } from "@/features/card/hooks/useBasicInfo";
 
 // Constants
@@ -44,7 +44,7 @@ import {
 import SubpageHeader from "@/shared/components/subpage-header/SubpageHeader";
 import SmallFooter from "@/shared/components/SmallFooter/SmallFooter";
 import DefaultModal from "@/shared/components/DefaultModal/DefaultModal";
-import DefaultToast from "@/shared/components/Toast/DefaultToast";
+import Toast from "@/shared/components/Toast/Toast";
 import BasicInfoItem from "@/features/card/components/BasicInfoItem";
 import BirthDateField from "@/features/card/components/BirthDateField";
 import BloodTypeField from "@/features/card/components/BloodTypeField";
@@ -88,8 +88,8 @@ function CardBasic() {
   // 삭제 확인 모달의 열림/닫힘 상태
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
 
-  // 토스트 메시지
-  const { toast, showToast, hideToast } = useToast();
+  // 토스트 (공통 스토어: 페이지를 이동해도 3초 동안 유지)
+  const showToast = useToastStore((state) => state.showToast);
 
   // 기본 정보 조회·저장·삭제 (성공·실패 안내는 토스트로)
   // - basicInfo: { birthDate, bloodType } / 항목마다 { informationId, value, updatedAt } 또는 null
@@ -250,16 +250,10 @@ function CardBasic() {
         </>
       )}
 
-      {/* 토스트 (DefaultToast는 absolute 배치라 하단 푸터와 겹치지 않도록 감싸서 위치 조정) */}
-      {toast && (
-        <div className={styles.toastArea}>
-          <DefaultToast
-            key={toast.id}
-            message={toast.message}
-            onHide={hideToast}
-          />
-        </div>
-      )}
+      {/* 토스트 (Toast는 absolute 배치라 하단 푸터와 겹치지 않도록 감싸서 위치 조정) */}
+      <div className={styles.toastArea}>
+        <Toast />
+      </div>
     </div>
   );
 }
