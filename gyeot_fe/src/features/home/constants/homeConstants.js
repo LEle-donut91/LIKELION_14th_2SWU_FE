@@ -133,15 +133,17 @@ export const NO_ASSIGNEE_FALLBACK_NAME = "탈퇴한 사용자";
 // - 화면에 그릴 순서대로 작성. 응답에 없는 key는 태그를 그리지 않음
 // - key는 F-34 명세(BE #147) requestCounts 기준: accepted, inProgress, waiting, noAssignee, responseNeeded
 //   (참여 상황의 waiting · noAssignee는 서버가 항상 0)
-// - TODO: inProgress(진행 중)는 시안 태그에 없어 아직 표시하지 않음. 수락에 합칠지 디자인 확인 후 반영
+// - inProgress(진행 중)는 수락과 따로 '진행중' 태그로 표시 (11/23 디자인 결정, 기본 태그 스타일)
 export const SITUATION_REQUEST_COUNT_TAG_LIST = {
   [SITUATION_TAB.MY]: [
     { countKey: "accepted", tagType: "ACCEPTED" },
+    { countKey: "inProgress", tagType: "IN_PROGRESS" },
     { countKey: "waiting", tagType: "WAITING" },
     { countKey: "noAssignee", tagType: "UNASSIGNED" },
   ],
   [SITUATION_TAB.PARTICIPATING]: [
     { countKey: "accepted", tagType: "ACCEPTED" },
+    { countKey: "inProgress", tagType: "IN_PROGRESS" },
     { countKey: "responseNeeded", tagType: "REQUESTED" },
   ],
 };
