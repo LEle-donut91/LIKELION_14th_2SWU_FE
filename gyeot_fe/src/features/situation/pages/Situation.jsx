@@ -9,8 +9,8 @@ import MaskIcon from "@/shared/components/MaskIcon/MaskIcon";
 import PastSituationList from "@/features/situation/components/PastSituationList";
 import SituationListEmpty from "@/features/situation/components/SituationListEmpty";
 import iconRight from "@/shared/assets/icons/iconRight.svg";
-import DefaultToast from "@/shared/components/Toast/DefaultToast";
-import { useToast } from "@/shared/hooks/useToast";
+import Toast from "@/shared/components/Toast/Toast";
+import { useToastStore } from "@/shared/stores/useToastStore";
 import { getErrorMessage } from "@/shared/utils/apiError";
 import {
   PAST_SITUATION_PREVIEW_SIZE,
@@ -24,7 +24,7 @@ function Situation() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  const { toast, showToast, hideToast } = useToast();
+  const showToast = useToastStore((state) => state.showToast);
 
   // 빈 상태(S-00-2) 확인용: /situation?state=empty (목업 사용 중일 때만 적용)
   const mockScenario =
@@ -150,9 +150,7 @@ function Situation() {
 
       <BottomNav />
 
-      {toast && (
-        <DefaultToast key={toast.id} message={toast.message} onHide={hideToast} />
-      )}
+      <Toast />
     </div>
   );
 }

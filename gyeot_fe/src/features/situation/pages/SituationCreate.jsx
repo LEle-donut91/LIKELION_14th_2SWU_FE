@@ -11,8 +11,8 @@ import TimeSheet from "@/shared/components/TimeSheet/TimeSheet";
 import DateTimeOption from "@/shared/components/DateTimeOption/DateTimeOption";
 import SituationTypeOption from "@/features/situation/components/SituationTypeOption";
 import ParticipantCheckList from "@/features/situation/components/ParticipantCheckList";
-import DefaultToast from "@/shared/components/Toast/DefaultToast";
-import { useToast } from "@/shared/hooks/useToast";
+import Toast from "@/shared/components/Toast/Toast";
+import { useToastStore } from "@/shared/stores/useToastStore";
 import { getErrorMessage } from "@/shared/utils/apiError";
 import {
   SITUATION_CREATE_VALIDATION_MESSAGE,
@@ -82,7 +82,7 @@ function SituationCreate() {
   // 열려 있는 시트 ("type" | "start" | "end" | null)
   const [openSheet, setOpenSheet] = useState(null);
 
-  const { toast, showToast, hideToast } = useToast();
+  const showToast = useToastStore((state) => state.showToast);
 
   // 참여할 지인 후보 (활성 관계 목록)
   const { data: candidateData, error: candidateError } =
@@ -218,9 +218,7 @@ function SituationCreate() {
         )}
       </TimeSheet>
 
-      {toast && (
-        <DefaultToast key={toast.id} message={toast.message} onHide={hideToast} />
-      )}
+      <Toast />
     </div>
   );
 }
