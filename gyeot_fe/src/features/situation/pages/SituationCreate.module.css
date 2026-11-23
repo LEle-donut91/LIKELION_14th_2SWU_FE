@@ -41,10 +41,3 @@
   letter-spacing: -0.28px;
   color: #6a5a44;
 }
-
-/* 입력 확인 토스트가 화면 밖으로 넘치지 않도록 보정
-   - 공통 토스트(Toast)는 max-width: calc(100% - 32px)에 좌우 padding 32px이 더해지는 구조
-   - 긴 문구에서 padding까지 포함해 화면 좌우 16px 안쪽에 들어오도록 border-box 적용 */
-.page [role="status"] {
-  box-sizing: border-box;
-}
