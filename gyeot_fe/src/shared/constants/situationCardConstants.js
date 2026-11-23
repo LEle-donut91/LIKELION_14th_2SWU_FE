@@ -4,6 +4,7 @@
 // isActive: 강조 태그(테두리/배경 olive-300) 여부
 export const SITUATION_TAG = {
   ACCEPTED: { label: "수락", isActive: false },
+  IN_PROGRESS: { label: "진행중", isActive: false },
   WAITING: { label: "응답대기", isActive: false },
   UNASSIGNED: { label: "담당없음", isActive: true },
   REQUESTED: { label: "응답요청", isActive: true },
