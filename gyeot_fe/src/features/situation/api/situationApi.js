@@ -21,9 +21,8 @@ import {
 // - 모든 함수는 공통 응답 전체 { status, code, message, data }를 반환
 // - 에러는 잡지 않고 그대로 던짐 (처리는 useQuery / useMutation 쪽에서)
 
-// B 영역은 명세 확정 상태이고 서버 배포 전이라 명세 응답 형태의 목업을 사용
-// TODO: 서버 배포 확인 후 USE_MOCK을 false로 변경
-const USE_MOCK = true;
+// 서버 배포 완료로 실제 API 사용 (true로 바꾸면 명세 응답 형태의 목업으로 확인 가능)
+const USE_MOCK = false;
 
 // 목업 시나리오 (USE_MOCK일 때만 사용)
 // - "empty": 진행 중·지난 상황이 하나도 없는 계정 (S-00-2 빈 상태 확인용, /situation?state=empty)
