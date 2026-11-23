@@ -17,7 +17,7 @@ import { useRequestNav } from "@/features/request/hooks/useRequestNav";
 import { useInformationOptionsQuery } from "@/features/request/hooks/queries/useInformationOptionsQuery";
 import { useSendRequestMutation } from "@/features/request/hooks/mutations/useSendRequestMutation";
 import { useRequestFormStore } from "@/features/request/stores/useRequestFormStore";
-import { useToast } from "@/shared/hooks/useToast";
+import { useToastStore } from "@/shared/stores/useToastStore";
 
 // Constants
 import { REQUEST_ROUTES } from "@/features/request/constants/routerConstants";
@@ -41,12 +41,12 @@ import DefaultSheet from "@/shared/components/DefaultSheet/DefaultSheet";
 import CheckOption from "@/features/request/components/Option/CheckOption";
 import LargeFooter from "@/shared/components/LargeFooter/LargeFooter";
 import DefaultModal from "@/shared/components/DefaultModal/DefaultModal";
-import DefaultToast from "@/shared/components/Toast/DefaultToast";
+import Toast from "@/shared/components/Toast/Toast";
 
 // 페이지 컴포넌트
 function InfoPreview() {
   const { handleGoNext, handleGoBack } = useRequestNav(); // useNavigation 커스텀 훅의 함수
-  const { toast, showToast, hideToast } = useToast(); // 토스트 메시지
+  const showToast = useToastStore((state) => state.showToast); // 토스트 메시지
 
   // 이전 페이지가 "다시 부탁하기"였는지 여부
   const [searchParams] = useSearchParams();
@@ -242,13 +242,7 @@ function InfoPreview() {
       />
 </>
       )}
-      {toast && (
-        <DefaultToast
-          key={toast.id}
-          message={toast.message}
-          onHide={hideToast}
-        />
-      )}
+      <Toast />
     </div>
   );
 }

@@ -6,7 +6,7 @@ import { useRequestNav } from "@/features/request/hooks/useRequestNav";
 import { useRequestDetailQuery } from "@/features/request/hooks/queries/useRequestDetailQuery";
 import { useRequestTargetsQuery } from "@/features/request/hooks/queries/useRequestTargetsQuery";
 import { useRequestDetailMutations } from "@/features/request/hooks/mutations/useRequestDetailMutations";
-import { useToast } from "@/shared/hooks/useToast";
+import { useToastStore } from "@/shared/stores/useToastStore";
 import { getRequestDetailService } from "@/features/request/services/requestDetailService";
 import { REQUEST_ROUTES } from "@/features/request/constants/routerConstants";
 import { RESPONSE_STATUS, SITUATION_STATUS } from "@/features/request/constants/enumConstants";
@@ -16,7 +16,7 @@ import SubpageHeader from "@/shared/components/subpage-header/SubpageHeader";
 import SmallFooter from "@/shared/components/SmallFooter/SmallFooter";
 import LargeFooter from "@/shared/components/LargeFooter/LargeFooter";
 import DefaultModal from "@/shared/components/DefaultModal/DefaultModal";
-import DefaultToast from "@/shared/components/Toast/DefaultToast";
+import Toast from "@/shared/components/Toast/Toast";
 import RequestStep from "@/features/request/components/Request/RequestStep";
 import RequestSummary from "@/features/request/components/Request/RequestSummary";
 import DueDateState from "@/features/request/components/State/DueDateState";
@@ -34,7 +34,7 @@ function RequestDetail() {
   const [isSameModalOpen, setSameModalOpen] = useState(false);
   const [isWithdrawModalOpen, setWithdrawModalOpen] = useState(false);
   const [isDuplicating, setDuplicating] = useState(false);
-  const { toast, showToast, hideToast } = useToast();
+  const showToast = useToastStore((state) => state.showToast);
   const initForm = useRequestFormStore((state) => state.initForm);
 
   // 1. 요청 상세 조회 API (응답의 viewerRole로 화면이 결정됨)
@@ -362,13 +362,7 @@ function RequestDetail() {
           )}
         </>
       )}
-      {toast && (
-        <DefaultToast
-          key={toast.id}
-          message={toast.message}
-          onHide={hideToast}
-        />
-      )}
+      <Toast />
     </div>
   );
 }

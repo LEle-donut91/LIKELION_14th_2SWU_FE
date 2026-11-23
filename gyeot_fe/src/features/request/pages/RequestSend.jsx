@@ -20,6 +20,7 @@ import { REQUEST_ROUTES } from "@/features/request/constants/routerConstants";
 // 일반 Components
 import SubpageHeader from "@/shared/components/subpage-header/SubpageHeader";
 import LargeFooter from "@/shared/components/LargeFooter/LargeFooter";
+import Toast from "@/shared/components/Toast/Toast";
 
 function RequestSend() {
   // navigation 커스텀 훅 불러오기
@@ -39,6 +40,7 @@ function RequestSend() {
         type="primary"
         onClick={() => handleGoNext(REQUEST_ROUTES.home, true)}
       />
+      <Toast />
     </div>
   );
 }
