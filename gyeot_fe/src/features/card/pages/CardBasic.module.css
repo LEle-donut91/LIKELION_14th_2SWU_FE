@@ -1,4 +1,4 @@
-/* 전체 페이지 (SmallFooter, DefaultToast의 absolute 기준점) */
+/* 전체 페이지 (SmallFooter, Toast의 absolute 기준점) */
 .page {
   position: relative;
   width: 100%;
@@ -34,7 +34,7 @@
 }
 
 /* 토스트 위치 조정 영역
- * - DefaultToast는 부모 기준 bottom 0 + margin-bottom 44px 로 배치됨
+ * - Toast는 부모 기준 bottom 0 + margin-bottom 44px 로 배치됨
  * - SmallFooter(약 114px)와 겹치지 않도록 이 영역을 위로 띄움 (시안 확정 후 조정) */
 .toastArea {
   position: absolute;
