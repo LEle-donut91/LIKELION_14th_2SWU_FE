@@ -10,8 +10,8 @@ import InviteParticipantOption from "@/features/situation/components/InviteParti
 import SituationEndSheet from "@/features/situation/components/SituationEndSheet";
 import SituationLeaveSheet from "@/features/situation/components/SituationLeaveSheet";
 import SituationConfirmModal from "@/features/situation/components/SituationConfirmModal";
-import DefaultToast from "@/shared/components/Toast/DefaultToast";
-import { useToast } from "@/shared/hooks/useToast";
+import Toast from "@/shared/components/Toast/Toast";
+import { useToastStore } from "@/shared/stores/useToastStore";
 import { getErrorCode, getErrorMessage } from "@/shared/utils/apiError";
 import {
   SITUATION_NAVIGATION_PATH,
@@ -28,7 +28,7 @@ function SituationManage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  const { toast, showToast, hideToast } = useToast();
+  const showToast = useToastStore((state) => state.showToast);
 
   // 상황 ID: H-03 상황 상세의 '…'에서 ?situationId= 로 전달
   // 목업 확인용: situationId=1 (정보 주인), situationId=21 (참여자),
@@ -83,9 +83,7 @@ function SituationManage() {
     return (
       <div className={styles.page}>
         <SubpageHeader title="" />
-        {toast && (
-          <DefaultToast key={toast.id} message={toast.message} onHide={hideToast} />
-        )}
+        <Toast />
       </div>
     );
   }
@@ -237,9 +235,7 @@ function SituationManage() {
         onClose={() => setExcludeTargetId(null)}
       />
 
-      {toast && (
-        <DefaultToast key={toast.id} message={toast.message} onHide={hideToast} />
-      )}
+      <Toast />
     </div>
   );
 }

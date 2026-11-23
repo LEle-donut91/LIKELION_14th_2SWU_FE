@@ -42,11 +42,9 @@
   color: #6a5a44;
 }
 
-/* 입력 확인 토스트를 한 줄로 표시
-   - 공통 토스트(DefaultToast)는 left: 50% 위치라 화면 절반 너비에서 줄바꿈됨
-   - 이 화면에서만 문구 길이에 맞춰 너비를 넓힘 (화면 좌우 16px 안쪽까지) */
+/* 입력 확인 토스트가 화면 밖으로 넘치지 않도록 보정
+   - 공통 토스트(Toast)는 max-width: calc(100% - 32px)에 좌우 padding 32px이 더해지는 구조
+   - 긴 문구에서 padding까지 포함해 화면 좌우 16px 안쪽에 들어오도록 border-box 적용 */
 .page [role="status"] {
   box-sizing: border-box;
-  width: max-content;
-  max-width: calc(100% - 32px);
 }

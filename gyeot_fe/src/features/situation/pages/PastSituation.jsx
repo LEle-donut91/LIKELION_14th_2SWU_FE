@@ -10,8 +10,8 @@ import PastSituationFilterTabs from "@/features/situation/components/PastSituati
 import PastSituationCard from "@/features/situation/components/PastSituationCard";
 import PersonRadioOption from "@/features/situation/components/PersonRadioOption";
 import resImgNew from "@/shared/assets/images/resImgNew.png";
-import DefaultToast from "@/shared/components/Toast/DefaultToast";
-import { useToast } from "@/shared/hooks/useToast";
+import Toast from "@/shared/components/Toast/Toast";
+import { useToastStore } from "@/shared/stores/useToastStore";
 import { getErrorMessage } from "@/shared/utils/apiError";
 import {
   PAST_SITUATION_ALL_PERSON_TEXT,
@@ -27,7 +27,7 @@ function PastSituation() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  const { toast, showToast, hideToast } = useToast();
+  const showToast = useToastStore((state) => state.showToast);
 
   // 빈 상태 확인용: ?state=empty (종료된 상황이 없는 경우, 목업 사용 중일 때만 적용)
   const mockScenario =
@@ -145,9 +145,7 @@ function PastSituation() {
         )}
       </DefaultSheet>
 
-      {toast && (
-        <DefaultToast key={toast.id} message={toast.message} onHide={hideToast} />
-      )}
+      <Toast />
     </div>
   );
 }

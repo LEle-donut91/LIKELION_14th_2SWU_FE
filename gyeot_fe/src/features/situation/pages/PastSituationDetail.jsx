@@ -6,8 +6,8 @@ import SubpageHeader from "@/shared/components/subpage-header/SubpageHeader"; //
 import PastSituationCard from "@/features/situation/components/PastSituationCard";
 import PastRequestHistoryList from "@/features/situation/components/PastRequestHistoryList";
 import ThanksMessageCard from "@/features/situation/components/ThanksMessageCard";
-import DefaultToast from "@/shared/components/Toast/DefaultToast";
-import { useToast } from "@/shared/hooks/useToast";
+import Toast from "@/shared/components/Toast/Toast";
+import { useToastStore } from "@/shared/stores/useToastStore";
 import { getErrorCode, getErrorMessage } from "@/shared/utils/apiError";
 import {
   SITUATION_NAVIGATION_PATH,
@@ -20,7 +20,7 @@ function PastSituationDetail() {
   const location = useLocation();
   const [searchParams] = useSearchParams();
 
-  const { toast, showToast, hideToast } = useToast();
+  const showToast = useToastStore((state) => state.showToast);
 
   // 지난 상황 ID: H-04 · S-00에서 ?situationId= 로 전달 (이동 state의 situationId도 허용)
   // 목업 확인용: situationId=13 (정보 주인), situationId=11 (참여자)
@@ -98,13 +98,7 @@ function PastSituationDetail() {
         </main>
       )}
 
-      {toast && (
-        <DefaultToast
-          key={toast.id}
-          message={toast.message}
-          onHide={hideToast}
-        />
-      )}
+      <Toast />
     </div>
   );
 }
