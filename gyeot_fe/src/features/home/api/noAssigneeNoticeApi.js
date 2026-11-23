@@ -16,9 +16,8 @@ import {
 // - 모든 함수는 공통 응답 전체 { status, code, message, data }를 반환
 // - 에러는 잡지 않고 그대로 던짐 (처리는 useQuery / useMutation 쪽에서)
 
-// 서버 연결·인증 처리 전까지 명세 응답 형태의 테스트 데이터를 사용한다.
-// TODO: 인증 처리 후 서버 응답 확인되면 USE_MOCK을 false로 변경 (BE "개발 완료")
-const USE_MOCK = true;
+// 개발 서버 응답을 사용한다. true로 바꾸면 명세 응답 형태의 테스트 데이터를 사용한다.
+const USE_MOCK = false;
 
 // 실패 응답 (명세 기준: 요청이 없거나 관련 없는 요청)
 const NOTICE_MOCK_ERROR = {
