@@ -94,3 +94,17 @@
 .pastListWrapper {
   padding: 0 16px;
 }
+
+/* 토스트 영역
+   - 토스트 아래 끝 = 68px + Toast 하단 margin 44px = 112px (홈·안심카드와 동일) */
+.toastArea {
+  position: fixed;
+  bottom: 68px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  width: 100%;
+  max-width: 402px;
+  height: 0;
+  pointer-events: none;
+}

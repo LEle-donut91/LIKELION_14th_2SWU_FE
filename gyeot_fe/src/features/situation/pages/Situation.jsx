@@ -150,7 +150,10 @@ function Situation() {
 
       <BottomNav />
 
-      <Toast />
+      {/* 토스트: 하단 탭 위에 표시 (홈·안심카드와 같은 높이, toastArea가 위치 담당) */}
+      <div className={styles.toastArea}>
+        <Toast />
+      </div>
     </div>
   );
 }
