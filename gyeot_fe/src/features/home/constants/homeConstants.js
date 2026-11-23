@@ -129,8 +129,9 @@ export const NO_ASSIGNEE_FALLBACK_NAME = "탈퇴한 사용자";
 
 // 상황 카드 하단 태그: 홈 통합 조회 requestCounts의 key → 태그 종류(SITUATION_TAG의 key)
 // - 화면에 그릴 순서대로 작성. 응답에 없는 key는 태그를 그리지 않음
-// - TODO: requestCounts 형태는 명세에 없어 가정한 값 (나의 상황: 수락/응답대기/담당없음,
-//         참여 상황: 수락/응답요청). 최종 DTO 확정 후 key 수정
+// - key는 F-34 명세(BE #147) requestCounts 기준: accepted, inProgress, waiting, noAssignee, responseNeeded
+//   (참여 상황의 waiting · noAssignee는 서버가 항상 0)
+// - TODO: inProgress(진행 중)는 시안 태그에 없어 아직 표시하지 않음. 수락에 합칠지 디자인 확인 후 반영
 export const SITUATION_REQUEST_COUNT_TAG_LIST = {
   [SITUATION_TAB.MY]: [
     { countKey: "accepted", tagType: "ACCEPTED" },
@@ -139,6 +140,6 @@ export const SITUATION_REQUEST_COUNT_TAG_LIST = {
   ],
   [SITUATION_TAB.PARTICIPATING]: [
     { countKey: "accepted", tagType: "ACCEPTED" },
-    { countKey: "requested", tagType: "REQUESTED" },
+    { countKey: "responseNeeded", tagType: "REQUESTED" },
   ],
 };
