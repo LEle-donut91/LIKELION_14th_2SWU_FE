@@ -34,3 +34,18 @@
   color: var(--color-gray-700);
   text-align: center;
 }
+
+/* 토스트 영역: 하단 내비(fixed) 위에 고정 (공통 Toast는 이 영역 기준 absolute 배치)
+   - 높이 0이라 아래 요소 클릭을 막지 않음
+   - 토스트 아래 끝 = 68px + Toast 하단 margin 44px = 112px (기존 HomeToast 위치) */
+.toastArea {
+  position: fixed;
+  bottom: 68px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  width: 100%;
+  max-width: 402px;
+  height: 0;
+  pointer-events: none;
+}

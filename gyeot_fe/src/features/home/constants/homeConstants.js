@@ -43,8 +43,10 @@ export const STATUS_CARD_LIST = [
 // 다가오는 일정 최대 노출 개수 (scr-H-00 주석 12: 가까운 순 2개)
 export const MAX_UPCOMING_SCHEDULE_COUNT = 2;
 
-// 토스트 노출 시간(ms)
-export const TOAST_DURATION = 3000;
+// 홈 토스트 문구 (노출 시간은 공통 스토어 기준, shared/constants/toastConstants.js)
+export const HOME_TOAST_MESSAGE = {
+  SITUATION_ENDED: "상황을 종료했어요.", // 상황 종료 직후 홈 진입 (scr-H-00 주석 8)
+};
 
 // 도움 종류: 서버 응답에 쓰는 값(key), 한글 매핑(value)
 // - 홈 통합 조회 helpType 기준 값 (card의 SHARE_HELP_TYPE_LABELS처럼 영역별로 둠)
