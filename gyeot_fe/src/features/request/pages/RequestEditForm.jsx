@@ -19,7 +19,7 @@ import { useInformationOptionsQuery } from "@/features/request/hooks/queries/use
 import { useCancelRequestMutation } from "@/features/request/hooks/mutations/useCancelRequestMutation";
 import { useRequestFormStore } from "@/features/request/stores/useRequestFormStore";
 import { useRequestErrorStore } from "@/features/request/stores/useRequestErrorStore";
-import { useToast } from "@/shared/hooks/useToast";
+import { useToastStore } from "@/shared/stores/useToastStore";
 
 // Constants
 import { REQUEST_ROUTES } from "@/features/request/constants/routerConstants";
@@ -54,13 +54,13 @@ import CheckOption from "@/features/request/components/Option/CheckOption";
 import SafetyCardGroup from "@/features/request/components/SafetyCard/SafetyCardGroup";
 import SmallFooter from "@/shared/components/SmallFooter/SmallFooter";
 import DefaultModal from "@/shared/components/DefaultModal/DefaultModal";
-import DefaultToast from "@/shared/components/Toast/DefaultToast";
+import Toast from "@/shared/components/Toast/Toast";
 
 // 페이지 컴포넌트
 function RequestEditForm() {
   const paramId = useParams().id;
   const { handleGoBack, handleGoNext } = useRequestNav();
-  const { toast, showToast, hideToast } = useToast();
+  const showToast = useToastStore((state) => state.showToast);
 
   // 열려 있는 시트 (한 번에 하나만 열림) - REQUEST_SHEET(START/END) 또는 CHECK_FORM_FIELD_KEY 중 하나
   const [openSheet, setOpenSheet] = useState(() => {
@@ -376,13 +376,7 @@ function RequestEditForm() {
       )}
 
       {/* 토스트 (key 가 바뀌면 새로 마운트되어 타이머가 다시 시작됨) */}
-      {toast && (
-        <DefaultToast
-          key={toast.id}
-          message={toast.message}
-          onHide={hideToast}
-        />
-      )}
+      <Toast />
     </div>
   );
 }

@@ -7,13 +7,13 @@ import { useParams } from "react-router-dom";
 // Custom Hooks
 import { useRequestNav } from "@/features/request/hooks/useRequestNav";
 import { useReceivedInfoQuery } from "@/features/request/hooks/queries/useReceivedInfoQuery";
-import { useToast } from "@/shared/hooks/useToast";
+import { useToastStore } from "@/shared/stores/useToastStore";
 
 // 일반 Components
 import SubpageHeader from "@/shared/components/subpage-header/SubpageHeader";
 import SafetyCardDetail from "@/features/request/components/SafetyCard/SafetyCardDetail";
 import DueDateState from "@/features/request/components/State/DueDateState";
-import DefaultToast from "@/shared/components/Toast/DefaultToast";
+import Toast from "@/shared/components/Toast/Toast";
 
 // Assets
 import resImgLock from "@/shared/assets/images/resImgLock.png";
@@ -21,7 +21,7 @@ import resImgLock from "@/shared/assets/images/resImgLock.png";
 function ReceivedInfo() {
   const paramId = useParams().id;
   const { handleGoBack } = useRequestNav();
-  const { toast, showToast, hideToast } = useToast();
+  const showToast = useToastStore((state) => state.showToast);
 
   // 전달받은 정보 조회 API
   const {
@@ -87,13 +87,7 @@ function ReceivedInfo() {
       </main>
 </>
       )}
-      {toast && (
-        <DefaultToast
-          key={toast.id}
-          message={toast.message}
-          onHide={hideToast}
-        />
-      )}
+      <Toast />
     </div>
   );
 }

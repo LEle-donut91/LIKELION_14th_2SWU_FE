@@ -21,7 +21,7 @@ import { useRequestDetailQuery } from "@/features/request/hooks/queries/useReque
 import { useInformationOptionsQuery } from "@/features/request/hooks/queries/useInformationOptionsQuery";
 import { useEditRequestMutation } from "@/features/request/hooks/mutations/useEditRequestMutation";
 import { useRequestFormStore } from "@/features/request/stores/useRequestFormStore";
-import { useToast } from "@/shared/hooks/useToast";
+import { useToastStore } from "@/shared/stores/useToastStore";
 
 // Services
 import { getEditCheckService } from "@/features/request/services/editRequestService";
@@ -31,12 +31,12 @@ import SubpageHeader from "@/shared/components/subpage-header/SubpageHeader";
 import RequestSummary from "@/features/request/components/Request/RequestSummary";
 import UserInfo from "@/features/request/components/User/UserInfo";
 import LargeFooter from "@/shared/components/LargeFooter/LargeFooter";
-import DefaultToast from "@/shared/components/Toast/DefaultToast";
+import Toast from "@/shared/components/Toast/Toast";
 
 // 페이지 컴포넌트
 function RequestEditCheck() {
   const { handleGoBack, handleGoBackTwice } = useRequestNav();
-  const { toast, showToast, hideToast } = useToast();
+  const showToast = useToastStore((state) => state.showToast);
   const paramId = useParams().id;
 
   // Zustand Store
@@ -156,13 +156,7 @@ function RequestEditCheck() {
       />
 </>
       )}
-      {toast && (
-        <DefaultToast
-          key={toast.id}
-          message={toast.message}
-          onHide={hideToast}
-        />
-      )}
+      <Toast />
     </div>
   );
 }

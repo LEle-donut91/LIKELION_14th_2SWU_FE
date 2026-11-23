@@ -9,8 +9,8 @@ import ParticipantTagList from "@/features/situation/components/ParticipantTagLi
 import SituationRequestList from "@/features/situation/components/SituationRequestList";
 import ResponseNeededRequestList from "@/features/situation/components/ResponseNeededRequestList";
 import RequestListEmpty from "@/features/situation/components/RequestListEmpty";
-import DefaultToast from "@/shared/components/Toast/DefaultToast";
-import { useToast } from "@/shared/hooks/useToast";
+import Toast from "@/shared/components/Toast/Toast";
+import { useToastStore } from "@/shared/stores/useToastStore";
 import { getErrorCode, getErrorMessage } from "@/shared/utils/apiError";
 import {
   MY_REQUEST_ROLE,
@@ -40,7 +40,7 @@ function SituationDetail() {
   const location = useLocation();
   const [searchParams] = useSearchParams();
 
-  const { toast, showToast, hideToast } = useToast();
+  const showToast = useToastStore((state) => state.showToast);
 
   // 상황 ID: 주소의 ?situationId= (S-00) 또는 이동 state의 situationId (H-00 홈)
   // 목업 확인용: situationId=1 (정보 주인), situationId=21 (참여자)
@@ -82,9 +82,7 @@ function SituationDetail() {
   if (!situation || !participantData) {
     return (
       <div className={styles.page}>
-        {toast && (
-          <DefaultToast key={toast.id} message={toast.message} onHide={hideToast} />
-        )}
+        <Toast />
       </div>
     );
   }
@@ -176,9 +174,7 @@ function SituationDetail() {
         />
       )}
 
-      {toast && (
-        <DefaultToast key={toast.id} message={toast.message} onHide={hideToast} />
-      )}
+      <Toast />
     </div>
   );
 }

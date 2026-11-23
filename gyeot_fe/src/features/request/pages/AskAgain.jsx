@@ -19,7 +19,7 @@ import { useInformationOptionsQuery } from "@/features/request/hooks/queries/use
 import { useRequestDetailQuery } from "@/features/request/hooks/queries/useRequestDetailQuery";
 import { useRequestFormStore } from "@/features/request/stores/useRequestFormStore";
 import { useRequestErrorStore } from "@/features/request/stores/useRequestErrorStore";
-import { useToast } from "@/shared/hooks/useToast";
+import { useToastStore } from "@/shared/stores/useToastStore";
 import { useInitialResponseDeadline } from "@/features/request/hooks/useInitialResponseDeadline";
 import { useLiveDueDateFixed } from "@/features/request/hooks/useLiveDueDateFixed";
 
@@ -66,7 +66,7 @@ import TimeSheet from "@/shared/components/TimeSheet/TimeSheet";
 import UserOption from "@/features/request/components/Option/UserOption";
 import DateTimeOption from "@/features/request/components/Option/DateTimeOption";
 import LargeFooter from "@/shared/components/LargeFooter/LargeFooter";
-import DefaultToast from "@/shared/components/Toast/DefaultToast";
+import Toast from "@/shared/components/Toast/Toast";
 
 // 페이지 컴포넌트
 function AskAgain() {
@@ -74,7 +74,7 @@ function AskAgain() {
   const paramId = useParams().id;
   const [searchParams] = useSearchParams();
   const fromDetail = searchParams.get("from") === "detail";
-  const { toast, showToast, hideToast } = useToast();
+  const showToast = useToastStore((state) => state.showToast);
 
   // 열려 있는 시트 (한 번에 하나만 열림)
   const [openSheet, setOpenSheet] = useState(() => {
@@ -311,13 +311,7 @@ function AskAgain() {
 
 
       {/* 토스트 (key 가 바뀌면 새로 마운트되어 타이머가 다시 시작됨) */}
-      {toast && (
-        <DefaultToast
-          key={toast.id}
-          message={toast.message}
-          onHide={hideToast}
-        />
-      )}
+      <Toast />
     </div>
   );
 }
