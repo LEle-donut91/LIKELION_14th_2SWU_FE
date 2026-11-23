@@ -1,9 +1,10 @@
-import { useCallback, useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import styles from "@/features/home/pages/Home.module.css";
 import MainHeader from "@/shared/components/main-header/MainHeader";
 import BottomNav from "@/shared/components/BottomNav/BottomNav";
-import { useToast } from "@/shared/hooks/useToast";
+import { useToastStore } from "@/shared/stores/useToastStore";
+import Toast from "@/shared/components/Toast/Toast";
 import { useHome } from "@/features/home/hooks/useHome";
 import { useNoAssigneeNotice } from "@/features/home/hooks/useNoAssigneeNotice";
 import HomeEmpty from "@/features/home/components/HomeEmpty";
@@ -13,11 +14,10 @@ import SituationTabContent from "@/features/home/components/SituationTabContent"
 import HomeRequestSections from "@/features/home/components/HomeRequestSections";
 import HelpFloatingButton from "@/features/home/components/HelpFloatingButton";
 import SituationSelectSheet from "@/features/home/components/SituationSelectSheet";
-import HomeToast from "@/features/home/components/HomeToast";
 import RequestModal from "@/features/home/components/RequestModal";
-import HomeTestSwitcher from "@/features/home/components/HomeTestSwitcher"; // [테스트용] 제거 가능
 import {
   HOME_NAVIGATION_PATH,
+  HOME_TOAST_MESSAGE,
   SITUATION_TAB,
   SITUATION_TAB_LIST,
 } from "@/features/home/constants/homeConstants";
@@ -46,8 +46,9 @@ function Home() {
   const navigate = useNavigate();
   const { homeData, isLoading, hasError } = useHome();
 
-  // 담당자 없음 안내 닫기 실패 토스트 (M-01)
-  const { toast, showToast, hideToast } = useToast();
+  // 토스트 (공통 스토어: 페이지를 이동해도 3초 동안 유지)
+  // - 담당자 없음 안내 닫기 실패 (M-01), 상황 종료 직후 안내
+  const showToast = useToastStore((state) => state.showToast);
 
   // 담당자 없음 안내 (M-01): 홈 조회와 함께 조회, 정상 홈 화면에서만 모달 표시
   const {
@@ -63,15 +64,17 @@ function Home() {
 
   // 상황 종료 직후 진입 시 토스트 1회 노출
   // H-03-05에서 navigate("/home", { state: { isSituationEnded: true } })로 진입
-  const isToastVisible = Boolean(location.state?.isSituationEnded);
+  // 띄운 뒤 바로 state를 비워 새로고침·뒤로가기 시 다시 뜨지 않게 함
+  const isSituationEnded = Boolean(location.state?.isSituationEnded);
 
-  // 토스트가 사라지면 state를 비워 새로고침·뒤로가기 시 다시 뜨지 않게 함
-  const handleToastHide = useCallback(() => {
+  useEffect(() => {
+    if (!isSituationEnded) return;
+    showToast(HOME_TOAST_MESSAGE.SITUATION_ENDED);
     navigate(
       { pathname: location.pathname, search: location.search },
       { replace: true, state: null },
     );
-  }, [navigate, location.pathname, location.search]);
+  }, [isSituationEnded, showToast, navigate, location.pathname, location.search]);
 
   // 화면 이동 (App.jsx 라우트 기준)
   // 라우트에 id 파라미터가 없어 대상 id는 location.state로 전달
@@ -104,7 +107,6 @@ function Home() {
     return (
       <div className={styles.home}>
         <p className={styles.message}>홈 정보를 불러오지 못했어요.</p>
-        <HomeTestSwitcher />
         <BottomNav />
       </div>
     );
@@ -201,17 +203,10 @@ function Home() {
         />
       )}
 
-      {isToastVisible && (
-        <HomeToast message="상황을 종료했어요." onHide={handleToastHide} />
-      )}
-
-      {/* M-01 닫기 실패 안내 (key가 바뀌면 새로 마운트되어 타이머가 다시 시작됨) */}
-      {toast && (
-        <HomeToast key={toast.id} message={toast.message} onHide={hideToast} />
-      )}
-
-      {/* [테스트용] 상황별 화면 전환 - 제거 시 이 줄과 import만 삭제 */}
-      <HomeTestSwitcher />
+      {/* 토스트: 스토어 메시지가 있을 때만 그려짐 (toastArea는 하단 내비 위 위치 담당) */}
+      <div className={styles.toastArea}>
+        <Toast />
+      </div>
 
       <BottomNav />
     </div>

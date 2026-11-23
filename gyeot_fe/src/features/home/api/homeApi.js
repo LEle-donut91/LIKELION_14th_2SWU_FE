@@ -14,9 +14,8 @@ import {
 // - 공통 응답 전체 { status, code, message, data }를 반환
 // - 에러는 잡지 않고 그대로 던짐 (처리는 useQuery 쪽에서)
 
-// 명세 초안(임시 계약) 상태라 명세 응답 형태의 테스트 데이터를 사용한다.
-// TODO: 최종 DTO 확정 + 서버 구현 완료 확인 후 USE_MOCK을 false로 변경
-const USE_MOCK = true;
+// 개발 서버 응답(BE #147)을 사용한다. true로 바꾸면 명세 응답 형태의 테스트 데이터를 사용한다.
+const USE_MOCK = false;
 
 // 1. 홈 통합 조회 (GET /api/home)
 // - mockScenario: 테스트 데이터 시나리오 키 (USE_MOCK일 때만 사용, ?mock=new·empty·single·default)

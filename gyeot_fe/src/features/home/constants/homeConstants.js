@@ -43,8 +43,10 @@ export const STATUS_CARD_LIST = [
 // 다가오는 일정 최대 노출 개수 (scr-H-00 주석 12: 가까운 순 2개)
 export const MAX_UPCOMING_SCHEDULE_COUNT = 2;
 
-// 토스트 노출 시간(ms)
-export const TOAST_DURATION = 3000;
+// 홈 토스트 문구 (노출 시간은 공통 스토어 기준, shared/constants/toastConstants.js)
+export const HOME_TOAST_MESSAGE = {
+  SITUATION_ENDED: "상황을 종료했어요.", // 상황 종료 직후 홈 진입 (scr-H-00 주석 8)
+};
 
 // 도움 종류: 서버 응답에 쓰는 값(key), 한글 매핑(value)
 // - 홈 통합 조회 helpType 기준 값 (card의 SHARE_HELP_TYPE_LABELS처럼 영역별로 둠)
@@ -129,16 +131,19 @@ export const NO_ASSIGNEE_FALLBACK_NAME = "탈퇴한 사용자";
 
 // 상황 카드 하단 태그: 홈 통합 조회 requestCounts의 key → 태그 종류(SITUATION_TAG의 key)
 // - 화면에 그릴 순서대로 작성. 응답에 없는 key는 태그를 그리지 않음
-// - TODO: requestCounts 형태는 명세에 없어 가정한 값 (나의 상황: 수락/응답대기/담당없음,
-//         참여 상황: 수락/응답요청). 최종 DTO 확정 후 key 수정
+// - key는 F-34 명세(BE #147) requestCounts 기준: accepted, inProgress, waiting, noAssignee, responseNeeded
+//   (참여 상황의 waiting · noAssignee는 서버가 항상 0)
+// - inProgress(진행 중)는 수락과 따로 '진행중' 태그로 표시 (11/23 디자인 결정, 기본 태그 스타일)
 export const SITUATION_REQUEST_COUNT_TAG_LIST = {
   [SITUATION_TAB.MY]: [
     { countKey: "accepted", tagType: "ACCEPTED" },
+    { countKey: "inProgress", tagType: "IN_PROGRESS" },
     { countKey: "waiting", tagType: "WAITING" },
     { countKey: "noAssignee", tagType: "UNASSIGNED" },
   ],
   [SITUATION_TAB.PARTICIPATING]: [
     { countKey: "accepted", tagType: "ACCEPTED" },
-    { countKey: "requested", tagType: "REQUESTED" },
+    { countKey: "inProgress", tagType: "IN_PROGRESS" },
+    { countKey: "responseNeeded", tagType: "REQUESTED" },
   ],
 };

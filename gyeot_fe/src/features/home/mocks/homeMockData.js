@@ -89,7 +89,7 @@ const MY_SITUATION_CARD_LIST = [
 ];
 
 // 참여 상황 카드 (situationCards.participating) - 추가 제안 · 미확정
-// - requestCounts 형태는 명세에 없어 가정함: 참여 상황 { accepted, requested }
+// - requestCounts 형태는 명세에 없어 가정함: 참여 상황 { accepted, responseNeeded }
 // - participantCount는 나의 상황에서만 표시 (화면에서 숨김은 service가 처리)
 const PARTICIPATING_SITUATION_CARD_LIST = [
   {
@@ -99,7 +99,7 @@ const PARTICIPATING_SITUATION_CARD_LIST = [
     endAt: getRelativeDate(9),
     participantCount: 3,
     isOwner: false,
-    requestCounts: { accepted: 0, requested: 3 }, // 형태 미확정
+    requestCounts: { accepted: 0, responseNeeded: 3 }, // 형태 미확정
     nextSchedule: {
       startsAt: getRelativeDate(3, 15, 0),
       helpType: "GROCERY",
@@ -114,7 +114,7 @@ const PARTICIPATING_SITUATION_CARD_LIST = [
     endAt: getRelativeDate(4),
     participantCount: 2,
     isOwner: false,
-    requestCounts: { requested: 1 }, // 형태 미확정
+    requestCounts: { responseNeeded: 1 }, // 형태 미확정
     nextSchedule: null,
     remainingScheduleCount: 0,
   },
