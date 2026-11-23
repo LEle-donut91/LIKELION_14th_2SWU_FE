@@ -15,7 +15,6 @@ import HelpFloatingButton from "@/features/home/components/HelpFloatingButton";
 import SituationSelectSheet from "@/features/home/components/SituationSelectSheet";
 import HomeToast from "@/features/home/components/HomeToast";
 import RequestModal from "@/features/home/components/RequestModal";
-import HomeTestSwitcher from "@/features/home/components/HomeTestSwitcher"; // [테스트용] 제거 가능
 import {
   HOME_NAVIGATION_PATH,
   SITUATION_TAB,
@@ -104,7 +103,6 @@ function Home() {
     return (
       <div className={styles.home}>
         <p className={styles.message}>홈 정보를 불러오지 못했어요.</p>
-        <HomeTestSwitcher />
         <BottomNav />
       </div>
     );
@@ -209,9 +207,6 @@ function Home() {
       {toast && (
         <HomeToast key={toast.id} message={toast.message} onHide={hideToast} />
       )}
-
-      {/* [테스트용] 상황별 화면 전환 - 제거 시 이 줄과 import만 삭제 */}
-      <HomeTestSwitcher />
 
       <BottomNav />
     </div>
