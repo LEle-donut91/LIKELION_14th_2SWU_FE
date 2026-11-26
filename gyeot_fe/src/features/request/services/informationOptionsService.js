@@ -1,4 +1,5 @@
 import { MS_PER_MINUTE } from "@/features/request/constants/timeConstants";
+import { INFORMATION_TYPE } from "@/features/request/constants/enumConstants";
 import { formatMonthDay, formatShortDateTime } from "@/shared/utils/dateFormat";
 import { toMinutes } from "@/features/request/utils/dueDateFormat";
 import { toDateFromInput } from "@/features/request/utils/dateTimeFormat";
@@ -22,11 +23,17 @@ const toInformationItem = (item) => {
     item.updated && item.updatedAt
       ? `, ${formatMonthDay(item.updatedAt)} 갱신`
       : "";
+  const value = getSafetyCardInfoValue(item.informationValue);
+  const suffix = {
+    [INFORMATION_TYPE.BIRTH_DATE]: " 출생",
+    [INFORMATION_TYPE.BLOOD_TYPE]: "형",
+  }[item.informationType] ?? "";
+
   return {
     id: item.informationId, // 선택·전송에 쓰는 고유 번호.
     label: item.typeName, // 분류 카드의 선택 요약에 쓰는 유형 이름. 예: "복용약"
     title: getSafetyCardInfoTitle(item), // 체크박스 옆 제목. 항목 유형에 맞춰 title과 typeName을 조합
-    description: `${getSafetyCardInfoValue(item.informationValue)}${updatedText}`, // 내용+갱신 문구
+    description: `${value}${value ? suffix : ""}${updatedText}`, // 내용+유형별 접미사+갱신 문구
     isSensitive: item.sensitive, // 민감정보인지
     isDefault: item.selected, // 서버가 정한 최초 선택 여부. 현재 사용자가 체크했는지와는 별개
   };
