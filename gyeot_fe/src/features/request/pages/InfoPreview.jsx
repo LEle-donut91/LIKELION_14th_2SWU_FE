@@ -211,12 +211,14 @@ function InfoPreview() {
         </div>
 
         <span className={`${styles.defaultTxt} typoBodySmall`}>
-          {isDefaultChecked && (
+          {/* 현재 기본값이 선택된 상태일 경우 (단, 다시 부탁하기 흐름이 아닐 때만) */}
+          {!reassignRequestId && isDefaultChecked && (
             <>
               기본값이 선택되어 있어요.
               <br />
             </>
           )}
+          {/* 현재 기본값이 선택되지 않은 상태일 때 (단, 다시 부탁하기 흐름일 땐 기본값 선택 여부와 관계없이 항상 이 문구만 출력) */}
           공유한 정보는 요청이 끝나면 자동 회수돼요.
         </span>
       </main>
