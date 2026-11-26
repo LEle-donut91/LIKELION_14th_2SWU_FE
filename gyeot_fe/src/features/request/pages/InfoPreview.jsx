@@ -63,7 +63,6 @@ function InfoPreview() {
   const {
     form: requestForm,
     setForm,
-    resetForm,
     initInformationSelection,
   } = useRequestFormStore((state) => state);
   const hasForm = Boolean(requestForm.helpType);
@@ -88,7 +87,6 @@ function InfoPreview() {
     showToast,
     onRefreshInformation: refetchInformation,
     onSuccess: ({ requestId }) => {
-      resetForm();
       handleGoNext(REQUEST_ROUTES.send(requestId), true);
     },
   });
