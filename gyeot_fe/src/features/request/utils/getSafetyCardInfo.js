@@ -1,3 +1,4 @@
+import { INFORMATION_CATEGORY } from "@/features/request/constants/enumConstants";
 import {
   RECEIVED_INFO_TITLE_RULE,
   RECEIVED_INFO_TITLE_RULE_BY_TYPE,
@@ -60,7 +61,15 @@ export const getSafetyCardInfoUnavailableMsg = (unavailableReason) =>
   RECEIVED_INFO_DEFAULT_UNAVAILABLE_MESSAGE;
 
 // 분류에 속한 항목 이름으로 안내 문구 생성 (예: "질환, 알러지가 포함되어 있어요.")
-export const getCategoryDescription = (items) => {
+export const getCategoryDescription = (items, category) => {
+  // "미리 남기는 말"은 항상 "기타 정보가 포함되어 있어요."를 출력 (안심카드 정보가 있을 때만)
+  if (
+    category === INFORMATION_CATEGORY.ADVANCE_MESSAGE &&
+    items.length > 0
+  ) {
+    return "기타 정보가 포함되어 있어요.";
+  }
+
   const names = [...new Set(items.map((item) => item.typeName))].join(", ");
   if (!names) return "";
 

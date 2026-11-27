@@ -121,6 +121,14 @@ export const HELP_TYPE = {
   OTHER: "OTHER",
 };
 
+// 안심카드 정보 분류 (category)
+export const INFORMATION_CATEGORY = {
+  BASIC: "BASIC",
+  HEALTH: "HEALTH",
+  LIFE: "LIFE",
+  ADVANCE_MESSAGE: "ADVANCE_MESSAGE",
+};
+
 // 전달받은 정보 - 항목 유형 (items[].informationType)
 export const INFORMATION_TYPE = {
   BIRTH_DATE: "BIRTH_DATE",
