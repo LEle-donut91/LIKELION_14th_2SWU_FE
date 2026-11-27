@@ -27,9 +27,6 @@ export const getEditFormService = (response = {}) => {
     situationId: raw.situation?.situationId ?? "",
     requestId: raw?.requestId ?? "",
     isEditing,
-    initialInformationIds: isEditing
-      ? (draft?.informations ?? []).map((item) => item.informationId)
-      : undefined,
     userName: raw.currentAssignment?.target?.name ?? "",
     dueDate: draft?.endsAt ? formatShortDateTime(draft.endsAt) : "",
     helpType: raw.helpType,
@@ -51,9 +48,18 @@ export const getEditCheckService = (
 ) => {
   const raw = response?.data ?? response ?? {};
   const target = raw.currentAssignment?.target;
+  const isEditing = raw.latestProposal?.status === PROPOSAL_STATUS.PENDING;
+  const draft = isEditing ? raw.latestProposal.after : raw;
+  const informationItems = flattenInformationItems(informationOptions);
+
+  // 변경 전 Card의 "정보" 항목: 수정안 여부와 관계없이 선택지 API의 기존 공개 항목을 표시한다.
+  const beforeInformations = informationItems
+    .filter((item) => item.selected)
+    .map((item) => ({ name: item.typeName }));
+  
   const start = toDateFromInput(requestForm.startDateTime);
   const end = toDateFromInput(requestForm.endDateTime);
-  const selectedItems = flattenInformationItems(informationOptions).filter(
+  const selectedItems = informationItems.filter(
     (item) => requestForm.informationIds?.includes(item.informationId),
   );
 
@@ -66,14 +72,12 @@ export const getEditCheckService = (
     beforeInfoList: [
       buildScheduleItem(
         "일정",
-        raw.startsAt,
-        raw.endsAt,
+        draft.startsAt,
+        draft.endsAt,
         formatShortDateTimeRange,
       ),
-      buildPlaceItem(raw.place),
-      buildInformationItem(
-        raw.informations ?? raw.latestProposal?.before?.informations,
-      ),
+      buildPlaceItem(draft.place),
+      buildInformationItem(beforeInformations),
     ],
     afterInfoList: [
       buildScheduleItem("일정", start, end, formatShortDateTimeRange),
@@ -99,9 +103,13 @@ export const patchEditService = (
 
   // 여기의 informationIds는 PATCH 전송 시 변경 여부를 판단하는 비교 기준
   // 서버가 selected로 표시한 기존에 선택된 항목만 남긴 뒤(filter), ID만 추출(map).
-  const informationIds = getEditFormService(response).initialInformationIds ?? flattenInformationItems(informationOptions)
-    .filter((item) => item.selected)
-    .map((item) => item.informationId);
+  const raw = response?.data ?? response ?? {};
+  const isEditing = raw.latestProposal?.status === PROPOSAL_STATUS.PENDING;
+  const informationIds = isEditing
+    ? (raw.latestProposal.after.informations ?? []).map((item) => item.informationId)
+    : flattenInformationItems(informationOptions)
+        .filter((item) => item.selected)
+        .map((item) => item.informationId);
 
   // 일정·장소 기준값(before)에 기존 공개 항목 ID를 합쳐 비교 기준 객체를 만든다.
   // 현재 입력값(requestForm)과 비교해 바뀐 필드만 PATCH 요청 데이터로 만든다.
