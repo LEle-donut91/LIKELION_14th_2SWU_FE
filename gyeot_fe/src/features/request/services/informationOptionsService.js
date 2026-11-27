@@ -43,7 +43,7 @@ const toInformationItem = (item) => {
 const toCategory = (category) => ({
   key: category.category,
   title: category.categoryName,
-  description: getCategoryDescription(category.items),
+  description: getCategoryDescription(category.items, category.category),
   items: category.items.map(toInformationItem),
 });
 
