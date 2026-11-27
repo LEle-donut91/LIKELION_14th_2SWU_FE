@@ -126,6 +126,7 @@ export const getSelectedTitles = (checkedList, dataList) => {
 // 이름은 중복 없이 최대 2개 표시하고, 나머지 건수에는 중복 항목도 포함한다.
 export const getInformationSummary = (informations = []) => {
   const items = informations ?? [];
+  if (items.length === 0) return "해당 없음";
   const names = [...new Set(items.map((item) => item.name))].slice(0, 2);
   const summary = names.join(", ");
 

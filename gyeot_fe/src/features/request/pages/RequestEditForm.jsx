@@ -141,7 +141,7 @@ function RequestEditForm() {
       ...initialRequestForm,
       situationId: detail.situationId,
       helpType: detail.helpType,
-      informationIds: detail.initialInformationIds ?? informationOptions.defaultIds,
+      informationIds: informationOptions.defaultIds,
     });
   }, [
     initialRequestForm,
@@ -177,7 +177,7 @@ function RequestEditForm() {
     // 현재 선택(requestForm.informationIds)과 비교해 공개 항목만 바꾼 경우도 구분한다.
     const errors = editValidateInput(requestForm, new Date(), {
       ...initialRequestForm,
-      informationIds: detail.initialInformationIds ?? informationOptions.defaultIds,
+      informationIds: informationOptions.defaultIds,
     });
     const [firstError] = Object.values(errors);
     if (firstError) {
